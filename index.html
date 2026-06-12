@@ -154,6 +154,68 @@
                 <i class="fa-solid fa-user-shield text-3xl text-amber-700"></i>
             </div>
 
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
+                <div class="flex items-center justify-between border-b pb-2">
+                    <h3 class="font-bold text-gray-800"><i class="fa-solid fa-calendar-days text-amber-700 mr-1"></i> Engenharia de Escala Mensal por Horário</h3>
+                    <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold uppercase">Sorteador Inteligente</span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Selecione o Fluxo da Enquete:</label>
+                            <select id="select-horario-mensal" class="w-full md:w-64 border p-2 text-sm rounded-lg bg-gray-50">
+                                <option value="terca_19">Terça-feira – 19:00</option>
+                                <option value="quinta_17">Quinta-feira – 17:00</option>
+                                <option value="sabado_19">Sábado – 19:00</option>
+                                <option value="domingo_09" selected>Domingo – 09:00</option>
+                                <option value="domingo_19">Domingo – 19:00</option>
+                            </select>
+                        </div>
+
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-bold text-gray-700 uppercase">Distribuição do Presbitério</span>
+                                <button type="button" id="btn-reordenar-mensal" class="text-[11px] bg-amber-700 hover:bg-amber-800 text-white font-bold py-1 px-3 rounded-md transition-all">
+                                    <i class="fa-solid fa-shuffle mr-1"></i> Rodar Sorteio Aleatório
+                                </button>
+                            </div>
+                            
+                            <div id="container-altar-mensal" class="space-y-2">
+                                <p class="text-xs text-gray-400 italic">Selecione um horário ou aguarde o carregamento...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200 space-y-3">
+                            <span class="text-xs font-bold text-amber-900 uppercase block"><i class="fa-solid fa-smog mr-1"></i> Equipe do Incenso (Manual)</span>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-amber-800 mb-1">Turíbulo</label>
+                                <select id="select-turibulo-mensal" class="w-full border p-2 text-xs rounded-lg bg-white select-membro-mensal"></select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-amber-800 mb-1">Naveta</label>
+                                <select id="select-naveta-mensal" class="w-full border p-2 text-xs rounded-lg bg-white select-membro-mensal"></select>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-200">
+                            <span class="text-xs font-bold text-blue-900 uppercase block mb-1"><i class="fa-solid fa-users mr-1"></i> Disponíveis na Enquete:</span>
+                            <div id="lista-disponiveis-mensal" class="text-xs text-blue-800 font-medium leading-relaxed max-h-24 overflow-y-auto">
+                                Nenhum membro mapeado.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2 border-t">
+                    <button type="button" id="btn-salvar-escala-mensal" class="bg-emerald-700 text-white text-xs font-bold py-2.5 px-6 rounded-lg hover:bg-emerald-800 transition-all shadow-xs">
+                        <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Salvar Bloco de Escala Mensal
+                    </button>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 lg:col-span-2">
                     <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-calendar-plus text-amber-700 mr-1"></i> Publicar Escala por Data</h3>
@@ -214,8 +276,7 @@
                                 <span class="text-[10px] font-semibold text-rose-800">INDISPONÍVEIS</span>
                             </div>
                         </div>
-                        <div class="text-[11px] text-gray-500 max-h-24 overflow-y-auto pt-1 space-y-1" id="lista-nomes-enquete">
-                            </div>
+                        <div class="text-[11px] text-gray-500 max-h-24 overflow-y-auto pt-1 space-y-1" id="lista-nomes-enquete"></div>
                     </div>
                 </div>
             </div>
@@ -298,7 +359,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, collection, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -313,7 +374,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Referências do DOM
+        // Referências do DOM Originais
         const formLogin = document.getElementById('form-login');
         const erroLogin = document.getElementById('erro-login');
         const btnLogout = document.getElementById('btn-logout');
@@ -326,8 +387,21 @@
         const menuAbasCoroinha = document.getElementById('menu-abas-coroinha');
         const buscaEscalaData = document.getElementById('busca-escala-data');
 
+        // Novas Referências (Escala Mensal)
+        const selectHorarioMensal = document.getElementById('select-horario-mensal');
+        const containerAltarMensal = document.getElementById('container-altar-mensal');
+        const selectTuribuloMensal = document.getElementById('select-turibulo-mensal');
+        const selectNavetaMensal = document.getElementById('select-naveta-mensal');
+        const listaDisponiveisMensal = document.getElementById('lista-disponiveis-mensal');
+        const btnReordenarMensal = document.getElementById('btn-reordenar-mensal');
+        const btnSalvarEscalaMensal = document.getElementById('btn-salvar-escala-mensal');
+
         let usuarioLogadoDados = null;
         let dataSelecionadaGlobal = "";
+        
+        // Estados Globais da Escala Mensal
+        let membrosDisponiveisMensal = [];
+        let escalaMensalAtual = {};
 
         // CONTROLE DE SESSÃO ATIVA (AUTH)
         onAuthStateChanged(auth, async (user) => {
@@ -345,9 +419,11 @@
                             menuAbasCoroinha.classList.add('hidden');
                             painelCoordenador.classList.remove('hidden');
                             
-                            // Ativa escutas em tempo real (OnSnapshot) exclusivas do coordenador
                             ouvirEnqueteTempoReal();
                             ouvirUsuariosCadastrados();
+                            
+                            // Gatilho inicial para ler a enquete mensal
+                            carregarMembrosEnqueteMensal();
                         } else {
                             painelCoordenador.classList.add('hidden');
                             painelCoroinha.classList.remove('hidden');
@@ -376,28 +452,158 @@
             e.preventDefault();
             try {
                 await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-senha').value);
-                erroLogin.classList.add('hidden');
-            } catch (err) { erroLogin.classList.remove('hidden'); }
+                erroLogin.className = 'hidden';
+            } catch (err) { erroLogin.className = 'text-xs text-rose-600 font-bold bg-rose-50 p-2 rounded-lg border border-rose-200 block'; }
         });
         btnLogout.addEventListener('click', () => signOut(auth));
 
 
         // ========================================================
-        // ENGENHARIA DE FUNÇÕES AUTOMÁTICAS E SUPORTE
+        // ENGENHARIA DE ESCALA MENSAL POR HORÁRIO (INTEGRADA)
+        // ========================================================
+        selectHorarioMensal.addEventListener('change', carregarMembrosEnqueteMensal);
+        btnReordenarMensal.addEventListener('click', rodarSorteioMensal);
+        btnSalvarEscalaMensal.addEventListener('click', salvarEscalaMensalFirestore);
+
+        async function carregarMembrosEnqueteMensal() {
+            const horario = selectHorarioMensal.value;
+            membrosDisponiveisMensal = [];
+            containerAltarMensal.innerHTML = '<p class="text-xs text-gray-400 italic"><i class="fa-solid fa-spinner animate-spin mr-1"></i> Buscando banco de respostas...</p>';
+            
+            try {
+                // Consulta modular na coleção "respostas_enquete" baseando-se no horário ativo
+                const q = query(collection(db, "respostas_enquete"), where("horario", "==", horario), where("disponivel", "==", true));
+                const querySnapshot = await getDocs(q);
+                
+                querySnapshot.forEach((doc) => {
+                    membrosDisponiveisMensal.push(doc.data().nomeMembro);
+                });
+
+                if (membrosDisponiveisMensal.length === 0) {
+                    containerAltarMensal.innerHTML = '<p class="text-xs text-rose-600 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Nenhum acólito disponível mapeado para este horário.</p>';
+                    listaDisponiveisMensal.innerText = "Nenhum.";
+                    return;
+                }
+
+                rodarSorteioMensal();
+            } catch (error) {
+                console.error("Erro na leitura mensal: ", error);
+            }
+        }
+
+        function embaralhar(array) {
+            let lista = [...array];
+            for (let i = lista.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [lista[i], lista[j]] = [lista[j], lista[i]];
+            }
+            return lista;
+        }
+
+        function romanize(num) {
+            const lookup = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
+            let roman = '';
+            for (let i in lookup) {
+                while (num >= lookup[i]) { roman += i; num -= lookup[i]; }
+            }
+            return roman;
+        }
+
+        function rodarSorteioMensal() {
+            if (membrosDisponiveisMensal.length === 0) return;
+            const sorteados = embaralhar(membrosDisponiveisMensal);
+            
+            escalaMensalAtual = {
+                "Altar I": sorteados[0] || "",
+                "Altar II": sorteados[1] || "",
+                "Altar III": sorteados[2] || "",
+                "Altar IV": sorteados[3] || "",
+                "Altar V": sorteados[4] || "",
+                "Altar VI": sorteados[5] || "",
+                "Turíbulo": sorteados[6] || "",
+                "Naveta": sorteados[7] || ""
+            };
+
+            renderizarPainelMensal();
+        }
+
+        function renderizarPainelMensal() {
+            containerAltarMensal.innerHTML = "";
+            listaDisponiveisMensal.innerText = membrosDisponiveisMensal.join(", ");
+
+            // Desenha os inputs Altar I ao VI combinando com o Tailwind v4 do seu tema
+            for (let i = 1; i <= 6; i++) {
+                const funcao = `Altar ${romanize(i)}`;
+                const selecionado = escalaMensalAtual[funcao];
+
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between bg-white p-2 rounded-xl border border-gray-200 gap-2";
+                div.innerHTML = `
+                    <span class="text-xs font-bold text-gray-600 w-16">${funcao}:</span>
+                    <select data-funcao="${funcao}" class="select-membro-mensal flex-1 border p-1 rounded-md text-xs bg-gray-50 focus:bg-white focus:outline-hidden transition-all">
+                        <option value="">-- Vago --</option>
+                        ${membrosDisponiveisMensal.map(m => `<option value="${m}" ${m === selecionado ? 'selected' : ''}>${m}</option>`).join('')}
+                    </select>
+                `;
+                containerAltarMensal.appendChild(div);
+            }
+
+            // Alimenta as caixas manuais do incenso
+            popularSelectIncenso(selectTuribuloMensal, escalaMensalAtual["Turíbulo"]);
+            popularSelectIncenso(selectNavetaMensal, escalaMensalAtual["Naveta"]);
+
+            // Captura mutações de trocas manuais direto nos combos
+            document.querySelectorAll('.select-membro-mensal').forEach(element => {
+                element.addEventListener('change', (e) => {
+                    let funcaoMapeada = e.target.getAttribute('data-funcao');
+                    if (!funcaoMapeada) {
+                        funcaoMapeada = e.target.id === 'select-turibulo-mensal' ? 'Turíbulo' : 'Naveta';
+                    }
+                    escalaMensalAtual[funcaoMapeada] = e.target.value;
+                });
+            });
+        }
+
+        function popularSelectIncenso(elementoDOM, selecionado) {
+            elementoDOM.innerHTML = `<option value="">-- Escolha --</option>
+                ${membrosDisponiveisMensal.map(m => `<option value="${m}" ${m === selecionado ? 'selected' : ''}>${m}</option>`).join('')}`;
+        }
+
+        async function salvarEscalaMensalFirestore() {
+            const horario = selectHorarioMensal.value;
+            btnSalvarEscalaMensal.disabled = true;
+            btnSalvarEscalaMensal.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-1"></i> Processando...';
+            
+            try {
+                await setDoc(doc(db, "escalas_mensais", horario), {
+                    horario: horario,
+                    escala: escalaMensalAtual,
+                    atualizadoEm: new Date().toISOString()
+                });
+                alert("Sucesso! Bloco de Escala Mensal gravado no Firestore.");
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao salvar escala.");
+            } finally {
+                btnSalvarEscalaMensal.disabled = false;
+                btnSalvarEscalaMensal.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Salvar Bloco de Escala Mensal';
+            }
+        }
+
+
+        // ========================================================
+        // ROTINAS ORIGINAIS DO SISTEMA ADMIN (MANTIDAS)
         // ========================================================
 
-        // 1. GERADOR AUTOMÁTICO DE SENHAS PROVISÓRIAS (Padrão Alfa-numérico seguro)
         document.getElementById('btn-gerar-senha').addEventListener('click', () => {
             const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
             let novaSenha = '';
-            // Gera uma senha forte de 8 dígitos fácil de ler pelos pais (sem 'O' ou '0')
             for (let i = 0; i < 8; i++) {
                 novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
             }
             document.getElementById('cad-senha').value = novaSenha;
         });
 
-        // 2. RETORNO E MONITORAMENTO DA ENQUETE EM TEMPO REAL (Para o Coordenador)
         function ouvirEnqueteTempoReal() {
             onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
                 if (docSnap.exists()) {
@@ -425,7 +631,6 @@
             });
         }
 
-        // 3. CENTRAL DE CONSULTA E RECUPERAÇÃO DE LOGINS (Para o Coordenador)
         function ouvirUsuariosCadastrados() {
             onSnapshot(collection(db, "usuarios"), (snapshot) => {
                 const tabelaBody = document.getElementById('tabela-usuarios-recuperacao');
@@ -433,7 +638,6 @@
 
                 snapshot.forEach((docSnap) => {
                     const usuario = docSnap.data();
-                    // Oculta a visualização da senha do coordenador por capricho de interface, mas exibe as dos coroinhas
                     const senhaExibida = usuario.funcao === "Coordenador" ? "•••••••• (Protegida)" : (usuario.senha_provisoria || "Sem registro");
                     
                     tabelaBody.innerHTML += `
@@ -450,7 +654,6 @@
             });
         }
 
-        // 4. CADASTRO DE MEMBROS (SALVA AS CREDENCIAIS DE SEGURANÇA NA CENTRAL)
         document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nome = document.getElementById('cad-nome').value;
@@ -459,24 +662,17 @@
 
             try {
                 const credencial = await createUserWithEmailAndPassword(auth, email, senha);
-                
-                // Grava o perfil incluindo a senha provisória para consulta de suporte
                 await setDoc(doc(db, "usuarios", credencial.user.uid), {
                     nome: nome,
                     email: email,
                     funcao: "Coroinha",
                     senha_provisoria: senha 
                 });
-
                 alert(`Membro ${nome} registrado com sucesso! Credenciais salvas na central.`);
                 document.getElementById('form-cadastro-usuario').reset();
             } catch (err) { alert("Falha no registro: " + err.message); }
         });
 
-
-        // ========================================================
-        // ROTINAS COMPLEMENTARES DA INTERFACE DO COROINHA
-        // ========================================================
         async function carregarEscalaPorData(dataString) {
             dataSelecionadaGlobal = dataString;
             const docSnap = await getDoc(doc(db, "escalas", dataString));
@@ -583,7 +779,6 @@
             }
         }
 
-        // SALVAR NOVA ESCALA
         document.getElementById('form-nova-escala').addEventListener('submit', async (e) => {
             e.preventDefault();
             const dataFila = document.getElementById('esc-data').value;
@@ -601,7 +796,6 @@
             } catch (err) { alert("Erro: " + err.message); }
         });
 
-        // ENQUETES DISPAROS
         document.getElementById('btn-disparar-enquete').addEventListener('click', async () => {
             await setDoc(doc(db, "enquetes", "disponibilidade_atual"), {
                 pergunta: document.getElementById('enq-pergunta').value,
@@ -616,14 +810,13 @@
             alert("Pesquisa encerrada.");
         });
 
-        // UPDATE DE MANUAL
         document.getElementById('form-upload-formacao').addEventListener('submit', async (e) => {
             e.preventDefault();
             await setDoc(doc(db, "formacao", "manual_atual"), {
                 titulo: document.getElementById('form-titulo-input').value,
                 url: document.getElementById('form-url-input').value
             });
-            alert("Material atualizado!");
+            alert("Material updated!");
             document.getElementById('form-upload-formacao').reset();
         });
 
