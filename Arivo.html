@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serviço do Altar - Sistema de Gestão Paroquial</title>
+    <title>Serviço do Altar - Tarcisius</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -12,181 +12,311 @@
 </head>
 <body class="bg-gray-100 font-sans min-h-screen flex flex-col">
 
-    <header class="bg-amber-700 text-white shadow-md p-4 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-cross text-2xl text-amber-200"></i>
-                <div>
-                    <h1 class="text-xl font-bold leading-none">Serviço do Altar</h1>
-                    <p class="text-xs text-amber-100">Paróquia Nossa Senhora do Livramento — Matriz</p>
+    <div id="tela-login" class="fixed inset-0 bg-amber-900 flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-6">
+            
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto text-amber-700 text-3xl shadow-sm">
+                    <i class="fa-solid fa-cross"></i>
                 </div>
+                <h2 class="text-2xl font-bold text-gray-800">Tarcisius Admin</h2>
+                <p class="text-xs text-gray-500">Gestão de Coroinhas e Acólitos</p>
             </div>
-            <div class="bg-amber-800 text-xs px-3 py-1.5 rounded-full font-semibold shadow-inner">
-                <i class="fa-solid fa-user-gear mr-1"></i> Modo: Coordenação / Painel Geral
+
+            <form id="form-login" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">E-mail de Acesso</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
+                        <input type="email" id="login-email" required placeholder="seu-email@igreja.com" 
+                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Senha</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="login-senha" required placeholder="••••••" 
+                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white transition-all">
+                    </div>
+                </div>
+
+                <div id="erro-login" class="text-xs text-rose-600 font-bold hidden bg-rose-50 p-2 rounded-lg border border-rose-200">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> E-mail ou senha incorretos / não cadastrados.
+                </div>
+
+                <button type="submit" class="w-full bg-amber-700 text-white font-bold py-3 rounded-xl hover:bg-amber-800 shadow-md transition-all cursor-pointer text-sm">
+                    <i class="fa-solid fa-right-to-bracket mr-1"></i> Entrar no Sistema
+                </button>
+            </form>
+
+            <div class="text-center">
+                <span class="text-xs text-gray-400">Desenvolvido para o app Tarcisius</span>
             </div>
         </div>
-    </header>
+    </div>
 
-    <nav class="bg-white shadow-sm border-b border-gray-200 flex justify-around sticky top-[68px] z-40 md:hidden">
-        <button onclick="switchTab('escala')" id="tab-escala" class="active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1">
-            <i class="fa-solid fa-calendar-days text-lg"></i> Escalas
-        </button>
-        <button onclick="switchTab('avisos')" id="tab-avisos" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1">
-            <i class="fa-solid fa-bell text-lg"></i> Avisos
-        </button>
-        <button onclick="switchTab('liturgia')" id="tab-liturgia" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1">
-            <i class="fa-solid fa-book-bible text-lg"></i> Liturgia
-        </button>
-    </nav>
 
-    <main class="flex-1 p-4 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 pb-20">
-
-        <section id="conteudo-escala" class="space-y-4 block">
-            <div class="flex justify-between items-center">
-                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-list-check text-amber-700 mr-1"></i> Escala e Confirmações</h3>
-                <span class="text-xs text-gray-500 font-semibold bg-gray-200 px-2 py-1 rounded">Missa das 19h</span>
-            </div>
-            
-            <div id="card-notificacao" class="bg-amber-50 border-l-4 border-amber-600 p-4 rounded-r-xl shadow-xs transition-all">
-                <div class="flex gap-3">
-                    <i class="fa-solid fa-circle-exclamation text-amber-600 text-xl mt-1"></i>
-                    <div class="flex-1">
-                        <h4 class="font-bold text-amber-900 text-sm">Sua Próxima Escala Pendente</h4>
-                        <p class="text-xs text-amber-800 mt-1">Você foi escalado para a <strong>Missa Dominical</strong>.</p>
-                        
-                        <div class="bg-white/60 p-2 rounded-lg my-2 border border-amber-200 text-xs text-gray-700 space-y-1">
-                            <div><i class="fa-solid fa-clock w-4 text-amber-700"></i> Domingo, 14 de Junho — 19:00</div>
-                            <div><i class="fa-solid fa-star w-4 text-amber-700"></i> Função: <strong>Turiferário (Turíbulo)</strong></div>
-                        </div>
-
-                        <div class="flex gap-2 mt-3" id="botoes-acao">
-                            <button onclick="responderEscala('confirmado')" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-xs hover:bg-emerald-700 transition-all flex-1 cursor-pointer">
-                                <i class="fa-solid fa-check mr-1"></i> Confirmar
-                            </button>
-                            <button onclick="responderEscala('recusado')" class="bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-xs hover:bg-rose-700 transition-all flex-1 cursor-pointer">
-                                <i class="fa-solid fa-xmark mr-1"></i> Pedir Troca
-                            </button>
-                        </div>
-                        <p id="txt-feedback" class="text-xs font-bold mt-2 hidden"></p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="bg-gray-800 text-white p-3 flex justify-between items-center">
+    <div id="sistema-conteudo" class="hidden flex-col min-h-screen">
+        
+        <header class="bg-amber-700 text-white shadow-md p-4 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-cross text-2xl text-amber-200"></i>
                     <div>
-                        <span class="text-xs bg-amber-600 font-bold px-2 py-0.5 rounded-sm">DOMINGO</span>
-                        <h4 class="font-bold text-sm mt-0.5">Missa da Comunidade — Matriz</h4>
-                    </div>
-                    <div class="text-right text-xs">
-                        <p class="font-bold">14/Jun/2026</p>
-                        <p class="text-gray-400">19:00h</p>
+                        <h1 id="nome-usuario-header" class="text-xl font-bold leading-none">Serviço do Altar</h1>
+                        <p class="text-xs text-amber-100">Paróquia São José — Sistema Tarcisius</p>
                     </div>
                 </div>
-
-                <div class="divide-y divide-gray-100">
-                    <div class="p-3 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="status-coroinha-1"></div>
-                            <div>
-                                <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Turiferário</p>
-                                <p class="font-medium text-sm text-gray-800" id="nome-coroinha-1">Gabriel Silva</p>
-                            </div>
-                        </div>
-                        <span id="badge-coroinha-1" class="text-[10px] font-bold px-2 py-1 rounded-full bg-amber-100 text-amber-800">
-                            <i class="fa-solid fa-spinner mr-1"></i>Pendente
-                        </span>
+                <div class="flex items-center gap-4">
+                    <div class="bg-amber-800 text-xs px-3 py-1.5 rounded-full font-semibold shadow-inner hidden sm:block">
+                        <i class="fa-solid fa-user-gear mr-1"></i> Conectado via Firebase
                     </div>
-
-                    <div class="p-3 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                            <div>
-                                <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Naveteiro</p>
-                                <p class="font-medium text-sm text-gray-800">Mateus Santos</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800">
-                            <i class="fa-solid fa-circle-check mr-1"></i>Confirmado
-                        </span>
-                    </div>
-
-                    <div class="p-3 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                            <div>
-                                <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Crucífero (Cruz)</p>
-                                <p class="font-medium text-sm text-gray-800">Lucas Oliveira</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800">
-                            <i class="fa-solid fa-circle-check mr-1"></i>Confirmado
-                        </span>
-                    </div>
+                    <button id="btn-logout" class="text-amber-100 hover:text-white text-sm font-bold flex items-center gap-1 cursor-pointer">
+                        <i class="fa-solid fa-power-off"></i> <span class="hidden sm:inline">Sair</span>
+                    </button>
                 </div>
             </div>
-        </section>
+        </header>
 
-        <section id="conteudo-avisos" class="space-y-4 hidden md:block">
-            <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-bullhorn text-amber-700 mr-1"></i> Mural de Avisos</h3>
-            
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-4">
-                <div class="border-b border-gray-100 pb-3">
-                    <div class="flex justify-between text-xs text-gray-400 mb-1">
-                        <span class="font-bold text-amber-800">Coordenação Geral</span>
-                        <span>Hoje, 08:30</span>
+        <nav class="bg-white shadow-sm border-b border-gray-200 flex justify-around sticky top-[68px] z-40 md:hidden">
+            <button id="tab-escala" class="active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1">
+                <i class="fa-solid fa-calendar-days text-lg"></i> Escalas
+            </button>
+            <button id="tab-avisos" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1">
+                <i class="fa-solid fa-bell text-lg"></i> Avisos
+            </button>
+            <button id="tab-liturgia" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1">
+                <i class="fa-solid fa-book-bible text-lg"></i> Liturgia
+            </button>
+        </nav>
+
+        <main class="flex-1 p-4 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 pb-20">
+
+            <section id="conteudo-escala" class="space-y-4 block">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-list-check text-amber-700 mr-1"></i> Escala e Confirmações</h3>
+                    <span class="text-xs text-gray-500 font-semibold bg-gray-200 px-2 py-1 rounded">Missa das 19h</span>
+                </div>
+                
+                <div id="card-notificacao" class="bg-amber-50 border-l-4 border-amber-600 p-4 rounded-r-xl shadow-xs transition-all">
+                    <div class="flex gap-3">
+                        <i class="fa-solid fa-circle-exclamation text-amber-600 text-xl mt-1"></i>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-amber-900 text-sm">Sua Próxima Escala Pendente</h4>
+                            <p class="text-xs text-amber-800 mt-1">Você foi escalado para a <strong>Missa Dominical</strong>.</p>
+                            
+                            <div class="bg-white/60 p-2 rounded-lg my-2 border border-amber-200 text-xs text-gray-700 space-y-1">
+                                <div><i class="fa-solid fa-clock w-4 text-amber-700"></i> Domingo, 14 de Junho — 19:00</div>
+                                <div><i class="fa-solid fa-star w-4 text-amber-700"></i> Função: <strong>Turiferário (Turíbulo)</strong></div>
+                            </div>
+
+                            <div class="flex gap-2 mt-3" id="botoes-acao">
+                                <button id="btn-confirmar" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-xs hover:bg-emerald-700 transition-all flex-1 cursor-pointer">
+                                    <i class="fa-solid fa-check mr-1"></i> Confirmar
+                                </button>
+                                <button id="btn-recusar" class="bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-xs hover:bg-rose-700 transition-all flex-1 cursor-pointer">
+                                    <i class="fa-solid fa-xmark mr-1"></i> Pedir Troca
+                                </button>
+                            </div>
+                            <p id="txt-feedback" class="text-xs font-bold mt-2 hidden"></p>
+                        </div>
                     </div>
-                    <h4 class="font-bold text-gray-800 text-sm">Ensaio para a Solenidade de Corpus Christi</h4>
-                    <p class="text-xs text-gray-600 mt-2 leading-relaxed">
-                        Atenção todos os acólitos e coroinhas! Próximo sábado, às 15:00, teremos ensaio geral obrigatório na matriz. Vamos alinhar a procissão externa.
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-800 text-white p-3 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs bg-amber-600 font-bold px-2 py-0.5 rounded-sm">DOMINGO</span>
+                            <h4 class="font-bold text-sm mt-0.5">Missa da Comunidade — Matriz</h4>
+                        </div>
+                        <div class="text-right text-xs">
+                            <p class="font-bold">14/Jun/2026</p>
+                            <p class="text-gray-400">19:00h</p>
+                        </div>
+                    </div>
+
+                    <div class="divide-y divide-gray-100">
+                        <div class="p-3 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="status-coroinha-1"></div>
+                                <div>
+                                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Turiferário</p>
+                                    <p class="font-medium text-sm text-gray-800" id="nome-coroinha-1">Gabriel Silva</p>
+                                </div>
+                            </div>
+                            <span id="badge-coroinha-1" class="text-[10px] font-bold px-2 py-1 rounded-full bg-amber-100 text-amber-800">
+                                <i class="fa-solid fa-spinner mr-1"></i>Pendente
+                            </span>
+                        </div>
+
+                        <div class="p-3 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                <div>
+                                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Naveteiro</p>
+                                    <p class="font-medium text-sm text-gray-800">Mateus Santos</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800">
+                                <i class="fa-solid fa-circle-check mr-1"></i>Confirmado
+                            </span>
+                        </div>
+
+                        <div class="p-3 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                <div>
+                                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Crucífero (Cruz)</p>
+                                    <p class="font-medium text-sm text-gray-800">Lucas Oliveira</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800">
+                                <i class="fa-solid fa-circle-check mr-1"></i>Confirmado
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="conteudo-avisos" class="space-y-4 hidden md:block">
+                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-bullhorn text-amber-700 mr-1"></i> Mural de Avisos</h3>
+                
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-4">
+                    <div class="border-b border-gray-100 pb-3">
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span class="font-bold text-amber-800">Coordenação Geral</span>
+                            <span>Hoje, 08:30</span>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-sm">Ensaio para a Solenidade de Corpus Christi</h4>
+                        <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                            Atenção todos os acólitos e coroinhas! Próximo sábado, às 15:00, teremos ensaio geral obrigatório na matriz. Vamos alinhar a procissão externa.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span class="font-bold text-amber-800">Secretaria Paroquial</span>
+                            <span>Ontem, 14:15</span>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-sm">Entrega das Novas Túnicas</h4>
+                        <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                            As túnicas que foram para ajuste já estão de volta na sacristia. Por favor, cheguem mais cedo na próxima escala para testar o tamanho.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="conteudo-liturgia" class="space-y-4 hidden md:block">
+                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-book-open text-amber-700 mr-1"></i> Liturgia e Formação</h3>
+                
+                <div class="bg-amber-900 text-amber-100 p-4 rounded-xl shadow-sm">
+                    <span class="text-[10px] uppercase font-bold tracking-widest bg-amber-800 px-2 py-0.5 rounded text-amber-300">Evangelho do Dia</span>
+                    <h4 class="font-serif font-bold text-base mt-2">Evangelho segundo São Mateus</h4>
+                    <p class="text-xs italic mt-2 text-amber-200/90 leading-relaxed">
+                        "Vós sois o sal da terra. Vós sois a luz do mundo. Não se pode esconder uma cidade situada sobre uma montanha..."
                     </p>
                 </div>
 
-                <div>
-                    <div class="flex justify-between text-xs text-gray-400 mb-1">
-                        <span class="font-bold text-amber-800">Secretaria Paroquial</span>
-                        <span>Ontem, 14:15</span>
-                    </div>
-                    <h4 class="font-bold text-gray-800 text-sm">Entrega das Novas Túnicas</h4>
-                    <p class="text-xs text-gray-600 mt-2 leading-relaxed">
-                        As túnicas que foram para ajuste já estão de volta na sacristia. Por favor, cheguem mais cedo na próxima escala para testar o tamanho.
-                    </p>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                    <h4 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-graduation-cap text-amber-700 mr-1"></i> Espaço de Formação</h4>
+                    <p class="text-xs text-gray-600 mt-1">Material de estudo focado nos objetos sagrados e reverência no presbitério.</p>
+                    <button class="w-full mt-3 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold py-2.5 rounded-lg hover:bg-amber-100 transition-all cursor-pointer">
+                        <i class="fa-solid fa-file-pdf mr-1"></i> Abrir Manual do Coroinha.pdf
+                    </button>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="conteudo-liturgia" class="space-y-4 hidden md:block">
-            <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-book-open text-amber-700 mr-1"></i> Liturgia e Formação</h3>
-            
-            <div class="bg-amber-900 text-amber-100 p-4 rounded-xl shadow-sm">
-                <span class="text-[10px] uppercase font-bold tracking-widest bg-amber-800 px-2 py-0.5 rounded text-amber-300">Evangelho do Dia</span>
-                <h4 class="font-serif font-bold text-base mt-2">Evangelho segundo São Mateus</h4>
-                <p class="text-xs italic mt-2 text-amber-200/90 leading-relaxed">
-                    "Vós sois o sal da terra. Vós sois a luz do mundo. Não se pode esconder uma cidade situada sobre uma montanha..."
-                </p>
-            </div>
+        </main>
 
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                <h4 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-graduation-cap text-amber-700 mr-1"></i> Espaço de Formação</h4>
-                <p class="text-xs text-gray-600 mt-1">Material de estudo focado nos objetos sagrados e reverência no presbitério.</p>
-                <button class="w-full mt-3 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold py-2.5 rounded-lg hover:bg-amber-100 transition-all cursor-pointer">
-                    <i class="fa-solid fa-file-pdf mr-1"></i> Abrir Manual do Coroinha.pdf
-                </button>
-            </div>
-        </section>
+        <footer class="bg-gray-800 text-gray-400 text-center text-[11px] py-3 mt-auto border-t border-gray-700">
+            <p>© 2026 Tarcisius System — Conectado ao Firebase</p>
+        </footer>
+    </div>
 
-    </main>
 
-    <footer class="bg-gray-800 text-gray-400 text-center text-[11px] py-3 mt-auto border-t border-gray-700">
-        <p>© 2026 Adoremus Admin — Sistema Responsivo Mobile/Desktop</p>
-    </footer>
+    <script type="module">
+        // Importando os SDKs necessários direto da infraestrutura web da Google
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    <script>
-        function switchTab(tabName) {
-            // Se estiver no computador (tela larga), ignora o sistema de abas já que tudo fica visível
+        // As credenciais exatas fornecidas para o projeto tarcisius-d03d7
+        const firebaseConfig = {
+            apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
+            authDomain: "tarcisius-d03d7.firebaseapp.com",
+            projectId: "tarcisius-d03d7",
+            storageBucket: "tarcisius-d03d7.firebasestorage.app",
+            messagingSenderId: "186797936591",
+            appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
+        };
+
+        // Inicializando os serviços da Google no app
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Captura de elementos do HTML para manipulação
+        const formLogin = document.getElementById('form-login');
+        const erroLogin = document.getElementById('erro-login');
+        const btnLogout = document.getElementById('btn-logout');
+        const telaLogin = document.getElementById('tela-login');
+        const sistemaConteudo = document.getElementById('sistema-conteudo');
+        const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
+
+        // ESCUTADOR DE ESTADO (Verifica se já tem usuário logado salvo no navegador)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Se o usuário está logado, puxamos o e-mail dele para o topo e liberamos o app
+                nomeUsuarioHeader.innerText = `Olá, ${user.email.split('@')[0]}`;
+                telaLogin.style.display = 'none';
+                sistemaConteudo.style.display = 'flex';
+                ajustarLayoutTela();
+            } else {
+                // Se não houver login salvo, garante que ele fique trancado na tela de autenticação
+                sistemaConteudo.style.display = 'none';
+                telaLogin.style.display = 'flex';
+            }
+        });
+
+        // FUNÇÃO DE LOGIN REAL NO FIREBASE
+        formLogin.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const senha = document.getElementById('login-senha').value;
+
+            try {
+                // Envia os dados criptografados para autenticação na nuvem do Firebase
+                await signInWithEmailAndPassword(auth, email, senha);
+                erroLogin.classList.add('hidden');
+            } catch (error) {
+                // Se falhar (senha errada ou e-mail inexistente), remove a classe oculta do erro
+                erroLogin.classList.remove('hidden');
+                console.error("Falha na autenticação: ", error.message);
+            }
+        });
+
+        // FUNÇÃO DE LOGOUT
+        btnLogout.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                document.getElementById('login-email').value = "";
+                document.getElementById('login-senha').value = "";
+            } catch (error) {
+                console.error("Erro ao deslogar: ", error.message);
+            }
+        });
+
+        // ========================================================
+        // INTERAÇÕES VISUAIS DA INTERFACE (MÓVEL & DESKTOP)
+        // ========================================================
+        
+        window.switchTab = function(tabName) {
             if (window.innerWidth >= 768) return;
 
-            // Lógica para celulares (esconde tudo e mostra só o selecionado)
             document.getElementById('conteudo-escala').className = 'space-y-4 hidden';
             document.getElementById('conteudo-avisos').className = 'space-y-4 hidden';
             document.getElementById('conteudo-liturgia').className = 'space-y-4 hidden';
@@ -197,21 +327,30 @@
 
             document.getElementById('conteudo-' + tabName).classList.remove('hidden');
             document.getElementById('tab-' + tabName).classList.add('active-tab');
-        }
+        };
 
-        // Monitora o redimensionamento da tela para ajustar o comportamento dinamicamente
-        window.addEventListener('resize', () => {
+        function ajustarLayoutTela() {
             if (window.innerWidth >= 768) {
                 document.getElementById('conteudo-escala').className = 'space-y-4 block';
                 document.getElementById('conteudo-avisos').className = 'space-y-4 block';
                 document.getElementById('conteudo-liturgia').className = 'space-y-4 block';
             } else {
-                switchTab('escala'); // Volta para o padrão celular se encolher a tela
+                switchTab('escala');
             }
+        }
+
+        window.addEventListener('resize', ajustarLayoutTela);
+
+        // DINÂMICA DE INTERAÇÃO COM A ESCALA
+        document.getElementById('btn-confirmar').addEventListener('click', () => {
+            atualizarInterfaceEscala('confirmado');
         });
 
-        // Função de resposta em tempo real
-        function responderEscala(resposta) {
+        document.getElementById('btn-recusar').addEventListener('click', () => {
+            atualizarInterfaceEscala('recusado');
+        });
+
+        function atualizarInterfaceEscala(opcao) {
             const botoesAcao = document.getElementById('botoes-acao');
             const txtFeedback = document.getElementById('txt-feedback');
             const statusCoroinha1 = document.getElementById('status-coroinha-1');
@@ -221,17 +360,15 @@
             botoesAcao.classList.add('hidden');
             txtFeedback.classList.remove('hidden');
 
-            if (resposta === 'confirmado') {
+            if (opcao === 'confirmado') {
                 txtFeedback.innerText = "✓ Presença confirmada com sucesso!";
                 txtFeedback.className = "text-xs font-bold mt-2 text-emerald-600";
-                
                 statusCoroinha1.className = "w-2 h-2 rounded-full bg-emerald-500";
                 badgeCoroinha1.className = "text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800";
                 badgeCoroinha1.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>Confirmado';
-            } else if (resposta === 'recusado') {
-                txtFeedback.innerText = "✕ Escala recusada. Buscando substitutos no grupo...";
+            } else {
+                txtFeedback.innerText = "✕ Escala recusada. Buscando substitutos...";
                 txtFeedback.className = "text-xs font-bold mt-2 text-rose-600";
-                
                 statusCoroinha1.className = "w-2 h-2 rounded-full bg-rose-500";
                 badgeCoroinha1.className = "text-[10px] font-bold px-2 py-1 rounded-full bg-rose-100 text-rose-800";
                 badgeCoroinha1.innerHTML = '<i class="fa-solid fa-clock-rotate-left mr-1"></i>Trocando...';
@@ -246,6 +383,12 @@
                 }, 3000);
             }
         }
+    </script>
+
+    <script>
+        document.getElementById('tab-escala').addEventListener('click', () => switchTab('escala'));
+        document.getElementById('tab-avisos').addEventListener('click', () => switchTab('avisos'));
+        document.getElementById('tab-liturgia').addEventListener('click', () => switchTab('liturgia'));
     </script>
 </body>
 </html>
