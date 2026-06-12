@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Serviço do Altar - Tarcisius</title>
-    <!-- Tailwind CSS para design responsivo -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .active-tab { border-bottom: 3px solid #b45309; color: #b45309; font-weight: bold; }
@@ -14,9 +12,6 @@
 </head>
 <body class="bg-gray-100 font-sans min-h-screen flex flex-col">
 
-    <!-- ======================================================== -->
-    <!-- 1. TELA DE LOGIN                                         -->
-    <!-- ======================================================== -->
     <div id="tela-login" class="fixed inset-0 bg-amber-900 flex items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-6">
             <div class="text-center space-y-2">
@@ -61,12 +56,8 @@
         </div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- 2. SISTEMA PRINCIPAL                                     -->
-    <!-- ======================================================== -->
     <div id="sistema-conteudo" class="hidden flex-col min-h-screen">
         
-        <!-- HEADER -->
         <header class="bg-amber-700 text-white shadow-md p-4 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-3">
@@ -82,121 +73,90 @@
             </div>
         </header>
 
-        <!-- MENU DE ABAS MÓVEL (Apenas para Coroinhas no celular) -->
         <nav id="menu-abas-coroinha" class="bg-white shadow-sm border-b border-gray-200 flex justify-around sticky top-[68px] z-40 md:hidden">
             <button id="tab-escala" class="active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1"><i class="fa-solid fa-calendar-days text-lg"></i> Escalas</button>
             <button id="tab-avisos" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1"><i class="fa-solid fa-bell text-lg"></i> Avisos</button>
             <button id="tab-liturgia" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1"><i class="fa-solid fa-book-bible text-lg"></i> Liturgia</button>
         </nav>
 
-        <!-- ======================================================== -->
-        <!-- PAINEL DO COROINHA (VISÃO PADRÃO)                       -->
-        <!-- ======================================================== -->
         <main id="painel-coroinha" class="hidden flex-1 p-4 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 pb-20">
-            
-            <!-- Coluna Escalas -->
             <section id="conteudo-escala" class="space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-list-check text-amber-700 mr-1"></i> Próximas Escalas</h3>
-                    <!-- Seletor de data para o coroinha navegar pelas escalas existentes -->
-                    <input type="date" id="busca-escala-data" class="text-xs bg-white border p-1 rounded-md text-gray-700 font-semibold shadow-xs">
+                    <input type="date" id="busca-escala-data" class="text-xs bg-white border p-1 rounded-md text-gray-700 font-semibold">
                 </div>
                 
-                <!-- CARD ENQUETE DE DISPONIBILIDADE (Oculto por padrão) -->
-                <div id="card-enquete" class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-xl shadow-xs hidden transition-all">
+                <div id="card-enquete" class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-xl shadow-xs hidden">
                     <div class="flex gap-3">
                         <i class="fa-solid fa-circle-question text-blue-600 text-xl mt-0.5"></i>
                         <div class="flex-1">
                             <h4 class="font-bold text-blue-900 text-sm">Pesquisa de Disponibilidade</h4>
                             <p class="text-xs text-blue-800 mt-1" id="txt-pergunta-enquete">Você está disponível para as escalas deste fim de semana?</p>
                             <div class="flex gap-2 mt-3" id="botoes-enquete">
-                                <button id="btn-enquete-sim" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all flex-1 cursor-pointer">✓ Posso Servir</button>
-                                <button id="btn-enquete-nao" class="bg-gray-400 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-gray-500 transition-all flex-1 cursor-pointer">✕ Não Posso</button>
+                                <button id="btn-enquete-sim" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-700 flex-1 cursor-pointer">✓ Posso Servir</button>
+                                <button id="btn-enquete-nao" class="bg-gray-400 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-gray-500 flex-1 cursor-pointer">✕ Não Posso</button>
                             </div>
                             <p id="txt-feedback-enquete" class="text-xs font-bold mt-2 text-blue-700 hidden">✓ Resposta enviada! Obrigado.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- CARD DA ESCALA SELECIONADA -->
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="bg-gray-800 text-white p-3 flex justify-between items-center">
                         <div>
                             <span class="text-xs bg-amber-600 font-bold px-2 py-0.5 rounded-sm" id="lbl-data-missa">--/--/----</span>
                             <h4 id="lbl-titulo-missa" class="font-bold text-sm mt-0.5">Selecione uma data acima</h4>
                         </div>
-                        <div class="text-right text-xs">
-                            <p class="font-bold" id="lbl-horario-missa">--:--h</p>
-                        </div>
+                        <div class="text-right text-xs"><p class="font-bold" id="lbl-horario-missa">--:--h</p></div>
                     </div>
-                    <div class="divide-y divide-gray-100" id="lista-presbiterio">
-                        <p class="text-xs text-gray-400 text-center py-6">Nenhuma escala ativa selecionada.</p>
-                    </div>
+                    <div class="divide-y divide-gray-100" id="lista-presbiterio"></div>
                 </div>
 
-                <!-- AÇÕES DA ESCALA ATIVA -->
                 <div id="card-notificacao" class="bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-xs hidden">
-                    <p class="text-xs text-amber-800 font-medium">Você faz parte desta escala! Por favor, confirme ou recuse sua participação:</p>
+                    <p class="text-xs text-amber-800 font-medium">Você faz parte desta escala! Por favor, confirme ou recuse:</p>
                     <div class="flex gap-2 mt-2" id="botoes-acao">
-                        <button id="btn-confirmar" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-emerald-700 flex-1 cursor-pointer">✓ Confirmar Presença</button>
+                        <button id="btn-confirmar" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-emerald-700 flex-1 cursor-pointer">✓ Confirmar</button>
                         <button id="btn-recusar" class="bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-rose-700 flex-1 cursor-pointer">✕ Pedir Troca</button>
                     </div>
                     <p id="txt-feedback" class="text-xs font-bold mt-2 hidden"></p>
                 </div>
             </section>
 
-            <!-- Coluna Mural de Avisos -->
             <section id="conteudo-avisos" class="space-y-4 hidden md:block">
-                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-bullhorn text-amber-700 mr-1"></i> Mural da Comunidade</h3>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
-                    <div class="border-b pb-2">
-                        <span class="text-[10px] text-amber-800 font-bold uppercase">Coordenação</span>
-                        <h4 class="font-bold text-sm text-gray-800">Ensaio de Corpus Christi</h4>
-                        <p class="text-xs text-gray-600 mt-1">Sábado que vem às 15h. Presença obrigatória de toda a equipe.</p>
-                    </div>
-                </div>
+                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-bullhorn text-amber-700 mr-1"></i> Mural</h3>
+                <div class="bg-white p-4 rounded-xl border text-xs text-gray-600">Nenhum comunicado urgente hoje.</div>
             </section>
 
-            <!-- Coluna Liturgia e Formação -->
             <section id="conteudo-liturgia" class="space-y-4 hidden md:block">
-                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-book-open text-amber-700 mr-1"></i> Liturgia e Formação</h3>
-                
-                <!-- CARD LITURGIA AUTOMÁTICA -->
+                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-book-open text-amber-700 mr-1"></i> Liturgia e Estudos</h3>
                 <div class="bg-amber-900 text-amber-100 p-4 rounded-xl shadow-sm">
-                    <div class="flex justify-between items-center border-b border-amber-800 pb-1.5 mb-2">
-                        <span class="text-[10px] uppercase font-bold tracking-widest text-amber-300">Evangelho de Hoje</span>
+                    <div class="flex justify-between items-center border-b border-amber-800 pb-1 mb-2">
+                        <span class="text-[10px] uppercase font-bold text-amber-300">Evangelho de Hoje</span>
                         <span id="lbl-ref-liturgia" class="text-xs font-bold text-amber-200">---</span>
                     </div>
-                    <p id="txt-evangelho-dia" class="text-xs italic leading-relaxed text-amber-100/90 max-h-48 overflow-y-auto">Carregando liturgia diária automaticamente...</p>
+                    <p id="txt-evangelho-dia" class="text-xs italic max-h-48 overflow-y-auto">Carregando...</p>
                 </div>
-
-                <!-- CARD FORMÇÃO DINÂMICA -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                    <h4 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-graduation-cap text-amber-700 mr-1"></i> Material de Estudo</h4>
-                    <p id="lbl-titulo-formacao" class="text-xs text-gray-600 mt-1">Baixe o material de formação disponibilizado pela paróquia.</p>
-                    <a id="btn-download-formacao" href="#" target="_blank" class="w-full block text-center mt-3 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold py-2.5 rounded-lg hover:bg-amber-100 transition-all">
-                        <i class="fa-solid fa-file-pdf mr-1"></i> Abrir Material de Apoio
-                    </a>
+                <div class="bg-white p-4 rounded-xl border">
+                    <h4 class="font-bold text-gray-800 text-sm">Material de Apoio</h4>
+                    <p id="lbl-titulo-formacao" class="text-xs text-gray-600 mt-1">Baixe os manuais litúrgicos.</p>
+                    <a id="btn-download-formacao" href="#" target="_blank" class="w-full block text-center mt-3 bg-amber-50 text-amber-800 border text-xs font-bold py-2 rounded-lg hover:bg-amber-100">Abrir Documento</a>
                 </div>
             </section>
         </main>
 
-        <!-- ======================================================== -->
-        <!-- PAINEL DO COORDENADOR (EXCLUSIVO)                        -->
-        <!-- ======================================================== -->
-        <main id="painel-coordenador" class="hidden flex-1 p-4 max-w-5xl mx-auto w-full space-y-6 pb-20">
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+        <main id="painel-coordenador" class="hidden flex-1 p-4 max-w-6xl mx-auto w-full space-y-6 pb-20">
+            
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between shadow-xs">
                 <div>
                     <h2 class="text-lg font-bold text-amber-900">Painel Geral da Coordenação</h2>
-                    <p class="text-xs text-amber-700">Controle avançado de escalas por dia, disparo de enquetes e atualizações de conteúdos.</p>
+                    <p class="text-xs text-amber-700">Gestão integrada de escalas, monitoramento de enquetes e controle de contas.</p>
                 </div>
                 <i class="fa-solid fa-user-shield text-3xl text-amber-700"></i>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- FORMULÁRIO 1: CRIAR ESCALA POR DATA -->
-                <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
-                    <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-calendar-plus text-amber-700 mr-1"></i> Publicar Escala por Data</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 lg:col-span-2">
+                    <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-calendar-plus text-amber-700 mr-1"></i> Publicar Escala por Data</h3>
                     <form id="form-nova-escala" class="space-y-3">
                         <div class="grid grid-cols-2 gap-2">
                             <div>
@@ -204,19 +164,19 @@
                                 <input type="date" id="esc-data" required class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Horário (Missa)</label>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Horário</label>
                                 <input type="time" id="esc-horario" required class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Título / Local</label>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Título da Celebração</label>
                             <input type="text" id="esc-titulo" required placeholder="Ex: Missa Dominical - Matriz" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Turiferário</label>
-                            <input type="text" id="esc-turi" required placeholder="Nome Completo" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Turiferário</label>
+                                <input type="text" id="esc-turi" required placeholder="Nome" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Naveteiro</label>
                                 <input type="text" id="esc-nave" required placeholder="Nome" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
@@ -230,58 +190,102 @@
                     </form>
                 </div>
 
-                <!-- CONTROLES ADICIONAIS: ENQUETE E FORMAÇÃO -->
-                <div class="space-y-6">
-                    <!-- ENQUETE -->
-                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
-                        <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-square-poll-horizontal text-amber-700 mr-1"></i> Pesquisa de Disponibilidade</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Pergunta do Fim de Semana</label>
-                                <input type="text" id="enq-pergunta" value="Você poderá servir nas missas deste fim de semana?" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
-                            </div>
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-square-poll-horizontal text-amber-700 mr-1"></i> Pesquisa & Retorno</h3>
+                        <div class="space-y-3 mt-3">
+                            <input type="text" id="enq-pergunta" value="Você poderá servir nas missas deste fim de semana?" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                             <div class="flex gap-2">
-                                <button id="btn-disparar-enquete" class="bg-blue-600 text-white text-xs font-bold py-2 px-4 rounded-lg hover:bg-blue-700 flex-1 cursor-pointer">Disparar Nova</button>
-                                <button id="btn-fechar-enquete" class="bg-gray-500 text-white text-xs font-bold py-2 px-4 rounded-lg hover:bg-gray-600 cursor-pointer">Encerrar Atual</button>
+                                <button id="btn-disparar-enquete" class="bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-blue-700 flex-1 cursor-pointer">Abrir</button>
+                                <button id="btn-fechar-enquete" class="bg-gray-500 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-gray-600 cursor-pointer">Fechar</button>
                             </div>
                         </div>
                     </div>
-
-                    <!-- ATUALIZAR CONTEÚDO PEDAGÓGICO / FORMAÇÃO -->
-                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
-                        <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-cloud-arrow-up text-amber-700 mr-1"></i> Upload de Formações (PDF / Links)</h3>
-                        <form id="form-upload-formacao" class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Título do Documento</label>
-                                <input type="text" id="form-titulo-input" required placeholder="Ex: Manual do Acólito v2" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                    
+                    <div class="bg-gray-50 p-3 rounded-xl border space-y-2 mt-2">
+                        <p class="text-xs font-bold text-gray-700 uppercase tracking-wider">Resultados Recebidos:</p>
+                        <div class="grid grid-cols-2 gap-2 text-center">
+                            <div class="bg-emerald-50 p-2 rounded-lg border border-emerald-100">
+                                <span class="block font-bold text-lg text-emerald-700" id="num-enq-sim">0</span>
+                                <span class="text-[10px] font-semibold text-emerald-800">DISPONÍVEIS</span>
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Link URL do Arquivo (Google Drive, OneDrive, etc)</label>
-                                <input type="url" id="form-url-input" required placeholder="https://drive.google.com/..." class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            <div class="bg-rose-50 p-2 rounded-lg border border-rose-100">
+                                <span class="block font-bold text-lg text-rose-700" id="num-enq-nao">0</span>
+                                <span class="text-[10px] font-semibold text-rose-800">INDISPONÍVEIS</span>
                             </div>
-                            <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2 rounded-lg hover:bg-amber-900 cursor-pointer">Atualizar Material no App</button>
-                        </form>
+                        </div>
+                        <div class="text-[11px] text-gray-500 max-h-24 overflow-y-auto pt-1 space-y-1" id="lista-nomes-enquete">
+                            </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- FORMULÁRIO: CADASTRAR NOVO COROINHA -->
-                <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 md:col-span-2">
-                    <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-user-plus text-amber-700 mr-1"></i> Cadastrar Novo Membro no Sistema</h3>
-                    <form id="form-cadastro-usuario" class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nome Completo</label>
-                            <input type="text" id="cad-nome" required placeholder="Ex: João Pedro" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 md:col-span-2">
+                    <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-user-plus text-amber-700 mr-1"></i> Cadastrar Novo Membro</h3>
+                    <form id="form-cadastro-usuario" class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Nome Completo</label>
+                                <input type="text" id="cad-nome" required placeholder="Ex: Lucas Silva" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail de Acesso</label>
+                                <input type="email" id="cad-email" required placeholder="nome@email.com" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail para  Login</label>
-                            <input type="email" id="cad-email" required placeholder="joao@email.com" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        <div class="flex items-end gap-2 bg-gray-50 p-3 rounded-xl border">
+                            <div class="flex-1">
+                                <label class="block text-xs font-bold text-amber-900 mb-1"><i class="fa-solid fa-key mr-1"></i> Senha de Acesso</label>
+                                <input type="text" id="cad-senha" required class="w-full border p-2 text-sm rounded-lg bg-white font-mono" placeholder="Clique ao lado para gerar">
+                            </div>
+                            <button type="button" id="btn-gerar-senha" class="bg-amber-700 text-white text-xs font-bold px-4 py-3 rounded-lg hover:bg-amber-800 shadow-xs cursor-pointer h-[40px]">
+                                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gerar Senha
+                            </button>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Senha Provisória</label>
-                            <input type="password" id="cad-senha" required placeholder="Mínimo 6 caracteres" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
-                        </div>
-                        <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-emerald-800 md:col-span-3 cursor-pointer">Adicionar Usuário ao Firebase</button>
+                        <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-emerald-800 cursor-pointer">Registrar e Armazenar Usuário</button>
                     </form>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
+                    <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-cloud-arrow-up text-amber-700 mr-1"></i> Material de Apoio (PDF)</h3>
+                    <form id="form-upload-formacao" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Título do Arquivo</label>
+                            <input type="text" id="form-titulo-input" required placeholder="Ex: Manual do Coroinha v3" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Link URL</label>
+                            <input type="url" id="form-url-input" required placeholder="https://drive.google.com/..." class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        </div>
+                        <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2 rounded-lg hover:bg-amber-900 cursor-pointer">Atualizar Link</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
+                <div class="flex items-center justify-between border-b pb-2">
+                    <h3 class="font-bold text-gray-800"><i class="fa-solid fa-address-book text-amber-700 mr-1"></i> Central de Recuperação de Acessos</h3>
+                    <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold uppercase">Lista de Consulta</span>
+                </div>
+                <p class="text-xs text-gray-500">Abaixo constam as credenciais criadas para suporte imediato aos pais ou coroinhas que perderem o acesso.</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 uppercase text-[10px] tracking-wider border-b border-gray-200">
+                                <th class="p-3 font-bold">Nome do Membro</th>
+                                <th class="p-3 font-bold">E-mail cadastrado</th>
+                                <th class="p-3 font-bold">Última Senha Salva</th>
+                                <th class="p-3 font-bold text-center">Tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-usuarios-recuperacao" class="divide-y divide-gray-100 text-gray-700">
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-gray-400 italic">Carregando carteira de acessos do Firestore...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </main>
@@ -291,13 +295,10 @@
         </footer>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- 3. MOTOR JAVASCRIPT - FIREBASE E APIS                   -->
-    <!-- ======================================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -328,14 +329,14 @@
         let usuarioLogadoDados = null;
         let dataSelecionadaGlobal = "";
 
-        // CONTROLE DE SESSÃO DO FIREBASE AUTH
+        // CONTROLE DE SESSÃO ATIVA (AUTH)
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
                     const docSnap = await getDoc(doc(db, "usuarios", user.uid));
                     if (docSnap.exists()) {
                         usuarioLogadoDados = docSnap.data();
-                        usuarioLogadoDados.uid = user.uid; // Mantém referência do ID
+                        usuarioLogadoDados.uid = user.uid;
                         nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
                         funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
 
@@ -343,12 +344,15 @@
                             painelCoroinha.classList.add('hidden');
                             menuAbasCoroinha.classList.add('hidden');
                             painelCoordenador.classList.remove('hidden');
+                            
+                            // Ativa escutas em tempo real (OnSnapshot) exclusivas do coordenador
+                            ouvirEnqueteTempoReal();
+                            ouvirUsuariosCadastrados();
                         } else {
                             painelCoordenador.classList.add('hidden');
                             painelCoroinha.classList.remove('hidden');
                             menuAbasCoroinha.classList.remove('hidden');
                             
-                            // Define o input de data para o dia corrente do sistema
                             const hoje = new Date().toISOString().split('T')[0];
                             buscaEscalaData.value = hoje;
                             
@@ -367,7 +371,7 @@
             }
         });
 
-        // AUTENTICAÇÃO
+        // LOGIN E LOGOUT
         formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
@@ -377,11 +381,102 @@
         });
         btnLogout.addEventListener('click', () => signOut(auth));
 
+
         // ========================================================
-        // ROTINAS DA VISÃO DO COROINHA (LEITURA E RESPOSTAS)
+        // ENGENHARIA DE FUNÇÕES AUTOMÁTICAS E SUPORTE
         // ========================================================
 
-        // 1. CARREGAR ESCALA ESPECÍFICA PELA DATA
+        // 1. GERADOR AUTOMÁTICO DE SENHAS PROVISÓRIAS (Padrão Alfa-numérico seguro)
+        document.getElementById('btn-gerar-senha').addEventListener('click', () => {
+            const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
+            let novaSenha = '';
+            // Gera uma senha forte de 8 dígitos fácil de ler pelos pais (sem 'O' ou '0')
+            for (let i = 0; i < 8; i++) {
+                novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            document.getElementById('cad-senha').value = novaSenha;
+        });
+
+        // 2. RETORNO E MONITORAMENTO DA ENQUETE EM TEMPO REAL (Para o Coordenador)
+        function ouvirEnqueteTempoReal() {
+            onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const dados = docSnap.data();
+                    const simLista = dados.respostas_sim || [];
+                    const naoLista = dados.respostas_nao || [];
+
+                    document.getElementById('num-enq-sim').innerText = simLista.length;
+                    document.getElementById('num-enq-nao').innerText = naoLista.length;
+
+                    const containerNomes = document.getElementById('lista-nomes-enquete');
+                    containerNomes.innerHTML = "";
+                    
+                    simLista.forEach(nome => {
+                        containerNomes.innerHTML += `<div class="text-emerald-700 bg-emerald-50/50 p-1 rounded"><i class="fa-solid fa-circle-check"></i> ${nome} (Disponível)</div>`;
+                    });
+                    naoLista.forEach(nome => {
+                        containerNomes.innerHTML += `<div class="text-rose-700 bg-rose-50/50 p-1 rounded"><i class="fa-solid fa-circle-xmark"></i> ${nome} (Indisponível)</div>`;
+                    });
+
+                    if(simLista.length === 0 && naoLista.length === 0) {
+                        containerNomes.innerHTML = `<span class="text-gray-400 italic">Nenhum voto computado ainda.</span>`;
+                    }
+                }
+            });
+        }
+
+        // 3. CENTRAL DE CONSULTA E RECUPERAÇÃO DE LOGINS (Para o Coordenador)
+        function ouvirUsuariosCadastrados() {
+            onSnapshot(collection(db, "usuarios"), (snapshot) => {
+                const tabelaBody = document.getElementById('tabela-usuarios-recuperacao');
+                tabelaBody.innerHTML = "";
+
+                snapshot.forEach((docSnap) => {
+                    const usuario = docSnap.data();
+                    // Oculta a visualização da senha do coordenador por capricho de interface, mas exibe as dos coroinhas
+                    const senhaExibida = usuario.funcao === "Coordenador" ? "•••••••• (Protegida)" : (usuario.senha_provisoria || "Sem registro");
+                    
+                    tabelaBody.innerHTML += `
+                        <tr class="hover:bg-gray-50/80 transition-all border-b border-gray-100">
+                            <td class="p-3 font-semibold text-gray-800">${usuario.nome}</td>
+                            <td class="p-3 text-gray-600 font-mono">${usuario.email}</td>
+                            <td class="p-3 text-amber-900 bg-amber-50/40 font-mono font-bold select-all">${senhaExibida}</td>
+                            <td class="p-3 text-center">
+                                <span class="px-2 py-0.5 text-[10px] font-bold rounded-sm ${usuario.funcao === 'Coordenador' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">${usuario.funcao}</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        // 4. CADASTRO DE MEMBROS (SALVA AS CREDENCIAIS DE SEGURANÇA NA CENTRAL)
+        document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('cad-nome').value;
+            const email = document.getElementById('cad-email').value;
+            const senha = document.getElementById('cad-senha').value;
+
+            try {
+                const credencial = await createUserWithEmailAndPassword(auth, email, senha);
+                
+                // Grava o perfil incluindo a senha provisória para consulta de suporte
+                await setDoc(doc(db, "usuarios", credencial.user.uid), {
+                    nome: nome,
+                    email: email,
+                    funcao: "Coroinha",
+                    senha_provisoria: senha 
+                });
+
+                alert(`Membro ${nome} registrado com sucesso! Credenciais salvas na central.`);
+                document.getElementById('form-cadastro-usuario').reset();
+            } catch (err) { alert("Falha no registro: " + err.message); }
+        });
+
+
+        // ========================================================
+        // ROTINAS COMPLEMENTARES DA INTERFACE DO COROINHA
+        // ========================================================
         async function carregarEscalaPorData(dataString) {
             dataSelecionadaGlobal = dataString;
             const docSnap = await getDoc(doc(db, "escalas", dataString));
@@ -409,14 +504,11 @@
                     </div>
                 `;
 
-                // Verifica se o usuário logado faz parte dessa escala específica para habilitar botões
                 if(usuarioLogadoDados && (dados.turiferario.nome === usuarioLogadoDados.nome || dados.naveteiro.nome === usuarioLogadoDados.nome || dados.crucifero.nome === usuarioLogadoDados.nome)) {
                     cardNotificacao.classList.remove('hidden');
                     document.getElementById('botoes-acao').classList.remove('hidden');
                     document.getElementById('txt-feedback').classList.add('hidden');
-                } else {
-                    cardNotificacao.classList.add('hidden');
-                }
+                } else { cardNotificacao.classList.add('hidden'); }
             } else {
                 document.getElementById('lbl-data-missa').innerText = "--/--/----";
                 document.getElementById('lbl-titulo-missa').innerText = "Sem escala publicada";
@@ -428,7 +520,6 @@
 
         buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
 
-        // ACEITAR OU RECUSAR A ESCALA SELECIONADA
         async function responderEscala(statusNovo) {
             const docRef = doc(db, "escalas", dataSelecionadaGlobal);
             const docSnap = await getDoc(docRef);
@@ -444,7 +535,7 @@
             document.getElementById('botoes-acao').classList.add('hidden');
             const feedback = document.getElementById('txt-feedback');
             feedback.className = `text-xs font-bold mt-2 ${statusNovo === 'Confirmado' ? 'text-emerald-600' : 'text-rose-600'}`;
-            feedback.innerText = statusNovo === 'Confirmado' ? "✓ Presença confirmada no banco!" : "✕ Solicitação de alteração enviada.";
+            feedback.innerText = statusNovo === 'Confirmado' ? "✓ Presença confirmada no banco!" : "✕ Solicitação enviada.";
             feedback.classList.remove('hidden');
             carregarEscalaPorData(dataSelecionadaGlobal);
         }
@@ -452,15 +543,12 @@
         document.getElementById('btn-confirmar').addEventListener('click', () => responderEscala('Confirmado'));
         document.getElementById('btn-recusar').addEventListener('click', () => responderEscala('Substituição Solicitada'));
 
-        // 2. SISTEMA DE ENQUETES COLETIVAS
         async function checarEnqueteAtiva() {
             const docSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
             if(docSnap.exists() && docSnap.data().ativa === true) {
                 document.getElementById('txt-pergunta-enquete').innerText = docSnap.data().pergunta;
                 document.getElementById('card-enquete').classList.remove('hidden');
-            } else {
-                document.getElementById('card-enquete').classList.add('hidden');
-            }
+            } else { document.getElementById('card-enquete').classList.add('hidden'); }
         }
 
         async function votarEnquete(opcao) {
@@ -476,7 +564,6 @@
         document.getElementById('btn-enquete-sim').addEventListener('click', () => votarEnquete('sim'));
         document.getElementById('btn-enquete-nao').addEventListener('click', () => votarEnquete('nao'));
 
-        // 3. CARREGAR MATERIAL DE ESTUDO DINÂMICO
         async function carregarMaterialEstudo() {
             const docSnap = await getDoc(doc(db, "formacao", "manual_atual"));
             if (docSnap.exists()) {
@@ -485,25 +572,18 @@
             }
         }
 
-        // 4. API AUTOMÁTICA DE LITURGIA DIÁRIA
         async function carregarLiturgiaAutomatica() {
             try {
-                // Consome API pública e aberta de liturgia diária (padrão de mercado para o Brasil)
                 const res = await fetch('https://liturgia.up.railway.app/');
                 const data = await res.json();
                 document.getElementById('lbl-ref-liturgia').innerText = data.evangelho.referencia;
                 document.getElementById('txt-evangelho-dia').innerText = data.evangelho.texto;
             } catch (err) {
-                document.getElementById('txt-evangelho-dia').innerText = "O Evangelho está disponível para leitura no subsídio impresso da sacristia.";
+                document.getElementById('txt-evangelho-dia').innerText = "Consulta disponível na sacristia.";
             }
         }
 
-
-        // ========================================================
-        // ROTINAS EXCLUSIVAS DO COORDENADOR (ESCRITA NO BANCO)
-        // ========================================================
-
-        // A) CRIAÇÃO DE ESCALAS COORDENADAS POR DATA
+        // SALVAR NOVA ESCALA
         document.getElementById('form-nova-escala').addEventListener('submit', async (e) => {
             e.preventDefault();
             const dataFila = document.getElementById('esc-data').value;
@@ -516,59 +596,37 @@
                     naveteiro: { nome: document.getElementById('esc-nave').value, status: "Pendente" },
                     crucifero: { nome: document.getElementById('esc-cruz').value, status: "Pendente" }
                 });
-                alert("Escala da data " + dataFila + " inserida com sucesso no Firestore!");
+                alert("Escala salva!");
                 document.getElementById('form-nova-escala').reset();
-            } catch (err) { alert("Erro de gravação: " + err.message); }
+            } catch (err) { alert("Erro: " + err.message); }
         });
 
-        // B) DISPARAR ENQUETE
+        // ENQUETES DISPAROS
         document.getElementById('btn-disparar-enquete').addEventListener('click', async () => {
-            const pergunta = document.getElementById('enq-pergunta').value;
             await setDoc(doc(db, "enquetes", "disponibilidade_atual"), {
-                pergunta: pergunta,
+                pergunta: document.getElementById('enq-pergunta').value,
                 ativa: true,
                 respostas_sim: [],
                 respostas_nao: []
             });
-            alert("Nova pesquisa disparada na timeline dos usuários!");
+            alert("Pesquisa publicada!");
         });
-
         document.getElementById('btn-fechar-enquete').addEventListener('click', async () => {
             await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false });
             alert("Pesquisa encerrada.");
         });
 
-        // C) PUBLICAR LINK DE FORMÇÃO
+        // UPDATE DE MANUAL
         document.getElementById('form-upload-formacao').addEventListener('submit', async (e) => {
             e.preventDefault();
             await setDoc(doc(db, "formacao", "manual_atual"), {
                 titulo: document.getElementById('form-titulo-input').value,
                 url: document.getElementById('form-url-input').value
             });
-            alert("Novo manual de estudos integrado!");
+            alert("Material atualizado!");
             document.getElementById('form-upload-formacao').reset();
         });
 
-        // D) CADASTRO INTEGRADO DE NOVOS USUÁRIOS (AUTH + FIRESTORE)
-        document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nome = document.getElementById('cad-nome').value;
-            const email = document.getElementById('cad-email').value;
-            const senha = document.getElementById('cad-senha').value;
-
-            try {
-                const credencial = await createUserWithEmailAndPassword(auth, email, senha);
-                await setDoc(doc(db, "usuarios", credencial.user.uid), {
-                    nome: nome,
-                    email: email,
-                    funcao: "Coroinha"
-                });
-                alert(`Membro ${nome} registrado com sucesso!`);
-                document.getElementById('form-cadastro-usuario').reset();
-            } catch (err) { alert("Falha no registro: " + err.message); }
-        });
-
-        // CONTROLE VISUAL DE NAVEGAÇÃO DE ABAS MÓVEIS
         window.switchTab = function(tabName) {
             if (usuarioLogadoDados?.funcao === "Coordenador") return;
             document.getElementById('conteudo-escala').className = tabName === 'escala' ? 'space-y-4 block' : 'space-y-4 hidden';
