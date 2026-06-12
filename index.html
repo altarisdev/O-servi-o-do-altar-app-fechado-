@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Serviço do Altar - Tarcisius</title>
+    <!-- Tailwind CSS para design responsivo -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .active-tab { border-bottom: 3px solid #b45309; color: #b45309; font-weight: bold; }
@@ -12,9 +14,11 @@
 </head>
 <body class="bg-gray-100 font-sans min-h-screen flex flex-col">
 
+    <!-- ======================================================== -->
+    <!-- 1. TELA DE LOGIN                                         -->
+    <!-- ======================================================== -->
     <div id="tela-login" class="fixed inset-0 bg-amber-900 flex items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-6">
-            
             <div class="text-center space-y-2">
                 <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto text-amber-700 text-3xl shadow-sm">
                     <i class="fa-solid fa-cross"></i>
@@ -54,198 +58,150 @@
                     <i class="fa-solid fa-right-to-bracket mr-1"></i> Entrar no Sistema
                 </button>
             </form>
-
-            <div class="text-center">
-                <span class="text-xs text-gray-400">Desenvolvido para o app Tarcisius</span>
-            </div>
         </div>
     </div>
 
-
+    <!-- ======================================================== -->
+    <!-- 2. SISTEMA PRINCIPAL (CONTEÚDO DINÂMICO)                 -->
+    <!-- ======================================================== -->
     <div id="sistema-conteudo" class="hidden flex-col min-h-screen">
         
+        <!-- HEADER -->
         <header class="bg-amber-700 text-white shadow-md p-4 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <i class="fa-solid fa-cross text-2xl text-amber-200"></i>
                     <div>
-                        <h1 id="nome-usuario-header" class="text-xl font-bold leading-none">Serviço do Altar</h1>
-                        <p class="text-xs text-amber-100">Paróquia São José — Sistema Tarcisius</p>
+                        <h1 id="nome-usuario-header" class="text-xl font-bold leading-none">Carregando...</h1>
+                        <p id="funcao-usuario-header" class="text-xs text-amber-100">Verificando permissões...</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <div class="bg-amber-800 text-xs px-3 py-1.5 rounded-full font-semibold shadow-inner hidden sm:block">
-                        <i class="fa-solid fa-user-gear mr-1"></i> Conectado via Firebase
-                    </div>
-                    <button id="btn-logout" class="text-amber-100 hover:text-white text-sm font-bold flex items-center gap-1 cursor-pointer">
-                        <i class="fa-solid fa-power-off"></i> <span class="hidden sm:inline">Sair</span>
-                    </button>
-                </div>
+                <button id="btn-logout" class="text-amber-100 hover:text-white text-sm font-bold flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-power-off"></i> <span>Sair</span>
+                </button>
             </div>
         </header>
 
-        <nav class="bg-white shadow-sm border-b border-gray-200 flex justify-around sticky top-[68px] z-40 md:hidden">
-            <button id="tab-escala" class="active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1">
-                <i class="fa-solid fa-calendar-days text-lg"></i> Escalas
-            </button>
-            <button id="tab-avisos" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1">
-                <i class="fa-solid fa-bell text-lg"></i> Avisos
-            </button>
-            <button id="tab-liturgia" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1">
-                <i class="fa-solid fa-book-bible text-lg"></i> Liturgia
-            </button>
+        <!-- MENU DE ABAS MÓVEL (Apenas para Coroinhas no celular) -->
+        <nav id="menu-abas-coroinha" class="bg-white shadow-sm border-b border-gray-200 flex justify-around sticky top-[68px] z-40 md:hidden">
+            <button id="tab-escala" class="active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1"><i class="fa-solid fa-calendar-days text-lg"></i> Escalas</button>
+            <button id="tab-avisos" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1"><i class="fa-solid fa-bell text-lg"></i> Avisos</button>
+            <button id="tab-liturgia" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1"><i class="fa-solid fa-book-bible text-lg"></i> Liturgia</button>
         </nav>
 
-        <main class="flex-1 p-4 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 pb-20">
-
-            <section id="conteudo-escala" class="space-y-4 block">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-list-check text-amber-700 mr-1"></i> Escala e Confirmações</h3>
-                    <span class="text-xs text-gray-500 font-semibold bg-gray-200 px-2 py-1 rounded">Missa das 19h</span>
-                </div>
+        <!-- ======================================================== -->
+        <!-- PAINEL DO COROINHA (VISÃO PADRÃO)                       -->
+        <!-- ======================================================== -->
+        <main id="painel-coroinha" class="hidden flex-1 p-4 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 pb-20">
+            <!-- Coluna Escalas -->
+            <section id="conteudo-escala" class="space-y-4">
+                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-list-check text-amber-700 mr-1"></i> Sua Próxima Escala</h3>
                 
-                <div id="card-notificacao" class="bg-amber-50 border-l-4 border-amber-600 p-4 rounded-r-xl shadow-xs transition-all">
-                    <div class="flex gap-3">
-                        <i class="fa-solid fa-circle-exclamation text-amber-600 text-xl mt-1"></i>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-amber-900 text-sm">Sua Próxima Escala Pendente</h4>
-                            <p class="text-xs text-amber-800 mt-1">Você foi escalado para a <strong>Missa Dominical</strong>.</p>
-                            
-                            <div class="bg-white/60 p-2 rounded-lg my-2 border border-amber-200 text-xs text-gray-700 space-y-1">
-                                <div><i class="fa-solid fa-clock w-4 text-amber-700"></i> Domingo, 14 de Junho — 19:00</div>
-                                <div><i class="fa-solid fa-star w-4 text-amber-700"></i> Função: <strong>Turiferário (Turíbulo)</strong></div>
-                            </div>
-
-                            <div class="flex gap-2 mt-3" id="botoes-acao">
-                                <button id="btn-confirmar" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-xs hover:bg-emerald-700 transition-all flex-1 cursor-pointer">
-                                    <i class="fa-solid fa-check mr-1"></i> Confirmar
-                                </button>
-                                <button id="btn-recusar" class="bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-xs hover:bg-rose-700 transition-all flex-1 cursor-pointer">
-                                    <i class="fa-solid fa-xmark mr-1"></i> Pedir Troca
-                                </button>
-                            </div>
-                            <p id="txt-feedback" class="text-xs font-bold mt-2 hidden"></p>
-                        </div>
+                <div id="card-notificacao" class="bg-amber-50 border-l-4 border-amber-600 p-4 rounded-r-xl shadow-xs">
+                    <h4 class="font-bold text-amber-900 text-sm">Confirmação Obrigatória</h4>
+                    <p class="text-xs text-amber-800 mt-1" id="txt-missa-info">Buscando detalhes da celebração...</p>
+                    <div class="flex gap-2 mt-3" id="botoes-acao">
+                        <button id="btn-confirmar" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-emerald-700 flex-1 cursor-pointer">✓ Confirmar</button>
+                        <button id="btn-recusar" class="bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-rose-700 flex-1 cursor-pointer">✕ Pedir Troca</button>
                     </div>
+                    <p id="txt-feedback" class="text-xs font-bold mt-2 hidden"></p>
                 </div>
 
+                <!-- Visão Geral do Presbitério -->
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="bg-gray-800 text-white p-3 flex justify-between items-center">
-                        <div>
-                            <span class="text-xs bg-amber-600 font-bold px-2 py-0.5 rounded-sm">DOMINGO</span>
-                            <h4 class="font-bold text-sm mt-0.5">Missa da Comunidade — Matriz</h4>
-                        </div>
-                        <div class="text-right text-xs">
-                            <p class="font-bold">14/Jun/2026</p>
-                            <p class="text-gray-400">19:00h</p>
-                        </div>
+                    <div class="bg-gray-800 text-white p-3">
+                        <span class="text-xs bg-amber-600 font-bold px-2 py-0.5 rounded-sm">EQUIPE INTEGRAL</span>
+                        <h4 id="lbl-titulo-missa" class="font-bold text-sm mt-0.5">---</h4>
                     </div>
-
-                    <div class="divide-y divide-gray-100">
-                        <div class="p-3 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="status-coroinha-1"></div>
-                                <div>
-                                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Turiferário</p>
-                                    <p class="font-medium text-sm text-gray-800" id="nome-coroinha-1">Gabriel Silva</p>
-                                </div>
-                            </div>
-                            <span id="badge-coroinha-1" class="text-[10px] font-bold px-2 py-1 rounded-full bg-amber-100 text-amber-800">
-                                <i class="fa-solid fa-spinner mr-1"></i>Pendente
-                            </span>
-                        </div>
-
-                        <div class="p-3 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                <div>
-                                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Naveteiro</p>
-                                    <p class="font-medium text-sm text-gray-800">Mateus Santos</p>
-                                </div>
-                            </div>
-                            <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800">
-                                <i class="fa-solid fa-circle-check mr-1"></i>Confirmado
-                            </span>
-                        </div>
-
-                        <div class="p-3 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                <div>
-                                    <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Crucífero (Cruz)</p>
-                                    <p class="font-medium text-sm text-gray-800">Lucas Oliveira</p>
-                                </div>
-                            </div>
-                            <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800">
-                                <i class="fa-solid fa-circle-check mr-1"></i>Confirmado
-                            </span>
-                        </div>
+                    <div class="divide-y divide-gray-100" id="lista-presbiterio">
+                        <!-- Gerado Dinamicamente -->
                     </div>
                 </div>
             </section>
 
+            <!-- Coluna Avisos e Coluna Liturgia mantêm layout anterior -->
             <section id="conteudo-avisos" class="space-y-4 hidden md:block">
-                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-bullhorn text-amber-700 mr-1"></i> Mural de Avisos</h3>
-                
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-4">
-                    <div class="border-b border-gray-100 pb-3">
-                        <div class="flex justify-between text-xs text-gray-400 mb-1">
-                            <span class="font-bold text-amber-800">Coordenação Geral</span>
-                            <span>Hoje, 08:30</span>
-                        </div>
-                        <h4 class="font-bold text-gray-800 text-sm">Ensaio para a Solenidade de Corpus Christi</h4>
-                        <p class="text-xs text-gray-600 mt-2 leading-relaxed">
-                            Atenção todos os acólitos e coroinhas! Próximo sábado, às 15:00, teremos ensaio geral obrigatório na matriz. Vamos alinhar a procissão externa.
-                        </p>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between text-xs text-gray-400 mb-1">
-                            <span class="font-bold text-amber-800">Secretaria Paroquial</span>
-                            <span>Ontem, 14:15</span>
-                        </div>
-                        <h4 class="font-bold text-gray-800 text-sm">Entrega das Novas Túnicas</h4>
-                        <p class="text-xs text-gray-600 mt-2 leading-relaxed">
-                            As túnicas que foram para ajuste já estão de volta na sacristia. Por favor, cheguem mais cedo na próxima escala para testar o tamanho.
-                        </p>
-                    </div>
-                </div>
+                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-bullhorn text-amber-700 mr-1"></i> Mural da Comunidade</h3>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-xs text-gray-600">Nenhum aviso importante postado hoje.</div>
             </section>
-
             <section id="conteudo-liturgia" class="space-y-4 hidden md:block">
-                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-book-open text-amber-700 mr-1"></i> Liturgia e Formação</h3>
-                
-                <div class="bg-amber-900 text-amber-100 p-4 rounded-xl shadow-sm">
-                    <span class="text-[10px] uppercase font-bold tracking-widest bg-amber-800 px-2 py-0.5 rounded text-amber-300">Evangelho do Dia</span>
-                    <h4 class="font-serif font-bold text-base mt-2">Evangelho segundo São Mateus</h4>
-                    <p class="text-xs italic mt-2 text-amber-200/90 leading-relaxed">
-                        "Vós sois o sal da terra. Vós sois a luz do mundo. Não se pode esconder uma cidade situada sobre uma montanha..."
-                    </p>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                    <h4 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-graduation-cap text-amber-700 mr-1"></i> Espaço de Formação</h4>
-                    <p class="text-xs text-gray-600 mt-1">Material de estudo focado nos objetos sagrados e reverência no presbitério.</p>
-                    <button class="w-full mt-3 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold py-2.5 rounded-lg hover:bg-amber-100 transition-all cursor-pointer">
-                        <i class="fa-solid fa-file-pdf mr-1"></i> Abrir Manual do Coroinha.pdf
-                    </button>
-                </div>
+                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-book-open text-amber-700 mr-1"></i> Formação</h3>
+                <div class="bg-amber-900 text-amber-100 p-4 rounded-xl"><p class="text-xs italic">"Vós sois a luz do mundo..."</p></div>
             </section>
+        </main>
 
+        <!-- ======================================================== -->
+        <!-- PAINEL DO COORDENADOR (EXCLUSIVO)                        -->
+        <!-- ======================================================== -->
+        <main id="painel-coordenador" class="hidden flex-1 p-4 max-w-4xl mx-auto w-full space-y-6 pb-20">
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-amber-900">Painel Administrativo da Coordenação</h2>
+                    <p class="text-xs text-amber-700">Central de gerenciamento de escalas e novos cadastros de coroinhas.</p>
+                </div>
+                <i class="fa-solid fa-user-shield text-3xl text-amber-700"></i>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- FORMULÁRIO 1: CRIAR NOVA ESCALA -->
+                <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
+                    <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-calendar-plus text-amber-700 mr-1"></i> Publicar Nova Escala</h3>
+                    <form id="form-nova-escala" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Título da Celebração</label>
+                            <input type="text" id="esc-titulo" required placeholder="Ex: Missa Dominical das 19h" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Turiferário</label>
+                            <input type="text" id="esc-turi" required placeholder="Nome do Coroinha" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Naveteiro</label>
+                            <input type="text" id="esc-nave" required placeholder="Nome do Coroinha" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Crucífero</label>
+                            <input type="text" id="esc-cruz" required placeholder="Nome do Coroinha" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        </div>
+                        <button type="submit" class="w-full bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-amber-800 cursor-pointer">Salvar e Notificar Equipe</button>
+                    </form>
+                </div>
+
+                <!-- FORMULÁRIO 2: CADASTRAR NOVO COROINHA -->
+                <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
+                    <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-user-plus text-amber-700 mr-1"></i> Cadastrar Novo Coroinha</h3>
+                    <form id="form-cadastro-usuario" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nome Completo</label>
+                            <input type="text" id="cad-nome" required placeholder="Ex: João Pedro Silva" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail para Login</label>
+                            <input type="email" id="cad-email" required placeholder="joao@email.com" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Senha Provisória</label>
+                            <input type="password" id="cad-senha" required placeholder="Mínimo 6 dígitos" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-emerald-800 cursor-pointer">Registrar no Banco de Dados</button>
+                    </form>
+                </div>
+            </div>
         </main>
 
         <footer class="bg-gray-800 text-gray-400 text-center text-[11px] py-3 mt-auto border-t border-gray-700">
-            <p>© 2026 Tarcisius System — Conectado ao Firebase</p>
+            <p>© 2026 Tarcisius System — Banco de Dados Firestore</p>
         </footer>
     </div>
 
-
+    <!-- ======================================================== -->
+    <!-- 3. MOTOR LOGIC - FIREBASE INTEGRADO                      -->
+    <!-- ======================================================== -->
     <script type="module">
-        // Importando os SDKs necessários direto da infraestrutura web da Google
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // As credenciais exatas fornecidas para o projeto tarcisius-d03d7
         const firebaseConfig = {
             apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
             authDomain: "tarcisius-d03d7.firebaseapp.com",
@@ -255,133 +211,188 @@
             appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
         };
 
-        // Inicializando os serviços da Google no app
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Captura de elementos do HTML para manipulação
+        // Referências Globais de Elementos
         const formLogin = document.getElementById('form-login');
         const erroLogin = document.getElementById('erro-login');
         const btnLogout = document.getElementById('btn-logout');
         const telaLogin = document.getElementById('tela-login');
         const sistemaConteudo = document.getElementById('sistema-conteudo');
         const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
+        const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
+        
+        const painelCoroinha = document.getElementById('painel-coroinha');
+        const painelCoordenador = document.getElementById('painel-coordenador');
+        const menuAbasCoroinha = document.getElementById('menu-abas-coroinha');
 
-        // ESCUTADOR DE ESTADO (Verifica se já tem usuário logado salvo no navegador)
-        onAuthStateChanged(auth, (user) => {
+        let usuarioLogadoDados = null;
+
+        // VERIFICADOR DE SESSÃO ATIVA
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Se o usuário está logado, puxamos o e-mail dele para o topo e liberamos o app
-                nomeUsuarioHeader.innerText = `Olá, ${user.email.split('@')[0]}`;
-                telaLogin.style.display = 'none';
-                sistemaConteudo.style.display = 'flex';
-                ajustarLayoutTela();
+                try {
+                    // Puxa o perfil do usuário na coleção para saber a sua função de acesso
+                    const docRef = doc(db, "usuarios", user.uid);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        usuarioLogadoDados = docSnap.data();
+                        nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
+                        funcaoUsuarioHeader.innerText = "Nível: " + usuarioLogadoDados.funcao;
+
+                        // Redirecionamento baseado na função gravada no banco
+                        if (usuarioLogadoDados.funcao === "Coordenador") {
+                            painelCoroinha.classList.add('hidden');
+                            menuAbasCoroinha.classList.add('hidden');
+                            painelCoordenador.classList.remove('hidden');
+                        } else {
+                            painelCoordenador.classList.add('hidden');
+                            painelCoroinha.classList.remove('hidden');
+                            menuAbasCoroinha.classList.remove('hidden');
+                            carregarEscalaReal();
+                        }
+                    } else {
+                        // Caso a conta exista no Auth mas não tenha perfil criado no Firestore ainda
+                        nomeUsuarioHeader.innerText = "Aguardando Cadastro";
+                        funcaoUsuarioHeader.innerText = "Entre em contato com o Coordenador";
+                        painelCoroinha.classList.add('hidden');
+                        painelCoordenador.classList.add('hidden');
+                    }
+
+                    telaLogin.style.display = 'none';
+                    sistemaConteudo.style.display = 'flex';
+                } catch (e) {
+                    console.error("Erro ao ler perfil: ", e);
+                }
             } else {
-                // Se não houver login salvo, garante que ele fique trancado na tela de autenticação
                 sistemaConteudo.style.display = 'none';
                 telaLogin.style.display = 'flex';
             }
         });
 
-        // FUNÇÃO DE LOGIN REAL NO FIREBASE
-        formLogin.addEventListener('submit', async (event) => {
-            event.preventDefault();
+        // ENTRAR NO SISTEMA
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
-
             try {
-                // Envia os dados criptografados para autenticação na nuvem do Firebase
                 await signInWithEmailAndPassword(auth, email, senha);
                 erroLogin.classList.add('hidden');
-            } catch (error) {
-                // Se falhar (senha errada ou e-mail inexistente), remove a classe oculta do erro
+            } catch (err) {
                 erroLogin.classList.remove('hidden');
-                console.error("Falha na autenticação: ", error.message);
             }
         });
 
-        // FUNÇÃO DE LOGOUT
-        btnLogout.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                document.getElementById('login-email').value = "";
-                document.getElementById('login-senha').value = "";
-            } catch (error) {
-                console.error("Erro ao deslogar: ", error.message);
-            }
-        });
+        // SAIR DO SISTEMA
+        btnLogout.addEventListener('click', () => signOut(auth));
 
         // ========================================================
-        // INTERAÇÕES VISUAIS DA INTERFACE (MÓVEL & DESKTOP)
+        // OPERAÇÕES DO BANCO DE DADOS (FIRESTORE)
         // ========================================================
-        
-        window.switchTab = function(tabName) {
-            if (window.innerWidth >= 768) return;
 
-            document.getElementById('conteudo-escala').className = 'space-y-4 hidden';
-            document.getElementById('conteudo-avisos').className = 'space-y-4 hidden';
-            document.getElementById('conteudo-liturgia').className = 'space-y-4 hidden';
-
-            document.getElementById('tab-escala').className = 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
-            document.getElementById('tab-avisos').className = 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
-            document.getElementById('tab-liturgia').className = 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
-
-            document.getElementById('conteudo-' + tabName).classList.remove('hidden');
-            document.getElementById('tab-' + tabName).classList.add('active-tab');
-        };
-
-        function ajustarLayoutTela() {
-            if (window.innerWidth >= 768) {
-                document.getElementById('conteudo-escala').className = 'space-y-4 block';
-                document.getElementById('conteudo-avisos').className = 'space-y-4 block';
-                document.getElementById('conteudo-liturgia').className = 'space-y-4 block';
-            } else {
-                switchTab('escala');
+        // 1. CARREGAR A ESCALA EM TEMPO REAL NA TELA DO COROINHA
+        async function carregarEscalaReal() {
+            const docSnap = await getDoc(doc(db, "escalas", "escala_ativa"));
+            if (docSnap.exists()) {
+                const dados = docSnap.data();
+                document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
+                document.getElementById('txt-missa-info').innerHTML = `Você está associado à escala vigente para a <strong>${dados.titulo}</strong>. Verifique sua função abaixo.`;
+                
+                const lista = document.getElementById('lista-presbiterio');
+                lista.innerHTML = `
+                    <div class="p-3 flex items-center justify-between">
+                        <div><p class="text-xs text-gray-400 font-bold uppercase">Turiferário</p><p class="font-medium text-sm text-gray-800">${dados.turiferario.nome}</p></div>
+                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.turiferario.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.turiferario.status}</span>
+                    </div>
+                    <div class="p-3 flex items-center justify-between">
+                        <div><p class="text-xs text-gray-400 font-bold uppercase">Naveteiro</p><p class="font-medium text-sm text-gray-800">${dados.naveteiro.nome}</p></div>
+                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.naveteiro.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.naveteiro.status}</span>
+                    </div>
+                    <div class="p-3 flex items-center justify-between">
+                        <div><p class="text-xs text-gray-400 font-bold uppercase">Crucífero</p><p class="font-medium text-sm text-gray-800">${dados.crucifero.nome}</p></div>
+                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.crucifero.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.crucifero.status}</span>
+                    </div>
+                `;
             }
         }
 
-        window.addEventListener('resize', ajustarLayoutTela);
-
-        // DINÂMICA DE INTERAÇÃO COM A ESCALA
-        document.getElementById('btn-confirmar').addEventListener('click', () => {
-            atualizarInterfaceEscala('confirmado');
+        // 2. COROINHA CONFIRMAR OU RECUSAR PRESENÇA
+        document.getElementById('btn-confirmar').addEventListener('click', async () => {
+            const docRef = doc(db, "escalas", "escala_ativa");
+            // Nota simplificada: Atualiza os status no banco de dados geral da escala
+            await updateDoc(docRef, { "turiferario.status": "Confirmado" });
+            document.getElementById('botoes-acao').classList.add('hidden');
+            document.getElementById('txt-feedback').className = "text-xs font-bold mt-2 text-emerald-600";
+            document.getElementById('txt-feedback').innerText = "✓ Presença gravada na nuvem!";
+            document.getElementById('txt-feedback').classList.remove('hidden');
+            carregarEscalaReal();
         });
 
-        document.getElementById('btn-recusar').addEventListener('click', () => {
-            atualizarInterfaceEscala('recusado');
+        document.getElementById('btn-recusar').addEventListener('click', async () => {
+            const docRef = doc(db, "escalas", "escala_ativa");
+            await updateDoc(docRef, { "turiferario.status": "Recusado/Troca" });
+            document.getElementById('botoes-acao').classList.add('hidden');
+            document.getElementById('txt-feedback').className = "text-xs font-bold mt-2 text-rose-600";
+            document.getElementById('txt-feedback').innerText = "✕ Solicitação de troca enviada ao coordenador.";
+            document.getElementById('txt-feedback').classList.remove('hidden');
+            carregarEscalaReal();
         });
 
-        function atualizarInterfaceEscala(opcao) {
-            const botoesAcao = document.getElementById('botoes-acao');
-            const txtFeedback = document.getElementById('txt-feedback');
-            const statusCoroinha1 = document.getElementById('status-coroinha-1');
-            const badgeCoroinha1 = document.getElementById('badge-coroinha-1');
-            const nomeCoroinha1 = document.getElementById('nome-coroinha-1');
-
-            botoesAcao.classList.add('hidden');
-            txtFeedback.classList.remove('hidden');
-
-            if (opcao === 'confirmado') {
-                txtFeedback.innerText = "✓ Presença confirmada com sucesso!";
-                txtFeedback.className = "text-xs font-bold mt-2 text-emerald-600";
-                statusCoroinha1.className = "w-2 h-2 rounded-full bg-emerald-500";
-                badgeCoroinha1.className = "text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800";
-                badgeCoroinha1.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>Confirmado';
-            } else {
-                txtFeedback.innerText = "✕ Escala recusada. Buscando substitutos...";
-                txtFeedback.className = "text-xs font-bold mt-2 text-rose-600";
-                statusCoroinha1.className = "w-2 h-2 rounded-full bg-rose-500";
-                badgeCoroinha1.className = "text-[10px] font-bold px-2 py-1 rounded-full bg-rose-100 text-rose-800";
-                badgeCoroinha1.innerHTML = '<i class="fa-solid fa-clock-rotate-left mr-1"></i>Trocando...';
-
-                setTimeout(() => {
-                    nomeCoroinha1.innerHTML = "Pedro Souza <span class='text-xs text-amber-700 font-bold'>(Substituto)</span>";
-                    statusCoroinha1.className = "w-2 h-2 rounded-full bg-emerald-500";
-                    badgeCoroinha1.className = "text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800";
-                    badgeCoroinha1.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>Confirmado';
-                    txtFeedback.innerText = "🔄 Troca concluída! Pedro Souza assumiu a escala.";
-                    txtFeedback.className = "text-xs font-bold mt-2 text-blue-600";
-                }, 3000);
+        // 3. COORDENADOR: PUBLICAR NOVA ESCALA
+        document.getElementById('form-nova-escala').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await setDoc(doc(db, "escalas", "escala_ativa"), {
+                    titulo: document.getElementById('esc-titulo').value,
+                    turiferario: { nome: document.getElementById('esc-turi').value, status: "Pendente" },
+                    naveteiro: { nome: document.getElementById('esc-nave').value, status: "Pendente" },
+                    crucifero: { nome: document.getElementById('esc-cruz').value, status: "Pendente" }
+                });
+                alert("Escala atualizada com sucesso no banco de dados!");
+                document.getElementById('form-nova-escala').reset();
+            } catch (err) {
+                alert("Erro ao salvar escala: " + err.message);
             }
+        });
+
+        // 4. COORDENADOR: CADASTRAR NOVO COROINHA NO SISTEMA
+        document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('cad-nome').value;
+            const email = document.getElementById('cad-email').value;
+            const senha = document.getElementById('cad-senha').value;
+
+            try {
+                // Cria a credencial no Firebase Auth
+                const resultado = await createUserWithEmailAndPassword(auth, email, senha);
+                
+                // Cria a ficha do usuário no Firestore vinculando ao ID criado
+                await setDoc(doc(db, "usuarios", resultado.user.uid), {
+                    nome: nome,
+                    email: email,
+                    funcao: "Coroinha" // Padrão dos novos cadastros
+                });
+
+                alert(`Sucesso! ${nome} foi inserido no banco.`);
+                document.getElementById('form-cadastro-usuario').reset();
+            } catch (err) {
+                alert("Erro ao registrar: " + err.message);
+            }
+        });
+
+        // CONTROLE VISUAL DE NAVEGAÇÃO DE ABAS MÓVEIS
+        window.switchTab = function(tabName) {
+            if (usuarioLogadoDados?.funcao === "Coordenador") return;
+            document.getElementById('conteudo-escala').className = tabName === 'escala' ? 'space-y-4 block' : 'space-y-4 hidden';
+            document.getElementById('conteudo-avisos').className = tabName === 'avisos' ? 'space-y-4 block md:block' : 'space-y-4 hidden md:block';
+            document.getElementById('conteudo-liturgia').className = tabName === 'liturgia' ? 'space-y-4 block md:block' : 'space-y-4 hidden md:block';
+            
+            document.getElementById('tab-escala').className = tabName === 'escala' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+            document.getElementById('tab-avisos').className = tabName === 'avisos' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+            document.getElementById('tab-liturgia').className = tabName === 'liturgia' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
         }
     </script>
 
