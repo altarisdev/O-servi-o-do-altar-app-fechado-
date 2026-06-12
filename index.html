@@ -51,7 +51,7 @@
                 </div>
 
                 <div id="erro-login" class="text-xs text-rose-600 font-bold hidden bg-rose-50 p-2 rounded-lg border border-rose-200">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> E-mail ou senha incorretos / não cadastrados.
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> E-mail ou senha incorretos.
                 </div>
 
                 <button type="submit" class="w-full bg-amber-700 text-white font-bold py-3 rounded-xl hover:bg-amber-800 shadow-md transition-all cursor-pointer text-sm">
@@ -62,7 +62,7 @@
     </div>
 
     <!-- ======================================================== -->
-    <!-- 2. SISTEMA PRINCIPAL (CONTEÚDO DINÂMICO)                 -->
+    <!-- 2. SISTEMA PRINCIPAL                                     -->
     <!-- ======================================================== -->
     <div id="sistema-conteudo" class="hidden flex-col min-h-screen">
         
@@ -93,114 +93,211 @@
         <!-- PAINEL DO COROINHA (VISÃO PADRÃO)                       -->
         <!-- ======================================================== -->
         <main id="painel-coroinha" class="hidden flex-1 p-4 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 pb-20">
+            
             <!-- Coluna Escalas -->
             <section id="conteudo-escala" class="space-y-4">
-                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-list-check text-amber-700 mr-1"></i> Sua Próxima Escala</h3>
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-list-check text-amber-700 mr-1"></i> Próximas Escalas</h3>
+                    <!-- Seletor de data para o coroinha navegar pelas escalas existentes -->
+                    <input type="date" id="busca-escala-data" class="text-xs bg-white border p-1 rounded-md text-gray-700 font-semibold shadow-xs">
+                </div>
                 
-                <div id="card-notificacao" class="bg-amber-50 border-l-4 border-amber-600 p-4 rounded-r-xl shadow-xs">
-                    <h4 class="font-bold text-amber-900 text-sm">Confirmação Obrigatória</h4>
-                    <p class="text-xs text-amber-800 mt-1" id="txt-missa-info">Buscando detalhes da celebração...</p>
-                    <div class="flex gap-2 mt-3" id="botoes-acao">
-                        <button id="btn-confirmar" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-emerald-700 flex-1 cursor-pointer">✓ Confirmar</button>
+                <!-- CARD ENQUETE DE DISPONIBILIDADE (Oculto por padrão) -->
+                <div id="card-enquete" class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-xl shadow-xs hidden transition-all">
+                    <div class="flex gap-3">
+                        <i class="fa-solid fa-circle-question text-blue-600 text-xl mt-0.5"></i>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-blue-900 text-sm">Pesquisa de Disponibilidade</h4>
+                            <p class="text-xs text-blue-800 mt-1" id="txt-pergunta-enquete">Você está disponível para as escalas deste fim de semana?</p>
+                            <div class="flex gap-2 mt-3" id="botoes-enquete">
+                                <button id="btn-enquete-sim" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all flex-1 cursor-pointer">✓ Posso Servir</button>
+                                <button id="btn-enquete-nao" class="bg-gray-400 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-gray-500 transition-all flex-1 cursor-pointer">✕ Não Posso</button>
+                            </div>
+                            <p id="txt-feedback-enquete" class="text-xs font-bold mt-2 text-blue-700 hidden">✓ Resposta enviada! Obrigado.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD DA ESCALA SELECIONADA -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-800 text-white p-3 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs bg-amber-600 font-bold px-2 py-0.5 rounded-sm" id="lbl-data-missa">--/--/----</span>
+                            <h4 id="lbl-titulo-missa" class="font-bold text-sm mt-0.5">Selecione uma data acima</h4>
+                        </div>
+                        <div class="text-right text-xs">
+                            <p class="font-bold" id="lbl-horario-missa">--:--h</p>
+                        </div>
+                    </div>
+                    <div class="divide-y divide-gray-100" id="lista-presbiterio">
+                        <p class="text-xs text-gray-400 text-center py-6">Nenhuma escala ativa selecionada.</p>
+                    </div>
+                </div>
+
+                <!-- AÇÕES DA ESCALA ATIVA -->
+                <div id="card-notificacao" class="bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-xs hidden">
+                    <p class="text-xs text-amber-800 font-medium">Você faz parte desta escala! Por favor, confirme ou recuse sua participação:</p>
+                    <div class="flex gap-2 mt-2" id="botoes-acao">
+                        <button id="btn-confirmar" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-emerald-700 flex-1 cursor-pointer">✓ Confirmar Presença</button>
                         <button id="btn-recusar" class="bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-rose-700 flex-1 cursor-pointer">✕ Pedir Troca</button>
                     </div>
                     <p id="txt-feedback" class="text-xs font-bold mt-2 hidden"></p>
                 </div>
+            </section>
 
-                <!-- Visão Geral do Presbitério -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="bg-gray-800 text-white p-3">
-                        <span class="text-xs bg-amber-600 font-bold px-2 py-0.5 rounded-sm">EQUIPE INTEGRAL</span>
-                        <h4 id="lbl-titulo-missa" class="font-bold text-sm mt-0.5">---</h4>
-                    </div>
-                    <div class="divide-y divide-gray-100" id="lista-presbiterio">
-                        <!-- Gerado Dinamicamente -->
+            <!-- Coluna Mural de Avisos -->
+            <section id="conteudo-avisos" class="space-y-4 hidden md:block">
+                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-bullhorn text-amber-700 mr-1"></i> Mural da Comunidade</h3>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
+                    <div class="border-b pb-2">
+                        <span class="text-[10px] text-amber-800 font-bold uppercase">Coordenação</span>
+                        <h4 class="font-bold text-sm text-gray-800">Ensaio de Corpus Christi</h4>
+                        <p class="text-xs text-gray-600 mt-1">Sábado que vem às 15h. Presença obrigatória de toda a equipe.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Coluna Avisos e Coluna Liturgia mantêm layout anterior -->
-            <section id="conteudo-avisos" class="space-y-4 hidden md:block">
-                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-bullhorn text-amber-700 mr-1"></i> Mural da Comunidade</h3>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-xs text-gray-600">Nenhum aviso importante postado hoje.</div>
-            </section>
+            <!-- Coluna Liturgia e Formação -->
             <section id="conteudo-liturgia" class="space-y-4 hidden md:block">
-                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-book-open text-amber-700 mr-1"></i> Formação</h3>
-                <div class="bg-amber-900 text-amber-100 p-4 rounded-xl"><p class="text-xs italic">"Vós sois a luz do mundo..."</p></div>
+                <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-book-open text-amber-700 mr-1"></i> Liturgia e Formação</h3>
+                
+                <!-- CARD LITURGIA AUTOMÁTICA -->
+                <div class="bg-amber-900 text-amber-100 p-4 rounded-xl shadow-sm">
+                    <div class="flex justify-between items-center border-b border-amber-800 pb-1.5 mb-2">
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-amber-300">Evangelho de Hoje</span>
+                        <span id="lbl-ref-liturgia" class="text-xs font-bold text-amber-200">---</span>
+                    </div>
+                    <p id="txt-evangelho-dia" class="text-xs italic leading-relaxed text-amber-100/90 max-h-48 overflow-y-auto">Carregando liturgia diária automaticamente...</p>
+                </div>
+
+                <!-- CARD FORMÇÃO DINÂMICA -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                    <h4 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-graduation-cap text-amber-700 mr-1"></i> Material de Estudo</h4>
+                    <p id="lbl-titulo-formacao" class="text-xs text-gray-600 mt-1">Baixe o material de formação disponibilizado pela paróquia.</p>
+                    <a id="btn-download-formacao" href="#" target="_blank" class="w-full block text-center mt-3 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold py-2.5 rounded-lg hover:bg-amber-100 transition-all">
+                        <i class="fa-solid fa-file-pdf mr-1"></i> Abrir Material de Apoio
+                    </a>
+                </div>
             </section>
         </main>
 
         <!-- ======================================================== -->
         <!-- PAINEL DO COORDENADOR (EXCLUSIVO)                        -->
         <!-- ======================================================== -->
-        <main id="painel-coordenador" class="hidden flex-1 p-4 max-w-4xl mx-auto w-full space-y-6 pb-20">
+        <main id="painel-coordenador" class="hidden flex-1 p-4 max-w-5xl mx-auto w-full space-y-6 pb-20">
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
                 <div>
-                    <h2 class="text-lg font-bold text-amber-900">Painel Administrativo da Coordenação</h2>
-                    <p class="text-xs text-amber-700">Central de gerenciamento de escalas e novos cadastros de coroinhas.</p>
+                    <h2 class="text-lg font-bold text-amber-900">Painel Geral da Coordenação</h2>
+                    <p class="text-xs text-amber-700">Controle avançado de escalas por dia, disparo de enquetes e atualizações de conteúdos.</p>
                 </div>
                 <i class="fa-solid fa-user-shield text-3xl text-amber-700"></i>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- FORMULÁRIO 1: CRIAR NOVA ESCALA -->
+                <!-- FORMULÁRIO 1: CRIAR ESCALA POR DATA -->
                 <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
-                    <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-calendar-plus text-amber-700 mr-1"></i> Publicar Nova Escala</h3>
+                    <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-calendar-plus text-amber-700 mr-1"></i> Publicar Escala por Data</h3>
                     <form id="form-nova-escala" class="space-y-3">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Data da Escala</label>
+                                <input type="date" id="esc-data" required class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Horário (Missa)</label>
+                                <input type="time" id="esc-horario" required class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            </div>
+                        </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Título da Celebração</label>
-                            <input type="text" id="esc-titulo" required placeholder="Ex: Missa Dominical das 19h" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Título / Local</label>
+                            <input type="text" id="esc-titulo" required placeholder="Ex: Missa Dominical - Matriz" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Turiferário</label>
-                            <input type="text" id="esc-turi" required placeholder="Nome do Coroinha" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            <input type="text" id="esc-turi" required placeholder="Nome Completo" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Naveteiro</label>
-                            <input type="text" id="esc-nave" required placeholder="Nome do Coroinha" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Naveteiro</label>
+                                <input type="text" id="esc-nave" required placeholder="Nome" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Crucífero</label>
+                                <input type="text" id="esc-cruz" required placeholder="Nome" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Crucífero</label>
-                            <input type="text" id="esc-cruz" required placeholder="Nome do Coroinha" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
-                        </div>
-                        <button type="submit" class="w-full bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-amber-800 cursor-pointer">Salvar e Notificar Equipe</button>
+                        <button type="submit" class="w-full bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-amber-800 cursor-pointer">Salvar Escala</button>
                     </form>
                 </div>
 
-                <!-- FORMULÁRIO 2: CADASTRAR NOVO COROINHA -->
-                <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
-                    <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-user-plus text-amber-700 mr-1"></i> Cadastrar Novo Coroinha</h3>
-                    <form id="form-cadastro-usuario" class="space-y-3">
+                <!-- CONTROLES ADICIONAIS: ENQUETE E FORMAÇÃO -->
+                <div class="space-y-6">
+                    <!-- ENQUETE -->
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
+                        <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-square-poll-horizontal text-amber-700 mr-1"></i> Pesquisa de Disponibilidade</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Pergunta do Fim de Semana</label>
+                                <input type="text" id="enq-pergunta" value="Você poderá servir nas missas deste fim de semana?" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            </div>
+                            <div class="flex gap-2">
+                                <button id="btn-disparar-enquete" class="bg-blue-600 text-white text-xs font-bold py-2 px-4 rounded-lg hover:bg-blue-700 flex-1 cursor-pointer">Disparar Nova</button>
+                                <button id="btn-fechar-enquete" class="bg-gray-500 text-white text-xs font-bold py-2 px-4 rounded-lg hover:bg-gray-600 cursor-pointer">Encerrar Atual</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ATUALIZAR CONTEÚDO PEDAGÓGICO / FORMAÇÃO -->
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
+                        <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-cloud-arrow-up text-amber-700 mr-1"></i> Upload de Formações (PDF / Links)</h3>
+                        <form id="form-upload-formacao" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Título do Documento</label>
+                                <input type="text" id="form-titulo-input" required placeholder="Ex: Manual do Acólito v2" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Link URL do Arquivo (Google Drive, OneDrive, etc)</label>
+                                <input type="url" id="form-url-input" required placeholder="https://drive.google.com/..." class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            </div>
+                            <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2 rounded-lg hover:bg-amber-900 cursor-pointer">Atualizar Material no App</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- FORMULÁRIO: CADASTRAR NOVO COROINHA -->
+                <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 md:col-span-2">
+                    <h3 class="font-bold text-gray-800 border-b border-gray-100 pb-2"><i class="fa-solid fa-user-plus text-amber-700 mr-1"></i> Cadastrar Novo Membro no Sistema</h3>
+                    <form id="form-cadastro-usuario" class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Nome Completo</label>
-                            <input type="text" id="cad-nome" required placeholder="Ex: João Pedro Silva" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            <input type="text" id="cad-nome" required placeholder="Ex: João Pedro" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail para Login</label>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail para  Login</label>
                             <input type="email" id="cad-email" required placeholder="joao@email.com" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Senha Provisória</label>
-                            <input type="password" id="cad-senha" required placeholder="Mínimo 6 dígitos" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                            <input type="password" id="cad-senha" required placeholder="Mínimo 6 caracteres" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                         </div>
-                        <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-emerald-800 cursor-pointer">Registrar no Banco de Dados</button>
+                        <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-emerald-800 md:col-span-3 cursor-pointer">Adicionar Usuário ao Firebase</button>
                     </form>
                 </div>
             </div>
         </main>
 
         <footer class="bg-gray-800 text-gray-400 text-center text-[11px] py-3 mt-auto border-t border-gray-700">
-            <p>© 2026 Tarcisius System — Banco de Dados Firestore</p>
+            <p>© 2026 Tarcisius System — Cloud Firestore Integrado</p>
         </footer>
     </div>
 
     <!-- ======================================================== -->
-    <!-- 3. MOTOR LOGIC - FIREBASE INTEGRADO                      -->
+    <!-- 3. MOTOR JAVASCRIPT - FIREBASE E APIS                   -->
     <!-- ======================================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -215,7 +312,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Referências Globais de Elementos
+        // Referências do DOM
         const formLogin = document.getElementById('form-login');
         const erroLogin = document.getElementById('erro-login');
         const btnLogout = document.getElementById('btn-logout');
@@ -223,27 +320,25 @@
         const sistemaConteudo = document.getElementById('sistema-conteudo');
         const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
         const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
-        
         const painelCoroinha = document.getElementById('painel-coroinha');
         const painelCoordenador = document.getElementById('painel-coordenador');
         const menuAbasCoroinha = document.getElementById('menu-abas-coroinha');
+        const buscaEscalaData = document.getElementById('busca-escala-data');
 
         let usuarioLogadoDados = null;
+        let dataSelecionadaGlobal = "";
 
-        // VERIFICADOR DE SESSÃO ATIVA
+        // CONTROLE DE SESSÃO DO FIREBASE AUTH
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
-                    // Puxa o perfil do usuário na coleção para saber a sua função de acesso
-                    const docRef = doc(db, "usuarios", user.uid);
-                    const docSnap = await getDoc(docRef);
-
+                    const docSnap = await getDoc(doc(db, "usuarios", user.uid));
                     if (docSnap.exists()) {
                         usuarioLogadoDados = docSnap.data();
+                        usuarioLogadoDados.uid = user.uid; // Mantém referência do ID
                         nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
-                        funcaoUsuarioHeader.innerText = "Nível: " + usuarioLogadoDados.funcao;
+                        funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
 
-                        // Redirecionamento baseado na função gravada no banco
                         if (usuarioLogadoDados.funcao === "Coordenador") {
                             painelCoroinha.classList.add('hidden');
                             menuAbasCoroinha.classList.add('hidden');
@@ -252,113 +347,209 @@
                             painelCoordenador.classList.add('hidden');
                             painelCoroinha.classList.remove('hidden');
                             menuAbasCoroinha.classList.remove('hidden');
-                            carregarEscalaReal();
+                            
+                            // Define o input de data para o dia corrente do sistema
+                            const hoje = new Date().toISOString().split('T')[0];
+                            buscaEscalaData.value = hoje;
+                            
+                            checarEnqueteAtiva();
+                            carregarEscalaPorData(hoje);
+                            carregarLiturgiaAutomatica();
+                            carregarMaterialEstudo();
                         }
-                    } else {
-                        // Caso a conta exista no Auth mas não tenha perfil criado no Firestore ainda
-                        nomeUsuarioHeader.innerText = "Aguardando Cadastro";
-                        funcaoUsuarioHeader.innerText = "Entre em contato com o Coordenador";
-                        painelCoroinha.classList.add('hidden');
-                        painelCoordenador.classList.add('hidden');
                     }
-
                     telaLogin.style.display = 'none';
                     sistemaConteudo.style.display = 'flex';
-                } catch (e) {
-                    console.error("Erro ao ler perfil: ", e);
-                }
+                } catch (e) { console.error(e); }
             } else {
                 sistemaConteudo.style.display = 'none';
                 telaLogin.style.display = 'flex';
             }
         });
 
-        // ENTRAR NO SISTEMA
+        // AUTENTICAÇÃO
         formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const senha = document.getElementById('login-senha').value;
             try {
-                await signInWithEmailAndPassword(auth, email, senha);
+                await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-senha').value);
                 erroLogin.classList.add('hidden');
-            } catch (err) {
-                erroLogin.classList.remove('hidden');
-            }
+            } catch (err) { erroLogin.classList.remove('hidden'); }
         });
-
-        // SAIR DO SISTEMA
         btnLogout.addEventListener('click', () => signOut(auth));
 
         // ========================================================
-        // OPERAÇÕES DO BANCO DE DADOS (FIRESTORE)
+        // ROTINAS DA VISÃO DO COROINHA (LEITURA E RESPOSTAS)
         // ========================================================
 
-        // 1. CARREGAR A ESCALA EM TEMPO REAL NA TELA DO COROINHA
-        async function carregarEscalaReal() {
-            const docSnap = await getDoc(doc(db, "escalas", "escala_ativa"));
+        // 1. CARREGAR ESCALA ESPECÍFICA PELA DATA
+        async function carregarEscalaPorData(dataString) {
+            dataSelecionadaGlobal = dataString;
+            const docSnap = await getDoc(doc(db, "escalas", dataString));
+            const lista = document.getElementById('lista-presbiterio');
+            const cardNotificacao = document.getElementById('card-notificacao');
+
             if (docSnap.exists()) {
                 const dados = docSnap.data();
+                document.getElementById('lbl-data-missa').innerText = dataString.split('-').reverse().join('/');
                 document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
-                document.getElementById('txt-missa-info').innerHTML = `Você está associado à escala vigente para a <strong>${dados.titulo}</strong>. Verifique sua função abaixo.`;
+                document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
                 
-                const lista = document.getElementById('lista-presbiterio');
                 lista.innerHTML = `
                     <div class="p-3 flex items-center justify-between">
                         <div><p class="text-xs text-gray-400 font-bold uppercase">Turiferário</p><p class="font-medium text-sm text-gray-800">${dados.turiferario.nome}</p></div>
-                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.turiferario.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.turiferario.status}</span>
+                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.turiferario.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : dados.turiferario.status === 'Pendente' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}">${dados.turiferario.status}</span>
                     </div>
                     <div class="p-3 flex items-center justify-between">
                         <div><p class="text-xs text-gray-400 font-bold uppercase">Naveteiro</p><p class="font-medium text-sm text-gray-800">${dados.naveteiro.nome}</p></div>
-                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.naveteiro.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.naveteiro.status}</span>
+                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.naveteiro.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : dados.naveteiro.status === 'Pendente' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}">${dados.naveteiro.status}</span>
                     </div>
                     <div class="p-3 flex items-center justify-between">
                         <div><p class="text-xs text-gray-400 font-bold uppercase">Crucífero</p><p class="font-medium text-sm text-gray-800">${dados.crucifero.nome}</p></div>
-                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.crucifero.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.crucifero.status}</span>
+                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.crucifero.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : dados.crucifero.status === 'Pendente' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}">${dados.crucifero.status}</span>
                     </div>
                 `;
+
+                // Verifica se o usuário logado faz parte dessa escala específica para habilitar botões
+                if(usuarioLogadoDados && (dados.turiferario.nome === usuarioLogadoDados.nome || dados.naveteiro.nome === usuarioLogadoDados.nome || dados.crucifero.nome === usuarioLogadoDados.nome)) {
+                    cardNotificacao.classList.remove('hidden');
+                    document.getElementById('botoes-acao').classList.remove('hidden');
+                    document.getElementById('txt-feedback').classList.add('hidden');
+                } else {
+                    cardNotificacao.classList.add('hidden');
+                }
+            } else {
+                document.getElementById('lbl-data-missa').innerText = "--/--/----";
+                document.getElementById('lbl-titulo-missa').innerText = "Sem escala publicada";
+                document.getElementById('lbl-horario-missa').innerText = "--:--h";
+                lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito escalado para este dia.</p>`;
+                cardNotificacao.classList.add('hidden');
             }
         }
 
-        // 2. COROINHA CONFIRMAR OU RECUSAR PRESENÇA
-        document.getElementById('btn-confirmar').addEventListener('click', async () => {
-            const docRef = doc(db, "escalas", "escala_ativa");
-            // Nota simplificada: Atualiza os status no banco de dados geral da escala
-            await updateDoc(docRef, { "turiferario.status": "Confirmado" });
-            document.getElementById('botoes-acao').classList.add('hidden');
-            document.getElementById('txt-feedback').className = "text-xs font-bold mt-2 text-emerald-600";
-            document.getElementById('txt-feedback').innerText = "✓ Presença gravada na nuvem!";
-            document.getElementById('txt-feedback').classList.remove('hidden');
-            carregarEscalaReal();
-        });
+        buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
 
-        document.getElementById('btn-recusar').addEventListener('click', async () => {
-            const docRef = doc(db, "escalas", "escala_ativa");
-            await updateDoc(docRef, { "turiferario.status": "Recusado/Troca" });
-            document.getElementById('botoes-acao').classList.add('hidden');
-            document.getElementById('txt-feedback').className = "text-xs font-bold mt-2 text-rose-600";
-            document.getElementById('txt-feedback').innerText = "✕ Solicitação de troca enviada ao coordenador.";
-            document.getElementById('txt-feedback').classList.remove('hidden');
-            carregarEscalaReal();
-        });
+        // ACEITAR OU RECUSAR A ESCALA SELECIONADA
+        async function responderEscala(statusNovo) {
+            const docRef = doc(db, "escalas", dataSelecionadaGlobal);
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) return;
+            const dados = docSnap.data();
 
-        // 3. COORDENADOR: PUBLICAR NOVA ESCALA
+            let atualizacao = {};
+            if (dados.turiferario.nome === usuarioLogadoDados.nome) atualizacao = { "turiferario.status": statusNovo };
+            if (dados.naveteiro.nome === usuarioLogadoDados.nome) atualizacao = { "naveteiro.status": statusNovo };
+            if (dados.crucifero.nome === usuarioLogadoDados.nome) atualizacao = { "crucifero.status": statusNovo };
+
+            await updateDoc(docRef, atualizacao);
+            document.getElementById('botoes-acao').classList.add('hidden');
+            const feedback = document.getElementById('txt-feedback');
+            feedback.className = `text-xs font-bold mt-2 ${statusNovo === 'Confirmado' ? 'text-emerald-600' : 'text-rose-600'}`;
+            feedback.innerText = statusNovo === 'Confirmado' ? "✓ Presença confirmada no banco!" : "✕ Solicitação de alteração enviada.";
+            feedback.classList.remove('hidden');
+            carregarEscalaPorData(dataSelecionadaGlobal);
+        }
+
+        document.getElementById('btn-confirmar').addEventListener('click', () => responderEscala('Confirmado'));
+        document.getElementById('btn-recusar').addEventListener('click', () => responderEscala('Substituição Solicitada'));
+
+        // 2. SISTEMA DE ENQUETES COLETIVAS
+        async function checarEnqueteAtiva() {
+            const docSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
+            if(docSnap.exists() && docSnap.data().ativa === true) {
+                document.getElementById('txt-pergunta-enquete').innerText = docSnap.data().pergunta;
+                document.getElementById('card-enquete').classList.remove('hidden');
+            } else {
+                document.getElementById('card-enquete').classList.add('hidden');
+            }
+        }
+
+        async function votarEnquete(opcao) {
+            const docRef = doc(db, "enquetes", "disponibilidade_atual");
+            if (opcao === 'sim') {
+                await updateDoc(docRef, { respostas_sim: arrayUnion(usuarioLogadoDados.nome) });
+            } else {
+                await updateDoc(docRef, { respostas_nao: arrayUnion(usuarioLogadoDados.nome) });
+            }
+            document.getElementById('botoes-enquete').classList.add('hidden');
+            document.getElementById('txt-feedback-enquete').classList.remove('hidden');
+        }
+        document.getElementById('btn-enquete-sim').addEventListener('click', () => votarEnquete('sim'));
+        document.getElementById('btn-enquete-nao').addEventListener('click', () => votarEnquete('nao'));
+
+        // 3. CARREGAR MATERIAL DE ESTUDO DINÂMICO
+        async function carregarMaterialEstudo() {
+            const docSnap = await getDoc(doc(db, "formacao", "manual_atual"));
+            if (docSnap.exists()) {
+                document.getElementById('lbl-titulo-formacao').innerText = docSnap.data().titulo;
+                document.getElementById('btn-download-formacao').href = docSnap.data().url;
+            }
+        }
+
+        // 4. API AUTOMÁTICA DE LITURGIA DIÁRIA
+        async function carregarLiturgiaAutomatica() {
+            try {
+                // Consome API pública e aberta de liturgia diária (padrão de mercado para o Brasil)
+                const res = await fetch('https://liturgia.up.railway.app/');
+                const data = await res.json();
+                document.getElementById('lbl-ref-liturgia').innerText = data.evangelho.referencia;
+                document.getElementById('txt-evangelho-dia').innerText = data.evangelho.texto;
+            } catch (err) {
+                document.getElementById('txt-evangelho-dia').innerText = "O Evangelho está disponível para leitura no subsídio impresso da sacristia.";
+            }
+        }
+
+
+        // ========================================================
+        // ROTINAS EXCLUSIVAS DO COORDENADOR (ESCRITA NO BANCO)
+        // ========================================================
+
+        // A) CRIAÇÃO DE ESCALAS COORDENADAS POR DATA
         document.getElementById('form-nova-escala').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const dataFila = document.getElementById('esc-data').value;
             try {
-                await setDoc(doc(db, "escalas", "escala_ativa"), {
+                await setDoc(doc(db, "escalas", dataFila), {
                     titulo: document.getElementById('esc-titulo').value,
+                    horario: document.getElementById('esc-horario').value,
+                    data: dataFila,
                     turiferario: { nome: document.getElementById('esc-turi').value, status: "Pendente" },
                     naveteiro: { nome: document.getElementById('esc-nave').value, status: "Pendente" },
                     crucifero: { nome: document.getElementById('esc-cruz').value, status: "Pendente" }
                 });
-                alert("Escala atualizada com sucesso no banco de dados!");
+                alert("Escala da data " + dataFila + " inserida com sucesso no Firestore!");
                 document.getElementById('form-nova-escala').reset();
-            } catch (err) {
-                alert("Erro ao salvar escala: " + err.message);
-            }
+            } catch (err) { alert("Erro de gravação: " + err.message); }
         });
 
-        // 4. COORDENADOR: CADASTRAR NOVO COROINHA NO SISTEMA
+        // B) DISPARAR ENQUETE
+        document.getElementById('btn-disparar-enquete').addEventListener('click', async () => {
+            const pergunta = document.getElementById('enq-pergunta').value;
+            await setDoc(doc(db, "enquetes", "disponibilidade_atual"), {
+                pergunta: pergunta,
+                ativa: true,
+                respostas_sim: [],
+                respostas_nao: []
+            });
+            alert("Nova pesquisa disparada na timeline dos usuários!");
+        });
+
+        document.getElementById('btn-fechar-enquete').addEventListener('click', async () => {
+            await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false });
+            alert("Pesquisa encerrada.");
+        });
+
+        // C) PUBLICAR LINK DE FORMÇÃO
+        document.getElementById('form-upload-formacao').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await setDoc(doc(db, "formacao", "manual_atual"), {
+                titulo: document.getElementById('form-titulo-input').value,
+                url: document.getElementById('form-url-input').value
+            });
+            alert("Novo manual de estudos integrado!");
+            document.getElementById('form-upload-formacao').reset();
+        });
+
+        // D) CADASTRO INTEGRADO DE NOVOS USUÁRIOS (AUTH + FIRESTORE)
         document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nome = document.getElementById('cad-nome').value;
@@ -366,21 +557,15 @@
             const senha = document.getElementById('cad-senha').value;
 
             try {
-                // Cria a credencial no Firebase Auth
-                const resultado = await createUserWithEmailAndPassword(auth, email, senha);
-                
-                // Cria a ficha do usuário no Firestore vinculando ao ID criado
-                await setDoc(doc(db, "usuarios", resultado.user.uid), {
+                const credencial = await createUserWithEmailAndPassword(auth, email, senha);
+                await setDoc(doc(db, "usuarios", credencial.user.uid), {
                     nome: nome,
                     email: email,
-                    funcao: "Coroinha" // Padrão dos novos cadastros
+                    funcao: "Coroinha"
                 });
-
-                alert(`Sucesso! ${nome} foi inserido no banco.`);
+                alert(`Membro ${nome} registrado com sucesso!`);
                 document.getElementById('form-cadastro-usuario').reset();
-            } catch (err) {
-                alert("Erro ao registrar: " + err.message);
-            }
+            } catch (err) { alert("Falha no registro: " + err.message); }
         });
 
         // CONTROLE VISUAL DE NAVEGAÇÃO DE ABAS MÓVEIS
@@ -395,7 +580,6 @@
             document.getElementById('tab-liturgia').className = tabName === 'liturgia' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
         }
     </script>
-
     <script>
         document.getElementById('tab-escala').addEventListener('click', () => switchTab('escala'));
         document.getElementById('tab-avisos').addEventListener('click', () => switchTab('avisos'));
