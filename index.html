@@ -124,6 +124,20 @@
                     <div class="divide-y divide-gray-100" id="lista-presbiterio"></div>
                 </div>
 
+                <div id="card-convite-substituto" class="bg-purple-50 border border-purple-300 p-4 rounded-xl shadow-xs hidden space-y-3">
+                    <div class="flex items-start gap-2 text-purple-900">
+                        <i class="fa-solid fa-handshake-angle text-lg mt-0.5"></i>
+                        <div>
+                            <p class="text-xs font-bold">Pedido de Auxílio Litúrgico!</p>
+                            <p id="txt-detalhe-convite" class="text-xs mt-0.5 text-purple-800">Um irmão escalado pediu uma substituição para esta missa. Você marcou que estava livre, pode assumir?</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="btn-aceitar-substituicao" class="bg-purple-700 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-purple-800 flex-1 cursor-pointer">✓ Posso Substituir</button>
+                        <button id="btn-recusar-substituicao" class="bg-gray-500 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-gray-600 flex-1 cursor-pointer">✕ Não posso mais</button>
+                    </div>
+                </div>
+
                 <div id="card-notificacao" class="bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-xs hidden space-y-3">
                     <p class="text-xs text-amber-800 font-medium"><i class="fa-solid fa-circle-info mr-1"></i> Você está alocado em uma celebração neste dia! Confirme ou peça substituição:</p>
                     <div class="flex gap-2" id="botoes-acao">
@@ -157,7 +171,6 @@
         </main>
 
         <main id="painel-coordenador" class="hidden flex-1 p-4 max-w-6xl mx-auto w-full space-y-6 pb-20">
-            
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between shadow-xs">
                 <div>
                     <h2 class="text-lg font-bold text-amber-900">Painel Geral da Coordenação</h2>
@@ -220,7 +233,6 @@
                         <input type="date" id="editor-escala-data" class="border border-gray-300 rounded-lg p-1.5 text-xs font-bold bg-gray-50 text-amber-950">
                     </div>
                 </div>
-                <p class="text-xs text-gray-500">Selecione um dia acima para visualizar as celebrações geradas. Você pode redefinir o Turiferário e o Naveteiro livremente quando houver imprevistos ou trocas manuais.</p>
                 
                 <div id="container-editores-missa" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                     <p class="text-xs text-gray-400 italic col-span-full text-center py-4 border border-dashed rounded-xl bg-gray-50">Escolha uma data para liberar o gerenciador.</p>
@@ -332,12 +344,16 @@
         const buscaEscalaData = document.getElementById('busca-escala-data');
         const editorEscalaData = document.getElementById('editor-escala-data');
         const containerEditoresMissa = document.getElementById('container-editores-missa');
+        const cardConviteSubstituto = document.getElementById('card-convite-substituto');
 
         let usuarioLogadoDados = null;
         let dataSelecionadaGlobal = "";
         let mapaRespostasGerais = {}; 
         let unsubEnquete = null;
-        let missaAtivaParaRespostaCoroinha = null; // Armazena a referência da missa carregada para o acólito responder
+        
+        // Referências locais de controle de fluxos ativos
+        let missaAtivaParaRespostaCoroinha = null; 
+        let conviteSubstituicaoAtivo = null;
 
         const CRONOGRAMA_PAROQUIA = [
             { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
@@ -347,7 +363,6 @@
             { diaSemana: 0, horario: "19:00", rotulo: "Domingo" }
         ];
 
-        // FUNÇÕES DE TRANSIÇÃO DO LOADING
         function showLoading() {
             telaLoading.classList.remove('opacity-0', 'pointer-events-none');
             telaLoading.classList.add('opacity-100');
@@ -370,7 +385,6 @@
             }
         }
 
-        // CONTROLADOR DE SESSÃO ATIVA
         onAuthStateChanged(auth, async (user) => {
             showLoading();
             if (user) {
@@ -415,7 +429,6 @@
             setTimeout(hideLoading, 400);
         });
 
-        // FORMULÁRIO DE LOGIN E LOGOUT
         formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
@@ -433,7 +446,6 @@
             signOut(auth);
         });
 
-        // GERADOR DINÂMICO DE DATAS
         function mapearDatasDoMes(ano, mes) {
             const datasMapeadas = [];
             const dataCorrente = new Date(ano, mes - 1, 1);
@@ -463,7 +475,6 @@
             document.getElementById('cad-senha').value = novaSenha;
         });
 
-        // COORDENADOR DISPARA ENQUETE MENSAL
         document.getElementById('btn-disparar-enquete').addEventListener('click', async () => {
             const mesAlvo = document.getElementById('enq-mes-alvo').value;
             if(!mesAlvo) { alert("Selecione o mês desejado!"); return; }
@@ -479,7 +490,7 @@
                 respostas: {} 
             });
             hideLoading();
-            alert("Enquete com múltiplos horários semanais aberta com sucesso!");
+            alert("Enquete com múltiplos horários semanais aberta!");
         });
 
         document.getElementById('btn-fechar-enquete').addEventListener('click', async () => {
@@ -489,7 +500,6 @@
             alert("Pesquisa encerrada.");
         });
 
-        // COORDENADOR MONITORANDO RETORNO DA ENQUETE
         function ouvirEnqueteTempoRealCoordenador() {
             onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
                 if (docSnap.exists()) {
@@ -520,7 +530,6 @@
             });
         }
 
-        // PROCESSADOR AUTOMÁTICO DE ESCALA MENSAL COMPLETA
         document.getElementById('form-escala-automatica').addEventListener('submit', async (e) => {
             e.preventDefault();
             const mesSelecionado = document.getElementById('auto-mes').value;
@@ -549,11 +558,14 @@
                         horario: cel.horario,
                         data: cel.data,
                         turiferario: { nome: turiferario, status: "Pendente" },
-                        naveteiro: { nome: naveteiro, status: "Pendente" }
+                        naveteiro: { nome: naveteiro, status: "Pendente" },
+                        // Estruturas de controle para as filas de substituição inteligente
+                        filaSubstitutosTuriferario: { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: turiferario },
+                        filaSubstitutosNaveteiro: { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: naveteiro }
                     });
                 }
                 hideLoading();
-                alert("Escala gerada com absoluto sucesso para todas as datas litúrgicas do mês!");
+                alert("Escala do mês gerada com sucesso!");
                 document.getElementById('form-escala-automatica').reset();
                 if(editorEscalaData.value) carregarEditorEscalasPorData(editorEscalaData.value);
             } catch (err) { 
@@ -562,7 +574,6 @@
             }
         });
 
-        // CONTROLADOR DO PAINEL DE EDIÇÃO MANUAL DO COORDENADOR
         async function carregarEditorEscalasPorData(dataString) {
             containerEditoresMissa.innerHTML = "";
             const horariosPossiveis = ["1900", "1700", "0900"];
@@ -587,12 +598,12 @@
                             <div>
                                 <label class="block text-[10px] font-bold text-gray-500 uppercase">Turiferário (Turíbulo)</label>
                                 <input type="text" id="edit-turi-${idDoc}" value="${dados.turiferario.nome}" class="w-full border border-gray-300 p-1.5 text-xs bg-white rounded-md font-medium text-gray-800">
-                                <span class="text-[9px] text-gray-400">Status atual: ${dados.turiferario.status}</span>
+                                <span class="text-[9px] text-gray-400 block">Status: ${dados.turiferario.status}</span>
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-gray-500 uppercase">Naveteiro (Naveta)</label>
                                 <input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro.nome}" class="w-full border border-gray-300 p-1.5 text-xs bg-white rounded-md font-medium text-gray-800">
-                                <span class="text-[9px] text-gray-400">Status atual: ${dados.naveteiro.status}</span>
+                                <span class="text-[9px] text-gray-400 block">Status: ${dados.naveteiro.status}</span>
                             </div>
                         </div>
                         <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md hover:bg-amber-900 transition-all cursor-pointer">
@@ -604,7 +615,7 @@
             }
 
             if (!encontrouAlguma) {
-                containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic col-span-full text-center py-4">Nenhuma escala cadastrada ou encontrada para o dia ${dataString.split('-').reverse().join('/')}.</p>`;
+                containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic col-span-full text-center py-4">Nenhuma escala para o dia ${dataString.split('-').reverse().join('/')}.</p>`;
             } else {
                 document.querySelectorAll('.btn-salvar-edicao-manual').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
@@ -619,10 +630,12 @@
                                 "turiferario.nome": novoTuriferario,
                                 "turiferario.status": "Alterado por Coord.",
                                 "naveteiro.nome": novoNaveteiro,
-                                "naveteiro.status": "Alterado por Coord."
+                                "naveteiro.status": "Alterado por Coord.",
+                                "filaSubstitutosTuriferario.nomeOriginal": novoTuriferario,
+                                "filaSubstitutosNaveteiro.nomeOriginal": novoNaveteiro
                             });
                             hideLoading();
-                            alert("Ministros atualizados com sucesso nesta missa!");
+                            alert("Ministros atualizados!");
                             if (buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                         } catch (err) {
                             hideLoading();
@@ -635,7 +648,6 @@
 
         editorEscalaData.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
 
-        // COROINHA: ESCUTA ATIVA EM TEMPO REAL PARA CONTROLAR A EXIBIÇÃO DA ENQUETE IMEDIATAMENTE
         function ouvirEnqueteTempoRealCoroinha() {
             if (unsubEnquete) unsubEnquete();
             
@@ -677,7 +689,6 @@
             });
         }
 
-        // COROINHA ENVIAR FORMULÁRIO DE DISPONIBILIDADE
         document.getElementById('btn-enquete-enviar').addEventListener('click', async () => {
             const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
             const chavesSelecionadas = [];
@@ -694,7 +705,7 @@
             hideLoading();
         });
 
-        // COROINHA: VISUALIZAR ESCALA POR DATA E GERENCIAR SE FAZ PARTE
+        // VISUALIZAR ESCALA POR DATA E CALCULAR FILAS DE SUBSTITUIÇÕES E CONVITES
         async function carregarEscalaPorData(dataString) {
             dataSelecionadaGlobal = dataString;
             const lista = document.getElementById('lista-presbiterio');
@@ -704,7 +715,10 @@
             
             lista.innerHTML = "";
             cardNotificacao.classList.add('hidden');
+            cardConviteSubstituto.classList.add('hidden');
+            
             missaAtivaParaRespostaCoroinha = null;
+            conviteSubstituicaoAtivo = null;
 
             try {
                 const horariosPossiveis = ["1900", "1700", "0900"];
@@ -721,6 +735,10 @@
                         document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
                         document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
                         
+                        // Garante retrocompatibilidade se os campos de fila não existirem no documento antigo
+                        const filaTuri = dados.filaSubstitutosTuriferario || { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: dados.turiferario.nome };
+                        const filaNave = dados.filaSubstitutosNaveteiro || { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: dados.naveteiro.nome };
+
                         lista.innerHTML += `
                             <div class="p-3 bg-amber-50/20 border-b border-gray-100">
                                 <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wide"><i class="fa-solid fa-clock"></i> Celebração das ${dados.horario}h</p>
@@ -738,33 +756,49 @@
                         `;
 
                         if (usuarioLogadoDados) {
+                            // 1. CHECAGEM: Verificar se o usuário logado possui um CONVITE DE SUBSTITUIÇÃO pendente direcionado a ele
+                            if (filaTuri.statusFila === "Processando" && filaTuri.candidatos[filaTuri.indiceAtual] === usuarioLogadoDados.nome) {
+                                conviteSubstituicaoAtivo = { idDocumentoMissa, papelFila: "filaSubstitutosTuriferario", papelMinistro: "turiferario", nomeOriginal: filaTuri.nomeOriginal };
+                            } else if (filaNave.statusFila === "Processando" && filaNave.candidatos[filaNave.indiceAtual] === usuarioLogadoDados.nome) {
+                                conviteSubstituicaoAtivo = { idDocumentoMissa, papelFila: "filaSubstitutosNaveteiro", papelMinistro: "naveteiro", nomeOriginal: filaNave.nomeOriginal };
+                            }
+
+                            if (conviteSubstituicaoAtivo) {
+                                document.getElementById('txt-detalhe-convite').innerText = `O coroinha ${conviteSubstituicaoAtivo.nomeOriginal} pediu uma troca para a função de ${conviteSubstituicaoAtivo.papelMinistro === 'turiferario' ? 'Turiferário' : 'Naveteiro'} às ${dados.horario}h. Você aceita cobrir este serviço?`;
+                                cardConviteSubstituto.classList.remove('hidden');
+                            }
+
+                            // 2. CHECAGEM: Verificar se o usuário logado é um dos escalados titulares
                             let papelUsuario = "";
                             let statusAtualResposta = "";
-                            let nomeDoOutroEscalado = "";
+                            let nomeDoParceiro = "";
 
-                            if (dados.turiferario.nome === usuarioLogadoDados.nome) {
+                            if (dados.turiferario.nome === usuarioLogadoDados.nome || (filaTuri.statusFila === "Processando" && filaTuri.nomeOriginal === usuarioLogadoDados.nome)) {
                                 papelUsuario = "turiferario";
                                 statusAtualResposta = dados.turiferario.status;
-                                nomeDoOutroEscalado = dados.naveteiro.nome;
-                            } else if (dados.naveteiro.nome === usuarioLogadoDados.nome) {
+                                nomeDoParceiro = dados.naveteiro.nome;
+                            } else if (dados.naveteiro.nome === usuarioLogadoDados.nome || (filaNave.statusFila === "Processando" && filaNave.nomeOriginal === usuarioLogadoDados.nome)) {
                                 papelUsuario = "naveteiro";
                                 statusAtualResposta = dados.naveteiro.status;
-                                nomeDoOutroEscalado = dados.turiferario.nome;
+                                nomeDoParceiro = dados.turiferario.nome;
                             }
 
                             if (papelUsuario !== "") {
-                                // Guarda dados adicionais (horário e quem é o parceiro) para a lógica da troca
                                 missaAtivaParaRespostaCoroinha = { 
                                     idDocumentoMissa, 
                                     papelUsuario, 
                                     horarioMissa: dados.horario,
-                                    nomeDoOutroEscalado
+                                    nomeDoParceiro
                                 };
                                 cardNotificacao.classList.remove('hidden');
 
-                                if (statusAtualResposta === "Confirmado" || statusAtualResposta === "Substituição Solicitada" || statusAtualResposta === "Substituindo") {
+                                if (statusAtualResposta === "Confirmado" || statusAtualResposta === "Substituindo") {
                                     botoesAcao.classList.add('hidden');
                                     txtFeedback.innerText = `Você respondeu esta escala como: ${statusAtualResposta}`;
+                                    txtFeedback.classList.remove('hidden');
+                                } else if (statusAtualResposta === "Substituição Solicitada") {
+                                    botoesAcao.classList.add('hidden');
+                                    txtFeedback.innerText = "Aguardando confirmação de algum voluntário da enquete...";
                                     txtFeedback.classList.remove('hidden');
                                 } else {
                                     botoesAcao.classList.remove('hidden');
@@ -782,76 +816,133 @@
                     document.getElementById('lbl-horario-missa').innerText = "--:--h";
                     lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado para este dia.</p>`;
                     cardNotificacao.classList.add('hidden');
+                    cardConviteSubstituto.classList.add('hidden');
                 }
             } catch(e) { console.error(e); }
         }
 
         buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
 
-        // NOVA LÓGICA DE PROCESSAMENTO DE RESPOSTA E SUBSTITUIÇÃO INTELIGENTE
+        // FLUXO DE PEDIDO DE REVEZAMENTO / SOLICITAÇÃO DE SUBSTITUIÇÃO
         async function responderEscala(statusNovo) {
             if (!missaAtivaParaRespostaCoroinha) return;
             
             showLoading();
             try {
-                const { idDocumentoMissa, papelUsuario, horarioMissa, nomeDoOutroEscalado } = missaAtivaParaRespostaCoroinha;
+                const { idDocumentoMissa, papelUsuario, horarioMissa, nomeDoParceiro } = missaAtivaParaRespostaCoroinha;
                 const docRef = doc(db, "escalas", idDocumentoMissa);
                 const objetoAtualizacao = {};
 
                 if (statusNovo === 'Substituição Solicitada') {
-                    // 1. Busca quem votou disponível na enquete para essa mesma data e horário
+                    // Monta a chave da enquete para encontrar os voluntários corretos
                     const idChaveEnquete = `${buscaEscalaData.value}_${horarioMissa}`;
                     const enqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
                     
-                    let candidatoSubstituto = "";
+                    let listaVoluntariosValidos = [];
 
                     if (enqueteSnap.exists()) {
                         const dadosEnquete = enqueteSnap.data();
                         const respostas = dadosEnquete.respostas || {};
-                        let aptosDisponiveis = [];
 
-                        // Filtra quem marcou o dia e não é o próprio usuário nem o parceiro de escala atual
+                        // Busca pessoas que votaram sim para este horário, excluindo o próprio solicitante e o parceiro
                         Object.keys(respostas).forEach(nome => {
-                            if (respostas[nome].includes(idChaveEnquete) && nome !== usuarioLogadoDados.nome && nome !== nomeDoOutroEscalado) {
-                                aptosDisponiveis.push(nome);
+                            if (respostas[nome].includes(idChaveEnquete) && nome !== usuarioLogadoDados.nome && nome !== nomeDoParceiro) {
+                                listaVoluntariosValidos.push(nome);
                             }
                         });
-
-                        if (aptosDisponiveis.length > 0) {
-                            // Sorteia um dos voluntários disponíveis para revezamento
-                            aptosDisponiveis.sort(() => Math.random() - 0.5);
-                            candidatoSubstituto = aptosDisponiveis[0];
-                        }
                     }
 
-                    // 2. Se achou alguém, faz a troca direta!
-                    if (candidatoSubstituto !== "") {
-                        objetoAtualizacao[`${papelUsuario}.nome`] = candidatoSubstituto;
-                        objetoAtualizacao[`${papelUsuario}.status`] = "Substituindo";
-                        await updateDoc(docRef, objetoAtualizacao);
-                        alert(`Substituição realizada! O coroinha ${candidatoSubstituto} (que estava livre) assumiu a sua escala.`);
-                    } else {
-                        // Se não achou ninguém livre na enquete, apenas joga o status para a coordenação ver
+                    if (listaVoluntariosValidos.length > 0) {
+                        // Embaralha para gerar um rodízio justo
+                        listaVoluntariosValidos.sort(() => Math.random() - 0.5);
+
+                        const nomeCampoFila = papelUsuario === 'turiferario' ? 'filaSubstitutosTuriferario' : 'filaSubstitutosNaveteiro';
+                        
                         objetoAtualizacao[`${papelUsuario}.status`] = "Substituição Solicitada";
+                        objetoAtualizacao[nomeCampoFila] = {
+                            candidatos: listaVoluntariosValidos,
+                            indiceAtual: 0,
+                            statusFila: "Processando",
+                            nomeOriginal: usuarioLogadoDados.nome
+                        };
+
                         await updateDoc(docRef, objetoAtualizacao);
-                        alert("Não encontramos voluntários pré-disponíveis na enquete. Seu pedido foi enviado para a coordenação!");
+                        alert(`Seu pedido foi registrado! O sistema notificou o primeiro coroinha disponível da lista (${listaVoluntariosValidos[0]}). Aguarde o retorno.`);
+                    } else {
+                        // Sem ninguém na enquete
+                        objetoAtualizacao[`${papelUsuario}.status`] = "Troca Manual Necessária";
+                        await updateDoc(docRef, objetoAtualizacao);
+                        alert("Não há voluntários mapeados na enquete para este dia/horário. A coordenação foi notificada diretamente!");
                     }
                 } else {
-                    // Fluxo padrão para Confirmação de Presença
+                    // Confirmação padrão
                     objetoAtualizacao[`${papelUsuario}.status`] = statusNovo;
                     await updateDoc(docRef, objetoAtualizacao);
-                    alert("Presença confirmada com sucesso!");
+                    alert("Presença confirmada!");
                 }
                 
                 await carregarEscalaPorData(buscaEscalaData.value);
             } catch (err) {
-                alert("Erro ao processar resposta: " + err.message);
+                alert("Erro ao processar: " + err.message);
             }
             hideLoading();
         }
 
         document.getElementById('btn-confirmar').addEventListener('click', () => responderEscala('Confirmado'));
         document.getElementById('btn-recusar').addEventListener('click', () => responderEscala('Substituição Solicitada'));
+
+        // PROCESSAMENTO DE RESPOSTA DO CONVIDADO (ACEITAR OU RECUSAR A SUB)
+        async function processarRespostaSubstituto(aceitou) {
+            if (!conviteSubstituicaoAtivo) return;
+
+            showLoading();
+            try {
+                const { idDocumentoMissa, papelFila, papelMinistro } = conviteSubstituicaoAtivo;
+                const docRef = doc(db, "escalas", idDocumentoMissa);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const dadosMissa = docSnap.data();
+                    const infoFila = dadosMissa[papelFila];
+                    const camposAtualizar = {};
+
+                    if (aceitou) {
+                        // Caso aceite, ele assume o posto imediatamente
+                        camposAtualizar[`${papelMinistro}.nome`] = usuarioLogadoDados.nome;
+                        camposAtualizar[`${papelMinistro}.status`] = "Substituindo";
+                        camposAtualizar[`${papelFila}.statusFila`] = "Finalizada";
+                        
+                        await updateDoc(docRef, camposAtualizar);
+                        alert("Obrigado! Você assumiu essa escala com sucesso.");
+                    } else {
+                        // Caso NÃO possa, avança para o próximo coroinha da lista
+                        const proximoIndice = infoFila.indiceAtual + 1;
+
+                        if (proximoIndice < infoFila.candidatos.length) {
+                            const proximoNome = infoFila.candidatos[proximoIndice];
+                            camposAtualizar[`${papelFila}.indiceAtual`] = proximoIndice;
+                            
+                            await updateDoc(docRef, camposAtualizar);
+                            alert(`Pedido repassado! O sistema agora enviará o convite para o próximo voluntário: ${proximoNome}.`);
+                        } else {
+                            // Esgotaram todos os voluntários da enquete e ninguém pôde
+                            camposAtualizar[`${papelFila}.statusFila`] = "Esgotada";
+                            camposAtualizar[`${papelMinistro}.status`] = "Troca Manual Necessária";
+                            
+                            await updateDoc(docRef, camposAtualizar);
+                            alert("Todos os voluntários cadastrados na enquete recusaram ou não puderam. O chamado foi repassado para a Coordenação resolver manualmente!");
+                        }
+                    }
+                }
+                await carregarEscalaPorData(buscaEscalaData.value);
+            } catch (err) {
+                alert("Erro ao processar convite: " + err.message);
+            }
+            hideLoading();
+        }
+
+        document.getElementById('btn-aceitar-substituicao').addEventListener('click', () => processarRespostaSubstituto(true));
+        document.getElementById('btn-recusar-substituicao').addEventListener('click', () => processarRespostaSubstituto(false));
 
         function ouvirUsuariosCadastrados() {
             onSnapshot(collection(db, "usuarios"), (snapshot) => {
