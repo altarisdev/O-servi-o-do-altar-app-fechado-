@@ -528,7 +528,7 @@
             });
         }
 
-        // GERADOR MENSAL AUTOMÁTICO DE 6 ALTARES
+                // GERADOR MENSAL AUTOMÁTICO DE 6 ALTARES (CORRIGIDO)
         document.getElementById('form-escala-automatica').addEventListener('submit', async (e) => {
             e.preventDefault();
             const mesSelecionado = document.getElementById('auto-mes').value;
@@ -551,7 +551,7 @@
 
                     const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
 
-                    // Criação da escala com os 6 postos padrão de Altar vazios ou preenchidos com os sorteados
+                    // GARANTE O PREENCHIMENTO CORRETO DOS OBJETOS DE CADA ALTAR
                     await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
                         titulo: `${tituloBase} (${cel.rotulo})`,
                         horario: cel.horario,
@@ -570,14 +570,18 @@
                     });
                 }
                 hideLoading();
-                alert("Escala de Altares gerada com sucesso!");
+                alert("Escala de Altares gerada e PREENCHIDA com sucesso!");
                 document.getElementById('form-escala-automatica').reset();
+                
+                // Atualiza os editores e telas se a data atual estiver selecionada
                 if(editorEscalaData.value) carregarEditorEscalasPorData(editorEscalaData.value);
+                if(buscaEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
             } catch (err) { 
                 hideLoading();
                 alert("Erro ao salvar lote: " + err.message); 
             }
         });
+
 
         // GERENCIADOR EXCLUSIVO DA COORDENAÇÃO (EDIÇÃO MANUAL + INCLUSÃO DE INCENSAÇÃO)
         async function carregarEditorEscalasPorData(dataString) {
