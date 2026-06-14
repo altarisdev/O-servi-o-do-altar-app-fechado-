@@ -89,7 +89,7 @@
             <section id="conteudo-escala" class="space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-list-check text-amber-700 mr-1"></i> Próximas Escalas</h3>
-                    <input type="date" id="busca-escala-data" class="text-xs bg-white border p-1 rounded-md text-gray-700 font-semibold">
+                    <input type="date" id="busca-escala-data" class="text-xs bg-white border border-gray-300 p-1 rounded-md text-gray-700 font-semibold">
                 </div>
                 
                 <div id="card-enquete" class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-xl shadow-xs hidden">
@@ -124,13 +124,13 @@
                     <div class="divide-y divide-gray-100" id="lista-presbiterio"></div>
                 </div>
 
-                <div id="card-notificacao" class="bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-xs hidden">
-                    <p class="text-xs text-amber-800 font-medium">Você faz parte desta escala! Por favor, confirme ou recuse:</p>
-                    <div class="flex gap-2 mt-2" id="botoes-acao">
-                        <button id="btn-confirmar" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-emerald-700 flex-1 cursor-pointer">✓ Confirmar</button>
-                        <button id="btn-recusar" class="bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-rose-700 flex-1 cursor-pointer">✕ Pedir Troca</button>
+                <div id="card-notificacao" class="bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-xs hidden space-y-3">
+                    <p class="text-xs text-amber-800 font-medium"><i class="fa-solid fa-circle-info mr-1"></i> Você está alocado em uma celebração neste dia! Confirme ou peça substituição:</p>
+                    <div class="flex gap-2" id="botoes-acao">
+                        <button id="btn-confirmar" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2.5 rounded-lg hover:bg-emerald-700 flex-1 cursor-pointer transition-all">✓ Confirmar Presença</button>
+                        <button id="btn-recusar" class="bg-rose-600 text-white text-xs font-bold px-3 py-2.5 rounded-lg hover:bg-rose-700 flex-1 cursor-pointer transition-all">✕ Pedir Troca</button>
                     </div>
-                    <p id="txt-feedback" class="text-xs font-bold mt-2 hidden"></p>
+                    <p id="txt-feedback" class="text-xs font-bold text-center bg-white p-2 border border-amber-200 rounded-lg text-amber-900 hidden"></p>
                 </div>
             </section>
 
@@ -161,7 +161,7 @@
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between shadow-xs">
                 <div>
                     <h2 class="text-lg font-bold text-amber-900">Painel Geral da Coordenação</h2>
-                    <p class="text-xs text-amber-700">Geração de Escala Mensal baseada em múltiplos horários semanais.</p>
+                    <p class="text-xs text-amber-700">Geração e edição customizada de escalas com múltiplos horários.</p>
                 </div>
                 <i class="fa-solid fa-user-shield text-3xl text-amber-700"></i>
             </div>
@@ -169,7 +169,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 lg:col-span-2">
                     <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-800"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gerador de Escala Mensal Multi-Horários</h3>
-                    <p class="text-xs text-gray-500">O sistema mapeará todas as **Terças (19h), Quintas (17h), Sábados (19h), Domingos (09h) e Domingos (19h)** do mês escolhido.</p>
+                    <p class="text-xs text-gray-500">Mapeamento automático de **Terças (19h), Quintas (17h), Sábados (19h) e Domingos (09h e 19h)** com base nas respostas ativas.</p>
                     
                     <form id="form-escala-automatica" class="space-y-3">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -209,6 +209,21 @@
                             <span class="text-gray-400 italic">Nenhum dado ativo no momento.</span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
+                <div class="border-b pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <h3 class="font-bold text-gray-800 text-amber-900"><i class="fa-solid fa-user-pen mr-1"></i> Gerenciar e Editar Escalas Publicadas</h3>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-bold text-gray-600">Filtrar Data:</label>
+                        <input type="date" id="editor-escala-data" class="border border-gray-300 rounded-lg p-1.5 text-xs font-bold bg-gray-50 text-amber-950">
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500">Selecione um dia acima para visualizar as celebrações geradas. Você pode redefinir o Turiferário e o Naveteiro livremente quando houver imprevistos ou trocas manuais.</p>
+                
+                <div id="container-editores-missa" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <p class="text-xs text-gray-400 italic col-span-full text-center py-4 border border-dashed rounded-xl bg-gray-50">Escolha uma data para liberar o gerenciador.</p>
                 </div>
             </div>
 
@@ -315,11 +330,14 @@
         const painelCoordenador = document.getElementById('painel-coordenador');
         const menuAbasCoroinha = document.getElementById('menu-abas-coroinha');
         const buscaEscalaData = document.getElementById('busca-escala-data');
+        const editorEscalaData = document.getElementById('editor-escala-data');
+        const containerEditoresMissa = document.getElementById('container-editores-missa');
 
         let usuarioLogadoDados = null;
         let dataSelecionadaGlobal = "";
         let mapaRespostasGerais = {}; 
         let unsubEnquete = null;
+        let missaAtivaParaRespostaCoroinha = null; // Guarda a referência da missa que o coroinha responderá
 
         const CRONOGRAMA_PAROQUIA = [
             { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
@@ -370,6 +388,10 @@
                             painelCoordenador.classList.remove('hidden');
                             ouvirEnqueteTempoRealCoordenador();
                             ouvirUsuariosCadastrados();
+                            
+                            // Define data de hoje no painel do coordenador por padrão
+                            editorEscalaData.value = new Date().toISOString().split('T')[0];
+                            carregarEditorEscalasPorData(editorEscalaData.value);
                         } else {
                             painelCoordenador.classList.add('hidden');
                             painelCoroinha.classList.remove('hidden');
@@ -534,11 +556,89 @@
                 hideLoading();
                 alert("Escala gerada com absoluto sucesso para todas as datas litúrgicas do mês!");
                 document.getElementById('form-escala-automatica').reset();
+                if(editorEscalaData.value) carregarEditorEscalasPorData(editorEscalaData.value);
             } catch (err) { 
                 hideLoading();
                 alert("Erro ao salvar lote: " + err.message); 
             }
         });
+
+        // CONTROLADOR DO PAINEL DE EDIÇÃO MANUAL DO COORDENADOR
+        async function carregarEditorEscalasPorData(dataString) {
+            containerEditoresMissa.innerHTML = "";
+            const horariosPossiveis = ["1900", "1700", "0900"];
+            let encontrouAlguma = false;
+
+            for (const hr of horariosPossiveis) {
+                const idDoc = `${dataString}_${hr}`;
+                const docSnap = await getDoc(doc(db, "escalas", idDoc));
+                
+                if (docSnap.exists()) {
+                    encontrouAlguma = true;
+                    const dados = docSnap.data();
+                    
+                    const divEdicao = document.createElement('div');
+                    divEdicao.className = "bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 shadow-2xs";
+                    divEdicao.innerHTML = `
+                        <div class="flex justify-between items-center border-b pb-1">
+                            <span class="text-xs font-bold text-amber-900"><i class="fa-solid fa-clock"></i> Celebração: ${dados.horario}h</span>
+                            <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded">${dados.titulo}</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Turiferário (Turíbulo)</label>
+                                <input type="text" id="edit-turi-${idDoc}" value="${dados.turiferario.nome}" class="w-full border border-gray-300 p-1.5 text-xs bg-white rounded-md font-medium text-gray-800">
+                                <span class="text-[9px] text-gray-400">Status atual: ${dados.turiferario.status}</span>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Naveteiro (Naveta)</label>
+                                <input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro.nome}" class="w-full border border-gray-300 p-1.5 text-xs bg-white rounded-md font-medium text-gray-800">
+                                <span class="text-[9px] text-gray-400">Status atual: ${dados.naveteiro.status}</span>
+                            </div>
+                        </div>
+                        <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md hover:bg-amber-900 transition-all cursor-pointer">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> Atualizar Ministros
+                        </button>
+                    `;
+                    containerEditoresMissa.appendChild(divEdicao);
+                }
+            }
+
+            if (!encontrouAlguma) {
+                containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic col-span-full text-center py-4">Nenhuma escala cadastrada ou encontrada para o dia ${dataString.split('-').reverse().join('/')}.</p>`;
+            } else {
+                // Atrela evento nos botões dinâmicos de salvamento manual
+                document.querySelectorAll('.btn-salvar-edicao-manual').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const idDocumentoMissa = e.currentTarget.getAttribute('data-id');
+                        const novoTuriferario = document.getElementById(`edit-turi-${idDocumentoMissa}`).value;
+                        const novoNaveteiro = document.getElementById(`edit-nave-${idDocumentoMissa}`).value;
+                        
+                        showLoading();
+                        try {
+                            const docRef = doc(db, "escalas", idDocumentoMissa);
+                            // Mantemos o status como pendente ao alterar manualmente o nome, para que o novo escalado confirme
+                            await updateDoc(docRef, {
+                                "turiferario.nome": novoTuriferario,
+                                "turiferario.status": "Alterado por Coord.",
+                                "naveteiro.nome": novoNaveteiro,
+                                "naveteiro.status": "Alterado por Coord."
+                            });
+                            hideLoading();
+                            alert("Ministros atualizados com sucesso nesta missa!");
+                            // Recarrega a visualização do coroinha caso ele esteja na mesma aba
+                            if (buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
+                        } catch (err) {
+                            hideLoading();
+                            alert("Erro ao salvar: " + err.message);
+                        }
+                    });
+                });
+            }
+        }
+
+        editorEscalaData.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
+
 
         // COROINHA: ESCUTA ATIVA EM TEMPO REAL PARA CONTROLAR A EXIBIÇÃO DA ENQUETE IMEDIATAMENTE
         function ouvirEnqueteTempoRealCoroinha() {
@@ -554,14 +654,12 @@
                     const dados = docSnap.data();
                     const respostas = dados.respostas || {};
                     
-                    // CORREÇÃO CRÍTICA: Se o nome do usuário logado já constar no nó de respostas, remove as checkboxes de vez
                     if (Object.prototype.hasOwnProperty.call(respostas, usuarioLogadoDados.nome)) {
                         blocoVotacao.classList.add('hidden');
-                        blocoVotacao.innerHTML = ""; // Limpa a árvore do DOM para assegurar que não reapareça
+                        blocoVotacao.innerHTML = ""; 
                         blocoFeedback.classList.remove('hidden');
                         cardEnquete.classList.remove('hidden');
                     } else {
-                        // Se não respondeu, constrói os inputs com os horários e exibe o formulário
                         container.innerHTML = "";
                         dados.celebracoes.forEach(cel => {
                             const dataBR = cel.data.split('-').reverse().join('/');
@@ -597,24 +695,30 @@
                 campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = chavesSelecionadas;
 
                 await updateDoc(docRef, campoAtualizacao);
-                // O próprio onSnapshot acima se encarregará de remontar a tela instantaneamente e exibir o sucesso.
             } catch (err) { alert("Erro ao salvar: " + err.message); }
             hideLoading();
         });
 
-        // COROINHA: VISUALIZAR ESCALA POR DATA
+        // COROINHA: VISUALIZAR ESCALA POR DATA E GERENCIAR SE FAZ PARTE
         async function carregarEscalaPorData(dataString) {
             dataSelecionadaGlobal = dataString;
             const lista = document.getElementById('lista-presbiterio');
             const cardNotificacao = document.getElementById('card-notificacao');
+            const botoesAcao = document.getElementById('botoes-acao');
+            const txtFeedback = document.getElementById('txt-feedback');
+            
             lista.innerHTML = "";
+            cardNotificacao.classList.add('hidden');
+            missaAtivaParaRespostaCoroinha = null;
 
             try {
                 const horariosPossiveis = ["1900", "1700", "0900"];
                 let encontrouAlguma = false;
 
                 for(const hr of horariosPossiveis) {
-                    const docSnap = await getDoc(doc(db, "escalas", `${dataString}_${hr}`));
+                    const idDocumentoMissa = `${dataString}_${hr}`;
+                    const docSnap = await getDoc(doc(db, "escalas", idDocumentoMissa));
+                    
                     if (docSnap.exists()) {
                         encontrouAlguma = true;
                         const dados = docSnap.data();
@@ -638,10 +742,35 @@
                             </div>
                         `;
 
-                        if(usuarioLogadoDados && (dados.turiferario.nome === usuarioLogadoDados.nome || dados.naveteiro.nome === usuarioLogadoDados.nome)) {
-                            cardNotificacao.classList.remove('hidden');
-                            document.getElementById('botoes-acao').classList.remove('hidden');
-                            document.getElementById('txt-feedback').classList.add('hidden');
+                        // CORREÇÃO: Mapeia se o usuário atual está alocado nessa missa e qual é o seu papel para tratar a resposta
+                        if (usuarioLogadoDados) {
+                            let papelUsuario = "";
+                            let statusAtualResposta = "";
+
+                            if (dados.turiferario.nome === usuarioLogadoDados.nome) {
+                                papelUsuario = "turiferario";
+                                statusAtualResposta = dados.turiferario.status;
+                            } else if (dados.naveteiro.nome === usuarioLogadoDados.nome) {
+                                papelUsuario = "naveteiro";
+                                statusAtualResposta = dados.naveteiro.status;
+                            }
+
+                            if (papelUsuario !== "") {
+                                missaAtivaParaRespostaCoroinha = { idDocumentoMissa, papelUsuario };
+                                cardNotificacao.classList.remove('hidden');
+
+                                // Se já respondeu algo diferente de Pendente ou Editado, esconde botões e crava a resposta na tela
+                                if (statusAtualResposta === "Confirmado" || statusAtualResposta === "Substituição Solicitada") {
+                                    botoesAcao.classList.add('hidden');
+                                    txtFeedback.innerText = `Você respondeu esta escala como: ${statusAtualResposta}`;
+                                    txtFeedback.classList.remove('hidden');
+                                } else {
+                                    // Se está pendente, libera os botões para clique
+                                    botoesAcao.classList.remove('hidden');
+                                    txtFeedback.classList.add('hidden');
+                                    txtFeedback.innerText = "";
+                                }
+                            }
                         }
                     }
                 }
@@ -657,6 +786,32 @@
         }
 
         buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
+
+        // LOGICA DE PROCESSAMENTO DE CONFIRMAÇÃO DO COROINHA
+        async function responderEscala(statusNovo) {
+            if (!missaAtivaParaRespostaCoroinha) return;
+            
+            showLoading();
+            try {
+                const { idDocumentoMissa, papelUsuario } = missaAtivaParaRespostaCoroinha;
+                const docRef = doc(db, "escalas", idDocumentoMissa);
+                
+                const objetoAtualizacao = {};
+                objetoAtualizacao[`${papelUsuario}.status`] = statusNovo;
+
+                await updateDoc(docRef, objetoAtualizacao);
+                
+                // Recarrega imediatamente os dados locais para atualizar o visual
+                await carregarEscalaPorData(buscaEscalaData.value);
+                alert("Sua resposta foi gravada com sucesso!");
+            } catch (err) {
+                alert("Erro ao processar resposta: " + err.message);
+            }
+            hideLoading();
+        }
+
+        document.getElementById('btn-confirmar').addEventListener('click', () => responderEscala('Confirmado'));
+        document.getElementById('btn-recusar').addEventListener('click', () => responderEscala('Substituição Solicitada'));
 
         function ouvirUsuariosCadastrados() {
             onSnapshot(collection(db, "usuarios"), (snapshot) => {
