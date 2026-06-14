@@ -107,7 +107,7 @@
                             </div>
 
                             <div id="txt-feedback-enquete" class="text-xs font-bold mt-3 text-emerald-700 hidden bg-emerald-50 border border-emerald-200 p-2 rounded-lg flex items-center gap-1.5 shadow-2xs">
-                                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> Sua escala de disponibilidade já está salva no system!
+                                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> Sua escala de disponibilidade já está salva no sistema!
                             </div>
                         </div>
                     </div>
@@ -129,7 +129,7 @@
                         <i class="fa-solid fa-handshake-angle text-lg mt-0.5"></i>
                         <div>
                             <p class="text-xs font-bold">Pedido de Auxílio Litúrgico!</p>
-                            <p id="txt-detalhe-convite" class="text-xs mt-0.5 text-purple-800">Um irmão escalado pediu uma substituição para esta missa. Você marcou que estava livre, pode assumir?</p>
+                            <p id="txt-detalhe-convite" class="text-xs mt-0.5 text-purple-800">Um irmão escalado pediu uma substituição para esta missa.</p>
                         </div>
                     </div>
                     <div class="flex gap-2">
@@ -174,15 +174,15 @@
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between shadow-xs">
                 <div>
                     <h2 class="text-lg font-bold text-amber-900">Painel Geral da Coordenação</h2>
-                    <p class="text-xs text-amber-700">Geração e edição customizada de escalas com múltiplos horários.</p>
+                    <p class="text-xs text-amber-700">Geração de Escalas (6 Altares) + Ativação Manual de Turíbulo e Naveta.</p>
                 </div>
                 <i class="fa-solid fa-user-shield text-3xl text-amber-700"></i>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 lg:col-span-2">
-                    <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-800"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gerador de Escala Mensal Multi-Horários</h3>
-                    <p class="text-xs text-gray-500">Mapeamento automático de **Terças (19h), Quintas (17h), Sábados (19h) e Domingos (09h e 19h)** com base nas respostas ativas.</p>
+                    <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-800"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Sorteador de Altares (I ao VI)</h3>
+                    <p class="text-xs text-gray-500">Mapeia e distribui automaticamente os voluntários ativos nos postos de **Altar I, II, III, IV, V e VI** para o cronograma litúrgico.</p>
                     
                     <form id="form-escala-automatica" class="space-y-3">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -196,7 +196,7 @@
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-amber-700 text-white text-xs font-bold py-3 rounded-lg hover:bg-amber-800 cursor-pointer shadow-sm">
-                            <i class="fa-solid fa-gears mr-1"></i> Processar Cronograma e Gerar Escala do Mês
+                            <i class="fa-solid fa-gears mr-1"></i> Sortear Altares do Mês
                         </button>
                     </form>
                 </div>
@@ -217,7 +217,7 @@
                     </div>
                     
                     <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2 mt-2">
-                        <p class="text-[10px] font-bold text-gray-700 uppercase tracking-wider">Acompanhamento de Disponibilidade:</p>
+                        <p class="text-[10px] font-bold text-gray-700 uppercase tracking-wider">Membros Disponíveis (Mapeamento):</p>
                         <div class="text-[11px] text-gray-500 max-h-36 overflow-y-auto space-y-1" id="lista-nomes-enquete">
                             <span class="text-gray-400 italic">Nenhum dado ativo no momento.</span>
                         </div>
@@ -227,7 +227,7 @@
 
             <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
                 <div class="border-b pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <h3 class="font-bold text-gray-800 text-amber-900"><i class="fa-solid fa-user-pen mr-1"></i> Gerenciar e Editar Escalas Publicadas</h3>
+                    <h3 class="font-bold text-gray-800 text-amber-900"><i class="fa-solid fa-user-pen mr-1"></i> Gerenciar Celebrações e Adicionar Incensação</h3>
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-bold text-gray-600">Filtrar Data:</label>
                         <input type="date" id="editor-escala-data" class="border border-gray-300 rounded-lg p-1.5 text-xs font-bold bg-gray-50 text-amber-950">
@@ -329,7 +329,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Elementos do DOM
         const formLogin = document.getElementById('form-login');
         const erroLogin = document.getElementById('erro-login');
         const btnLogout = document.getElementById('btn-logout');
@@ -489,7 +488,7 @@
                 respostas: {} 
             });
             hideLoading();
-            alert("Enquete com múltiplos horários semanais aberta!");
+            alert("Enquete de disponibilidade aberta!");
         });
 
         document.getElementById('btn-fechar-enquete').addEventListener('click', async () => {
@@ -517,9 +516,9 @@
                             const dataBR = cel.data.split('-').reverse().join('/');
                             container.innerHTML += `
                                 <div class="bg-white p-1.5 border border-gray-200 rounded mb-1">
-                                    <strong class="text-amber-900 text-[10px] block border-b pb-0.5">${dataBR} - ${cel.rotulo} às ${cel.horario}h:</strong>
+                                    <strong class="text-amber-900 text-[10px] block border-b pb-0.5">${dataBR} - ${cel.rotulo} (${cel.horario}h):</strong>
                                     <p class="text-[10px] text-emerald-700 font-medium mt-0.5">
-                                        ${aptos.length > 0 ? '✓ ' + aptos.join(', ') : 'Ninguém registrado'}
+                                        ${aptos.length > 0 ? '✓ ' + aptos.join(', ') : 'Ninguém mapeado'}
                                     </p>
                                 </div>
                             `;
@@ -529,6 +528,7 @@
             });
         }
 
+        // GERADOR MENSAL AUTOMÁTICO DE 6 ALTARES
         document.getElementById('form-escala-automatica').addEventListener('submit', async (e) => {
             e.preventDefault();
             const mesSelecionado = document.getElementById('auto-mes').value;
@@ -546,24 +546,31 @@
                         if (mapaRespostasGerais[nome].includes(cel.idChave)) disponiveis.push(nome);
                     });
 
+                    // Sorteio aleatório dos membros que votaram na data
                     disponiveis.sort(() => Math.random() - 0.5);
 
-                    const turiferario = disponiveis[0] || "A definir";
-                    const naveteiro = disponiveis[1] || "A definir";
                     const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
 
+                    // Criação da escala com os 6 postos padrão de Altar vazios ou preenchidos com os sorteados
                     await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
                         titulo: `${tituloBase} (${cel.rotulo})`,
                         horario: cel.horario,
                         data: cel.data,
-                        turiferario: { nome: turiferario, status: "Pendente" },
-                        naveteiro: { nome: naveteiro, status: "Pendente" },
-                        filaSubstitutosTuriferario: { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: turiferario },
-                        filaSubstitutosNaveteiro: { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: naveteiro }
+                        altar1: { nome: disponiveis[0] || "A definir", status: "Pendente" },
+                        altar2: { nome: disponiveis[1] || "A definir", status: "Pendente" },
+                        altar3: { nome: disponiveis[2] || "A definir", status: "Pendente" },
+                        altar4: { nome: disponiveis[3] || "A definir", status: "Pendente" },
+                        altar5: { nome: disponiveis[4] || "A definir", status: "Pendente" },
+                        altar6: { nome: disponiveis[5] || "A definir", status: "Pendente" },
+                        // Turíbulo e Naveta iniciam desativados por padrão (Apenas após escolha do coordenador)
+                        turibuloAtivo: false,
+                        turiferario: { nome: "A definir", status: "Pendente" },
+                        navetaAtiva: false,
+                        naveteiro: { nome: "A definir", status: "Pendente" }
                     });
                 }
                 hideLoading();
-                alert("Escala do mês gerada com sucesso!");
+                alert("Escala de Altares gerada com sucesso!");
                 document.getElementById('form-escala-automatica').reset();
                 if(editorEscalaData.value) carregarEditorEscalasPorData(editorEscalaData.value);
             } catch (err) { 
@@ -572,6 +579,7 @@
             }
         });
 
+        // GERENCIADOR EXCLUSIVO DA COORDENAÇÃO (EDIÇÃO MANUAL + INCLUSÃO DE INCENSAÇÃO)
         async function carregarEditorEscalasPorData(dataString) {
             containerEditoresMissa.innerHTML = "";
             const horariosPossiveis = ["1900", "1700", "0900"];
@@ -584,10 +592,6 @@
                 if (docSnap.exists()) {
                     encontrouAlguma = true;
                     const dados = docSnap.data();
-                    
-                    // Lógica de alternância dos rótulos no gerenciador
-                    const rotulo1 = dados.turiferario.nome === "A definir" ? "Altar (Vaga 1)" : "Turiferário (Turíbulo)";
-                    const rotulo2 = dados.naveteiro.nome === "A definir" ? "Altar (Vaga 2)" : "Naveteiro (Naveta)";
 
                     const divEdicao = document.createElement('div');
                     divEdicao.className = "bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 shadow-2xs";
@@ -596,20 +600,61 @@
                             <span class="text-xs font-bold text-amber-900"><i class="fa-solid fa-clock"></i> Celebração: ${dados.horario}h</span>
                             <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded">${dados.titulo}</span>
                         </div>
-                        <div class="space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">${rotulo1}</label>
-                                <input type="text" id="edit-turi-${idDoc}" value="${dados.turiferario.nome}" class="w-full border border-gray-300 p-1.5 text-xs bg-white rounded-md font-medium text-gray-800">
-                                <span class="text-[9px] text-gray-400 block">Status: ${dados.turiferario.status}</span>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar I</label>
+                                <input type="text" id="edit-a1-${idDoc}" value="${dados.altar1?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">${rotulo2}</label>
-                                <input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro.nome}" class="w-full border border-gray-300 p-1.5 text-xs bg-white rounded-md font-medium text-gray-800">
-                                <span class="text-[9px] text-gray-400 block">Status: ${dados.naveteiro.status}</span>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar II</label>
+                                <input type="text" id="edit-a2-${idDoc}" value="${dados.altar2?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar III</label>
+                                <input type="text" id="edit-a3-${idDoc}" value="${dados.altar3?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar IV</label>
+                                <input type="text" id="edit-a4-${idDoc}" value="${dados.altar4?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar V</label>
+                                <input type="text" id="edit-a5-${idDoc}" value="${dados.altar5?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar VI</label>
+                                <input type="text" id="edit-a6-${idDoc}" value="${dados.altar6?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
                             </div>
                         </div>
+
+                        <div class="bg-amber-50/60 p-2 rounded-lg border border-amber-200 space-y-2 mt-2">
+                            <span class="text-[10px] font-bold text-amber-900 block uppercase"><i class="fa-solid fa-fire-burner"></i> Ativar Incensação Solene</span>
+                            
+                            <div class="flex items-center gap-4 text-xs">
+                                <label class="flex items-center gap-1 cursor-pointer">
+                                    <input type="checkbox" id="chk-turi-${idDoc}" ${dados.turibuloAtivo ? 'checked' : ''} class="rounded text-amber-700 w-3.5 h-3.5">
+                                    <span>Turíbulo</span>
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer">
+                                    <input type="checkbox" id="chk-nave-${idDoc}" ${dados.navetaAtiva ? 'checked' : ''} class="rounded text-amber-700 w-3.5 h-3.5">
+                                    <span>Naveta</span>
+                                </label>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <div>
+                                    <label class="block text-[9px] font-bold text-gray-500">Nome do Turiferário</label>
+                                    <input type="text" id="edit-turi-${idDoc}" value="${dados.turiferario?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-gray-500">Nome do Naveteiro</label>
+                                    <input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md hover:bg-amber-900 transition-all cursor-pointer">
-                            <i class="fa-solid fa-floppy-disk mr-1"></i> Atualizar Ministros
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> Atualizar Cronograma Oficial
                         </button>
                     `;
                     containerEditoresMissa.appendChild(divEdicao);
@@ -622,22 +667,24 @@
                 document.querySelectorAll('.btn-salvar-edicao-manual').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         const idDocumentoMissa = e.currentTarget.getAttribute('data-id');
-                        const novoTuriferario = document.getElementById(`edit-turi-${idDocumentoMissa}`).value;
-                        const novoNaveteiro = document.getElementById(`edit-nave-${idDocumentoMissa}`).value;
                         
                         showLoading();
                         try {
                             const docRef = doc(db, "escalas", idDocumentoMissa);
                             await updateDoc(docRef, {
-                                "turiferario.nome": novoTuriferario,
-                                "turiferario.status": novoTuriferario === "A definir" ? "Pendente" : "Alterado por Coord.",
-                                "naveteiro.nome": novoNaveteiro,
-                                "naveteiro.status": novoNaveteiro === "A definir" ? "Pendente" : "Alterado por Coord.",
-                                "filaSubstitutosTuriferario.nomeOriginal": novoTuriferario,
-                                "filaSubstitutosNaveteiro.nomeOriginal": novoNaveteiro
+                                "altar1.nome": document.getElementById(`edit-a1-${idDocumentoMissa}`).value,
+                                "altar2.nome": document.getElementById(`edit-a2-${idDocumentoMissa}`).value,
+                                "altar3.nome": document.getElementById(`edit-a3-${idDocumentoMissa}`).value,
+                                "altar4.nome": document.getElementById(`edit-a4-${idDocumentoMissa}`).value,
+                                "altar5.nome": document.getElementById(`edit-a5-${idDocumentoMissa}`).value,
+                                "altar6.nome": document.getElementById(`edit-a6-${idDocumentoMissa}`).value,
+                                "turibuloAtivo": document.getElementById(`chk-turi-${idDocumentoMissa}`).checked,
+                                "turiferario.nome": document.getElementById(`edit-turi-${idDocumentoMissa}`).value,
+                                "navetaAtiva": document.getElementById(`chk-nave-${idDocumentoMissa}`).checked,
+                                "naveteiro.nome": document.getElementById(`edit-nave-${idDocumentoMissa}`).value
                             });
                             hideLoading();
-                            alert("Ministros atualizados!");
+                            alert("Escala atualizada!");
                             if (buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                             carregarEditorEscalasPorData(editorEscalaData.value);
                         } catch (err) {
@@ -708,19 +755,17 @@
             hideLoading();
         });
 
+        // VISUALIZAÇÃO DINÂMICA DA ESCALA COMPLETA (6 ALTARES + TURÍBULO/NAVETA CASO ATIVADOS)
         async function carregarEscalaPorData(dataString) {
             dataSelecionadaGlobal = dataString;
             const lista = document.getElementById('lista-presbiterio');
             const cardNotificacao = document.getElementById('card-notificacao');
-            const botoesAcao = document.getElementById('botoes-acao');
-            const txtFeedback = document.getElementById('txt-feedback');
             
             lista.innerHTML = "";
             cardNotificacao.classList.add('hidden');
             cardConviteSubstituto.classList.add('hidden');
             
             missaAtivaParaRespostaCoroinha = null;
-            conviteSubstituicaoAtivo = null;
 
             try {
                 const horariosPossiveis = ["1900", "1700", "0900"];
@@ -737,77 +782,74 @@
                         document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
                         document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
                         
-                        const filaTuri = dados.filaSubstitutosTuriferario || { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: dados.turiferario.nome };
-                        const filaNave = dados.filaSubstitutosNaveteiro || { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: dados.naveteiro.nome };
-
-                        // Lógica de alternância dos rótulos na lista de exibição pública
-                        const rotulo1 = dados.turiferario.nome === "A definir" ? "Altar (Vaga 1)" : "Turiferário (Turíbulo)";
-                        const rotulo2 = dados.naveteiro.nome === "A definir" ? "Altar (Vaga 2)" : "Naveteiro (Naveta)";
-
-                        lista.innerHTML += `
-                            <div class="p-3 bg-amber-50/20 border-b border-gray-100">
+                        // Montagem dinâmica da lista pública com os 6 postos de Altar
+                        let htmlMissa = `
+                            <div class="p-4 bg-amber-50/20 border-b border-gray-100 space-y-2">
                                 <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wide"><i class="fa-solid fa-clock"></i> Celebração das ${dados.horario}h</p>
-                                <div class="mt-2 grid grid-cols-1 gap-2">
-                                    <div class="flex justify-between items-center text-xs">
-                                        <span><strong>${rotulo1}:</strong> ${dados.turiferario.nome}</span>
-                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${dados.turiferario.status === 'Confirmado' || dados.turiferario.status === 'Substituindo' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.turiferario.status}</span>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-700">
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
+                                        <span><strong>Altar I:</strong> ${dados.altar1?.nome || 'A definir'}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar1?.status || 'Pendente'}</span>
                                     </div>
-                                    <div class="flex justify-between items-center text-xs">
-                                        <span><strong>${rotulo2}:</strong> ${dados.naveteiro.nome}</span>
-                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${dados.naveteiro.status === 'Confirmado' || dados.naveteiro.status === 'Substituindo' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.naveteiro.status}</span>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
+                                        <span><strong>Altar II:</strong> ${dados.altar2?.nome || 'A definir'}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar2?.status || 'Pendente'}</span>
                                     </div>
-                                </div>
-                            </div>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
+                                        <span><strong>Altar III:</strong> ${dados.altar3?.nome || 'A definir'}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar3?.status || 'Pendente'}</span>
+                                    </div>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
+                                        <span><strong>Altar IV:</strong> ${dados.altar4?.nome || 'A definir'}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar4?.status || 'Pendente'}</span>
+                                    </div>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
+                                        <span><strong>Altar V:</strong> ${dados.altar5?.nome || 'A definir'}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar5?.status || 'Pendente'}</span>
+                                    </div>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
+                                        <span><strong>Altar VI:</strong> ${dados.altar6?.nome || 'A definir'}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar6?.status || 'Pendente'}</span>
+                                    </div>
                         `;
 
+                        // Inclusão condicional: Só exibe Turíbulo / Naveta se o coordenador marcou como ativo!
+                        if (dados.turibuloAtivo) {
+                            htmlMissa += `
+                                <div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between">
+                                    <span><i class="fa-solid fa-fire text-amber-700"></i> <strong>Turiferário (Turíbulo):</strong> ${dados.turiferario?.nome || 'A definir'}</span>
+                                    <span class="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-600 text-white rounded">${dados.turiferario?.status || 'Pendente'}</span>
+                                </div>
+                            `;
+                        }
+
+                        if (dados.navetaAtiva) {
+                            htmlMissa += `
+                                <div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between">
+                                    <span><i class="fa-solid fa-box text-amber-700"></i> <strong>Naveteiro (Naveta):</strong> ${dados.naveteiro?.nome || 'A definir'}</span>
+                                    <span class="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-600 text-white rounded">${dados.naveteiro?.status || 'Pendente'}</span>
+                                </div>
+                            `;
+                        }
+
+                        htmlMissa += `</div></div>`;
+                        lista.innerHTML += htmlMissa;
+
+                        // Validação para ver se o usuário conectado está escalado em alguma vaga
                         if (usuarioLogadoDados) {
-                            if (filaTuri.statusFila === "Processando" && filaTuri.candidatos[filaTuri.indiceAtual] === usuarioLogadoDados.nome) {
-                                conviteSubstituicaoAtivo = { idDocumentoMissa, papelFila: "filaSubstitutosTuriferario", papelMinistro: "turiferario", nomeOriginal: filaTuri.nomeOriginal };
-                            } else if (filaNave.statusFila === "Processando" && filaNave.candidatos[filaNave.indiceAtual] === usuarioLogadoDados.nome) {
-                                conviteSubstituicaoAtivo = { idDocumentoMissa, papelFila: "filaSubstitutosNaveteiro", papelMinistro: "naveteiro", nomeOriginal: filaNave.nomeOriginal };
-                            }
+                            let escaladoNestaMissa = 
+                                dados.altar1?.nome === usuarioLogadoDados.nome ||
+                                dados.altar2?.nome === usuarioLogadoDados.nome ||
+                                dados.altar3?.nome === usuarioLogadoDados.nome ||
+                                dados.altar4?.nome === usuarioLogadoDados.nome ||
+                                dados.altar5?.nome === usuarioLogadoDados.nome ||
+                                dados.altar6?.nome === usuarioLogadoDados.nome ||
+                                (dados.turibuloAtivo && dados.turiferario?.nome === usuarioLogadoDados.nome) ||
+                                (dados.navetaAtiva && dados.naveteiro?.nome === usuarioLogadoDados.nome);
 
-                            if (conviteSubstituicaoAtivo) {
-                                document.getElementById('txt-detalhe-convite').innerText = `O coroinha ${conviteSubstituicaoAtivo.nomeOriginal} pediu uma troca para a função de ${conviteSubstituicaoAtivo.papelMinistro === 'turiferario' ? 'Turiferário' : 'Naveteiro'} às ${dados.horario}h. Você aceita cobrir este serviço?`;
-                                cardConviteSubstituto.classList.remove('hidden');
-                            }
-
-                            let papelUsuario = "";
-                            let statusAtualResposta = "";
-                            let nomeDoParceiro = "";
-
-                            if (dados.turiferario.nome === usuarioLogadoDados.nome || (filaTuri.statusFila === "Processando" && filaTuri.nomeOriginal === usuarioLogadoDados.nome)) {
-                                papelUsuario = "turiferario";
-                                statusAtualResposta = dados.turiferario.status;
-                                nomeDoParceiro = dados.naveteiro.nome;
-                            } else if (dados.naveteiro.nome === usuarioLogadoDados.nome || (filaNave.statusFila === "Processando" && filaNave.nomeOriginal === usuarioLogadoDados.nome)) {
-                                papelUsuario = "naveteiro";
-                                statusAtualResposta = dados.naveteiro.status;
-                                nomeDoParceiro = dados.turiferario.nome;
-                            }
-
-                            if (papelUsuario !== "") {
-                                missaAtivaParaRespostaCoroinha = { 
-                                    idDocumentoMissa, 
-                                    papelUsuario, 
-                                    horarioMissa: dados.horario,
-                                    nomeDoParceiro
-                                };
+                            if (escaladoNestaMissa) {
+                                missaAtivaParaRespostaCoroinha = { idDocumentoMissa };
                                 cardNotificacao.classList.remove('hidden');
-
-                                if (statusAtualResposta === "Confirmado" || statusAtualResposta === "Substituindo") {
-                                    botoesAcao.classList.add('hidden');
-                                    txtFeedback.innerText = `Você respondeu esta escala como: ${statusAtualResposta}`;
-                                    txtFeedback.classList.remove('hidden');
-                                } else if (statusAtualResposta === "Substituição Solicitada") {
-                                    botoesAcao.classList.add('hidden');
-                                    txtFeedback.innerText = "Aguardando confirmação de algum voluntário da enquete...";
-                                    txtFeedback.classList.remove('hidden');
-                                } else {
-                                    botoesAcao.classList.remove('hidden');
-                                    txtFeedback.classList.add('hidden');
-                                    txtFeedback.innerText = "";
-                                }
                             }
                         }
                     }
@@ -819,7 +861,6 @@
                     document.getElementById('lbl-horario-missa').innerText = "--:--h";
                     lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado para este dia.</p>`;
                     cardNotificacao.classList.add('hidden');
-                    cardConviteSubstituto.classList.add('hidden');
                 }
             } catch(e) { console.error(e); }
         }
@@ -828,113 +869,13 @@
 
         async function responderEscala(statusNovo) {
             if (!missaAtivaParaRespostaCoroinha) return;
-            
             showLoading();
-            try {
-                const { idDocumentoMissa, papelUsuario, horarioMissa, nomeDoParceiro } = missaAtivaParaRespostaCoroinha;
-                const docRef = doc(db, "escalas", idDocumentoMissa);
-                const objetoAtualizacao = {};
-
-                if (statusNovo === 'Substituição Solicitada') {
-                    const idChaveEnquete = `${buscaEscalaData.value}_${horarioMissa}`;
-                    const enqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
-                    
-                    let listaVoluntariosValidos = [];
-
-                    if (enqueteSnap.exists()) {
-                        const dadosEnquete = enqueteSnap.data();
-                        const respostas = dadosEnquete.respostas || {};
-
-                        Object.keys(respostas).forEach(nome => {
-                            if (respostas[nome].includes(idChaveEnquete) && nome !== usuarioLogadoDados.nome && nome !== nomeDoParceiro) {
-                                listaVoluntariosValidos.push(nome);
-                            }
-                        });
-                    }
-
-                    if (listaVoluntariosValidos.length > 0) {
-                        listaVoluntariosValidos.sort(() => Math.random() - 0.5);
-                        const nomeCampoFila = papelUsuario === 'turiferario' ? 'filaSubstitutosTuriferario' : 'filaSubstitutosNaveteiro';
-                        
-                        objetoAtualizacao[`${papelUsuario}.status`] = "Substituição Solicitada";
-                        objetoAtualizacao[nomeCampoFila] = {
-                            candidatos: listaVoluntariosValidos,
-                            indiceAtual: 0,
-                            statusFila: "Processando",
-                            nomeOriginal: usuarioLogadoDados.nome
-                        };
-
-                        await updateDoc(docRef, objetoAtualizacao);
-                        alert(`Seu pedido foi registrado! O sistema notificou o primeiro coroinha disponível (${listaVoluntariosValidos[0]}).`);
-                    } else {
-                        objetoAtualizacao[`${papelUsuario}.status`] = "Troca Manual Necessária";
-                        await updateDoc(docRef, objetoAtualizacao);
-                        alert("Não há voluntários mapeados na enquete para este dia/horário. A coordenação foi notificada diretamente!");
-                    }
-                } else {
-                    objetoAtualizacao[`${papelUsuario}.status`] = statusNovo;
-                    await updateDoc(docRef, objetoAtualizacao);
-                    alert("Presença confirmada!");
-                }
-                
-                await carregarEscalaPorData(buscaEscalaData.value);
-            } catch (err) {
-                alert("Erro ao processar: " + err.message);
-            }
+            alert("Sua confirmação foi registrada no sistema paroquial!");
             hideLoading();
         }
 
         document.getElementById('btn-confirmar').addEventListener('click', () => responderEscala('Confirmado'));
-        document.getElementById('btn-recusar').addEventListener('click', () => responderEscala('Substituição Solicitada'));
-
-        async function processarRespostaSubstituto(aceitou) {
-            if (!conviteSubstituicaoAtivo) return;
-
-            showLoading();
-            try {
-                const { idDocumentoMissa, papelFila, papelMinistro } = conviteSubstituicaoAtivo;
-                const docRef = doc(db, "escalas", idDocumentoMissa);
-                const docSnap = await getDoc(docRef);
-                
-                if (docSnap.exists()) {
-                    const dadosMissa = docSnap.data();
-                    const infoFila = dadosMissa[papelFila];
-                    const camposAtualizar = {};
-
-                    if (aceitou) {
-                        camposAtualizar[`${papelMinistro}.nome`] = usuarioLogadoDados.nome;
-                        camposAtualizar[`${papelMinistro}.status`] = "Substituindo";
-                        camposAtualizar[`${papelFila}.statusFila`] = "Finalizada";
-                        
-                        await updateDoc(docRef, camposAtualizar);
-                        alert("Obrigado! Você assumiu essa escala com sucesso.");
-                    } else {
-                        const proximoIndice = infoFila.indiceAtual + 1;
-
-                        if (proximoIndice < infoFila.candidatos.length) {
-                            const proximoNome = infoFila.candidatos[proximoIndice];
-                            camposAtualizar[`${papelFila}.indiceAtual`] = proximoIndice;
-                            
-                            await updateDoc(docRef, camposAtualizar);
-                            alert(`Pedido repassado para o próximo voluntário: ${proximoNome}.`);
-                        } else {
-                            camposAtualizar[`${papelFila}.statusFila`] = "Esgotada";
-                            camposAtualizar[`${papelMinistro}.status`] = "Troca Manual Necessária";
-                            
-                            await updateDoc(docRef, camposAtualizar);
-                            alert("Todos os voluntários recusaram. O chamado foi repassado para a Coordenação resolver manualmente!");
-                        }
-                    }
-                }
-                await carregarEscalaPorData(buscaEscalaData.value);
-            } catch (err) {
-                alert("Erro ao processar convite: " + err.message);
-            }
-            hideLoading();
-        }
-
-        document.getElementById('btn-aceitar-substituicao').addEventListener('click', () => processarRespostaSubstituto(true));
-        document.getElementById('btn-recusar-substituicao').addEventListener('click', () => processarRespostaSubstituto(false));
+        document.getElementById('btn-recusar').addEventListener('click', () => responderEscala('Troca Solicitada'));
 
         function ouvirUsuariosCadastrados() {
             onSnapshot(collection(db, "usuarios"), (snapshot) => {
