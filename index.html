@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serviço do Altar - Altaris</title>
+    <title>Serviço do Altar - Tarcisius</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         .active-tab { border-bottom: 3px solid #b45309; color: #b45309; font-weight: bold; }
+        .active-coord-tab { bg-amber-700; color: white; }
         .fade-overlay { transition: opacity 0.3s ease-in-out, visibility 0.3s; }
     </style>
 </head>
@@ -24,7 +26,7 @@
                 <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto text-amber-700 text-3xl shadow-sm">
                     <i class="fa-solid fa-cross"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800">Altaris</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Tarcisius Admin</h2>
                 <p class="text-xs text-gray-500">Gestão de Coroinhas e Acólitos</p>
             </div>
 
@@ -107,7 +109,7 @@
                             </div>
 
                             <div id="txt-feedback-enquete" class="text-xs font-bold mt-3 text-emerald-700 hidden bg-emerald-50 border border-emerald-200 p-2 rounded-lg flex items-center gap-1.5 shadow-2xs">
-                                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> Sua escala de disponibilidade já está salva no systema!
+                                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> Sua escala de disponibilidade já está salva no sistema!
                             </div>
                         </div>
                     </div>
@@ -176,150 +178,177 @@
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between shadow-xs">
                 <div>
                     <h2 class="text-lg font-bold text-amber-900">Painel Geral da Coordenação</h2>
-                    <p class="text-xs text-amber-700">Geração de Escalas (6 Altares) + Ativação Manual de Turíbulo e Naveta.</p>
+                    <p class="text-xs text-amber-700">Gerencie escalas, membros, comunicados oficiais e acessos.</p>
                 </div>
                 <i class="fa-solid fa-user-shield text-3xl text-amber-700"></i>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 lg:col-span-2">
-                    <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-800"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Sorteador de Altares (I ao VI)</h3>
-                    <p class="text-xs text-gray-500">Mapeia e distribui automaticamente os voluntários ativos nos postos de **Altar I, II, III, IV, V e VI** para o cronograma litúrgico.</p>
-                    
-                    <form id="form-escala-automatica" class="space-y-3">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Mês de Referência das Missas</label>
-                                <input type="month" id="auto-mes" required class="w-full border border-gray-300 p-2 text-sm rounded-lg bg-gray-50 font-bold text-amber-900">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Título Base das Celebrações</label>
-                                <input type="text" id="auto-titulo" value="Santa Missa" required class="w-full border border-gray-300 p-2 text-sm rounded-lg bg-gray-50">
-                            </div>
-                        </div>
-                        <button type="submit" class="w-full bg-amber-700 text-white text-xs font-bold py-3 rounded-lg hover:bg-amber-800 cursor-pointer shadow-sm">
-                            <i class="fa-solid fa-gears mr-1"></i> Sortear Altares do Mês
-                        </button>
-                    </form>
-                </div>
-
-                <div class="bg-white p-5 rounded-2xl border border-gray-200 flex flex-col justify-between space-y-4">
-                    <div>
-                        <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-square-poll-horizontal text-amber-700 mr-1"></i> Configurar Enquete Semanal</h3>
-                        <div class="space-y-3 mt-3">
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Selecione o Mês Alvo</label>
-                                <input type="month" id="enq-mes-alvo" required class="w-full border border-gray-300 p-2 text-sm rounded-lg bg-gray-50 mt-0.5">
-                            </div>
-                            <div class="flex gap-2 pt-2">
-                                <button id="btn-disparar-enquete" class="bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-blue-700 flex-1 cursor-pointer">Abrir Enquete</button>
-                                <button id="btn-fechar-enquete" class="bg-gray-500 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-gray-600 cursor-pointer">Encerrar</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2 mt-2">
-                        <p class="text-[10px] font-bold text-gray-700 uppercase tracking-wider">Membros Disponíveis (Mapeamento):</p>
-                        <div class="text-[11px] text-gray-500 max-h-36 overflow-y-auto space-y-1" id="lista-nomes-enquete">
-                            <span class="text-gray-400 italic">Nenhum dado ativo no momento.</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex flex-wrap bg-white p-1.5 rounded-xl border border-gray-200 gap-1">
+                <button onclick="switchCoordTab('coord-usuarios')" id="btn-c-usuarios" class="flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-users text-sm"></i> Usuários & Acessos
+                </button>
+                <button onclick="switchCoordTab('coord-escalas')" id="btn-c-escalas" class="flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-calendar-days text-sm"></i> Gerenciar Celebrações
+                </button>
+                <button onclick="switchCoordTab('coord-sorteio')" id="btn-c-sorteio" class="flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-wand-magic-sparkles text-sm"></i> Sorteio & Enquetes
+                </button>
+                <button onclick="switchCoordTab('coord-material')" id="btn-c-material" class="flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-cloud-arrow-up text-sm"></i> Material de Apoio
+                </button>
+                <button onclick="switchCoordTab('coord-avisos-tab')" id="btn-c-avisos" class="flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-bullhorn text-sm"></i> Mural de Avisos
+                </button>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
-                <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-900"><i class="fa-solid fa-bullhorn mr-1"></i> Publicar Comunicado Oficial (Mural)</h3>
-                <form id="form-publicar-aviso" class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Texto do Comunicado / Instruções</label>
-                        <textarea id="txt-aviso-coordenador" rows="3" required placeholder="Digite avisos gerais, escalas de reuniões ou recados importantes para todo o grupo..." 
-                            class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-gray-50 bg-white focus:ring-2 focus:ring-amber-600 focus:outline-hidden font-medium"></textarea>
-                    </div>
-                    <div class="flex justify-end">
-                        <button type="submit" class="bg-amber-800 text-white text-xs font-bold py-2 px-6 rounded-lg hover:bg-amber-900 cursor-pointer shadow-sm">
-                            <i class="fa-solid fa-paper-plane mr-1"></i> Atualizar Mural do Grupo
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
-                <div class="border-b pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <h3 class="font-bold text-gray-800 text-amber-900"><i class="fa-solid fa-user-pen mr-1"></i> Gerenciar Celebrações e Adicionar Incensação</h3>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-bold text-gray-600">Filtrar Data:</label>
-                        <input type="date" id="editor-escala-data" class="border border-gray-300 rounded-lg p-1.5 text-xs font-bold bg-gray-50 text-amber-950">
-                    </div>
-                </div>
-                
-                <div id="container-editores-missa" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                    <p class="text-xs text-gray-400 italic col-span-full text-center py-4 border border-dashed rounded-xl bg-gray-50">Escolha uma data para liberar o gerenciador.</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 md:col-span-2">
-                    <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-user-plus text-amber-700 mr-1"></i> Cadastrar Novo Membro</h3>
-                    <form id="form-cadastro-usuario" class="space-y-3">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div id="sec-coord-usuarios" class="space-y-6 hidden-coord-tab">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 md:col-span-1">
+                        <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-950"><i class="fa-solid fa-user-plus text-amber-700 mr-1"></i> Cadastrar Novo Membro</h3>
+                        <form id="form-cadastro-usuario" class="space-y-3">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Nome Completo</label>
-                                <input type="text" id="cad-nome" required placeholder="Ex: Lucas Silva" class="w-full border border-gray-300 p-2 text-sm rounded-lg bg-gray-50">
+                                <input type="text" id="cad-nome" required placeholder="Ex: Lucas Silva" class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-gray-50">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail de Acesso</label>
-                                <input type="email" id="cad-email" required placeholder="nome@email.com" class="w-full border border-gray-300 p-2 text-sm rounded-lg bg-gray-50">
+                                <input type="email" id="cad-email" required placeholder="nome@email.com" class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-gray-50">
                             </div>
-                        </div>
-                        <div class="flex items-end gap-2 bg-gray-50 p-3 rounded-xl border border-gray-200">
-                            <div class="flex-1">
-                                <label class="block text-xs font-bold text-amber-900 mb-1"><i class="fa-solid fa-key mr-1"></i> Senha de Acesso</label>
-                                <input type="text" id="cad-senha" required class="w-full border border-gray-200 p-2 text-sm rounded-lg bg-white font-mono" placeholder="Clique ao lado para gerar">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Função Hierárquica</label>
+                                <select id="cad-funcao" class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-gray-50 font-semibold text-amber-900">
+                                    <option value="Coroinha">Coroinha / Acólito</option>
+                                    <option value="Coordenador">Coordenador Geral</option>
+                                </select>
                             </div>
-                            <button type="button" id="btn-gerar-senha" class="bg-amber-700 text-white text-xs font-bold px-4 py-3 rounded-lg hover:bg-amber-800 shadow-xs cursor-pointer h-[40px]">
-                                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gerar
-                            </button>
-                        </div>
-                        <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-emerald-800 cursor-pointer">Registrar e Armazenar Usuário</button>
-                    </form>
-                </div>
+                            <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1">
+                                <label class="block text-xs font-bold text-amber-900"><i class="fa-solid fa-key mr-1"></i> Senha de Acesso</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="cad-senha" required class="flex-1 border border-gray-200 p-2 text-xs rounded-lg bg-white font-mono" placeholder="Gere ao lado">
+                                    <button type="button" id="btn-gerar-senha" class="bg-amber-700 text-white text-xs font-bold px-3 rounded-lg hover:bg-amber-800 cursor-pointer shadow-xs">Gerar</button>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-emerald-800 cursor-pointer transition-all">Registrar e Enviar Credenciais</button>
+                        </form>
+                    </div>
 
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 md:col-span-2">
+                        <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-950"><i class="fa-solid fa-address-book text-amber-700 mr-1"></i> Central de Gerenciamento e Recuperação</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-100 text-gray-600 uppercase text-[10px] tracking-wider border-b border-gray-200">
+                                        <th class="p-3 font-bold">Nome do Membro</th>
+                                        <th class="p-3 font-bold">E-mail</th>
+                                        <th class="p-3 font-bold">Senha Salva</th>
+                                        <th class="p-3 font-bold text-center">Tipo</th>
+                                        <th class="p-3 font-bold text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-usuarios-recuperacao" class="divide-y divide-gray-100 text-gray-700">
+                                    <tr>
+                                        <td colspan="5" class="p-4 text-center text-gray-400 italic">Carregando carteira de acessos...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sec-coord-escalas" class="space-y-4 hidden-coord-tab">
                 <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
-                    <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-cloud-arrow-up text-amber-700 mr-1"></i> Material de Apoio (PDF)</h3>
+                    <div class="border-b pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <h3 class="font-bold text-gray-800 text-amber-900"><i class="fa-solid fa-user-pen mr-1"></i> Gerenciar Celebrações e Adicionar Incensação</h3>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-bold text-gray-600">Filtrar Data:</label>
+                            <input type="date" id="editor-escala-data" class="border border-gray-300 rounded-lg p-1.5 text-xs font-bold bg-gray-50 text-amber-950">
+                        </div>
+                    </div>
+                    <div id="container-editores-missa" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <p class="text-xs text-gray-400 italic col-span-full text-center py-4 border border-dashed rounded-xl bg-gray-50">Escolha uma data para liberar o gerenciador.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sec-coord-sorteio" class="space-y-6 hidden-coord-tab">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 lg:col-span-2">
+                        <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-800"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Sorteador de Altares (I ao VI)</h3>
+                        <p class="text-xs text-gray-500">Mapeia e distribui automaticamente os voluntários ativos nos postos de **Altar I ao VI** com base nas enquetes.</p>
+                        <form id="form-escala-automatica" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Mês de Referência das Missas</label>
+                                    <input type="month" id="auto-mes" required class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-gray-50 font-bold text-amber-900">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Título Base das Celebrações</label>
+                                    <input type="text" id="auto-titulo" value="Santa Missa" required class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-gray-50">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-amber-700 text-white text-xs font-bold py-3 rounded-lg hover:bg-amber-800 cursor-pointer shadow-sm">
+                                <i class="fa-solid fa-gears mr-1"></i> Sortear Altares do Mês
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 flex flex-col justify-between space-y-4">
+                        <div>
+                            <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-square-poll-horizontal text-amber-700 mr-1"></i> Configurar Enquete Semanal</h3>
+                            <div class="space-y-3 mt-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Selecione o Mês Alvo</label>
+                                    <input type="month" id="enq-mes-alvo" required class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-gray-50 mt-0.5">
+                                </div>
+                                <div class="flex gap-2 pt-2">
+                                    <button id="btn-disparar-enquete" class="bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-blue-700 flex-1 cursor-pointer">Abrir Enquete</button>
+                                    <button id="btn-fechar-enquete" class="bg-gray-500 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-gray-600 cursor-pointer">Encerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2 mt-2">
+                            <p class="text-[10px] font-bold text-gray-700 uppercase tracking-wider">Membros Disponíveis (Mapeamento):</p>
+                            <div class="text-[11px] text-gray-500 max-h-36 overflow-y-auto space-y-1" id="lista-nomes-enquete">
+                                <span class="text-gray-400 italic">Nenhum dado ativo no momento.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sec-coord-material" class="space-y-4 hidden-coord-tab">
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 max-w-md">
+                    <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-950"><i class="fa-solid fa-cloud-arrow-up text-amber-700 mr-1"></i> Upload de Material de Apoio (PDF)</h3>
                     <form id="form-upload-formacao" class="space-y-3">
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Título do Arquivo</label>
-                            <input type="text" id="form-titulo-input" required placeholder="Ex: Manual do Coroinha v3" class="w-full border border-gray-300 p-2 text-sm rounded-lg bg-gray-50">
+                            <input type="text" id="form-titulo-input" required placeholder="Ex: Manual do Coroinha v3" class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-gray-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Link URL</label>
-                            <input type="url" id="form-url-input" required placeholder="https://drive.google.com/..." class="w-full border border-gray-300 p-2 text-sm rounded-lg bg-gray-50">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Link URL Google Drive</label>
+                            <input type="url" id="form-url-input" required placeholder="https://drive.google.com/..." class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-gray-50">
                         </div>
-                        <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2 rounded-lg hover:bg-amber-900 cursor-pointer">Atualizar Link</button>
+                        <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2 rounded-lg hover:bg-amber-900 cursor-pointer">Atualizar Link de Downloads</button>
                     </form>
                 </div>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
-                <div class="flex items-center justify-between border-b pb-2">
-                    <h3 class="font-bold text-gray-800"><i class="fa-solid fa-address-book text-amber-700 mr-1"></i> Central de Recuperação de Acessos</h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-gray-100 text-gray-600 uppercase text-[10px] tracking-wider border-b border-gray-200">
-                                <th class="p-3 font-bold">Nome do Membro</th>
-                                <th class="p-3 font-bold">E-mail cadastrado</th>
-                                <th class="p-3 font-bold">Última Senha Salva</th>
-                                <th class="p-3 font-bold text-center">Tipo</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-usuarios-recuperacao" class="divide-y divide-gray-100 text-gray-700">
-                            <tr>
-                                <td colspan="4" class="p-4 text-center text-gray-400 italic">Carregando carteira de acessos...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div id="sec-coord-avisos-tab" class="space-y-4 hidden-coord-tab">
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
+                    <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-900"><i class="fa-solid fa-bullhorn mr-1"></i> Publicar Comunicado Oficial (Mural)</h3>
+                    <form id="form-publicar-aviso" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Texto do Comunicado / Instruções</label>
+                            <textarea id="txt-aviso-coordenador" rows="4" required placeholder="Digite avisos gerais..." 
+                                class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-white focus:ring-2 focus:ring-amber-600 focus:outline-hidden font-medium"></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-amber-800 text-white text-xs font-bold py-2 px-6 rounded-lg hover:bg-amber-900 cursor-pointer shadow-sm">
+                                <i class="fa-solid fa-paper-plane mr-1"></i> Atualizar Mural do Grupo
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </main>
@@ -331,8 +360,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -346,6 +375,10 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // CONFIGURAÇÃO DO EMAILJS
+        // IMPORTANTE: Insira sua Public Key, Service ID e Template ID gerados gratuitamente no site emailjs.com
+        emailjs.init("SUA_PUBLIC_KEY_AQUI");
 
         const formLogin = document.getElementById('form-login');
         const erroLogin = document.getElementById('erro-login');
@@ -368,7 +401,6 @@
         let mapaRespostasGerais = {}; 
         let unsubEnquete = null;
         let unsubMural = null;
-        
         let missaAtivaParaRespostaCoroinha = null; 
 
         const CRONOGRAMA_PAROQUIA = [
@@ -412,7 +444,6 @@
                         nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
                         funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
 
-                        // SEMPRE ATIVA A ESCUTA DO MURAL PARA AMBOS
                         ouvirMuralAvisos();
 
                         if (usuarioLogadoDados.funcao === "Coordenador") {
@@ -423,6 +454,7 @@
                             ouvirUsuariosCadastrados();
                             carregarAvisoNoInputCoordenador();
                             
+                            switchCoordTab('coord-usuarios');
                             editorEscalaData.value = new Date().toISOString().split('T')[0];
                             carregarEditorEscalasPorData(editorEscalaData.value);
                         } else {
@@ -470,11 +502,9 @@
         function mapearDatasDoMes(ano, mes) {
             const datasMapeadas = [];
             const dataCorrente = new Date(ano, mes - 1, 1);
-            
             while (dataCorrente.getMonth() === mes - 1) {
                 const diaSemanaAtual = dataCorrente.getDay();
                 const correspondencias = CRONOGRAMA_PAROQUIA.filter(c => c.diaSemana === diaSemanaAtual);
-                
                 correspondencias.forEach(item => {
                     const dataString = dataCorrente.toISOString().split('T')[0];
                     datasMapeadas.push({
@@ -496,14 +526,118 @@
             document.getElementById('cad-senha').value = novaSenha;
         });
 
+        // 3ª ALTERAÇÃO: FUNÇÃO ADICIONADA PARA DELETAR USUÁRIO DO BANCO DE DADOS
+        window.deletarUsuarioDoSistema = async function(idDocumento, nomeUsuario) {
+            if(confirm(`Tem certeza que deseja apagar permanentemente o usuário "${nomeUsuario}" do sistema?`)) {
+                showLoading();
+                try {
+                    await deleteDoc(doc(db, "usuarios", idDocumento));
+                    alert(`Usuário ${nomeUsuario} removido com sucesso.`);
+                } catch(err) {
+                    alert("Erro ao remover usuário: " + err.message);
+                }
+                hideLoading();
+            }
+        }
+
+        // 1ª E 2ª ALTERAÇÃO: CADASTRO COM TRATAMENTO DE FUNÇÃO E DISPARO DE E-MAIL (EMAILJS)
+        document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const nome = document.getElementById('cad-nome').value;
+            const email = document.getElementById('cad-email').value;
+            const senha = document.getElementById('cad-senha').value;
+            const funcao = document.getElementById('cad-funcao').value;
+
+            try {
+                // Cria uma ID única baseada no timestamp para o documento de credenciais reutilizável
+                const idUnicaInterna = "user_" + Date.now();
+                await setDoc(doc(db, "usuarios", idUnicaInterna), { 
+                    nome, 
+                    email, 
+                    funcao, 
+                    senha_provisoria: senha 
+                });
+
+                // Modelo de parâmetros que seu template do EmailJS deve receber:
+                // {{to_name}} -> nome do usuário, {{to_email}} -> e-mail dele, {{user_login}} -> e-mail, {{user_password}} -> senha, {{user_role}} -> funcao
+                const parametrosEmail = {
+                    to_name: nome,
+                    to_email: email,
+                    user_login: email,
+                    user_password: senha,
+                    user_role: funcao
+                };
+
+                // Dispara o e-mail via EmailJS
+                await emailjs.send("SEU_SERVICE_ID_AQUI", "SEU_TEMPLATE_ID_AQUI", parametrosEmail);
+
+                alert(`Membro ${nome} registrado com sucesso na função de ${funcao}! As credenciais de acesso foram enviadas para o e-mail: ${email}`);
+                document.getElementById('form-cadastro-usuario').reset();
+            } catch (err) { 
+                alert("O usuário foi guardado, mas o envio do e-mail falhou. Verifique as chaves do EmailJS. Erro: " + err.message); 
+            }
+            hideLoading();
+        });
+
+        function ouvirUsuariosCadastrados() {
+            onSnapshot(collection(db, "usuarios"), (snapshot) => {
+                const tabelaBody = document.getElementById('tabela-usuarios-recuperacao');
+                tabelaBody.innerHTML = "";
+                snapshot.forEach((docSnap) => {
+                    const usuario = docSnap.data();
+                    const idDoc = docSnap.id;
+                    const senhaExibida = usuario.senha_provisoria || "••••••••";
+                    tabelaBody.innerHTML += `
+                        <tr class="hover:bg-gray-50/80 transition-all border-b border-gray-100">
+                            <td class="p-3 font-semibold text-gray-800">${usuario.nome}</td>
+                            <td class="p-3 text-gray-600 font-mono">${usuario.email}</td>
+                            <td class="p-3 text-amber-900 bg-amber-50/40 font-mono font-bold select-all">${senhaExibida}</td>
+                            <td class="p-3 text-center">
+                                <span class="px-2 py-0.5 text-[10px] font-bold rounded-sm ${usuario.funcao === 'Coordenador' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">
+                                    ${usuario.funcao || 'Coroinha'}
+                                </span>
+                            </td>
+                            <td class="p-3 text-center">
+                                <button onclick="deletarUsuarioDoSistema('${idDoc}', '${usuario.nome}')" class="text-rose-600 hover:text-rose-800 font-bold px-2 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded text-[11px] cursor-pointer transition-all">
+                                    <i class="fa-solid fa-trash-can"></i> Excluir
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        // 4ª ALTERAÇÃO: NAVEGAÇÃO ENTRE ABAS DO COORDENADOR
+        window.switchCoordTab = function(tabID) {
+            document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
+            document.getElementById('sec-' + tabID).classList.remove('hidden');
+
+            const botoesMap = {
+                'coord-usuarios': 'btn-c-usuarios',
+                'coord-escalas': 'btn-c-escalas',
+                'coord-sorteio': 'btn-c-sorteio',
+                'coord-material': 'btn-c-material',
+                'coord-avisos-tab': 'btn-c-avisos'
+            };
+
+            Object.keys(botoesMap).forEach(key => {
+                const btn = document.getElementById(botoesMap[key]);
+                if(key === tabID) {
+                    btn.className = "flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold bg-amber-700 text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-xs";
+                } else {
+                    btn.className = "flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer";
+                }
+            });
+        }
+
         document.getElementById('btn-disparar-enquete').addEventListener('click', async () => {
             const mesAlvo = document.getElementById('enq-mes-alvo').value;
             if(!mesAlvo) { alert("Selecione o mês desejado!"); return; }
-
             showLoading();
             const [ano, mes] = mesAlvo.split('-').map(Number);
             const listaCelebracoes = mapearDatasDoMes(ano, mes);
-
             await setDoc(doc(db, "enquetes", "disponibilidade_atual"), {
                 mesReferencia: mesAlvo,
                 ativa: true,
@@ -528,14 +662,12 @@
                     mapaRespostasGerais = dados.respostas || {};
                     const container = document.getElementById('lista-nomes-enquete');
                     container.innerHTML = "";
-
                     if (dados.celebracoes) {
                         dados.celebracoes.forEach(cel => {
                             const aptos = [];
                             Object.keys(mapaRespostasGerais).forEach(nome => {
                                 if (mapaRespostasGerais[nome].includes(cel.idChave)) aptos.push(nome);
                             });
-
                             const dataBR = cel.data.split('-').reverse().join('/');
                             container.innerHTML += `
                                 <div class="bg-white p-1.5 border border-gray-200 rounded mb-1">
@@ -551,25 +683,18 @@
             });
         }
 
-        // SALVAR AVISOS DO MURAL NO FIREBASE
         document.getElementById('form-publicar-aviso').addEventListener('submit', async (e) => {
             e.preventDefault();
             const textoAviso = document.getElementById('txt-aviso-coordenador').value;
             showLoading();
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
-                await setDoc(doc(db, "mural", "aviso_geral"), {
-                    texto: textoAviso,
-                    dataPublicacao: dataHoje
-                });
+                await setDoc(doc(db, "mural", "aviso_geral"), { texto: textoAviso, dataPublicacao: dataHoje });
                 alert("Mural atualizado com sucesso!");
-            } catch (err) {
-                alert("Erro ao publicar aviso: " + err.message);
-            }
+            } catch (err) { alert("Erro ao publicar aviso: " + err.message); }
             hideLoading();
         });
 
-        // PUXA O AVISO JÁ EXISTENTE PARA O INPUT DO COORDENADOR NÃO FICAR EM BRANCO ao carregar
         async function carregarAvisoNoInputCoordenador() {
             const docSnap = await getDoc(doc(db, "mural", "aviso_geral"));
             if(docSnap.exists()) {
@@ -577,7 +702,6 @@
             }
         }
 
-        // ATUALIZAÇÃO EM TEMPO REAL DO MURAL DE AVISOS NA TELA PÚBLICA / COROINHA
         function ouvirMuralAvisos() {
             if (unsubMural) unsubMural();
             unsubMural = onSnapshot(doc(db, "mural", "aviso_geral"), (docSnap) => {
@@ -596,27 +720,22 @@
             });
         }
 
-        // GERADOR MENSAL AUTOMÁTICO DE 6 ALTARES (PREENCHIMENTO COMPLETO CORRIGIDO)
         document.getElementById('form-escala-automatica').addEventListener('submit', async (e) => {
             e.preventDefault();
             const mesSelecionado = document.getElementById('auto-mes').value;
             const tituloBase = document.getElementById('auto-titulo').value;
             if(!mesSelecionado) return;
-
             showLoading();
             const [ano, mes] = mesSelecionado.split('-').map(Number);
             const cronogramaDoMes = mapearDatasDoMes(ano, mes);
-
             try {
                 for (const cel of cronogramaDoMes) {
                     let disponiveis = [];
                     Object.keys(mapaRespostasGerais).forEach(nome => {
                         if (mapaRespostasGerais[nome].includes(cel.idChave)) disponiveis.push(nome);
                     });
-
                     disponiveis.sort(() => Math.random() - 0.5);
                     const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
-
                     await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
                         titulo: `${tituloBase} (${cel.rotulo})`,
                         horario: cel.horario,
@@ -637,26 +756,19 @@
                 alert("Escala de Altares gerada e PREENCHIDA com sucesso!");
                 document.getElementById('form-escala-automatica').reset();
                 if(editorEscalaData.value) carregarEditorEscalasPorData(editorEscalaData.value);
-            } catch (err) { 
-                hideLoading();
-                alert("Erro ao salvar lote: " + err.message); 
-            }
+            } catch (err) { hideLoading(); alert("Erro ao salvar lote: " + err.message); }
         });
 
-        // GERENCIADOR MANUAL DA COORDENAÇÃO
         async function carregarEditorEscalasPorData(dataString) {
             containerEditoresMissa.innerHTML = "";
             const horariosPossiveis = ["1900", "1700", "0900"];
             let encontrouAlguma = false;
-
             for (const hr of horariosPossiveis) {
                 const idDoc = `${dataString}_${hr}`;
                 const docSnap = await getDoc(doc(db, "escalas", idDoc));
-                
                 if (docSnap.exists()) {
                     encontrouAlguma = true;
                     const dados = docSnap.data();
-
                     const divEdicao = document.createElement('div');
                     divEdicao.className = "bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 shadow-2xs";
                     divEdicao.innerHTML = `
@@ -690,10 +802,8 @@
                                 <input type="text" id="edit-a6-${idDoc}" value="${dados.altar6?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
                             </div>
                         </div>
-
                         <div class="bg-amber-50/60 p-2 rounded-lg border border-amber-200 space-y-2 mt-2">
                             <span class="text-[10px] font-bold text-amber-900 block uppercase"><i class="fa-solid fa-fire-burner"></i> Ativar Incensação Solene</span>
-                            
                             <div class="flex items-center gap-4 text-xs">
                                 <label class="flex items-center gap-1 cursor-pointer">
                                     <input type="checkbox" id="chk-turi-${idDoc}" ${dados.turibuloAtivo ? 'checked' : ''} class="rounded text-amber-700 w-3.5 h-3.5">
@@ -704,7 +814,6 @@
                                     <span>Naveta</span>
                                 </label>
                             </div>
-
                             <div class="grid grid-cols-2 gap-2 pt-1">
                                 <div>
                                     <label class="block text-[9px] font-bold text-gray-500">Nome do Turiferário</label>
@@ -716,7 +825,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md hover:bg-amber-900 transition-all cursor-pointer">
                             <i class="fa-solid fa-floppy-disk mr-1"></i> Atualizar Cronograma Oficial
                         </button>
@@ -724,7 +832,6 @@
                     containerEditoresMissa.appendChild(divEdicao);
                 }
             }
-
             if (!encontrouAlguma) {
                 containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic col-span-full text-center py-4">Nenhuma escala para o dia ${dataString.split('-').reverse().join('/')}.</p>`;
             } else {
@@ -747,13 +854,10 @@
                                 "naveteiro.nome": document.getElementById(`edit-nave-${idDocumentoMissa}`).value
                             });
                             hideLoading();
-                            alert("Escala atualizada!");
+                            alert("Escala updated!");
                             if (buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                             carregarEditorEscalasPorData(editorEscalaData.value);
-                        } catch (err) {
-                            hideLoading();
-                            alert("Erro ao salvar: " + err.message);
-                        }
+                        } catch (err) { hideLoading(); alert("Erro ao salvar: " + err.message); }
                     });
                 });
             }
@@ -768,11 +872,9 @@
                 const blocoVotacao = document.getElementById('bloco-votacao-enquete');
                 const blocoFeedback = document.getElementById('txt-feedback-enquete');
                 const container = document.getElementById('container-opcoes-enquete');
-
                 if (docSnap.exists() && docSnap.data().ativa === true) {
                     const dados = docSnap.data();
                     const respostas = dados.respostas || {};
-                    
                     if (Object.prototype.hasOwnProperty.call(respostas, usuarioLogadoDados.nome)) {
                         blocoVotacao.classList.add('hidden');
                         blocoVotacao.innerHTML = ""; 
@@ -795,9 +897,7 @@
                         blocoVotacao.classList.remove('hidden');
                         cardEnquete.classList.remove('hidden');
                     }
-                } else {
-                    cardEnquete.classList.add('hidden');
-                }
+                } else { cardEnquete.classList.add('hidden'); }
             });
         }
 
@@ -805,7 +905,6 @@
             const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
             const chavesSelecionadas = [];
             checkboxes.forEach(chk => chavesSelecionadas.push(chk.value));
-
             showLoading();
             try {
                 const docRef = doc(db, "enquetes", "disponibilidade_atual");
@@ -816,32 +915,26 @@
             hideLoading();
         });
 
-        // VISUALIZAÇÃO DINÂMICA DA ESCALA
         async function carregarEscalaPorData(dataString) {
             dataSelecionadaGlobal = dataString;
             const lista = document.getElementById('lista-presbiterio');
             const cardNotificacao = document.getElementById('card-notificacao');
-            
             lista.innerHTML = "";
             cardNotificacao.classList.add('hidden');
             cardConviteSubstituto.classList.add('hidden');
             missaAtivaParaRespostaCoroinha = null;
-
             try {
                 const horariosPossiveis = ["1900", "1700", "0900"];
                 let encontrouAlguma = false;
-
                 for(const hr of horariosPossiveis) {
                     const idDocumentoMissa = `${dataString}_${hr}`;
                     const docSnap = await getDoc(doc(db, "escalas", idDocumentoMissa));
-                    
                     if (docSnap.exists()) {
                         encontrouAlguma = true;
                         const dados = docSnap.data();
                         document.getElementById('lbl-data-missa').innerText = dataString.split('-').reverse().join('/');
                         document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
                         document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
-                        
                         let htmlMissa = `
                             <div class="p-4 bg-amber-50/20 border-b border-gray-100 space-y-2">
                                 <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wide"><i class="fa-solid fa-clock"></i> Celebração das ${dados.horario}h</p>
@@ -871,7 +964,6 @@
                                         <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar6?.status || 'Pendente'}</span>
                                     </div>
                         `;
-
                         if (dados.turibuloAtivo) {
                             htmlMissa += `
                                 <div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between">
@@ -880,7 +972,6 @@
                                 </div>
                             `;
                         }
-
                         if (dados.navetaAtiva) {
                             htmlMissa += `
                                 <div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between">
@@ -889,10 +980,8 @@
                                 </div>
                             `;
                         }
-
                         htmlMissa += `</div></div>`;
                         lista.innerHTML += htmlMissa;
-
                         if (usuarioLogadoDados) {
                             let escaladoNestaMissa = 
                                 dados.altar1?.nome === usuarioLogadoDados.nome ||
@@ -903,7 +992,6 @@
                                 dados.altar6?.nome === usuarioLogadoDados.nome ||
                                 (dados.turibuloAtivo && dados.turiferario?.nome === usuarioLogadoDados.nome) ||
                                 (dados.navetaAtiva && dados.naveteiro?.nome === usuarioLogadoDados.nome);
-
                             if (escaladoNestaMissa) {
                                 missaAtivaParaRespostaCoroinha = { idDocumentoMissa };
                                 cardNotificacao.classList.remove('hidden');
@@ -911,7 +999,6 @@
                         }
                     }
                 }
-
                 if(!encontrouAlguma) {
                     document.getElementById('lbl-data-missa').innerText = "--/--/----";
                     document.getElementById('lbl-titulo-missa').innerText = "Sem escala publicada";
@@ -924,47 +1011,15 @@
 
         buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
 
-        async function responderEscala(statusNovo) {
-            if (!missaAtivaParaRespostaCoroinha) return;
-            showLoading();
-            alert("Sua confirmação foi registrada no sistema paroquial!");
-            hideLoading();
-        }
-
-        document.getElementById('btn-confirmar').addEventListener('click', () => responderEscala('Confirmado'));
-        document.getElementById('btn-recusar').addEventListener('click', () => responderEscala('Troca Solicitada'));
-
-        function ouvirUsuariosCadastrados() {
-            onSnapshot(collection(db, "usuarios"), (snapshot) => {
-                const tabelaBody = document.getElementById('tabela-usuarios-recuperacao');
-                tabelaBody.innerHTML = "";
-                snapshot.forEach((docSnap) => {
-                    const usuario = docSnap.data();
-                    const senhaExibida = usuario.funcao === "Coordenador" ? "••••••••" : (usuario.senha_provisoria || "Sem registro");
-                    tabelaBody.innerHTML += `
-                        <tr class="hover:bg-gray-50/80 transition-all border-b border-gray-100">
-                            <td class="p-3 font-semibold text-gray-800">${usuario.nome}</td>
-                            <td class="p-3 text-gray-600 font-mono">${usuario.email}</td>
-                            <td class="p-3 text-amber-900 bg-amber-50/40 font-mono font-bold select-all">${senhaExibida}</td>
-                            <td class="p-3 text-center"><span class="px-2 py-0.5 text-[10px] font-bold rounded-sm ${usuario.funcao === 'Coordenador' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">${usuario.funcao}</span></td>
-                        </tr>
-                    `;
-                });
-            });
-        }
-
-        document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
+        document.getElementById('form-upload-formacao').addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
-            const nome = document.getElementById('cad-nome').value;
-            const email = document.getElementById('cad-email').value;
-            const senha = document.getElementById('cad-senha').value;
+            const titulo = document.getElementById('form-titulo-input').value;
+            const url = document.getElementById('form-url-input').value;
             try {
-                const credencial = await createUserWithEmailAndPassword(auth, email, senha);
-                await setDoc(doc(doc(db, "usuarios", credencial.user.uid)), { nome, email, funcao: "Coroinha", senha_provisoria: senha });
-                alert(`Membro ${nome} registrado!`);
-                document.getElementById('form-cadastro-usuario').reset();
-            } catch (err) { alert("Falha: " + err.message); }
+                await setDoc(doc(db, "formacao", "manual_atual"), { titulo, url });
+                alert("Material de estudo atualizado com sucesso!");
+            } catch(err) { alert("Erro: " + err.message); }
             hideLoading();
         });
 
