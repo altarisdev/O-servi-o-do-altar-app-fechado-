@@ -107,7 +107,7 @@
                             </div>
 
                             <div id="txt-feedback-enquete" class="text-xs font-bold mt-3 text-emerald-700 hidden bg-emerald-50 border border-emerald-200 p-2 rounded-lg flex items-center gap-1.5 shadow-2xs">
-                                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> Sua escala de disponibilidade já está salva no sistema!
+                                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> Sua escala de disponibilidade já está salva no system!
                             </div>
                         </div>
                     </div>
@@ -351,7 +351,6 @@
         let mapaRespostasGerais = {}; 
         let unsubEnquete = null;
         
-        // Referências locais de controle de fluxos ativos
         let missaAtivaParaRespostaCoroinha = null; 
         let conviteSubstituicaoAtivo = null;
 
@@ -559,7 +558,6 @@
                         data: cel.data,
                         turiferario: { nome: turiferario, status: "Pendente" },
                         naveteiro: { nome: naveteiro, status: "Pendente" },
-                        // Estruturas de controle para as filas de substituição inteligente
                         filaSubstitutosTuriferario: { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: turiferario },
                         filaSubstitutosNaveteiro: { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: naveteiro }
                     });
@@ -587,6 +585,10 @@
                     encontrouAlguma = true;
                     const dados = docSnap.data();
                     
+                    // Lógica de alternância dos rótulos no gerenciador
+                    const rotulo1 = dados.turiferario.nome === "A definir" ? "Altar (Vaga 1)" : "Turiferário (Turíbulo)";
+                    const rotulo2 = dados.naveteiro.nome === "A definir" ? "Altar (Vaga 2)" : "Naveteiro (Naveta)";
+
                     const divEdicao = document.createElement('div');
                     divEdicao.className = "bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 shadow-2xs";
                     divEdicao.innerHTML = `
@@ -596,12 +598,12 @@
                         </div>
                         <div class="space-y-2">
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Turiferário (Turíbulo)</label>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">${rotulo1}</label>
                                 <input type="text" id="edit-turi-${idDoc}" value="${dados.turiferario.nome}" class="w-full border border-gray-300 p-1.5 text-xs bg-white rounded-md font-medium text-gray-800">
                                 <span class="text-[9px] text-gray-400 block">Status: ${dados.turiferario.status}</span>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Naveteiro (Naveta)</label>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">${rotulo2}</label>
                                 <input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro.nome}" class="w-full border border-gray-300 p-1.5 text-xs bg-white rounded-md font-medium text-gray-800">
                                 <span class="text-[9px] text-gray-400 block">Status: ${dados.naveteiro.status}</span>
                             </div>
@@ -628,15 +630,16 @@
                             const docRef = doc(db, "escalas", idDocumentoMissa);
                             await updateDoc(docRef, {
                                 "turiferario.nome": novoTuriferario,
-                                "turiferario.status": "Alterado por Coord.",
+                                "turiferario.status": novoTuriferario === "A definir" ? "Pendente" : "Alterado por Coord.",
                                 "naveteiro.nome": novoNaveteiro,
-                                "naveteiro.status": "Alterado por Coord.",
+                                "naveteiro.status": novoNaveteiro === "A definir" ? "Pendente" : "Alterado por Coord.",
                                 "filaSubstitutosTuriferario.nomeOriginal": novoTuriferario,
                                 "filaSubstitutosNaveteiro.nomeOriginal": novoNaveteiro
                             });
                             hideLoading();
                             alert("Ministros atualizados!");
                             if (buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
+                            carregarEditorEscalasPorData(editorEscalaData.value);
                         } catch (err) {
                             hideLoading();
                             alert("Erro ao salvar: " + err.message);
@@ -705,7 +708,6 @@
             hideLoading();
         });
 
-        // VISUALIZAR ESCALA POR DATA E CALCULAR FILAS DE SUBSTITUIÇÕES E CONVITES
         async function carregarEscalaPorData(dataString) {
             dataSelecionadaGlobal = dataString;
             const lista = document.getElementById('lista-presbiterio');
@@ -735,20 +737,23 @@
                         document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
                         document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
                         
-                        // Garante retrocompatibilidade se os campos de fila não existirem no documento antigo
                         const filaTuri = dados.filaSubstitutosTuriferario || { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: dados.turiferario.nome };
                         const filaNave = dados.filaSubstitutosNaveteiro || { candidatos: [], indiceAtual: 0, statusFila: "Inativa", nomeOriginal: dados.naveteiro.nome };
+
+                        // Lógica de alternância dos rótulos na lista de exibição pública
+                        const rotulo1 = dados.turiferario.nome === "A definir" ? "Altar (Vaga 1)" : "Turiferário (Turíbulo)";
+                        const rotulo2 = dados.naveteiro.nome === "A definir" ? "Altar (Vaga 2)" : "Naveteiro (Naveta)";
 
                         lista.innerHTML += `
                             <div class="p-3 bg-amber-50/20 border-b border-gray-100">
                                 <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wide"><i class="fa-solid fa-clock"></i> Celebração das ${dados.horario}h</p>
                                 <div class="mt-2 grid grid-cols-1 gap-2">
                                     <div class="flex justify-between items-center text-xs">
-                                        <span><strong>Turiferário:</strong> ${dados.turiferario.nome}</span>
+                                        <span><strong>${rotulo1}:</strong> ${dados.turiferario.nome}</span>
                                         <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${dados.turiferario.status === 'Confirmado' || dados.turiferario.status === 'Substituindo' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.turiferario.status}</span>
                                     </div>
                                     <div class="flex justify-between items-center text-xs">
-                                        <span><strong>Naveteiro:</strong> ${dados.naveteiro.nome}</span>
+                                        <span><strong>${rotulo2}:</strong> ${dados.naveteiro.nome}</span>
                                         <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${dados.naveteiro.status === 'Confirmado' || dados.naveteiro.status === 'Substituindo' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.naveteiro.status}</span>
                                     </div>
                                 </div>
@@ -756,7 +761,6 @@
                         `;
 
                         if (usuarioLogadoDados) {
-                            // 1. CHECAGEM: Verificar se o usuário logado possui um CONVITE DE SUBSTITUIÇÃO pendente direcionado a ele
                             if (filaTuri.statusFila === "Processando" && filaTuri.candidatos[filaTuri.indiceAtual] === usuarioLogadoDados.nome) {
                                 conviteSubstituicaoAtivo = { idDocumentoMissa, papelFila: "filaSubstitutosTuriferario", papelMinistro: "turiferario", nomeOriginal: filaTuri.nomeOriginal };
                             } else if (filaNave.statusFila === "Processando" && filaNave.candidatos[filaNave.indiceAtual] === usuarioLogadoDados.nome) {
@@ -768,7 +772,6 @@
                                 cardConviteSubstituto.classList.remove('hidden');
                             }
 
-                            // 2. CHECAGEM: Verificar se o usuário logado é um dos escalados titulares
                             let papelUsuario = "";
                             let statusAtualResposta = "";
                             let nomeDoParceiro = "";
@@ -823,7 +826,6 @@
 
         buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
 
-        // FLUXO DE PEDIDO DE REVEZAMENTO / SOLICITAÇÃO DE SUBSTITUIÇÃO
         async function responderEscala(statusNovo) {
             if (!missaAtivaParaRespostaCoroinha) return;
             
@@ -834,7 +836,6 @@
                 const objetoAtualizacao = {};
 
                 if (statusNovo === 'Substituição Solicitada') {
-                    // Monta a chave da enquete para encontrar os voluntários corretos
                     const idChaveEnquete = `${buscaEscalaData.value}_${horarioMissa}`;
                     const enqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
                     
@@ -844,7 +845,6 @@
                         const dadosEnquete = enqueteSnap.data();
                         const respostas = dadosEnquete.respostas || {};
 
-                        // Busca pessoas que votaram sim para este horário, excluindo o próprio solicitante e o parceiro
                         Object.keys(respostas).forEach(nome => {
                             if (respostas[nome].includes(idChaveEnquete) && nome !== usuarioLogadoDados.nome && nome !== nomeDoParceiro) {
                                 listaVoluntariosValidos.push(nome);
@@ -853,9 +853,7 @@
                     }
 
                     if (listaVoluntariosValidos.length > 0) {
-                        // Embaralha para gerar um rodízio justo
                         listaVoluntariosValidos.sort(() => Math.random() - 0.5);
-
                         const nomeCampoFila = papelUsuario === 'turiferario' ? 'filaSubstitutosTuriferario' : 'filaSubstitutosNaveteiro';
                         
                         objetoAtualizacao[`${papelUsuario}.status`] = "Substituição Solicitada";
@@ -867,15 +865,13 @@
                         };
 
                         await updateDoc(docRef, objetoAtualizacao);
-                        alert(`Seu pedido foi registrado! O sistema notificou o primeiro coroinha disponível da lista (${listaVoluntariosValidos[0]}). Aguarde o retorno.`);
+                        alert(`Seu pedido foi registrado! O sistema notificou o primeiro coroinha disponível (${listaVoluntariosValidos[0]}).`);
                     } else {
-                        // Sem ninguém na enquete
                         objetoAtualizacao[`${papelUsuario}.status`] = "Troca Manual Necessária";
                         await updateDoc(docRef, objetoAtualizacao);
                         alert("Não há voluntários mapeados na enquete para este dia/horário. A coordenação foi notificada diretamente!");
                     }
                 } else {
-                    // Confirmação padrão
                     objetoAtualizacao[`${papelUsuario}.status`] = statusNovo;
                     await updateDoc(docRef, objetoAtualizacao);
                     alert("Presença confirmada!");
@@ -891,7 +887,6 @@
         document.getElementById('btn-confirmar').addEventListener('click', () => responderEscala('Confirmado'));
         document.getElementById('btn-recusar').addEventListener('click', () => responderEscala('Substituição Solicitada'));
 
-        // PROCESSAMENTO DE RESPOSTA DO CONVIDADO (ACEITAR OU RECUSAR A SUB)
         async function processarRespostaSubstituto(aceitou) {
             if (!conviteSubstituicaoAtivo) return;
 
@@ -907,7 +902,6 @@
                     const camposAtualizar = {};
 
                     if (aceitou) {
-                        // Caso aceite, ele assume o posto imediatamente
                         camposAtualizar[`${papelMinistro}.nome`] = usuarioLogadoDados.nome;
                         camposAtualizar[`${papelMinistro}.status`] = "Substituindo";
                         camposAtualizar[`${papelFila}.statusFila`] = "Finalizada";
@@ -915,7 +909,6 @@
                         await updateDoc(docRef, camposAtualizar);
                         alert("Obrigado! Você assumiu essa escala com sucesso.");
                     } else {
-                        // Caso NÃO possa, avança para o próximo coroinha da lista
                         const proximoIndice = infoFila.indiceAtual + 1;
 
                         if (proximoIndice < infoFila.candidatos.length) {
@@ -923,14 +916,13 @@
                             camposAtualizar[`${papelFila}.indiceAtual`] = proximoIndice;
                             
                             await updateDoc(docRef, camposAtualizar);
-                            alert(`Pedido repassado! O sistema agora enviará o convite para o próximo voluntário: ${proximoNome}.`);
+                            alert(`Pedido repassado para o próximo voluntário: ${proximoNome}.`);
                         } else {
-                            // Esgotaram todos os voluntários da enquete e ninguém pôde
                             camposAtualizar[`${papelFila}.statusFila`] = "Esgotada";
                             camposAtualizar[`${papelMinistro}.status`] = "Troca Manual Necessária";
                             
                             await updateDoc(docRef, camposAtualizar);
-                            alert("Todos os voluntários cadastrados na enquete recusaram ou não puderam. O chamado foi repassado para a Coordenação resolver manualmente!");
+                            alert("Todos os voluntários recusaram. O chamado foi repassado para a Coordenação resolver manualmente!");
                         }
                     }
                 }
