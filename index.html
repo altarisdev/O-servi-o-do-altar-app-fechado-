@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serviço do Altar - Altaris</title>
+    <title>Serviço do Altar - Tarcisius</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -24,7 +24,7 @@
                 <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto text-amber-700 text-3xl shadow-sm">
                     <i class="fa-solid fa-cross"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800">Altaris</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Tarcisius Admin</h2>
                 <p class="text-xs text-gray-500">Gestão de Coroinhas e Acólitos</p>
             </div>
 
@@ -107,7 +107,7 @@
                             </div>
 
                             <div id="txt-feedback-enquete" class="text-xs font-bold mt-3 text-emerald-700 hidden bg-emerald-50 border border-emerald-200 p-2 rounded-lg flex items-center gap-1.5 shadow-2xs">
-                                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> Sua escala de disponibilidade já está salva no sistema!
+                                <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> Sua escala de disponibilidade já está salva no systema!
                             </div>
                         </div>
                     </div>
@@ -150,7 +150,9 @@
 
             <section id="conteudo-avisos" class="space-y-4 hidden md:block">
                 <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-bullhorn text-amber-700 mr-1"></i> Mural</h3>
-                <div class="bg-white p-4 rounded-xl border text-xs text-gray-600">Nenhum comunicado urgente hoje.</div>
+                <div id="corpo-mural-avisos" class="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
+                    <p class="text-xs text-gray-400 italic text-center py-2">Carregando informativos...</p>
+                </div>
             </section>
 
             <section id="conteudo-liturgia" class="space-y-4 hidden md:block">
@@ -223,6 +225,22 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
+                <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-900"><i class="fa-solid fa-bullhorn mr-1"></i> Publicar Comunicado Oficial (Mural)</h3>
+                <form id="form-publicar-aviso" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Texto do Comunicado / Instruções</label>
+                        <textarea id="txt-aviso-coordenador" rows="3" required placeholder="Digite avisos gerais, escalas de reuniões ou recados importantes para todo o grupo..." 
+                            class="w-full border border-gray-300 p-2 text-xs rounded-lg bg-gray-50 bg-white focus:ring-2 focus:ring-amber-600 focus:outline-hidden font-medium"></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-amber-800 text-white text-xs font-bold py-2 px-6 rounded-lg hover:bg-amber-900 cursor-pointer shadow-sm">
+                            <i class="fa-solid fa-paper-plane mr-1"></i> Atualizar Mural do Grupo
+                        </button>
+                    </div>
+                </form>
             </div>
 
             <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4">
@@ -349,9 +367,9 @@
         let dataSelecionadaGlobal = "";
         let mapaRespostasGerais = {}; 
         let unsubEnquete = null;
+        let unsubMural = null;
         
         let missaAtivaParaRespostaCoroinha = null; 
-        let conviteSubstituicaoAtivo = null;
 
         const CRONOGRAMA_PAROQUIA = [
             { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
@@ -394,12 +412,16 @@
                         nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
                         funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
 
+                        // SEMPRE ATIVA A ESCUTA DO MURAL PARA AMBOS
+                        ouvirMuralAvisos();
+
                         if (usuarioLogadoDados.funcao === "Coordenador") {
                             painelCoroinha.classList.add('hidden');
                             menuAbasCoroinha.classList.add('hidden');
                             painelCoordenador.classList.remove('hidden');
                             ouvirEnqueteTempoRealCoordenador();
                             ouvirUsuariosCadastrados();
+                            carregarAvisoNoInputCoordenador();
                             
                             editorEscalaData.value = new Date().toISOString().split('T')[0];
                             carregarEditorEscalasPorData(editorEscalaData.value);
@@ -421,6 +443,7 @@
                 } catch (e) { console.error(e); }
             } else {
                 if (unsubEnquete) { unsubEnquete(); unsubEnquete = null; }
+                if (unsubMural) { unsubMural(); unsubMural = null; }
                 usuarioLogadoDados = null;
                 alternarTelasVisiveis(false);
             }
@@ -528,7 +551,52 @@
             });
         }
 
-                // GERADOR MENSAL AUTOMÁTICO DE 6 ALTARES (CORRIGIDO)
+        // SALVAR AVISOS DO MURAL NO FIREBASE
+        document.getElementById('form-publicar-aviso').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const textoAviso = document.getElementById('txt-aviso-coordenador').value;
+            showLoading();
+            try {
+                const dataHoje = new Date().toLocaleDateString('pt-BR');
+                await setDoc(doc(db, "mural", "aviso_geral"), {
+                    texto: textoAviso,
+                    dataPublicacao: dataHoje
+                });
+                alert("Mural atualizado com sucesso!");
+            } catch (err) {
+                alert("Erro ao publicar aviso: " + err.message);
+            }
+            hideLoading();
+        });
+
+        // PUXA O AVISO JÁ EXISTENTE PARA O INPUT DO COORDENADOR NÃO FICAR EM BRANCO ao carregar
+        async function carregarAvisoNoInputCoordenador() {
+            const docSnap = await getDoc(doc(db, "mural", "aviso_geral"));
+            if(docSnap.exists()) {
+                document.getElementById('txt-aviso-coordenador').value = docSnap.data().texto || "";
+            }
+        }
+
+        // ATUALIZAÇÃO EM TEMPO REAL DO MURAL DE AVISOS NA TELA PÚBLICA / COROINHA
+        function ouvirMuralAvisos() {
+            if (unsubMural) unsubMural();
+            unsubMural = onSnapshot(doc(db, "mural", "aviso_geral"), (docSnap) => {
+                const muralContainer = document.getElementById('corpo-mural-avisos');
+                if (docSnap.exists() && docSnap.data().texto) {
+                    const dados = docSnap.data();
+                    muralContainer.innerHTML = `
+                        <div class="text-gray-700 font-medium leading-relaxed whitespace-pre-wrap">${dados.texto}</div>
+                        <div class="text-[10px] text-gray-400 font-bold text-right pt-2 border-t border-gray-100 mt-2">
+                            <i class="fa-solid fa-calendar-day"></i> Publicado em: ${dados.dataPublicacao}
+                        </div>
+                    `;
+                } else {
+                    muralContainer.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-2">Nenhum comunicado urgente hoje.</p>`;
+                }
+            });
+        }
+
+        // GERADOR MENSAL AUTOMÁTICO DE 6 ALTARES (PREENCHIMENTO COMPLETO CORRIGIDO)
         document.getElementById('form-escala-automatica').addEventListener('submit', async (e) => {
             e.preventDefault();
             const mesSelecionado = document.getElementById('auto-mes').value;
@@ -546,12 +614,9 @@
                         if (mapaRespostasGerais[nome].includes(cel.idChave)) disponiveis.push(nome);
                     });
 
-                    // Sorteio aleatório dos membros que votaram na data
                     disponiveis.sort(() => Math.random() - 0.5);
-
                     const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
 
-                    // GARANTE O PREENCHIMENTO CORRETO DOS OBJETOS DE CADA ALTAR
                     await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
                         titulo: `${tituloBase} (${cel.rotulo})`,
                         horario: cel.horario,
@@ -562,7 +627,6 @@
                         altar4: { nome: disponiveis[3] || "A definir", status: "Pendente" },
                         altar5: { nome: disponiveis[4] || "A definir", status: "Pendente" },
                         altar6: { nome: disponiveis[5] || "A definir", status: "Pendente" },
-                        // Turíbulo e Naveta iniciam desativados por padrão (Apenas após escolha do coordenador)
                         turibuloAtivo: false,
                         turiferario: { nome: "A definir", status: "Pendente" },
                         navetaAtiva: false,
@@ -572,18 +636,14 @@
                 hideLoading();
                 alert("Escala de Altares gerada e PREENCHIDA com sucesso!");
                 document.getElementById('form-escala-automatica').reset();
-                
-                // Atualiza os editores e telas se a data atual estiver selecionada
                 if(editorEscalaData.value) carregarEditorEscalasPorData(editorEscalaData.value);
-                if(buscaEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
             } catch (err) { 
                 hideLoading();
                 alert("Erro ao salvar lote: " + err.message); 
             }
         });
 
-
-        // GERENCIADOR EXCLUSIVO DA COORDENAÇÃO (EDIÇÃO MANUAL + INCLUSÃO DE INCENSAÇÃO)
+        // GERENCIADOR MANUAL DA COORDENAÇÃO
         async function carregarEditorEscalasPorData(dataString) {
             containerEditoresMissa.innerHTML = "";
             const horariosPossiveis = ["1900", "1700", "0900"];
@@ -671,7 +731,6 @@
                 document.querySelectorAll('.btn-salvar-edicao-manual').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         const idDocumentoMissa = e.currentTarget.getAttribute('data-id');
-                        
                         showLoading();
                         try {
                             const docRef = doc(db, "escalas", idDocumentoMissa);
@@ -704,7 +763,6 @@
 
         function ouvirEnqueteTempoRealCoroinha() {
             if (unsubEnquete) unsubEnquete();
-            
             unsubEnquete = onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
                 const cardEnquete = document.getElementById('card-enquete');
                 const blocoVotacao = document.getElementById('bloco-votacao-enquete');
@@ -753,13 +811,12 @@
                 const docRef = doc(db, "enquetes", "disponibilidade_atual");
                 const campoAtualizacao = {};
                 campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = chavesSelecionadas;
-
                 await updateDoc(docRef, campoAtualizacao);
             } catch (err) { alert("Erro ao salvar: " + err.message); }
             hideLoading();
         });
 
-        // VISUALIZAÇÃO DINÂMICA DA ESCALA COMPLETA (6 ALTARES + TURÍBULO/NAVETA CASO ATIVADOS)
+        // VISUALIZAÇÃO DINÂMICA DA ESCALA
         async function carregarEscalaPorData(dataString) {
             dataSelecionadaGlobal = dataString;
             const lista = document.getElementById('lista-presbiterio');
@@ -768,7 +825,6 @@
             lista.innerHTML = "";
             cardNotificacao.classList.add('hidden');
             cardConviteSubstituto.classList.add('hidden');
-            
             missaAtivaParaRespostaCoroinha = null;
 
             try {
@@ -786,7 +842,6 @@
                         document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
                         document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
                         
-                        // Montagem dinâmica da lista pública com os 6 postos de Altar
                         let htmlMissa = `
                             <div class="p-4 bg-amber-50/20 border-b border-gray-100 space-y-2">
                                 <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wide"><i class="fa-solid fa-clock"></i> Celebração das ${dados.horario}h</p>
@@ -817,7 +872,6 @@
                                     </div>
                         `;
 
-                        // Inclusão condicional: Só exibe Turíbulo / Naveta se o coordenador marcou como ativo!
                         if (dados.turibuloAtivo) {
                             htmlMissa += `
                                 <div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between">
@@ -839,7 +893,6 @@
                         htmlMissa += `</div></div>`;
                         lista.innerHTML += htmlMissa;
 
-                        // Validação para ver se o usuário conectado está escalado em alguma vaga
                         if (usuarioLogadoDados) {
                             let escaladoNestaMissa = 
                                 dados.altar1?.nome === usuarioLogadoDados.nome ||
@@ -908,7 +961,7 @@
             const senha = document.getElementById('cad-senha').value;
             try {
                 const credencial = await createUserWithEmailAndPassword(auth, email, senha);
-                await setDoc(doc(db, "usuarios", credencial.user.uid), { nome, email, funcao: "Coroinha", senha_provisoria: senha });
+                await setDoc(doc(doc(db, "usuarios", credencial.user.uid)), { nome, email, funcao: "Coroinha", senha_provisoria: senha });
                 alert(`Membro ${nome} registrado!`);
                 document.getElementById('form-cadastro-usuario').reset();
             } catch (err) { alert("Falha: " + err.message); }
