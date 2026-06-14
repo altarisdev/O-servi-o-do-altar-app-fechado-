@@ -337,7 +337,7 @@
         let dataSelecionadaGlobal = "";
         let mapaRespostasGerais = {}; 
         let unsubEnquete = null;
-        let missaAtivaParaRespostaCoroinha = null; // Guarda a referência da missa que o coroinha responderá
+        let missaAtivaParaRespostaCoroinha = null; // Armazena a referência da missa carregada para o acólito responder
 
         const CRONOGRAMA_PAROQUIA = [
             { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
@@ -389,7 +389,6 @@
                             ouvirEnqueteTempoRealCoordenador();
                             ouvirUsuariosCadastrados();
                             
-                            // Define data de hoje no painel do coordenador por padrão
                             editorEscalaData.value = new Date().toISOString().split('T')[0];
                             carregarEditorEscalasPorData(editorEscalaData.value);
                         } else {
@@ -434,7 +433,7 @@
             signOut(auth);
         });
 
-        // GERADOR DINÂMICO DE DATAS COMPATÍVEL COM O CRONOGRAMA PAROQUIAL
+        // GERADOR DINÂMICO DE DATAS
         function mapearDatasDoMes(ano, mes) {
             const datasMapeadas = [];
             const dataCorrente = new Date(ano, mes - 1, 1);
@@ -607,7 +606,6 @@
             if (!encontrouAlguma) {
                 containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic col-span-full text-center py-4">Nenhuma escala cadastrada ou encontrada para o dia ${dataString.split('-').reverse().join('/')}.</p>`;
             } else {
-                // Atrela evento nos botões dinâmicos de salvamento manual
                 document.querySelectorAll('.btn-salvar-edicao-manual').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         const idDocumentoMissa = e.currentTarget.getAttribute('data-id');
@@ -617,7 +615,6 @@
                         showLoading();
                         try {
                             const docRef = doc(db, "escalas", idDocumentoMissa);
-                            // Mantemos o status como pendente ao alterar manualmente o nome, para que o novo escalado confirme
                             await updateDoc(docRef, {
                                 "turiferario.nome": novoTuriferario,
                                 "turiferario.status": "Alterado por Coord.",
@@ -626,7 +623,6 @@
                             });
                             hideLoading();
                             alert("Ministros atualizados com sucesso nesta missa!");
-                            // Recarrega a visualização do coroinha caso ele esteja na mesma aba
                             if (buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                         } catch (err) {
                             hideLoading();
@@ -638,7 +634,6 @@
         }
 
         editorEscalaData.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
-
 
         // COROINHA: ESCUTA ATIVA EM TEMPO REAL PARA CONTROLAR A EXIBIÇÃO DA ENQUETE IMEDIATAMENTE
         function ouvirEnqueteTempoRealCoroinha() {
@@ -732,40 +727,46 @@
                                 <div class="mt-2 grid grid-cols-1 gap-2">
                                     <div class="flex justify-between items-center text-xs">
                                         <span><strong>Turiferário:</strong> ${dados.turiferario.nome}</span>
-                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${dados.turiferario.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.turiferario.status}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${dados.turiferario.status === 'Confirmado' || dados.turiferario.status === 'Substituindo' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.turiferario.status}</span>
                                     </div>
                                     <div class="flex justify-between items-center text-xs">
                                         <span><strong>Naveteiro:</strong> ${dados.naveteiro.nome}</span>
-                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${dados.naveteiro.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.naveteiro.status}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${dados.naveteiro.status === 'Confirmado' || dados.naveteiro.status === 'Substituindo' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.naveteiro.status}</span>
                                     </div>
                                 </div>
                             </div>
                         `;
 
-                        // CORREÇÃO: Mapeia se o usuário atual está alocado nessa missa e qual é o seu papel para tratar a resposta
                         if (usuarioLogadoDados) {
                             let papelUsuario = "";
                             let statusAtualResposta = "";
+                            let nomeDoOutroEscalado = "";
 
                             if (dados.turiferario.nome === usuarioLogadoDados.nome) {
                                 papelUsuario = "turiferario";
                                 statusAtualResposta = dados.turiferario.status;
+                                nomeDoOutroEscalado = dados.naveteiro.nome;
                             } else if (dados.naveteiro.nome === usuarioLogadoDados.nome) {
                                 papelUsuario = "naveteiro";
                                 statusAtualResposta = dados.naveteiro.status;
+                                nomeDoOutroEscalado = dados.turiferario.nome;
                             }
 
                             if (papelUsuario !== "") {
-                                missaAtivaParaRespostaCoroinha = { idDocumentoMissa, papelUsuario };
+                                // Guarda dados adicionais (horário e quem é o parceiro) para a lógica da troca
+                                missaAtivaParaRespostaCoroinha = { 
+                                    idDocumentoMissa, 
+                                    papelUsuario, 
+                                    horarioMissa: dados.horario,
+                                    nomeDoOutroEscalado
+                                };
                                 cardNotificacao.classList.remove('hidden');
 
-                                // Se já respondeu algo diferente de Pendente ou Editado, esconde botões e crava a resposta na tela
-                                if (statusAtualResposta === "Confirmado" || statusAtualResposta === "Substituição Solicitada") {
+                                if (statusAtualResposta === "Confirmado" || statusAtualResposta === "Substituição Solicitada" || statusAtualResposta === "Substituindo") {
                                     botoesAcao.classList.add('hidden');
                                     txtFeedback.innerText = `Você respondeu esta escala como: ${statusAtualResposta}`;
                                     txtFeedback.classList.remove('hidden');
                                 } else {
-                                    // Se está pendente, libera os botões para clique
                                     botoesAcao.classList.remove('hidden');
                                     txtFeedback.classList.add('hidden');
                                     txtFeedback.innerText = "";
@@ -787,23 +788,62 @@
 
         buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
 
-        // LOGICA DE PROCESSAMENTO DE CONFIRMAÇÃO DO COROINHA
+        // NOVA LÓGICA DE PROCESSAMENTO DE RESPOSTA E SUBSTITUIÇÃO INTELIGENTE
         async function responderEscala(statusNovo) {
             if (!missaAtivaParaRespostaCoroinha) return;
             
             showLoading();
             try {
-                const { idDocumentoMissa, papelUsuario } = missaAtivaParaRespostaCoroinha;
+                const { idDocumentoMissa, papelUsuario, horarioMissa, nomeDoOutroEscalado } = missaAtivaParaRespostaCoroinha;
                 const docRef = doc(db, "escalas", idDocumentoMissa);
-                
                 const objetoAtualizacao = {};
-                objetoAtualizacao[`${papelUsuario}.status`] = statusNovo;
 
-                await updateDoc(docRef, objetoAtualizacao);
+                if (statusNovo === 'Substituição Solicitada') {
+                    // 1. Busca quem votou disponível na enquete para essa mesma data e horário
+                    const idChaveEnquete = `${buscaEscalaData.value}_${horarioMissa}`;
+                    const enqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
+                    
+                    let candidatoSubstituto = "";
+
+                    if (enqueteSnap.exists()) {
+                        const dadosEnquete = enqueteSnap.data();
+                        const respostas = dadosEnquete.respostas || {};
+                        let aptosDisponiveis = [];
+
+                        // Filtra quem marcou o dia e não é o próprio usuário nem o parceiro de escala atual
+                        Object.keys(respostas).forEach(nome => {
+                            if (respostas[nome].includes(idChaveEnquete) && nome !== usuarioLogadoDados.nome && nome !== nomeDoOutroEscalado) {
+                                aptosDisponiveis.push(nome);
+                            }
+                        });
+
+                        if (aptosDisponiveis.length > 0) {
+                            // Sorteia um dos voluntários disponíveis para revezamento
+                            aptosDisponiveis.sort(() => Math.random() - 0.5);
+                            candidatoSubstituto = aptosDisponiveis[0];
+                        }
+                    }
+
+                    // 2. Se achou alguém, faz a troca direta!
+                    if (candidatoSubstituto !== "") {
+                        objetoAtualizacao[`${papelUsuario}.nome`] = candidatoSubstituto;
+                        objetoAtualizacao[`${papelUsuario}.status`] = "Substituindo";
+                        await updateDoc(docRef, objetoAtualizacao);
+                        alert(`Substituição realizada! O coroinha ${candidatoSubstituto} (que estava livre) assumiu a sua escala.`);
+                    } else {
+                        // Se não achou ninguém livre na enquete, apenas joga o status para a coordenação ver
+                        objetoAtualizacao[`${papelUsuario}.status`] = "Substituição Solicitada";
+                        await updateDoc(docRef, objetoAtualizacao);
+                        alert("Não encontramos voluntários pré-disponíveis na enquete. Seu pedido foi enviado para a coordenação!");
+                    }
+                } else {
+                    // Fluxo padrão para Confirmação de Presença
+                    objetoAtualizacao[`${papelUsuario}.status`] = statusNovo;
+                    await updateDoc(docRef, objetoAtualizacao);
+                    alert("Presença confirmada com sucesso!");
+                }
                 
-                // Recarrega imediatamente os dados locais para atualizar o visual
                 await carregarEscalaPorData(buscaEscalaData.value);
-                alert("Sua resposta foi gravada com sucesso!");
             } catch (err) {
                 alert("Erro ao processar resposta: " + err.message);
             }
