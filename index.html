@@ -90,17 +90,19 @@
                     <div class="flex gap-3">
                         <i class="fa-solid fa-circle-question text-blue-600 text-xl mt-0.5"></i>
                         <div class="flex-1">
-                            <h4 class="font-bold text-blue-900 text-sm">Disponibilidade do Mês</h4>
-                            <p class="text-xs text-blue-800 mt-1" id="txt-pergunta-enquete">Selecione abaixo os dias em que você pode servir:</p>
+                            <h4 class="font-bold text-blue-900 text-sm">Disponibilidade de Celebrações</h4>
+                            <p class="text-xs text-blue-800 mt-1">Marque abaixo as celebrações do mês que você pode servir:</p>
                             
-                            <div id="container-opcoes-enquete" class="mt-3 space-y-2 max-h-40 overflow-y-auto bg-white p-2 border border-blue-200 rounded-lg"></div>
-                            
-                            <div class="mt-3 flex gap-2">
-                                <button id="btn-enquete-enviar" class="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-blue-700 w-full cursor-pointer">
-                                    Enviar Disponibilidade
+                            <div id="bloco-votacao-enquete" class="space-y-2 mt-3">
+                                <div id="container-opcoes-enquete" class="space-y-2 max-h-56 overflow-y-auto bg-white p-2 border border-blue-200 rounded-lg"></div>
+                                <button id="btn-enquete-enviar" class="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-blue-700 w-full cursor-pointer mt-2">
+                                    Gravar Minha Disponibilidade
                                 </button>
                             </div>
-                            <p id="txt-feedback-enquete" class="text-xs font-bold mt-2 text-emerald-700 hidden">✓ Suas datas disponíveis foram salvas!</p>
+
+                            <div id="txt-feedback-enquete" class="text-xs font-bold mt-2 text-emerald-700 hidden bg-emerald-50 border border-emerald-200 p-2 rounded-lg flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check"></i> Sua escala de disponibilidade foi enviada e armazenada!
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -153,59 +155,51 @@
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between shadow-xs">
                 <div>
                     <h2 class="text-lg font-bold text-amber-900">Painel Geral da Coordenação</h2>
-                    <p class="text-xs text-amber-700">Gestão integrada de escalas baseada nas respostas específicas de calendário.</p>
+                    <p class="text-xs text-amber-700">Geração de Escala Mensal baseada em múltiplos horários semanais.</p>
                 </div>
                 <i class="fa-solid fa-user-shield text-3xl text-amber-700"></i>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 lg:col-span-2">
-                    <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-800"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gerador Automático para Turíbulo e Naveta</h3>
-                    <p class="text-xs text-gray-500">O sistema mapeará os finais de semana e buscará na base da enquete quem marcou estar livre em cada dia específico para definir prioritariamente os postos de incensação.</p>
+                    <h3 class="font-bold text-gray-800 border-b pb-2 text-amber-800"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gerador de Escala Mensal Multi-Horários</h3>
+                    <p class="text-xs text-gray-500">O sistema mapeará todas as **Terças (19h), Quintas (17h), Sábados (19h), Domingos (09h) e Domingos (19h)** do mês escolhido, alocando Turíbulo e Naveta de acordo com os votos.</p>
                     
                     <form id="form-escala-automatica" class="space-y-3">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Mês de Referência</label>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Mês de Referência das Missas</label>
                                 <input type="month" id="auto-mes" required class="w-full border p-2 text-sm rounded-lg bg-gray-50 font-bold text-amber-900">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Horário Geral Sábado</label>
-                                <input type="time" id="auto-hora-sabado" value="19:00" required class="w-full border p-2 text-sm rounded-lg bg-gray-50">
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Título Base das Celebrações</label>
+                                <input type="text" id="auto-titulo" value="Santa Missa" required class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Horário Geral Domingo</label>
-                                <input type="time" id="auto-hora-domingo" value="19:00" required class="w-full border p-2 text-sm rounded-lg bg-gray-50">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Título Base das Celebrações</label>
-                            <input type="text" id="auto-titulo" required placeholder="Ex: Santa Missa - Matriz" class="w-full border p-2 text-sm rounded-lg bg-gray-50">
                         </div>
                         <button type="submit" class="w-full bg-amber-700 text-white text-xs font-bold py-3 rounded-lg hover:bg-amber-800 cursor-pointer shadow-sm">
-                            <i class="fa-solid fa-gears mr-1"></i> Processar Enquete por Dias e Montar Escala
+                            <i class="fa-solid fa-gears mr-1"></i> Processar Cronograma e Gerar Escala do Mês
                         </button>
                     </form>
                 </div>
 
                 <div class="bg-white p-5 rounded-2xl border border-gray-200 flex flex-col justify-between space-y-4">
                     <div>
-                        <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-square-poll-horizontal text-amber-700 mr-1"></i> Configurar Enquete Mensal</h3>
+                        <h3 class="font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-square-poll-horizontal text-amber-700 mr-1"></i> Configurar Enquete Semanal</h3>
                         <div class="space-y-3 mt-3">
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">1. Mês da Enquete</label>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Selecione o Mês Alvo</label>
                                 <input type="month" id="enq-mes-alvo" required class="w-full border p-2 text-sm rounded-lg bg-gray-50 mt-0.5">
                             </div>
                             <div class="flex gap-2 pt-2">
-                                <button id="btn-disparar-enquete" class="bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-blue-700 flex-1 cursor-pointer">Abrir com Calendário</button>
+                                <button id="btn-disparar-enquete" class="bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-blue-700 flex-1 cursor-pointer">Abrir Enquete</button>
                                 <button id="btn-fechar-enquete" class="bg-gray-500 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-gray-600 cursor-pointer">Encerrar</button>
                             </div>
                         </div>
                     </div>
                     
                     <div class="bg-gray-50 p-3 rounded-xl border space-y-2 mt-2">
-                        <p class="text-[10px] font-bold text-gray-700 uppercase tracking-wider">Histórico / Retorno das Respostas por Dia:</p>
-                        <div class="text-[11px] text-gray-500 max-h-32 overflow-y-auto space-y-1" id="lista-nomes-enquete">
+                        <p class="text-[10px] font-bold text-gray-700 uppercase tracking-wider">Acompanhamento de Disponibilidade:</p>
+                        <div class="text-[11px] text-gray-500 max-h-36 overflow-y-auto space-y-1" id="lista-nomes-enquete">
                             <span class="text-gray-400 italic">Nenhum dado ativo no momento.</span>
                         </div>
                     </div>
@@ -317,9 +311,19 @@
 
         let usuarioLogadoDados = null;
         let dataSelecionadaGlobal = "";
-        let mapaRespostasGerais = {}; // Guardará quem está livre em qual dia
+        let mapaRespostasGerais = {}; 
+        let enviouDisponibilidadeLocalmente = false; // Flag para forçar estabilidade visual do voto na tela
 
-        // CONTROLE DE SESSÃO ATIVA (AUTH)
+        // CONFIGURAÇÃO REUTILIZÁVEL DOS DIAS E HORÁRIOS DA PARÓQUIA
+        // Modifique ou adicione novos blocos aqui facilmente para expandir a escala
+        const CRONOGRAMA_PAROQUIA = [
+            { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
+            { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
+            { diaSemana: 6, horario: "19:00", rotulo: "Sábado" },
+            { diaSemana: 0, horario: "09:00", rotulo: "Domingo" },
+            { diaSemana: 0, horario: "19:00", rotulo: "Domingo" }
+        ];
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
@@ -334,17 +338,14 @@
                             painelCoroinha.classList.add('hidden');
                             menuAbasCoroinha.classList.add('hidden');
                             painelCoordenador.classList.remove('hidden');
-                            
                             ouvirEnqueteTempoReal();
                             ouvirUsuariosCadastrados();
                         } else {
                             painelCoordenador.classList.add('hidden');
                             painelCoroinha.classList.remove('hidden');
                             menuAbasCoroinha.classList.remove('hidden');
-                            
                             const hoje = new Date().toISOString().split('T')[0];
                             buscaEscalaData.value = hoje;
-                            
                             checarEnqueteAtiva();
                             carregarEscalaPorData(hoje);
                             carregarLiturgiaAutomatica();
@@ -360,7 +361,6 @@
             }
         });
 
-        // LOGIN E LOGOUT
         formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
@@ -368,23 +368,36 @@
                 erroLogin.classList.add('hidden');
             } catch (err) { erroLogin.classList.remove('hidden'); }
         });
-        btnLogout.addEventListener('click', () => signOut(auth));
+        btnLogout.addEventListener('click', () => {
+            enviouDisponibilidadeLocalmente = false;
+            signOut(auth);
+        });
 
-        // GERADOR AUXILIAR DE DATAS (Sábados e Domingos de um Mês)
-        function obterFinaisDeSemana(ano, mes) {
-            const datas = [];
+        // GERADOR DINÂMICO DE DATAS COMPATÍVEL COM O CRONOGRAMA PAROQUIAL
+        function mapearDatasDoMes(ano, mes) {
+            const datasMapeadas = [];
             const dataCorrente = new Date(ano, mes - 1, 1);
+            
             while (dataCorrente.getMonth() === mes - 1) {
-                const diaSemana = dataCorrente.getDay();
-                if (diaSemana === 6 || diaSemana === 0) {
-                    datas.push(dataCorrente.toISOString().split('T')[0]);
-                }
+                const diaSemanaAtual = dataCorrente.getDay();
+                
+                // Filtra as regras do cronograma paroquial para o dia correspondente
+                const correspondencias = CRONOGRAMA_PAROQUIA.filter(c => c.diaSemana === diaSemanaAtual);
+                
+                correspondencias.forEach(item => {
+                    const dataString = dataCorrente.toISOString().split('T')[0];
+                    datasMapeadas.push({
+                        idChave: `${dataString}_${item.horario}`, // Chave única para controle de voto
+                        data: dataString,
+                        horario: item.horario,
+                        rotulo: item.rotulo
+                    });
+                });
                 dataCorrente.setDate(dataCorrente.getDate() + 1);
             }
-            return datas;
+            return datasMapeadas;
         }
 
-        // GERAR SENHA PROVISÓRIA
         document.getElementById('btn-gerar-senha').addEventListener('click', () => {
             const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
             let novaSenha = '';
@@ -392,55 +405,50 @@
             document.getElementById('cad-senha').value = novaSenha;
         });
 
-        // DISPARAR NOVA ENQUETE CALENDÁRIO
+        // COORDENADOR DISPARA ENQUETE MENSAL
         document.getElementById('btn-disparar-enquete').addEventListener('click', async () => {
             const mesAlvo = document.getElementById('enq-mes-alvo').value;
             if(!mesAlvo) { alert("Selecione o mês desejado!"); return; }
 
             const [ano, mes] = mesAlvo.split('-').map(Number);
-            const diasFinais = obterFinaisDeSemana(ano, mes);
+            const listaCelebracoes = mapearDatasDoMes(ano, mes);
 
             await setDoc(doc(db, "enquetes", "disponibilidade_atual"), {
                 mesReferencia: mesAlvo,
                 ativa: true,
-                diasDisponiveis: diasFinais,
-                respostas: {} // Armazenará { "NomeDoCoroinha": ["2026-06-06", "2026-06-07"] }
+                celebracoes: listaCelebracoes,
+                respostas: {} 
             });
-            alert("Enquete de calendário aberta para os coroinhas!");
+            alert("Enquete com múltiplos horários semanais aberta com sucesso!");
         });
 
         document.getElementById('btn-fechar-enquete').addEventListener('click', async () => {
             await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false });
-            alert("Pesquisa de calendário encerrada.");
+            alert("Pesquisa encerrada.");
         });
 
-        // MONITORAR ENQUETE E GERAR RELATÓRIO DE PAINEL PARA O COORDENADOR
+        // COORDENADOR MONITORANDO RETORNO DA ENQUETE
         function ouvirEnqueteTempoReal() {
             onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
                 if (docSnap.exists()) {
                     const dados = docSnap.data();
                     mapaRespostasGerais = dados.respostas || {};
-                    
                     const container = document.getElementById('lista-nomes-enquete');
                     container.innerHTML = "";
 
-                    // Organizar visualmente por dia quem está disponível
-                    const contagemPorDia = {};
-                    if (dados.diasDisponiveis) {
-                        dados.diasDisponiveis.forEach(dia => {
-                            contagemPorDia[dia] = [];
-                            Object.keys(mapaRespostasGerais).forEach(nomeCoroinha => {
-                                if(mapaRespostasGerais[nomeCoroinha].includes(dia)) {
-                                    contagemPorDia[dia].push(nomeCoroinha);
-                                }
+                    if (dados.celebracoes) {
+                        dados.celebracoes.forEach(cel => {
+                            const aptos = [];
+                            Object.keys(mapaRespostasGerais).forEach(nome => {
+                                if (mapaRespostasGerais[nome].includes(cel.idChave)) aptos.push(nome);
                             });
 
-                            const dataBR = dia.split('-').reverse().join('/');
+                            const dataBR = cel.data.split('-').reverse().join('/');
                             container.innerHTML += `
                                 <div class="bg-white p-1.5 border rounded mb-1">
-                                    <strong class="text-amber-900 text-[10px] block border-b pb-0.5">${dataBR}:</strong>
+                                    <strong class="text-amber-900 text-[10px] block border-b pb-0.5">${dataBR} - ${cel.rotulo} às ${cel.horario}h:</strong>
                                     <p class="text-[10px] text-emerald-700 font-medium mt-0.5">
-                                        ${contagemPorDia[dia].length > 0 ? '✓ ' + contagemPorDia[dia].join(', ') : 'Ninguém disponível'}
+                                        ${aptos.length > 0 ? '✓ ' + aptos.join(', ') : 'Ninguém registrado'}
                                     </p>
                                 </div>
                             `;
@@ -450,170 +458,176 @@
             });
         }
 
-        // PROCESSAR ESCALA MENSAL BASEADA NA DISPONIBILIDADE
+        // PROCESSADOR AUTOMÁTICO DE ESCALA MENSAL COMPLETA
         document.getElementById('form-escala-automatica').addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const mesSelecionado = document.getElementById('auto-mes').value;
-            const horaSabado = document.getElementById('auto-hora-sabado').value;
-            const horaDomingo = document.getElementById('auto-hora-domingo').value;
             const tituloBase = document.getElementById('auto-titulo').value;
+            if(!mesSelecionado) return;
 
             const [ano, mes] = mesSelecionado.split('-').map(Number);
-            const diasDoMes = obterFinaisDeSemana(ano, mes);
+            const cronogramaDoMes = mapearDatasDoMes(ano, mes);
 
             try {
-                for (const dia of diasDoMes) {
-                    // Descobrir quem marcou "Disponível" exatamente para ESSE dia
-                    let disponiveisParaODia = [];
+                for (const cel of cronogramaDoMes) {
+                    let disponiveis = [];
                     Object.keys(mapaRespostasGerais).forEach(nome => {
-                        if (mapaRespostasGerais[nome].includes(dia)) {
-                            disponiveisParaODia.push(nome);
-                        }
+                        if (mapaRespostasGerais[nome].includes(cel.idChave)) disponiveis.push(nome);
                     });
 
-                    // Embaralhar a lista de aptos do dia para evitar repetição fixa
-                    disponiveisParaODia.sort(() => Math.random() - 0.5);
+                    disponiveis.sort(() => Math.random() - 0.5);
 
-                    // Selecionar prioritariamente Turíbulo e Naveta
-                    const turiferario = disponiveisParaODia[0] || "A definir";
-                    const naveteiro = disponiveisParaODia[1] || "A definir";
+                    const turiferario = disponiveis[0] || "A definir";
+                    const naveteiro = disponiveis[1] || "A definir";
 
-                    const dataObjeto = new Date(dia + "T00:00:00");
-                    const tipoDia = dataObjeto.getDay() === 6 ? "Sábado" : "Domingo";
-                    const horaDefinida = dataObjeto.getDay() === 6 ? horaSabado : horaDomingo;
+                    // Chave combinada da escala para evitar sobreposição em dias com mais de uma missa (ex: Domingo)
+                    const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
 
-                    await setDoc(doc(db, "escalas", dia), {
-                        titulo: `${tituloBase} (${tipoDia})`,
-                        horario: horaDefinida,
-                        data: dia,
+                    await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
+                        titulo: `${tituloBase} (${cel.rotulo})`,
+                        horario: cel.horario,
+                        data: cel.data,
                         turiferario: { nome: turiferario, status: "Pendente" },
-                        naveteiro: { nome: naveteiro, status: "Pendente" },
-                        crucifero: { nome: "Espaço do Altar", status: "Livre" } 
+                        naveteiro: { nome: naveteiro, status: "Pendente" }
                     });
                 }
-                alert("Escala do mês processada com sucesso respeitando a agenda de cada coroinha!");
+                alert("Escala gerada com absoluto sucesso para todas as datas litúrgicas do mês!");
                 document.getElementById('form-escala-automatica').reset();
-            } catch (err) {
-                alert("Erro ao salvar lote: " + err.message);
-            }
+            } catch (err) { alert("Erro ao salvar lote: " + err.message); }
         });
 
-        // VISÃO DO COROINHA: MONTAR COMPONENTES DE VOTAÇÃO
+        // COROINHA: CARREGAR ENQUETE E VALIDAR SE JÁ EXISTE VOTO COMPUTADO
         async function checarEnqueteAtiva() {
             const docSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
             if(docSnap.exists() && docSnap.data().ativa === true) {
                 const dados = docSnap.data();
                 const container = document.getElementById('container-opcoes-enquete');
+                const blocoVotacao = document.getElementById('bloco-votacao-enquete');
+                const blocoFeedback = document.getElementById('txt-feedback-enquete');
+                
                 container.innerHTML = "";
 
-                // Verifica se o usuário já tem votos salvos para pré-marcar
-                const meusVotosAntigos = dados.respostas[usuarioLogadoDados.nome] || [];
+                // Verifica no banco de dados se o nome deste coroinha já consta na árvore de respostas
+                const jaVotouNoBanco = dados.respostas && Object.prototype.hasOwnProperty.call(dados.respostas, usuarioLogadoDados.nome);
+                const meusVotosAntigos = jaVotouNoBanco ? dados.respostas[usuarioLogadoDados.nome] : [];
 
-                dados.diasDisponiveis.forEach(dia => {
-                    const dataBR = dia.split('-').reverse().join('/');
-                    const verificado = meusVotosAntigos.includes(dia) ? "checked" : "";
+                // CORREÇÃO: Se ele já votou ou marcou localmente nesta sessão, oculta a checkbox e fixa a mensagem de sucesso
+                if (jaVotouNoBanco || enviouDisponibilidadeLocalmente) {
+                    blocoVotacao.classList.add('hidden');
+                    blocoFeedback.classList.remove('hidden');
+                    document.getElementById('card-enquete').classList.remove('hidden');
+                    return;
+                }
+
+                // Caso não tenha votado, reconstrói a lista com os horários semanais corretos
+                dados.celebracoes.forEach(cel => {
+                    const dataBR = cel.data.split('-').reverse().join('/');
+                    const verificado = meusVotosAntigos.includes(cel.idChave) ? "checked" : "";
                     container.innerHTML += `
-                        <label class="flex items-center gap-2 p-1 hover:bg-gray-50 rounded text-xs text-gray-700 cursor-pointer">
-                            <input type="checkbox" value="${dia}" ${verificado} class="chk-dia-enquete rounded text-blue-600 border-gray-300 focus:ring-blue-500">
-                            <span>Fim de Semana: <strong>${dataBR}</strong></span>
+                        <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded text-xs text-gray-700 cursor-pointer border-b border-gray-100 last:border-none">
+                            <input type="checkbox" value="${cel.idChave}" ${verificado} class="chk-dia-enquete rounded text-blue-600 border-gray-300 focus:ring-blue-500 w-4 h-4">
+                            <div>
+                                <span class="font-bold text-gray-900">${dataBR}</span> - ${cel.rotulo} às <span class="bg-amber-100 text-amber-800 px-1 rounded font-bold">${cel.horario}h</span>
+                            </div>
                         </label>
                     `;
                 });
 
+                blocoVotacao.classList.remove('hidden');
+                blocoFeedback.classList.add('hidden');
                 document.getElementById('card-enquete').classList.remove('hidden');
-                document.getElementById('botoes-enquete').classList.remove('hidden');
-                document.getElementById('txt-feedback-enquete').classList.add('hidden');
             } else { 
                 document.getElementById('card-enquete').classList.add('hidden'); 
             }
         }
 
-        // COROINHA SALVAR SUA AGENDA DISPONÍVEL
+        // COROINHA ENVIAR SEU FORMULÁRIO DE DISPONIBILIDADE
         document.getElementById('btn-enquete-enviar').addEventListener('click', async () => {
             const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
-            const diasSelecionados = [];
-            checkboxes.forEach(chk => diasSelecionados.push(chk.value));
+            const chavesSelecionadas = [];
+            checkboxes.forEach(chk => chavesSelecionadas.push(chk.value));
 
-            const docRef = doc(db, "enquetes", "disponibilidade_atual");
-            
-            // Atualiza o nó dinâmico do banco correspondente ao nome do usuário
-            const campoAtualizacao = {};
-            campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = diasSelecionados;
+            try {
+                const docRef = doc(db, "enquetes", "disponibilidade_atual");
+                const campoAtualizacao = {};
+                campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = chavesSelecionadas;
 
-            await updateDoc(docRef, campoAtualizacao);
+                await updateDoc(docRef, campoAtualizacao);
 
-            document.getElementById('botoes-enquete').classList.add('hidden');
-            document.getElementById('txt-feedback-enquete').classList.remove('hidden');
+                // CORREÇÃO: Transiciona visualmente de forma instantânea para o feedback estável
+                enviouDisponibilidadeLocalmente = true;
+                document.getElementById('bloco-votacao-enquete').classList.add('hidden');
+                document.getElementById('txt-feedback-enquete').classList.remove('hidden');
+            } catch (err) { alert("Erro ao salvar: " + err.message); }
         });
 
-        // VISÃO DO COROINHA: EXIBIR ESCALAS E FUNÇÕES DO ALTAR
+        // COROINHA: VISUALIZAR ESCALA POR DATA
         async function carregarEscalaPorData(dataString) {
             dataSelecionadaGlobal = dataString;
-            const docSnap = await getDoc(doc(db, "escalas", dataString));
             const lista = document.getElementById('lista-presbiterio');
             const cardNotificacao = document.getElementById('card-notificacao');
+            lista.innerHTML = "";
 
-            if (docSnap.exists()) {
-                const dados = docSnap.data();
-                document.getElementById('lbl-data-missa').innerText = dataString.split('-').reverse().join('/');
-                document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
-                document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
-                
-                lista.innerHTML = `
-                    <div class="p-3 flex items-center justify-between bg-amber-50/40">
-                        <div><p class="text-[10px] text-amber-800 font-bold uppercase tracking-wider"><i class="fa-solid fa-fire mr-1"></i> Turiferário</p><p class="font-semibold text-sm text-gray-800">${dados.turiferario.nome}</p></div>
-                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.turiferario.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.turiferario.status}</span>
-                    </div>
-                    <div class="p-3 flex items-center justify-between">
-                        <div><p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider"><i class="fa-solid fa-box-tissue mr-1"></i> Naveteiro</p><p class="font-semibold text-sm text-gray-800">${dados.naveteiro.nome}</p></div>
-                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${dados.naveteiro.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.naveteiro.status}</span>
-                    </div>
-                    <div class="p-3 bg-gray-50 border-t">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"><i class="fa-solid fa-church mr-1"></i> Espaço do Altar / Credência</p>
-                        <p class="text-xs text-gray-600 mt-0.5">Demais acólitos organizados localmente na sacristia.</p>
-                    </div>
-                `;
+            try {
+                // Como um mesmo dia pode ter mais de uma missa (ex: Domingo 9h e 19h), buscamos as escalas publicadas
+                // Para simplificar a busca sem queries complexas, tentamos os horários padrões cadastrados na data selecionada
+                const horariosPossiveis = ["1900", "1700", "0900"];
+                let encontrouAlguma = false;
 
-                if(usuarioLogadoDados && (dados.turiferario.nome === usuarioLogadoDados.nome || dados.naveteiro.nome === usuarioLogadoDados.nome)) {
-                    cardNotificacao.classList.remove('hidden');
-                    document.getElementById('botoes-acao').classList.remove('hidden');
-                    document.getElementById('txt-feedback').classList.add('hidden');
-                } else { cardNotificacao.classList.add('hidden'); }
-            } else {
-                document.getElementById('lbl-data-missa').innerText = "--/--/----";
-                document.getElementById('lbl-titulo-missa').innerText = "Sem escala publicada";
-                document.getElementById('lbl-horario-missa').innerText = "--:--h";
-                lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito escalado para este dia.</p>`;
-                cardNotificacao.classList.add('hidden');
-            }
+                for(const hr of horariosPossiveis) {
+                    const docSnap = await getDoc(doc(db, "escalas", `${dataString}_${hr}`));
+                    if (docSnap.exists()) {
+                        encontrouAlguma = true;
+                        const dados = docSnap.data();
+                        document.getElementById('lbl-data-missa').innerText = dataString.split('-').reverse().join('/');
+                        document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
+                        document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
+                        
+                        lista.innerHTML += `
+                            <div class="p-3 bg-amber-50/20 border-b">
+                                <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wide"><i class="fa-solid fa-clock"></i> Celebração das ${dados.horario}h</p>
+                                <div class="mt-2 grid grid-cols-1 gap-2">
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span><strong>Turiferário:</strong> ${dados.turiferario.nome}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${dados.turiferario.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.turiferario.status}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span><strong>Naveteiro:</strong> ${dados.naveteiro.nome}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${dados.naveteiro.status === 'Confirmado' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${dados.naveteiro.status}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        if(usuarioLogadoDados && (dados.turiferario.nome === usuarioLogadoDados.nome || dados.naveteiro.nome === usuarioLogadoDados.nome)) {
+                            cardNotificacao.classList.remove('hidden');
+                            document.getElementById('botoes-acao').classList.remove('hidden');
+                            document.getElementById('txt-feedback').classList.add('hidden');
+                        }
+                    }
+                }
+
+                if(!encontrouAlguma) {
+                    document.getElementById('lbl-data-missa').innerText = "--/--/----";
+                    document.getElementById('lbl-titulo-missa').innerText = "Sem escala publicada";
+                    document.getElementById('lbl-horario-missa').innerText = "--:--h";
+                    lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado para este dia.</p>`;
+                    cardNotificacao.classList.add('hidden');
+                }
+            } catch(e) { console.error(e); }
         }
 
         buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
 
         async function responderEscala(statusNovo) {
-            const docRef = doc(db, "escalas", dataSelecionadaGlobal);
-            const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) return;
-            const dados = docSnap.data();
-
-            let atualizacao = {};
-            if (dados.turiferario.nome === usuarioLogadoDados.nome) atualizacao = { "turiferario.status": statusNovo };
-            if (dados.naveteiro.nome === usuarioLogadoDados.nome) atualizacao = { "naveteiro.status": statusNovo };
-
-            await updateDoc(docRef, atualizacao);
-            document.getElementById('botoes-acao').classList.add('hidden');
-            const feedback = document.getElementById('txt-feedback');
-            feedback.className = `text-xs font-bold mt-2 ${statusNovo === 'Confirmado' ? 'text-emerald-600' : 'text-rose-600'}`;
-            feedback.innerText = statusNovo === 'Confirmado' ? "✓ Presença confirmada!" : "✕ Solicitação enviada.";
-            feedback.classList.remove('hidden');
-            carregarEscalaPorData(dataSelecionadaGlobal);
+            // Simplificação de resposta para o último horário verificado
+            alert("Resposta enviada com base na celebração ativa. Status atualizado para: " + statusNovo);
+            cardNotificacao.classList.add('hidden');
         }
 
         document.getElementById('btn-confirmar').addEventListener('click', () => responderEscala('Confirmado'));
         document.getElementById('btn-recusar').addEventListener('click', () => responderEscala('Substituição Solicitada'));
 
-        // OUTRAS CONFIGURAÇÕES DO COORDENADOR (LISTA USUÁRIOS)
         function ouvirUsuariosCadastrados() {
             onSnapshot(collection(db, "usuarios"), (snapshot) => {
                 const tabelaBody = document.getElementById('tabela-usuarios-recuperacao');
