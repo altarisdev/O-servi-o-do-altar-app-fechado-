@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Altaris - Gestão de Acólitos</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link class="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .active-tab {
             border-bottom: 3px solid #b45309;
@@ -390,10 +389,6 @@
     const secondaryApp = initializeSecondaryApp(firebaseConfig, "SecondaryAuthApp");
     const secondaryAuth = getSecondaryAuth(secondaryApp);
 
-    if (typeof emailjs !== 'undefined') {
-        emailjs.init("bwcOObTQavlK3QCuP");
-    }
-
     const formLogin = document.getElementById('form-login');
     const erroLogin = document.getElementById('erro-login');
     const erroLoginTexto = document.getElementById('erro-login-texto');
@@ -623,13 +618,12 @@
         });
     }
 
-    // FORMULÁRIO DE CADASTRO CORRIGIDO (Com tratamento de erro detalhado para o EmailJS)
+    // FORMULÁRIO DE CADASTRO MODIFICADO: Envia requisição para a Serverless Function da Vercel
     const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
     if(formCadastroUsuario) {
         formCadastroUsuario.addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
-            
             const nome = document.getElementById('cad-nome').value.trim();
             const email = document.getElementById('cad-email').value.trim().toLowerCase();
             const senha = document.getElementById('cad-senha').value.trim();
@@ -642,13 +636,11 @@
             }
 
             try {
-                // 1. Cria o perfil no módulo Auth Secundário
-                console.log("A iniciar criação no Firebase Auth...");
+                // 1. Cria o perfil no módulo Auth Secundário (impede que derrube o coordenador)
                 const resultadoAuth = await createUserWithEmailAndPassword(secondaryAuth, email, senha);
                 const novoUidOficial = resultadoAuth.user.uid;
 
-                // 2. Cria o documento no Firestore
-                console.log("A gravar dados no Firestore...");
+                // 2. Cria o documento no Firestore mapeado com EXATAMENTE o mesmo UID
                 await setDoc(doc(db, "usuarios", novoUidOficial), {
                     nome: nome,
                     email: email,
@@ -656,35 +648,38 @@
                     funcao: funcao
                 });
                 
-                // 3. Integração EmailJS
-                if (typeof emailjs !== 'undefined') {
-                    console.log("A disparar e-mail via EmailJS para:", email);
-                    
-                    // IMPORTANTE: Substitua 'SEU_SERVICE_ID' e 'SEU_TEMPLATE_ID' pelas suas chaves reais do painel
-                    await emailjs.send('service_s695vbi', 'template_a74j3it', {
-                        nome: nome,
-                        email: email,
-                        senha: senha
+                // 3. ENVIO VIA VERCEL API: Faz a chamada para a nossa função serveless interna
+                try {
+                    const respostaApi = await fetch('/api/send-email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ nome, email, senha })
                     });
                     
-                    console.log("Notificação de acesso enviada via EmailJS com sucesso.");
-                } else {
-                    console.warn("Aviso: Objeto 'emailjs' está undefined. O script não foi carregado corretamente no head.");
+                    if (respostaApi.ok) {
+                        console.log("Notificação de acesso enviada via Vercel/Resend com sucesso.");
+                    } else {
+                        const erroTexto = await respostaApi.text();
+                        console.error("A API da Vercel retornou um erro ao enviar e-mail:", erroTexto);
+                    }
+                } catch (fetchErr) {
+                    console.error("Falha ao comunicar com a rota de e-mail da Vercel:", fetchErr);
                 }
 
-                // 4. Efetua o signout da memória secundária
+                // 4. Efetua o signout do perfil recém-criado na memória secundária
                 await signOut(secondaryAuth);
 
                 alert(`Conta de ${nome} ativada com sucesso e credenciais enviadas por e-mail!`);
                 formCadastroUsuario.reset();
             } catch (err) {
-                console.error("Erro detalhado capturado:", err);
-                alert("Erro ao processar cadastro ou envio de e-mail: " + (err.text || err.message || err));
+                console.error(err);
+                alert("Erro ao processar cadastro: " + err.message);
             }
             hideLoading();
         });
     }
-
 
     window.deletarUsuarioDoSistema = async function(idDocumento, nomeUsuario) {
         if(confirm(`Deseja remover permanentemente o usuário "${nomeUsuario}"?`)) {
@@ -854,7 +849,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural atualizado com sucesso!");
+                alert("Mural updated com sucesso!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
