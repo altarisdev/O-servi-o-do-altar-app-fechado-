@@ -93,7 +93,6 @@
         <main class="max-w-6xl w-full mx-auto p-4 flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
             
             <div id="painel-coroinha" class="hidden md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                
                 <div id="conteudo-escala" class="space-y-4 block md:col-span-2">
                     
                     <div class="bg-white p-4 rounded-xl shadow-xs border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -152,17 +151,6 @@
                                 <button class="flex-1 sm:flex-none bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] px-3 py-1.5 rounded-md transition-all cursor-pointer">Pedir Troca</button>
                             </div>
                         </div>
-                    </div>
-
-                    <div id="card-convite-substituto" class="hidden bg-rose-50 border border-rose-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <div class="flex gap-2">
-                            <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
-                            <div>
-                                <p class="text-xs font-bold text-rose-900">Vaga aberta por falta justificada!</p>
-                                <p class="text-[10px] text-rose-700">Um irmão precisou de substituto. Deseja assumir este posto no altar?</p>
-                            </div>
-                        </div>
-                        <button class="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] px-4 py-1.5 rounded-lg shadow-xs transition-all cursor-pointer">Assumir Vaga</button>
                     </div>
                 </div>
 
@@ -317,12 +305,18 @@
                         </form>
                     </div>
 
-                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 space-y-3">
-                        <div>
-                            <h3 class="text-sm font-black text-gray-800">Lista de Respostas / Disponíveis</h3>
-                            <p class="text-[11px] text-gray-400 font-medium">Voluntários mapeados por dia (Base para o Sorteador)</p>
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2">
+                            <div>
+                                <h3 class="text-sm font-black text-gray-800">Ordem de Resposta e Disponíveis</h3>
+                                <p class="text-[11px] text-gray-400 font-medium">Quem respondeu primeiro aparece no topo do ranking</p>
+                            </div>
                         </div>
-                        <div id="lista-nomes-enquete" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto bg-gray-50 p-3 rounded-xl border border-gray-100"></div>
+                        <div id="ranking-votacao-container" class="mb-4 bg-amber-50/60 p-3 rounded-xl border border-amber-200 max-h-40 overflow-y-auto space-y-1">
+                            <p class="text-[10px] uppercase font-bold text-amber-900 tracking-wider mb-1"><i class="fa-solid fa-stopwatch"></i> Fila de Envio da Enquete:</p>
+                            <div id="lista-fila-prioridade" class="space-y-1"></div>
+                        </div>
+                        <div id="lista-nomes-enquete" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[300px] overflow-y-auto bg-gray-50 p-3 rounded-xl border border-gray-100"></div>
                     </div>
                 </section>
 
@@ -367,8 +361,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -384,7 +377,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // CONFIGURAÇÃO DO EMAILJS COPIADA DO SEU PAINEL (1000433568.png)
         emailjs.init("bwcOObTQavlK3QCuP");
 
         const formLogin = document.getElementById('form-login');
@@ -534,66 +526,15 @@
         });
 
         window.deletarUsuarioDoSistema = async function(idDocumento, nomeUsuario) {
-            if(confirm(`Tem certeza que deseja apagar permanentemente o usuário "${nomeUsuario}" do sistema?\n\nNota: Isso removerá os dados do painel. A exclusão de login direto no Auth precisa ser feita pelo console do Firebase.`)) {
+            if(confirm(`Deseja remover permanentemente o usuário "${nomeUsuario}"?`)) {
                 showLoading();
                 try {
                     await deleteDoc(doc(db, "usuarios", idDocumento));
-                    alert(`Usuário ${nomeUsuario} removido com sucesso do painel.`);
-                } catch(err) {
-                    alert("Erro ao remover usuário: " + err.message);
-                }
+                    alert(`Usuário ${nomeUsuario} removido.`);
+                } catch(err) { alert(err.message); }
                 hideLoading();
             }
         }
-
-        document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            showLoading();
-            
-            const emailCoordenadorLogado = auth.currentUser.email;
-            const senhaCoordenadorLogada = document.getElementById('login-senha').value; 
-
-            const nome = document.getElementById('cad-nome').value;
-            const email = document.getElementById('cad-email').value;
-            const senha = document.getElementById('cad-senha').value;
-            const funcao = document.getElementById('cad-funcao').value;
-
-            try {
-                const resultadoAuth = await createUserWithEmailAndPassword(auth, email, senha);
-                const novoUsuarioUid = resultadoAuth.user.uid;
-
-                await setDoc(doc(db, "usuarios", novoUsuarioUid), { 
-                    nome, 
-                    email, 
-                    funcao, 
-                    senha_provisoria: senha 
-                });
-
-                const parametrosEmail = {
-                    to_name: nome,
-                    to_email: email,
-                    user_login: email,
-                    user_password: senha,
-                    user_role: funcao
-                };
-                try {
-                    await emailjs.send("service_s695vbi", "template_a74j3lt", parametrosEmail);
-                    console.log("Notificação de acesso enviada com sucesso para o e-mail do acólito.");
-                } catch(eMailErr) {
-                    console.warn("Erro ao processar envio no EmailJS. Verifique o mapeamento das variáveis dentro do template 'template_a74j3lt'.", eMailErr);
-                }
-
-                alert(`Membro ${nome} cadastrado com sucesso como ${funcao}!`);
-                document.getElementById('form-cadastro-usuario').reset();
-                
-                await signOut(auth);
-                await signInWithEmailAndPassword(auth, emailCoordenadorLogado, senhaCoordenadorLogada);
-
-            } catch (err) { 
-                alert("Erro crítico ao salvar no Auth do Firebase: " + err.message); 
-            }
-            hideLoading();
-        });
 
         function ouvirUsuariosCadastrados() {
             onSnapshot(collection(db, "usuarios"), (snapshot) => {
@@ -670,18 +611,67 @@
             alert("Pesquisa encerrada.");
         });
 
+        // LÓGICA DE DETECÇÃO DO RANKING DOS COROINHAS (PAINEL DO COORDENADOR)
         function ouvirEnqueteTempoRealCoordenador() {
             onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
                 if (docSnap.exists()) {
                     const dados = docSnap.data();
                     mapaRespostasGerais = dados.respostas || {};
+                    
+                    // 1. Processa e Organiza a Fila por Ordem Crítica de Tempo (RespondidoEm)
+                    const filaPrioridadeContainer = document.getElementById('lista-fila-prioridade');
+                    filaPrioridadeContainer.innerHTML = "";
+
+                    let arrayOrdenadoVotos = [];
+                    Object.keys(mapaRespostasGerais).forEach(nome => {
+                        const infoVoto = mapaRespostasGerais[nome];
+                        // Suporta tanto o formato legado (array direto) quanto o novo (objeto estruturado)
+                        const timestamp = infoVoto.respondidoEm || 0;
+                        const escolhas = infoVoto.escolhas || (Array.isArray(infoVoto) ? infoVoto : []);
+                        arrayOrdenadoVotos.push({ nome, timestamp, escolhas });
+                    });
+
+                    // Ordena: Menor timestamp primeiro (quem votou primeiro fica no topo)
+                    // Votos antigos sem timestamp ficam no final por padrão
+                    arrayOrdenadoVotos.sort((a, b) => {
+                        if (a.timestamp === 0) return 1;
+                        if (b.timestamp === 0) return -1;
+                        return a.timestamp - b.timestamp;
+                    });
+
+                    if(arrayOrdenadoVotos.length === 0) {
+                        filaPrioridadeContainer.innerHTML = `<p class="text-[10px] text-gray-400 italic">Nenhuma resposta submetida ainda.</p>`;
+                    } else {
+                        arrayOrdenadoVotos.forEach((voto, index) => {
+                            let medalha = "";
+                            if(index === 0 && voto.timestamp > 0) medalha = "🥇 ";
+                            else if(index === 1 && voto.timestamp > 0) medalha = "🥈 ";
+                            else if(index === 2 && voto.timestamp > 0) medalha = "🥉 ";
+                            else medalha = `<span class="text-gray-400 font-mono font-bold mr-1 text-[9px]">${index + 1}.</span> `;
+
+                            let dataFormatada = "Formato Antigo";
+                            if (voto.timestamp > 0) {
+                                const d = new Date(voto.timestamp);
+                                dataFormatada = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')} às ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                            }
+
+                            filaPrioridadeContainer.innerHTML += `
+                                <div class="flex justify-between items-center bg-white px-2 py-1 rounded border border-gray-100 text-[11px]">
+                                    <span class="font-bold text-gray-800">${medalha}${voto.nome}</span>
+                                    <span class="text-[9px] text-amber-700 bg-amber-100/50 font-semibold px-1 rounded"><i class="fa-solid fa-clock"></i> ${dataFormatada}</span>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    // 2. Renderiza a Listagem por Celebrações Casando com as Escolhas
                     const container = document.getElementById('lista-nomes-enquete');
                     container.innerHTML = "";
                     if (dados.celebracoes) {
                         dados.celebracoes.forEach(cel => {
                             const aptos = [];
-                            Object.keys(mapaRespostasGerais).forEach(nome => {
-                                if (mapaRespostasGerais[nome].includes(cel.idChave)) aptos.push(nome);
+                            arrayOrdenadoVotos.forEach(voto => {
+                                if (voto.escolhas.includes(cel.idChave)) aptos.push(voto.nome);
                             });
                             const dataBR = cel.data.split('-').reverse().join('/');
                             container.innerHTML += `
@@ -706,7 +696,7 @@
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: textoAviso, dataPublicacao: dataHoje });
                 alert("Mural atualizado!");
-            } catch (err) { alert("Erro ao publicar aviso: " + err.message); }
+            } catch (err) { alert(err.message); }
             hideLoading();
         });
 
@@ -735,17 +725,16 @@
             });
         }
 
-        // CÓDIGO CORRIGIDO INTEGRADO: CONSULTA DIRETAMENTE A ENQUETE OFICIAL DO BANCO DE DADOS
+        // GERADOR E PREENCHEDOR DE ESCALAS INTEGRADO COM FORMATO MULTI-DADO
         document.getElementById('form-escala-automatica').addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
 
             try {
                 const docEnqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
-                
                 if (!docEnqueteSnap.exists()) {
                     hideLoading();
-                    alert("Nenhuma enquete foi encontrada ativa ou configurada no banco de dados.");
+                    alert("Nenhuma enquete configurada no banco.");
                     return;
                 }
 
@@ -755,7 +744,7 @@
 
                 if (!mesSelecionado) {
                     hideLoading();
-                    alert("O mês de referência não foi identificado na enquete ativa.");
+                    alert("O mês de referência não foi identificado.");
                     return;
                 }
 
@@ -765,11 +754,12 @@
                 for (const cel of cronogramaDoMes) {
                     let disponiveis = [];
                     Object.keys(mapaRespostasGerais).forEach(nome => {
-                        if (mapaRespostasGerais[nome].includes(cel.idChave)) disponiveis.push(nome);
+                        const alvo = mapaRespostasGerais[nome];
+                        const listas = alvo.escolhas || (Array.isArray(alvo) ? alvo : []);
+                        if (listas.includes(cel.idChave)) disponiveis.push(nome);
                     });
                     
                     disponiveis.sort(() => Math.random() - 0.5);
-                    
                     const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
                     
                     await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
@@ -790,16 +780,10 @@
                 }
 
                 hideLoading();
-                alert("Escala de Altares gerada e PREENCHIDA com sucesso com os dados da enquete!");
+                alert("Escala preenchida e gerada com sucesso!");
                 document.getElementById('form-escala-automatica').reset();
-                
-                if (editorEscalaData.value) {
-                    carregarEditorEscalasPorData(editorEscalaData.value);
-                }
-            } catch (err) { 
-                hideLoading(); 
-                alert("Erro ao processar lote: " + err.message); 
-            }
+                if (editorEscalaData.value) carregarEditorEscalasPorData(editorEscalaData.value);
+            } catch (err) { hideLoading(); alert(err.message); }
         });
 
         async function carregarEditorEscalasPorData(dataString) {
@@ -820,52 +804,22 @@
                             <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded">${dados.titulo}</span>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar I</label>
-                                <input type="text" id="edit-a1-${idDoc}" value="${dados.altar1?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar II</label>
-                                <input type="text" id="edit-a2-${idDoc}" value="${dados.altar2?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar III</label>
-                                <input type="text" id="edit-a3-${idDoc}" value="${dados.altar3?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar IV</label>
-                                <input type="text" id="edit-a4-${idDoc}" value="${dados.altar4?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar V</label>
-                                <input type="text" id="edit-a5-${idDoc}" value="${dados.altar5?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase">Altar VI</label>
-                                <input type="text" id="edit-a6-${idDoc}" value="${dados.altar6?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
-                            </div>
+                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar I</label><input type="text" id="edit-a1-${idDoc}" value="${dados.altar1?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
+                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar II</label><input type="text" id="edit-a2-${idDoc}" value="${dados.altar2?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
+                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar III</label><input type="text" id="edit-a3-${idDoc}" value="${dados.altar3?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
+                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar IV</label><input type="text" id="edit-a4-${idDoc}" value="${dados.altar4?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
+                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar V</label><input type="text" id="edit-a5-${idDoc}" value="${dados.altar5?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
+                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar VI</label><input type="text" id="edit-a6-${idDoc}" value="${dados.altar6?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
                         </div>
                         <div class="bg-amber-50/60 p-2 rounded-lg border border-amber-200 space-y-2 mt-2">
-                            <span class="text-[10px] font-bold text-amber-900 block uppercase"><i class="fa-solid fa-fire-burner"></i> Ativar Incensação Solene</span>
+                            <span class="text-[10px] font-bold text-amber-900 block uppercase"><i class="fa-solid fa-fire-burner"></i> Incensação Solene</span>
                             <div class="flex items-center gap-4 text-xs">
-                                <label class="flex items-center gap-1 cursor-pointer">
-                                    <input type="checkbox" id="chk-turi-${idDoc}" ${dados.turibuloAtivo ? 'checked' : ''} class="rounded text-amber-700 w-3.5 h-3.5">
-                                    <span>Turíbulo</span>
-                                </label>
-                                <label class="flex items-center gap-1 cursor-pointer">
-                                    <input type="checkbox" id="chk-nave-${idDoc}" ${dados.navetaAtiva ? 'checked' : ''} class="rounded text-amber-700 w-3.5 h-3.5">
-                                    <span>Naveta</span>
-                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="chk-turi-${idDoc}" ${dados.turibuloAtivo ? 'checked' : ''} class="rounded text-amber-700 w-3.5 h-3.5"> <span>Turíbulo</span></label>
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="chk-nave-${idDoc}" ${dados.navetaAtiva ? 'checked' : ''} class="rounded text-amber-700 w-3.5 h-3.5"> <span>Naveta</span></label>
                             </div>
                             <div class="grid grid-cols-2 gap-2 pt-1">
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-500">Nome do Turiferário</label>
-                                    <input type="text" id="edit-turi-${idDoc}" value="${dados.turiferario?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-500">Nome do Naveteiro</label>
-                                    <input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium">
-                                </div>
+                                <div><label class="block text-[9px] font-bold text-gray-500">Turiferário</label><input type="text" id="edit-turi-${idDoc}" value="${dados.turiferario?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
+                                <div><label class="block text-[9px] font-bold text-gray-500">Naveteiro</label><input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
                             </div>
                         </div>
                         <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md hover:bg-amber-900 transition-all cursor-pointer">
@@ -883,8 +837,7 @@
                         const idDocumentoMissa = e.currentTarget.getAttribute('data-id');
                         showLoading();
                         try {
-                            const docRef = doc(db, "escalas", idDocumentoMissa);
-                            await updateDoc(docRef, {
+                            await updateDoc(doc(db, "escalas", idDocumentoMissa), {
                                 "altar1.nome": document.getElementById(`edit-a1-${idDocumentoMissa}`).value,
                                 "altar2.nome": document.getElementById(`edit-a2-${idDocumentoMissa}`).value,
                                 "altar3.nome": document.getElementById(`edit-a3-${idDocumentoMissa}`).value,
@@ -897,10 +850,10 @@
                                 "naveteiro.nome": document.getElementById(`edit-nave-${idDocumentoMissa}`).value
                             });
                             hideLoading();
-                            alert("Escala updated!");
+                            alert("Escala atualizada!");
                             if (buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                             carregarEditorEscalasPorData(editorEscalaData.value);
-                        } catch (err) { hideLoading(); alert("Erro ao salvar: " + err.message); }
+                        } catch (err) { hideLoading(); alert(err.message); }
                     });
                 });
             }
@@ -944,6 +897,7 @@
             });
         }
 
+        // SALVA AS ESCOLHAS ADICIONANDO O MARCADOR DO RELÓGIO (TIMESTAMP)
         document.getElementById('btn-enquete-enviar').addEventListener('click', async () => {
             const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
             const chavesSelecionadas = [];
@@ -952,7 +906,13 @@
             try {
                 const docRef = doc(db, "enquetes", "disponibilidade_atual");
                 const campoAtualizacao = {};
-                campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = chavesSelecionadas;
+                
+                // Grava as escolhas estruturadas com a marcação temporal milimétrica
+                campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = {
+                    escolhas: chavesSelecionadas,
+                    respondidoEm: Date.now()
+                };
+                
                 await updateDoc(docRef, campoAtualizacao);
             } catch (err) { alert("Erro ao salvar: " + err.message); }
             hideLoading();
@@ -982,49 +942,22 @@
                             <div class="p-4 bg-amber-50/20 border-b border-gray-100 space-y-2">
                                 <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wide"><i class="fa-solid fa-clock"></i> Celebração das ${dados.horario}h</p>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-700">
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
-                                        <span><strong>Altar I:</strong> ${dados.altar1?.nome || 'A definir'}</span>
-                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar1?.status || 'Pendente'}</span>
-                                    </div>
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
-                                        <span><strong>Altar II:</strong> ${dados.altar2?.nome || 'A definir'}</span>
-                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar2?.status || 'Pendente'}</span>
-                                    </div>
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
-                                        <span><strong>Altar III:</strong> ${dados.altar3?.nome || 'A definir'}</span>
-                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar3?.status || 'Pendente'}</span>
-                                    </div>
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
-                                        <span><strong>Altar IV:</strong> ${dados.altar4?.nome || 'A definir'}</span>
-                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar4?.status || 'Pendente'}</span>
-                                    </div>
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
-                                        <span><strong>Altar V:</strong> ${dados.altar5?.nome || 'A definir'}</span>
-                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar5?.status || 'Pendente'}</span>
-                                    </div>
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between">
-                                        <span><strong>Altar VI:</strong> ${dados.altar6?.nome || 'A definir'}</span>
-                                        <span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar6?.status || 'Pendente'}</span>
-                                    </div>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar I:</strong> ${dados.altar1?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar1?.status || 'Pendente'}</span></div>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar II:</strong> ${dados.altar2?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar2?.status || 'Pendente'}</span></div>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar III:</strong> ${dados.altar3?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar3?.status || 'Pendente'}</span></div>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar IV:</strong> ${dados.altar4?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar4?.status || 'Pendente'}</span></div>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar V:</strong> ${dados.altar5?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar5?.status || 'Pendente'}</span></div>
+                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar VI:</strong> ${dados.altar6?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar6?.status || 'Pendente'}</span></div>
                         `;
                         if (dados.turibuloAtivo) {
-                            htmlMissa += `
-                                <div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between">
-                                    <span><i class="fa-solid fa-fire text-amber-700"></i> <strong>Turiferário (Turíbulo):</strong> ${dados.turiferario?.nome || 'A definir'}</span>
-                                    <span class="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-600 text-white rounded">${dados.turiferario?.status || 'Pendente'}</span>
-                                </div>
-                            `;
+                            htmlMissa += `<div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between"><span><i class="fa-solid fa-fire text-amber-700"></i> <strong>Turiferário:</strong> ${dados.turiferario?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-600 text-white rounded">${dados.turiferario?.status || 'Pendente'}</span></div>`;
                         }
                         if (dados.navetaAtiva) {
-                            htmlMissa += `
-                                <div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between">
-                                    <span><i class="fa-solid fa-box text-amber-700"></i> <strong>Naveteiro (Naveta):</strong> ${dados.naveteiro?.nome || 'A definir'}</span>
-                                    <span class="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-600 text-white rounded">${dados.naveteiro?.status || 'Pendente'}</span>
-                                </div>
-                            `;
+                            htmlMissa += `<div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between"><span><i class="fa-solid fa-box text-amber-700"></i> <strong>Naveteiro:</strong> ${dados.naveteiro?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-600 text-white rounded">${dados.naveteiro?.status || 'Pendente'}</span></div>`;
                         }
                         htmlMissa += `</div></div>`;
                         lista.innerHTML += htmlMissa;
+                        
                         if (usuarioLogadoDados) {
                             let escaladoNestaMissa = 
                                 dados.altar1?.nome === usuarioLogadoDados.nome ||
@@ -1047,7 +980,6 @@
                     document.getElementById('lbl-titulo-missa').innerText = "Sem escala publicada";
                     document.getElementById('lbl-horario-missa').innerText = "--:--h";
                     lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado para este dia.</p>`;
-                    cardNotificacao.classList.add('hidden');
                 }
             } catch(e) { console.error(e); }
         }
@@ -1057,13 +989,14 @@
         document.getElementById('form-upload-formacao').addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
-            const titulo = document.getElementById('form-titulo-input').value;
-            const url = document.getElementById('form-url-input').value;
             try {
-                await setDoc(doc(db, "formacao", "manual_atual"), { titulo, url });
-                alert("Material de estudo atualizado!");
+                await setDoc(doc(db, "formacao", "manual_atual"), { 
+                    titulo: document.getElementById('form-titulo-input').value, 
+                    url: document.getElementById('form-url-input').value 
+                });
+                alert("Material atualizado!");
                 carregarMaterialEstudo();
-            } catch(err) { alert("Erro: " + err.message); }
+            } catch(err) { alert(err.message); }
             hideLoading();
         });
 
