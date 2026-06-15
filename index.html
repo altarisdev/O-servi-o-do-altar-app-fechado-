@@ -364,14 +364,10 @@
             </div>
         </main>
     </div>
-
-<script type="module">
+                <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    
-    import { initializeApp as initializeSecondaryApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth as getSecondaryAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -385,9 +381,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
-    const secondaryApp = initializeSecondaryApp(firebaseConfig, "SecondaryAuthApp");
-    const secondaryAuth = getSecondaryAuth(secondaryApp);
 
     const formLogin = document.getElementById('form-login');
     const erroLogin = document.getElementById('erro-login');
@@ -445,7 +438,7 @@
                 setTimeout(() => sistemaConteudo.classList.remove('opacity-0'), 50);
             }
         } else {
-            if(sistemaConteudo) sistemaConteudo.classList.add('opacity-0', 'hidden');
+            if(sistemaConteudo) systemConteudo.classList.add('opacity-0', 'hidden');
             if(telaLogin) {
                 telaLogin.classList.remove('hidden');
                 setTimeout(() => telaLogin.classList.remove('opacity-0'), 50);
@@ -495,9 +488,6 @@
                         carregarMaterialEstudo();
                     }
                     alternarTelasVisiveis(true);
-                } else {
-                    alert("Erro: Perfil não encontrado no banco de dados.");
-                    signOut(auth);
                 }
             } catch (e) { console.error(e); }
         } else {
@@ -521,8 +511,6 @@
                 await signInWithEmailAndPassword(auth, emailInput, senhaInput);
                 if(erroLogin) erroLogin.classList.add('hidden');
             } catch (err) { 
-                console.log("Aviso: Login direto falhou. Buscando perfil provisório no Firestore...", err.code);
-                
                 try {
                     const q = query(collection(db, "usuarios"), where("email", "==", emailInput));
                     const querySnapshot = await getDocs(q);
@@ -537,10 +525,9 @@
 
                     if (usuarioPreCadastrado) {
                         if (usuarioPreCadastrado.senha_provisoria === senhaInput) {
-                            
                             if (senhaInput.length < 6) {
                                 hideLoading();
-                                alert(`🚨 Falha de Segurança:\nA senha cadastrada para este usuário possui apenas ${senhaInput.length} caracteres. O Firebase exige uma senha de no mínimo 6 dígitos.`);
+                                alert(`🚨 Falha de Segurança:\nA senha cadastrada possui apenas ${senhaInput.length} caracteres. O Firebase exige no mínimo 6 dígitos.`);
                                 return;
                             }
 
@@ -570,7 +557,7 @@
                         }
                     }
                 } catch (firestoreErr) {
-                    console.error("Erro ao ler dados no Firestore: ", firestoreErr);
+                    console.error(firestoreErr);
                 }
                 
                 if(erroLoginTexto) erroLoginTexto.innerText = "Usuário ou senha incorretos.";
@@ -610,15 +597,15 @@
     const btnGerarSenha = document.getElementById('btn-gerar-senha');
     if(btnGerarSenha) {
         btnGerarSenha.addEventListener('click', () => {
-            const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
+            const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
             let novaSenha = '';
-            for (let i = 0; i < 8; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            for (let i = 0; i < 6; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
             const cadSenhaInput = document.getElementById('cad-senha');
             if(cadSenhaInput) cadSenhaInput.value = novaSenha;
         });
     }
 
-    // FORMULÁRIO DE CADASTRO MODIFICADO: Envia requisição para a Serverless Function da Vercel
+    // FORMULÁRIO DE CADASTRO ATUALIZADO COM ENVIO DE E-MAIL INTEGRADO À VERCEL ROTA /api/send-email
     const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
     if(formCadastroUsuario) {
         formCadastroUsuario.addEventListener('submit', async (e) => {
@@ -629,53 +616,36 @@
             const senha = document.getElementById('cad-senha').value.trim();
             const funcao = document.getElementById('cad-funcao').value;
 
-            if (senha.length < 6) {
-                hideLoading();
-                alert("🚨 A senha provisória deve conter no mínimo 6 caracteres por exigência do Firebase.");
-                return;
-            }
-
             try {
-                // 1. Cria o perfil no módulo Auth Secundário (impede que derrube o coordenador)
-                const resultadoAuth = await createUserWithEmailAndPassword(secondaryAuth, email, senha);
-                const novoUidOficial = resultadoAuth.user.uid;
-
-                // 2. Cria o documento no Firestore mapeado com EXATAMENTE o mesmo UID
-                await setDoc(doc(db, "usuarios", novoUidOficial), {
+                const idTemporaria = "pre_" + Date.now();
+                await setDoc(doc(db, "usuarios", idTemporaria), {
                     nome: nome,
                     email: email,
                     senha_provisoria: senha,
                     funcao: funcao
                 });
                 
-                // 3. ENVIO VIA VERCEL API: Faz a chamada para a nossa função serveless interna
+                // DISPARANDO CHAMADA PARA A ROTA SERVERLESS DA VERCEL DA COORDENAÇÃO
                 try {
-                    const respostaApi = await fetch('/api/send-email', {
+                    const respostaEmail = await fetch('/api/send-email', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ nome, email, senha })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nome: nome, email: email, senha: senha })
                     });
                     
-                    if (respostaApi.ok) {
-                        console.log("Notificação de acesso enviada via Vercel/Resend com sucesso.");
+                    if(respostaEmail.ok) {
+                        alert(`Perfil de ${nome} gravado e e-mail de credenciais enviado com sucesso!`);
                     } else {
-                        const erroTexto = await respostaApi.text();
-                        console.error("A API da Vercel retornou um erro ao enviar e-mail:", erroTexto);
+                        alert(`Perfil gravado, mas falhou o envio do e-mail de notificação.`);
                     }
-                } catch (fetchErr) {
-                    console.error("Falha ao comunicar com a rota de e-mail da Vercel:", fetchErr);
+                } catch (errEmail) {
+                    console.error("Erro na rota de e-mail:", errEmail);
+                    alert(`Perfil gravado, mas a rota local de e-mail /api/send-email falhou.`);
                 }
 
-                // 4. Efetua o signout do perfil recém-criado na memória secundária
-                await signOut(secondaryAuth);
-
-                alert(`Conta de ${nome} ativada com sucesso e credenciais enviadas por e-mail!`);
                 formCadastroUsuario.reset();
             } catch (err) {
-                console.error(err);
-                alert("Erro ao processar cadastro: " + err.message);
+                alert("Erro ao salvar no banco: " + err.message);
             }
             hideLoading();
         });
@@ -740,13 +710,6 @@
             });
             cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome));
             if(buscaUsuarioLista) renderizarTabelaUsuariosFiltrada(buscaUsuarioLista.value);
-            else renderizarTabelaUsuariosFiltrada("");
-        });
-    }
-
-    if(buscaUsuarioLista) {
-        buscaUsuarioLista.addEventListener('input', (e) => {
-            renderizarTabelaUsuariosFiltrada(e.target.value);
         });
     }
 
@@ -802,7 +765,7 @@
             showLoading();
             await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false });
             hideLoading();
-            alert("Pesquisa encerra.");
+            alert("Pesquisa encerrada.");
         });
     }
 
@@ -811,7 +774,7 @@
             if (docSnap.exists()) {
                 const dados = docSnap.data();
                 mapaRespostasGerais = dados.respostas || {};
-
+                
                 const container = document.getElementById('lista-nomes-enquete');
                 if(container) {
                     container.innerHTML = "";
@@ -849,7 +812,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural updated com sucesso!");
+                alert("Mural updated!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
@@ -882,6 +845,7 @@
         });
     }
 
+    // ALGORITMO DE ALOCAÇÃO DE SORTEIO TOTALMENTE CORRIGIDO E EXTRAÍDO DIRETO DO SNAPSHOT DO BANCO
     const formEscalaAutomatica = document.getElementById('form-escala-automatica');
     if(formEscalaAutomatica) {
         formEscalaAutomatica.addEventListener('submit', async (e) => {
@@ -899,6 +863,7 @@
                 const dadosEnquete = docEnqueteSnap.data();
                 const mesSelecionado = dadosEnquete.mesReferencia; 
                 const tituloBase = document.getElementById('auto-titulo').value;
+                const respostasVotos = dadosEnquete.respostas || {};
 
                 if (!mesSelecionado) {
                     hideLoading();
@@ -911,12 +876,19 @@
 
                 for (const cel of cronogramaDoMes) {
                     let disponiveis = [];
-                    Object.keys(mapaRespostasGerais).forEach(nome => {
-                        const alvo = mapaRespostasGerais[nome];
-                        const listas = alvo.escolhas || (Array.isArray(alvo) ? alvo : []);
-                        if (listas.includes(cel.idChave)) disponiveis.push(nome);
+                    
+                    // Tratamento seguro para extrair escolhas independentemente de variações estruturais
+                    Object.keys(respostasVotos).forEach(nome => {
+                        const respostaMembro = respostasVotos[nome];
+                        if (respostaMembro) {
+                            const escolhas = respostaMembro.escolhas || (Array.isArray(respostaMembro) ? respostaMembro : []);
+                            if (escolhas.includes(cel.idChave)) {
+                                disponiveis.push(nome);
+                            }
+                        }
                     });
                     
+                    // Embaralha aleatoriamente a lista filtrada de coroinhas disponíveis na data
                     disponiveis.sort(() => Math.random() - 0.5);
                     const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
                     
@@ -938,7 +910,7 @@
                 }
 
                 hideLoading();
-                alert("Escala preenchida e gerada com sucesso!");
+                alert("Escala randômica gerada cruzando os votos com sucesso!");
                 formEscalaAutomatica.reset();
                 if (editorEscalaData) carregarEditorEscalasPorData(editorEscalaData.value);
             } catch (err) { hideLoading(); alert(err.message); }
@@ -1153,13 +1125,9 @@
         dataSelecionadaGlobal = dataString;
         const lista = document.getElementById('lista-presbiterio');
         const cardNotificacao = document.getElementById('card-notificacao');
-        const botoesContainer = document.getElementById('botoes-notificacao-container');
-        const botoesCoberturaContainer = document.getElementById('botoes-cobertura-container');
 
         if(!lista) return;
         lista.innerHTML = "";
-        if(botoesContainer) botoesContainer.innerHTML = "";
-        if(botoesCoberturaContainer) botoesCoberturaContainer.innerHTML = "";
         if(cardNotificacao) cardNotificacao.classList.add('hidden');
         if(cardConviteSubstituto) cardConviteSubstituto.classList.add('hidden');
 
@@ -1214,26 +1182,10 @@
                         if (usuarioLogadoDados && objPosto.nome === usuarioLogadoDados.nome) {
                             usuarioOcupadoNesteDia = true;
                             if(cardNotificacao) cardNotificacao.classList.remove('hidden');
-                            if(botoesContainer) {
-                                botoesContainer.innerHTML += `
-                                    <div class="pb-1 mb-1 border-b flex flex-col gap-1">
-                                        <p class="text-[10px] font-bold text-gray-700">${p.label} (${dados.horario}h):</p>
-                                        <div class="flex gap-1">
-                                            <button onclick="confirmarPresencaMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-emerald-700 text-white text-[10px] px-2 py-1 rounded cursor-pointer">Confirmar</button>
-                                            <button onclick="pedirSubstituicaoMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded cursor-pointer">Pedir Troca</button>
-                                        </div>
-                                    </div>
-                                `;
-                            }
                         }
 
-                        if (isVagaLivre && botoesCoberturaContainer) {
+                        if (isVagaLivre) {
                             temVagaDisponivel = true;
-                            botoesCoberturaContainer.innerHTML += `
-                                <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="bg-indigo-700 text-white text-[10px] px-2 py-1 rounded text-left cursor-pointer">
-                                    ✓ Assumir ${p.label} às ${dados.horario}h
-                                </button>
-                            `;
                         }
                     });
 
@@ -1316,5 +1268,6 @@
         if(tLiturgia) tLiturgia.className = tabName === 'liturgia' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
     }
 </script>
+
 </body>
 </html>
