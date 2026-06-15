@@ -250,9 +250,12 @@
                     </div>
 
                     <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 overflow-hidden flex flex-col">
-                        <div class="mb-3">
-                            <h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3>
-                            <p class="text-[11px] text-gray-400 font-medium">Controle total de credenciais e cargos</p>
+                        <div class="mb-3 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3>
+                                <p class="text-[11px] text-gray-400 font-medium">Controle total de credenciais e cargos</p>
+                            </div>
+                            <input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-xs font-medium w-48">
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
@@ -362,12 +365,12 @@
             </div>
         </main>
     </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
-    // IMPORTANTE: Inicialização da instância secundária para registo sem derrubar a sessão atual
     import { initializeApp as initializeSecondaryApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth as getSecondaryAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -384,7 +387,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Instancia secundária isolada para criação de utilizadores
     const secondaryApp = initializeSecondaryApp(firebaseConfig, "SecondaryAuthApp");
     const secondaryAuth = getSecondaryAuth(secondaryApp);
 
@@ -499,7 +501,6 @@
                     }
                     alternarTelasVisiveis(true);
                 } else {
-                    // Se o documento não existe no firestore, desloga para não travar em loop
                     alert("Erro: Perfil não encontrado no banco de dados.");
                     signOut(auth);
                 }
@@ -622,7 +623,7 @@
         });
     }
 
-    // CORREÇÃO: Formulário cria utilizador no Auth e Firestore de forma atómica e sincronizada
+    // FORMULÁRIO DE CADASTRO CORRIGIDO: Cria no Auth, grava no Firestore e dispara e-mail via EmailJS
     const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
     if(formCadastroUsuario) {
         formCadastroUsuario.addEventListener('submit', async (e) => {
@@ -640,11 +641,11 @@
             }
 
             try {
-                // 1. Cria o perfil no módulo Auth Secundário (não derruba a sessão do coordenador)
+                // 1. Cria o perfil no módulo Auth Secundário (impede que derrube o coordenador)
                 const resultadoAuth = await createUserWithEmailAndPassword(secondaryAuth, email, senha);
                 const novoUidOficial = resultadoAuth.user.uid;
 
-                // 2. Cria o documento no Firestore usando EXATAMENTE o mesmo UID
+                // 2. Cria o documento no Firestore mapeado com EXATAMENTE o mesmo UID
                 await setDoc(doc(db, "usuarios", novoUidOficial), {
                     nome: nome,
                     email: email,
@@ -652,14 +653,27 @@
                     funcao: funcao
                 });
                 
-                // 3. Desloga a credencial criada da memória secundária
+                // 3. Integração EmailJS: Envia as credenciais de login para o e-mail do usuário
+                if (typeof emailjs !== 'undefined') {
+                    // ATENÇÃO: Substitua 'SEU_SERVICE_ID' e 'SEU_TEMPLATE_ID' pelos seus IDs reais do painel EmailJS
+                    await emailjs.send('SEU_SERVICE_ID', 'SEU_TEMPLATE_ID', {
+                        nome: nome,
+                        email: email,
+                        senha: senha
+                    });
+                    console.log("Notificação de acesso enviada via EmailJS com sucesso.");
+                } else {
+                    console.warn("Aviso: EmailJS não inicializado ou script ausente.");
+                }
+
+                // 4. Efetua o signout do perfil recém-criado na memória secundária
                 await signOut(secondaryAuth);
 
-                alert(`Conta de ${nome} ativada e gravada com sucesso!`);
+                alert(`Conta de ${nome} ativada com sucesso e credenciais enviadas por e-mail!`);
                 formCadastroUsuario.reset();
             } catch (err) {
                 console.error(err);
-                alert("Erro ao salvar no sistema: " + err.message);
+                alert("Erro ao processar cadastro ou envio de e-mail: " + err.message);
             }
             hideLoading();
         });
@@ -786,7 +800,7 @@
             showLoading();
             await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false });
             hideLoading();
-            alert("Pesquisa encerrada.");
+            alert("Pesquisa encerra.");
         });
     }
 
@@ -833,7 +847,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural updated com sucesso!");
+                alert("Mural atualizado com sucesso!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
