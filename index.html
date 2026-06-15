@@ -140,7 +140,7 @@
 
                         <div id="card-notificacao" class="hidden bg-amber-50 p-4 border-t-2 border-amber-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                             <div class="flex gap-2.5 items-start">
-                                <i class="fa-solid fa-bell text-amber-700 text-sm mt-0.5 animate-bounce"></i>
+                                <i class="fa-solid fa-bell text-amber-700 text-sm mt-0.5"></i>
                                 <div>
                                     <p class="text-xs font-bold text-amber-900">Você está escalado para esta celebração!</p>
                                     <p class="text-[10px] text-gray-500 font-medium">Confirme sua presença ou solicite um substituto imediatamente.</p>
@@ -150,6 +150,19 @@
                                 <button class="flex-1 sm:flex-none bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[11px] px-3 py-1.5 rounded-md transition-all cursor-pointer">Confirmar</button>
                                 <button class="flex-1 sm:flex-none bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] px-3 py-1.5 rounded-md transition-all cursor-pointer">Pedir Troca</button>
                             </div>
+                        </div>
+
+                        <div id="card-convite-substituto" class="hidden bg-indigo-50 p-4 border-t-2 border-indigo-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div class="flex gap-2.5 items-start">
+                                <i class="fa-solid fa-handshake-angle text-indigo-700 text-sm mt-0.5"></i>
+                                <div>
+                                    <p class="text-xs font-bold text-indigo-900">Vaga disponível nesta escala!</p>
+                                    <p class="text-[10px] text-gray-500 font-medium">Um irmão pediu substituição. Deseja cobrir essa vaga?</p>
+                                </div>
+                            </div>
+                            <button class="w-full sm:w-auto bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[11px] px-4 py-1.5 rounded-md transition-all cursor-pointer">
+                                Cobrir Vaga
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -362,7 +375,12 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js" /* O ERRO DE PARADA ANTERIOR ANULADO COM ESSE SCRIPT UNIFICADO */
+        import {  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Importação unificada padrão estável
+        const dbImports = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+        const { getFirestore: fsGet, doc: fsDoc, setDoc: fsSet, getDoc: fsGetD, updateDoc: fsUpd, collection: fsColl, onSnapshot: fsSnap, deleteDoc: fsDel } = dbImports;
 
         const firebaseConfig = {
             apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -375,7 +393,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = fsGet(app);
 
         emailjs.init("bwcOObTQavlK3QCuP");
 
@@ -436,7 +454,7 @@
             showLoading();
             if (user) {
                 try {
-                    const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+                    const docSnap = await fsGetD(fsDoc(db, "usuarios", user.uid));
                     if (docSnap.exists()) {
                         usuarioLogadoDados = docSnap.data();
                         usuarioLogadoDados.uid = user.uid;
@@ -529,7 +547,7 @@
             if(confirm(`Deseja remover permanentemente o usuário "${nomeUsuario}"?`)) {
                 showLoading();
                 try {
-                    await deleteDoc(doc(db, "usuarios", idDocumento));
+                    await fsDel(fsDoc(db, "usuarios", idDocumento));
                     alert(`Usuário ${nomeUsuario} removido.`);
                 } catch(err) { alert(err.message); }
                 hideLoading();
@@ -537,7 +555,7 @@
         }
 
         function ouvirUsuariosCadastrados() {
-            onSnapshot(collection(db, "usuarios"), (snapshot) => {
+            fsSnap(fsColl(db, "usuarios"), (snapshot) => {
                 const tabelaBody = document.getElementById('tabela-usuarios-recuperacao');
                 tabelaBody.innerHTML = "";
                 snapshot.forEach((docSnap) => {
@@ -594,7 +612,7 @@
             const [ano, mes] = mesAlvo.split('-').map(Number);
             const listaCelebracoes = mapearDatasDoMes(ano, mes);
             
-            await setDoc(doc(db, "enquetes", "disponibilidade_atual"), {
+            await fsSet(fsDoc(db, "enquetes", "disponibilidade_atual"), {
                 mesReferencia: mesAlvo,
                 ativa: true,
                 celebracoes: listaCelebracoes,
@@ -606,33 +624,28 @@
 
         document.getElementById('btn-fechar-enquete').addEventListener('click', async () => {
             showLoading();
-            await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false });
+            await fsUpd(fsDoc(db, "enquetes", "disponibilidade_atual"), { ativa: false });
             hideLoading();
             alert("Pesquisa encerrada.");
         });
 
-        // LÓGICA DE DETECÇÃO DO RANKING DOS COROINHAS (PAINEL DO COORDENADOR)
         function ouvirEnqueteTempoRealCoordenador() {
-            onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
+            fsSnap(fsDoc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
                 if (docSnap.exists()) {
                     const dados = docSnap.data();
                     mapaRespostasGerais = dados.respostas || {};
                     
-                    // 1. Processa e Organiza a Fila por Ordem Crítica de Tempo (RespondidoEm)
                     const filaPrioridadeContainer = document.getElementById('lista-fila-prioridade');
                     filaPrioridadeContainer.innerHTML = "";
 
                     let arrayOrdenadoVotos = [];
                     Object.keys(mapaRespostasGerais).forEach(nome => {
                         const infoVoto = mapaRespostasGerais[nome];
-                        // Suporta tanto o formato legado (array direto) quanto o novo (objeto estruturado)
                         const timestamp = infoVoto.respondidoEm || 0;
-                        const escolhas = infoVoto.escolhas || (Array.isArray(infoVoto) ? infoVoto : []);
-                        arrayOrdenadoVotos.push({ nome, timestamp, escolhas });
+                        const choices = infoVoto.escolhas || (Array.isArray(infoVoto) ? infoVoto : []);
+                        arrayOrdenadoVotos.push({ nome, timestamp, escolhas: choices });
                     });
 
-                    // Ordena: Menor timestamp primeiro (quem votou primeiro fica no topo)
-                    // Votos antigos sem timestamp ficam no final por padrão
                     arrayOrdenadoVotos.sort((a, b) => {
                         if (a.timestamp === 0) return 1;
                         if (b.timestamp === 0) return -1;
@@ -664,7 +677,6 @@
                         });
                     }
 
-                    // 2. Renderiza a Listagem por Celebrações Casando com as Escolhas
                     const container = document.getElementById('lista-nomes-enquete');
                     container.innerHTML = "";
                     if (dados.celebracoes) {
@@ -694,14 +706,14 @@
             showLoading();
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
-                await setDoc(doc(db, "mural", "aviso_geral"), { texto: textoAviso, dataPublicacao: dataHoje });
-                alert("Mural atualizado!");
+                await fsSet(fsDoc(db, "mural", "aviso_geral"), { texto: textoAviso, dataPublicacao: dataHoje });
+                alert("Mural updated!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
 
         async function carregarAvisoNoInputCoordenador() {
-            const docSnap = await getDoc(doc(db, "mural", "aviso_geral"));
+            const docSnap = await fsGetD(fsDoc(db, "mural", "aviso_geral"));
             if(docSnap.exists()) {
                 document.getElementById('txt-aviso-coordenador').value = docSnap.data().texto || "";
             }
@@ -709,7 +721,7 @@
 
         function ouvirMuralAvisos() {
             if (unsubMural) unsubMural();
-            unsubMural = onSnapshot(doc(db, "mural", "aviso_geral"), (docSnap) => {
+            unsubMural = fsSnap(fsDoc(db, "mural", "aviso_geral"), (docSnap) => {
                 const muralContainer = document.getElementById('corpo-mural-avisos');
                 if (docSnap.exists() && docSnap.data().texto) {
                     const dados = docSnap.data();
@@ -725,13 +737,12 @@
             });
         }
 
-        // GERADOR E PREENCHEDOR DE ESCALAS INTEGRADO COM FORMATO MULTI-DADO
         document.getElementById('form-escala-automatica').addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
 
             try {
-                const docEnqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
+                const docEnqueteSnap = await fsGetD(fsDoc(db, "enquetes", "disponibilidade_atual"));
                 if (!docEnqueteSnap.exists()) {
                     hideLoading();
                     alert("Nenhuma enquete configurada no banco.");
@@ -762,7 +773,7 @@
                     disponiveis.sort(() => Math.random() - 0.5);
                     const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
                     
-                    await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
+                    await fsSet(fsDoc(db, "escalas", chaveEscalaDocumento), {
                         titulo: `${tituloBase} (${cel.rotulo})`,
                         horario: cel.horario,
                         data: cel.data,
@@ -792,7 +803,7 @@
             let encontrouAlguma = false;
             for (const hr of horariosPossiveis) {
                 const idDoc = `${dataString}_${hr}`;
-                const docSnap = await getDoc(doc(db, "escalas", idDoc));
+                const docSnap = await fsGetD(fsDoc(db, "escalas", idDoc));
                 if (docSnap.exists()) {
                     encontrouAlguma = true;
                     const dados = docSnap.data();
@@ -837,7 +848,7 @@
                         const idDocumentoMissa = e.currentTarget.getAttribute('data-id');
                         showLoading();
                         try {
-                            await updateDoc(doc(db, "escalas", idDocumentoMissa), {
+                            await fsUpd(fsDoc(db, "escalas", idDocumentoMissa), {
                                 "altar1.nome": document.getElementById(`edit-a1-${idDocumentoMissa}`).value,
                                 "altar2.nome": document.getElementById(`edit-a2-${idDocumentoMissa}`).value,
                                 "altar3.nome": document.getElementById(`edit-a3-${idDocumentoMissa}`).value,
@@ -863,7 +874,7 @@
 
         function ouvirEnqueteTempoRealCoroinha() {
             if (unsubEnquete) unsubEnquete();
-            unsubEnquete = onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
+            unsubEnquete = fsSnap(fsDoc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
                 const cardEnquete = document.getElementById('card-enquete');
                 const blocoVotacao = document.getElementById('bloco-votacao-enquete');
                 const blocoFeedback = document.getElementById('txt-feedback-enquete');
@@ -897,23 +908,21 @@
             });
         }
 
-        // SALVA AS ESCOLHAS ADICIONANDO O MARCADOR DO RELÓGIO (TIMESTAMP)
         document.getElementById('btn-enquete-enviar').addEventListener('click', async () => {
             const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
             const chavesSelecionadas = [];
             checkboxes.forEach(chk => chavesSelecionadas.push(chk.value));
             showLoading();
             try {
-                const docRef = doc(db, "enquetes", "disponibilidade_atual");
+                const docRef = fsDoc(db, "enquetes", "disponibilidade_atual");
                 const campoAtualizacao = {};
                 
-                // Grava as escolhas estruturadas com a marcação temporal milimétrica
                 campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = {
                     escolhas: chavesSelecionadas,
                     respondidoEm: Date.now()
                 };
                 
-                await updateDoc(docRef, campoAtualizacao);
+                await fsUpd(docRef, campoAtualizacao);
             } catch (err) { alert("Erro ao salvar: " + err.message); }
             hideLoading();
         });
@@ -931,7 +940,7 @@
                 let encontrouAlguma = false;
                 for(const hr of horariosPossiveis) {
                     const idDocumentoMissa = `${dataString}_${hr}`;
-                    const docSnap = await getDoc(doc(db, "escalas", idDocumentoMissa));
+                    const docSnap = await fsGetD(fsDoc(db, "escalas", idDocumentoMissa));
                     if (docSnap.exists()) {
                         encontrouAlguma = true;
                         const dados = docSnap.data();
@@ -990,7 +999,7 @@
             e.preventDefault();
             showLoading();
             try {
-                await setDoc(doc(db, "formacao", "manual_atual"), { 
+                await fsSet(fsDoc(db, "formacao", "manual_atual"), { 
                     titulo: document.getElementById('form-titulo-input').value, 
                     url: document.getElementById('form-url-input').value 
                 });
@@ -1001,7 +1010,7 @@
         });
 
         async function carregarMaterialEstudo() {
-            const docSnap = await getDoc(doc(db, "formacao", "manual_atual"));
+            const docSnap = await fsGetD(fsDoc(db, "formacao", "manual_atual"));
             if (docSnap.exists()) {
                 document.getElementById('lbl-titulo-formacao').innerText = docSnap.data().titulo;
                 document.getElementById('btn-download-formacao').href = docSnap.data().url;
