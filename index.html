@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Altaris - Gestão de Acólitos</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link class="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         .active-tab {
             border-bottom: 3px solid #b45309;
@@ -138,27 +139,29 @@
 
                         <div id="lista-presbiterio" class="divide-y divide-gray-100"></div>
 
-                        <div id="card-notificacao" class="hidden bg-amber-50 p-4 border-t-2 border-amber-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div id="card-notificacao" class="hidden bg-amber-50 p-4 border-t-2 border-amber-600 flex flex-col justify-between items-start gap-3">
                             <div class="flex gap-2.5 items-start">
                                 <i class="fa-solid fa-bell text-amber-700 text-sm mt-0.5 animate-bounce"></i>
                                 <div>
                                     <p class="text-xs font-bold text-amber-900">Você está escalado para esta celebração!</p>
-                                    <p class="text-[10px] text-gray-500 font-medium">Confirme sua presença ou gerencie suas ações nos painéis abaixo.</p>
+                                    <p class="text-[10px] text-gray-500 font-medium">Confirme sua presença ou solicite um substituto imediatamente.</p>
                                 </div>
                             </div>
-                            <div id="botoes-notificacao-container" class="flex flex-col gap-2 w-full sm:w-auto"></div>
+                            <div id="botoes-notificacao-container" class="w-full space-y-1">
+                                </div>
                         </div>
                     </div>
 
-                    <div id="card-convite-substituto" class="hidden bg-rose-50 border border-rose-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div id="card-convite-substituto" class="hidden bg-rose-50 border border-rose-200 p-4 rounded-xl flex flex-col justify-between items-start gap-3">
                         <div class="flex gap-2">
                             <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
                             <div>
-                                <p class="text-xs font-bold text-rose-900">Vaga aberta ou posto disponível!</p>
-                                <p class="text-[10px] text-rose-700">Há um posto vago nesta celebração. Deseja assumir esta função no altar?</p>
+                                <p class="text-xs font-bold text-rose-900">Vaga aberta por falta justificada!</p>
+                                <p class="text-[10px] text-rose-700">Um irmão precisou de substituto. Deseja assumir este posto no altar?</p>
                             </div>
                         </div>
-                        <div id="botoes-cobertura-container" class="flex flex-col gap-1 w-full sm:w-auto"></div>
+                        <div id="botoes-cobertura-container" class="w-full flex flex-col gap-1">
+                            </div>
                     </div>
                 </div>
 
@@ -249,12 +252,10 @@
                     </div>
 
                     <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 overflow-hidden flex flex-col">
-                        <div class="mb-3 flex justify-between items-center">
-                            <div>
-                                <h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3>
-                                <p class="text-[11px] text-gray-400 font-medium">Controle total de credenciais e cargos</p>
-                            </div>
-                            <input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-xs font-medium w-48">
+                        <div class="mb-3">
+                            <h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3>
+                            <p class="text-[11px] text-gray-400 font-medium">Controle total de credenciais e cargos</p>
+                            <input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="mt-2 w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium focus:outline-hidden focus:border-amber-700">
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
@@ -319,6 +320,9 @@
 
                     <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 space-y-3">
                         <div>
+                            <h3 class="text-sm font-black text-gray-800">Fila de Prioridade / Ordem de Resposta</h3>
+                            <div id="lista-fila-prioridade" class="space-y-1 max-h-32 overflow-y-auto bg-gray-50 p-2 rounded-lg border text-xs mb-3"></div>
+                            
                             <h3 class="text-sm font-black text-gray-800">Lista de Respostas / Disponíveis</h3>
                             <p class="text-[11px] text-gray-400 font-medium">Voluntários mapeados por dia (Base para o Sorteador)</p>
                         </div>
@@ -364,7 +368,7 @@
             </div>
         </main>
     </div>
-                <script type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -381,6 +385,10 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init("bwcOObTQavlK3QCuP");
+    }
 
     const formLogin = document.getElementById('form-login');
     const erroLogin = document.getElementById('erro-login');
@@ -438,7 +446,7 @@
                 setTimeout(() => sistemaConteudo.classList.remove('opacity-0'), 50);
             }
         } else {
-            if(sistemaConteudo) systemConteudo.classList.add('opacity-0', 'hidden');
+            if(sistemaConteudo) sistemaConteudo.classList.add('opacity-0', 'hidden');
             if(telaLogin) {
                 telaLogin.classList.remove('hidden');
                 setTimeout(() => telaLogin.classList.remove('opacity-0'), 50);
@@ -511,6 +519,8 @@
                 await signInWithEmailAndPassword(auth, emailInput, senhaInput);
                 if(erroLogin) erroLogin.classList.add('hidden');
             } catch (err) { 
+                console.log("Aviso: Login direto falhou. Buscando perfil provisório no Firestore...", err.code);
+                
                 try {
                     const q = query(collection(db, "usuarios"), where("email", "==", emailInput));
                     const querySnapshot = await getDocs(q);
@@ -525,9 +535,10 @@
 
                     if (usuarioPreCadastrado) {
                         if (usuarioPreCadastrado.senha_provisoria === senhaInput) {
+                            
                             if (senhaInput.length < 6) {
                                 hideLoading();
-                                alert(`🚨 Falha de Segurança:\nA senha cadastrada possui apenas ${senhaInput.length} caracteres. O Firebase exige no mínimo 6 dígitos.`);
+                                alert(`🚨 Falha de Segurança:\nA senha cadastrada para este usuário possui apenas ${senhaInput.length} caracteres. O Firebase exige uma senha de no mínimo 6 dígitos.`);
                                 return;
                             }
 
@@ -557,7 +568,7 @@
                         }
                     }
                 } catch (firestoreErr) {
-                    console.error(firestoreErr);
+                    console.error("Erro ao ler dados no Firestore: ", firestoreErr);
                 }
                 
                 if(erroLoginTexto) erroLoginTexto.innerText = "Usuário ou senha incorretos.";
@@ -597,15 +608,14 @@
     const btnGerarSenha = document.getElementById('btn-gerar-senha');
     if(btnGerarSenha) {
         btnGerarSenha.addEventListener('click', () => {
-            const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+            const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
             let novaSenha = '';
-            for (let i = 0; i < 6; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            for (let i = 0; i < 8; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
             const cadSenhaInput = document.getElementById('cad-senha');
             if(cadSenhaInput) cadSenhaInput.value = novaSenha;
         });
     }
 
-    // FORMULÁRIO DE CADASTRO ATUALIZADO COM ENVIO DE E-MAIL INTEGRADO À VERCEL ROTA /api/send-email
     const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
     if(formCadastroUsuario) {
         formCadastroUsuario.addEventListener('submit', async (e) => {
@@ -625,24 +635,7 @@
                     funcao: funcao
                 });
                 
-                // DISPARANDO CHAMADA PARA A ROTA SERVERLESS DA VERCEL DA COORDENAÇÃO
-                try {
-                    const respostaEmail = await fetch('/api/send-email', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nome: nome, email: email, senha: senha })
-                    });
-                    
-                    if(respostaEmail.ok) {
-                        alert(`Perfil de ${nome} gravado e e-mail de credenciais enviado com sucesso!`);
-                    } else {
-                        alert(`Perfil gravado, mas falhou o envio do e-mail de notificação.`);
-                    }
-                } catch (errEmail) {
-                    console.error("Erro na rota de e-mail:", errEmail);
-                    alert(`Perfil gravado, mas a rota local de e-mail /api/send-email falhou.`);
-                }
-
+                alert(`Perfil de ${nome} gravado com sucesso!`);
                 formCadastroUsuario.reset();
             } catch (err) {
                 alert("Erro ao salvar no banco: " + err.message);
@@ -713,6 +706,12 @@
         });
     }
 
+    if(buscaUsuarioLista) {
+        buscaUsuarioLista.addEventListener('input', (e) => {
+            renderizarTabelaUsuariosFiltrada(e.target.value);
+        });
+    }
+
     window.switchCoordTab = function(tabID) {
         document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
         const targetSec = document.getElementById('sec-' + tabID);
@@ -775,6 +774,39 @@
                 const dados = docSnap.data();
                 mapaRespostasGerais = dados.respostas || {};
                 
+                const filaPrioridadeContainer = document.getElementById('lista-fila-prioridade');
+                if(filaPrioridadeContainer) {
+                    filaPrioridadeContainer.innerHTML = "";
+                    let arrayOrdenadoVotos = [];
+                    Object.keys(mapaRespostasGerais).forEach(nome => {
+                        const infoVoto = mapaRespostasGerais[nome];
+                        const timestamp = infoVoto.respondidoEm || 0;
+                        const choices = infoVoto.escolhas || (Array.isArray(infoVoto) ? infoVoto : []);
+                        arrayOrdenadoVotos.push({ nome, timestamp, escolhas: choices });
+                    });
+
+                    arrayOrdenadoVotos.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+                    if(arrayOrdenadoVotos.length === 0) {
+                        filaPrioridadeContainer.innerHTML = `<p class="text-[10px] text-gray-400 italic">Nenhuma resposta submetida ainda.</p>`;
+                    } else {
+                        arrayOrdenadoVotos.forEach((voto, index) => {
+                            let medalha = `${index + 1}. `;
+                            let dataFormatada = "Sem data";
+                            if (voto.timestamp > 0) {
+                                const d = new Date(voto.timestamp);
+                                dataFormatada = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')} às ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                            }
+                            filaPrioridadeContainer.innerHTML += `
+                                <div class="flex justify-between items-center bg-white px-2 py-1 rounded border border-gray-100 text-[11px]">
+                                    <span class="font-bold text-gray-800">${medalha}${voto.nome}</span>
+                                    <span class="text-[9px] text-amber-700 bg-amber-100/50 font-semibold px-1 rounded">${dataFormatada}</span>
+                                </div>
+                            `;
+                        });
+                    }
+                }
+
                 const container = document.getElementById('lista-nomes-enquete');
                 if(container) {
                     container.innerHTML = "";
@@ -812,7 +844,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural updated!");
+                alert("Mural updated successfully!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
@@ -845,7 +877,6 @@
         });
     }
 
-    // ALGORITMO DE ALOCAÇÃO DE SORTEIO TOTALMENTE CORRIGIDO E EXTRAÍDO DIRETO DO SNAPSHOT DO BANCO
     const formEscalaAutomatica = document.getElementById('form-escala-automatica');
     if(formEscalaAutomatica) {
         formEscalaAutomatica.addEventListener('submit', async (e) => {
@@ -863,7 +894,6 @@
                 const dadosEnquete = docEnqueteSnap.data();
                 const mesSelecionado = dadosEnquete.mesReferencia; 
                 const tituloBase = document.getElementById('auto-titulo').value;
-                const respostasVotos = dadosEnquete.respostas || {};
 
                 if (!mesSelecionado) {
                     hideLoading();
@@ -876,19 +906,12 @@
 
                 for (const cel of cronogramaDoMes) {
                     let disponiveis = [];
-                    
-                    // Tratamento seguro para extrair escolhas independentemente de variações estruturais
-                    Object.keys(respostasVotos).forEach(nome => {
-                        const respostaMembro = respostasVotos[nome];
-                        if (respostaMembro) {
-                            const escolhas = respostaMembro.escolhas || (Array.isArray(respostaMembro) ? respostaMembro : []);
-                            if (escolhas.includes(cel.idChave)) {
-                                disponiveis.push(nome);
-                            }
-                        }
+                    Object.keys(mapaRespostasGerais).forEach(nome => {
+                        const alvo = mapaRespostasGerais[nome];
+                        const listas = alvo.escolhas || (Array.isArray(alvo) ? alvo : []);
+                        if (listas.includes(cel.idChave)) disponiveis.push(nome);
                     });
                     
-                    // Embaralha aleatoriamente a lista filtrada de coroinhas disponíveis na data
                     disponiveis.sort(() => Math.random() - 0.5);
                     const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
                     
@@ -910,7 +933,7 @@
                 }
 
                 hideLoading();
-                alert("Escala randômica gerada cruzando os votos com sucesso!");
+                alert("Escala preenchida e gerada com sucesso!");
                 formEscalaAutomatica.reset();
                 if (editorEscalaData) carregarEditorEscalasPorData(editorEscalaData.value);
             } catch (err) { hideLoading(); alert(err.message); }
@@ -953,8 +976,8 @@
                             <div><input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
                         </div>
                     </div>
-                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md cursor-pointer">
-                        Atualizar Cronograma Oficial
+                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md">
+                        Atualizar Cronograma Oficinal
                     </button>
                 `;
                 containerEditoresMissa.appendChild(divEdicao);
@@ -1125,9 +1148,13 @@
         dataSelecionadaGlobal = dataString;
         const lista = document.getElementById('lista-presbiterio');
         const cardNotificacao = document.getElementById('card-notificacao');
+        const botoesContainer = document.getElementById('botoes-notificacao-container');
+        const botoesCoberturaContainer = document.getElementById('botoes-cobertura-container');
 
         if(!lista) return;
         lista.innerHTML = "";
+        if(botoesContainer) botoesContainer.innerHTML = "";
+        if(botoesCoberturaContainer) botoesCoberturaContainer.innerHTML = "";
         if(cardNotificacao) cardNotificacao.classList.add('hidden');
         if(cardConviteSubstituto) cardConviteSubstituto.classList.add('hidden');
 
@@ -1182,10 +1209,26 @@
                         if (usuarioLogadoDados && objPosto.nome === usuarioLogadoDados.nome) {
                             usuarioOcupadoNesteDia = true;
                             if(cardNotificacao) cardNotificacao.classList.remove('hidden');
+                            if(botoesContainer) {
+                                botoesContainer.innerHTML += `
+                                    <div class="pb-1 mb-1 border-b flex items-center justify-between gap-2 bg-white p-2 rounded-lg border">
+                                        <span class="font-bold text-amber-900">${p.label} (${dados.horario}h):</span>
+                                        <div class="flex gap-1">
+                                            <button onclick="confirmarPresencaMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-emerald-700 text-white text-[10px] px-2 py-1 rounded cursor-pointer font-bold">Confirmar</button>
+                                            <button onclick="pedirSubstituicaoMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded cursor-pointer font-bold">Pedir Troca</button>
+                                        </div>
+                                    </div>
+                                `;
+                            }
                         }
 
-                        if (isVagaLivre) {
+                        if (isVagaLivre && botoesCoberturaContainer) {
                             temVagaDisponivel = true;
+                            botoesCoberturaContainer.innerHTML += `
+                                <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="w-full bg-indigo-700 text-white text-[10px] p-2 rounded-lg text-left font-bold cursor-pointer hover:bg-indigo-800 transition-all">
+                                    <i class="fa-solid fa-plus-circle mr-1"></i> Assumir ${p.label} às ${dados.horario}h
+                                </button>
+                            `;
                         }
                     });
 
@@ -1268,6 +1311,5 @@
         if(tLiturgia) tLiturgia.className = tabName === 'liturgia' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
     }
 </script>
-
 </body>
 </html>
