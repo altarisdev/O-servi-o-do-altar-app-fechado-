@@ -262,7 +262,7 @@
                                     <tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] border-b border-gray-200">
                                         <th class="p-3">Nome</th>
                                         <th class="p-3">E-mail</th>
-                                        <th class="p-3">Senha Prov.</th>
+                                        <th class="p-3 text-amber-900 bg-amber-50/40 font-mono font-bold">Senha Prov.</th>
                                         <th class="p-3 text-center">Função</th>
                                         <th class="p-3 text-center">Ações</th>
                                     </tr>
@@ -613,7 +613,7 @@
     }
 
     // ==========================================
-    // ABORDAGEM 2: CADASTRO + REQUISIÇÃO AO RESEND
+    // INTEGRAÇÃO COMPLETA COM A SUA ROTA VERCEL
     // ==========================================
     const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
     if(formCadastroUsuario) {
@@ -627,7 +627,8 @@
 
             try {
                 const idTemporaria = "pre_" + Date.now();
-                // 1. Salva no banco de dados Firestore
+                
+                // 1. Grava o usuário provisório na sua coleção "usuarios" do Firestore
                 await setDoc(doc(db, "usuarios", idTemporaria), {
                     nome: nome,
                     email: email,
@@ -635,10 +636,9 @@
                     funcao: funcao
                 });
                 
-                // 2. Dispara a requisição HTTP para a rota backend segura do Resend
-                // NOTA: Substitua a URL abaixo pela URL real da sua API (Ex: Vercel, Render ou Cloud Function)
+                // 2. Dispara a requisição HTTP segura para o endpoint do Resend na sua Vercel
                 try {
-                    await fetch('https://sua-api.com/api/enviar-email', {
+                    await fetch('https://o-servi-o-do-altar-app-fechado.vercel.app/api/enviar-email', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -647,10 +647,10 @@
                             senhaProvisoria: senha
                         })
                     });
-                    alert(`Perfil de ${nome} gravado e e-mail enviado com sucesso via Resend!`);
+                    alert(`Perfil de ${nome} gravado no Firestore e e-mail enviado com sucesso via Resend!`);
                 } catch (emailErr) {
                     console.error("Falha no disparo da API do Resend:", emailErr);
-                    alert(`Perfil de ${nome} foi gravado no banco, mas a notificação por e-mail falhou.`);
+                    alert(`Perfil de ${nome} foi gravado no banco, mas a notificação por e-mail falhou. Verifique os logs da Vercel.`);
                 }
 
                 formCadastroUsuario.reset();
@@ -861,7 +861,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural atualizado com sucesso!");
+                alert("Mural updated!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
