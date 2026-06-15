@@ -385,7 +385,7 @@
         const db = getFirestore(app);
 
         // CONFIGURAÇÃO DO EMAILJS
-        emailjs.init("SUA_PUBLIC_KEY_AQUI");
+        emailjs.init("bwcOObTQavIK3QCuP");
 
         const formLogin = document.getElementById('form-login');
         const erroLogin = document.getElementById('erro-login');
@@ -581,7 +581,7 @@
                     user_role: funcao
                 };
                 try {
-                    await emailjs.send("SEU_SERVICE_ID_AQUI", "SEU_TEMPLATE_ID_AQUI", parametrosEmail);
+                    await emailjs.send("service_s695vbi", "template_a74j3it", parametrosEmail);
                 } catch(eMailErr) {
                     console.log("EmailJS não configurado ou falhou, mas as credenciais de login foram salvas.");
                 }
