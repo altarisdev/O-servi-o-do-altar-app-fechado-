@@ -307,7 +307,6 @@
                                 <h4 class="text-xs font-bold text-gray-700 uppercase">Processar Lote Automático</h4>
                                 <p class="text-[10px] text-gray-400 font-medium">Cruza as respostas e preenche o mês de forma randômica pura</p>
                             </div>
-                            <input type="hidden" id="auto-mes">
                             <div>
                                 <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Título Padrão das Celebrações</label>
                                 <input type="text" id="auto-titulo" required placeholder="Ex: Santa Missa Dominical" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium">
@@ -369,6 +368,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -384,8 +384,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // CONFIGURAÇÃO DO EMAILJS
-        emailjs.init("bwcOObTQavIK3QCuP");
+        // CONFIGURAÇÃO DO EMAILJS COPIADA DO SEU PAINEL (1000433568.png)
+        emailjs.init("bwcOObTQavlK3QCuP");
 
         const formLogin = document.getElementById('form-login');
         const erroLogin = document.getElementById('erro-login');
@@ -546,7 +546,6 @@
             }
         }
 
-        // CADASTRO CORRIGIDO: INTEGRA AUTH + FIRESTORE SEM PERDER A SESSÃO ATUAL
         document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
@@ -560,11 +559,9 @@
             const funcao = document.getElementById('cad-funcao').value;
 
             try {
-                // 1. Cria a credencial de login oficial no módulo Firebase Auth
                 const resultadoAuth = await createUserWithEmailAndPassword(auth, email, senha);
                 const novoUsuarioUid = resultadoAuth.user.uid;
 
-                // 2. Vincula e grava os metadados do perfil no Firestore utilizando o UID gerado
                 await setDoc(doc(db, "usuarios", novoUsuarioUid), { 
                     nome, 
                     email, 
@@ -572,7 +569,6 @@
                     senha_provisoria: senha 
                 });
 
-                // 3. Dispara as informações de acesso via EmailJS
                 const parametrosEmail = {
                     to_name: nome,
                     to_email: email,
@@ -581,15 +577,15 @@
                     user_role: funcao
                 };
                 try {
-                    await emailjs.send("service_s695vbi", "template_a74j3it", parametrosEmail);
+                    await emailjs.send("service_s695vbi", "template_a74j3lt", parametrosEmail);
+                    console.log("Notificação de acesso enviada com sucesso para o e-mail do acólito.");
                 } catch(eMailErr) {
-                    console.log("EmailJS não configurado ou falhou, mas as credenciais de login foram salvas.");
+                    console.warn("Erro ao processar envio no EmailJS. Verifique o mapeamento das variáveis dentro do template 'template_a74j3lt'.", eMailErr);
                 }
 
                 alert(`Membro ${nome} cadastrado com sucesso como ${funcao}!`);
                 document.getElementById('form-cadastro-usuario').reset();
                 
-                // 4. Correção de persistência de sessão:
                 await signOut(auth);
                 await signInWithEmailAndPassword(auth, emailCoordenadorLogado, senhaCoordenadorLogada);
 
@@ -657,8 +653,6 @@
             const [ano, mes] = mesAlvo.split('-').map(Number);
             const listaCelebracoes = mapearDatasDoMes(ano, mes);
             
-            document.getElementById('auto-mes').value = mesAlvo;
-
             await setDoc(doc(db, "enquetes", "disponibilidade_atual"), {
                 mesReferencia: mesAlvo,
                 ativa: true,
@@ -711,7 +705,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: textoAviso, dataPublicacao: dataHoje });
-                alert("Mural atualizado com sucesso!");
+                alert("Mural atualizado!");
             } catch (err) { alert("Erro ao publicar aviso: " + err.message); }
             hideLoading();
         });
@@ -741,22 +735,43 @@
             });
         }
 
+        // CÓDIGO CORRIGIDO INTEGRADO: CONSULTA DIRETAMENTE A ENQUETE OFICIAL DO BANCO DE DADOS
         document.getElementById('form-escala-automatica').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const mesSelecionado = document.getElementById('auto-mes').value;
-            const tituloBase = document.getElementById('auto-titulo').value;
-            if(!mesSelecionado) { alert("Nenhuma enquete ativa de mês foi encontrada aberta."); return; }
             showLoading();
-            const [ano, mes] = mesSelecionado.split('-').map(Number);
-            const cronogramaDoMes = mapearDatasDoMes(ano, mes);
+
             try {
+                const docEnqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
+                
+                if (!docEnqueteSnap.exists()) {
+                    hideLoading();
+                    alert("Nenhuma enquete foi encontrada ativa ou configurada no banco de dados.");
+                    return;
+                }
+
+                const dadosEnquete = docEnqueteSnap.data();
+                const mesSelecionado = dadosEnquete.mesReferencia; 
+                const tituloBase = document.getElementById('auto-titulo').value;
+
+                if (!mesSelecionado) {
+                    hideLoading();
+                    alert("O mês de referência não foi identificado na enquete ativa.");
+                    return;
+                }
+
+                const [ano, mes] = mesSelecionado.split('-').map(Number);
+                const cronogramaDoMes = mapearDatasDoMes(ano, mes);
+
                 for (const cel of cronogramaDoMes) {
                     let disponiveis = [];
                     Object.keys(mapaRespostasGerais).forEach(nome => {
                         if (mapaRespostasGerais[nome].includes(cel.idChave)) disponiveis.push(nome);
                     });
+                    
                     disponiveis.sort(() => Math.random() - 0.5);
+                    
                     const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
+                    
                     await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
                         titulo: `${tituloBase} (${cel.rotulo})`,
                         horario: cel.horario,
@@ -773,11 +788,18 @@
                         naveteiro: { nome: "A definir", status: "Pendente" }
                     });
                 }
+
                 hideLoading();
-                alert("Escala de Altares gerada e PREENCHIDA com sucesso!");
+                alert("Escala de Altares gerada e PREENCHIDA com sucesso com os dados da enquete!");
                 document.getElementById('form-escala-automatica').reset();
-                if(editorEscalaData.value) carregarEditorEscalasPorData(editorEscalaData.value);
-            } catch (err) { hideLoading(); alert("Erro ao salvar lote: " + err.message); }
+                
+                if (editorEscalaData.value) {
+                    carregarEditorEscalasPorData(editorEscalaData.value);
+                }
+            } catch (err) { 
+                hideLoading(); 
+                alert("Erro ao processar lote: " + err.message); 
+            }
         });
 
         async function carregarEditorEscalasPorData(dataString) {
@@ -875,7 +897,7 @@
                                 "naveteiro.nome": document.getElementById(`edit-nave-${idDocumentoMissa}`).value
                             });
                             hideLoading();
-                            alert("Escala atualizada com sucesso!");
+                            alert("Escala updated!");
                             if (buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                             carregarEditorEscalasPorData(editorEscalaData.value);
                         } catch (err) { hideLoading(); alert("Erro ao salvar: " + err.message); }
@@ -1039,7 +1061,7 @@
             const url = document.getElementById('form-url-input').value;
             try {
                 await setDoc(doc(db, "formacao", "manual_atual"), { titulo, url });
-                alert("Material de estudo updated!");
+                alert("Material de estudo atualizado!");
                 carregarMaterialEstudo();
             } catch(err) { alert("Erro: " + err.message); }
             hideLoading();
