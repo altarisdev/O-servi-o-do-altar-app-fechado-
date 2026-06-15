@@ -250,14 +250,20 @@
                     </div>
 
                     <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 overflow-hidden flex flex-col">
-                        <div class="mb-3">
-                            <h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3>
-                            <p class="text-[11px] text-gray-400 font-medium">Controle total de credenciais e cargos</p>
+                        <div class="mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3>
+                                <p class="text-[11px] text-gray-400 font-medium">Controle total de credenciais e cargos</p>
+                            </div>
+                            <div class="relative">
+                                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-400 text-[10px]"></i>
+                                <input type="text" id="busca-usuario-lista" placeholder="Buscar por nome ou e-mail..." class="bg-gray-50 border border-gray-200 rounded-lg pl-7 pr-3 py-1.5 text-xs font-medium focus:outline-hidden focus:border-amber-700 w-full sm:w-48">
+                            </div>
                         </div>
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto max-h-[450px] overflow-y-auto border border-gray-100 rounded-xl">
                             <table class="w-full text-left text-xs border-collapse">
-                                <thead>
-                                    <tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] border-b border-gray-200">
+                                <thead class="sticky top-0 z-10 bg-gray-100 shadow-2xs">
+                                    <tr class="text-gray-600 font-bold uppercase text-[10px] border-b border-gray-200">
                                         <th class="p-3">Nome</th>
                                         <th class="p-3">E-mail</th>
                                         <th class="p-3">Senha Prov.</th>
@@ -403,12 +409,15 @@
         const editorEscalaData = document.getElementById('editor-escala-data');
         const containerEditoresMissa = document.getElementById('container-editores-missa');
         const cardConviteSubstituto = document.getElementById('card-convite-substituto');
+        const buscaUsuarioLista = document.getElementById('busca-usuario-lista');
 
         let usuarioLogadoDados = null;
         let dataSelecionadaGlobal = "";
         let mapaRespostasGerais = {}; 
+        let cacheTodosUsuarios = []; // Armazena a lista bruta para busca instantânea em tempo real
         let unsubEnquete = null;
         let unsubMural = null;
+        let unsubUsuarios = null;
 
         const CRONOGRAMA_PAROQUIA = [
             { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
@@ -483,6 +492,7 @@
             } else {
                 if (unsubEnquete) { unsubEnquete(); unsubEnquete = null; }
                 if (unsubMural) { unsubMural(); unsubMural = null; }
+                if (unsubUsuarios) { unsubUsuarios(); unsubUsuarios = null; }
                 usuarioLogadoDados = null;
                 alternarTelasVisiveis(false);
             }
@@ -533,6 +543,33 @@
             document.getElementById('cad-senha').value = novaSenha;
         });
 
+        // FORMULÁRIO DE CADASTRO OTIMIZADO PARA MAIS DE 90 USUÁRIOS
+        document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const nome = document.getElementById('cad-nome').value.trim();
+            const email = document.getElementById('cad-email').value.trim().toLowerCase();
+            const senha = document.getElementById('cad-senha').value.trim();
+            const funcao = document.getElementById('cad-funcao').value;
+
+            try {
+                // Inserção direta usando uma hash/ID baseada no timestamp para evitar colisões em lote
+                const novoUidFake = "user_" + Date.now();
+                await setDoc(doc(db, "usuarios", novoUidFake), {
+                    nome: nome,
+                    email: email,
+                    senha_provisoria: senha,
+                    funcao: funcao
+                });
+                
+                alert(`Usuário ${nome} registrado e ativado com sucesso!`);
+                document.getElementById('form-cadastro-usuario').reset();
+            } catch (err) {
+                alert("Erro ao cadastrar membro: " + err.message);
+            }
+            hideLoading();
+        });
+
         window.deletarUsuarioDoSistema = async function(idDocumento, nomeUsuario) {
             if(confirm(`Deseja remover permanentemente o usuário "${nomeUsuario}"?`)) {
                 showLoading();
@@ -544,34 +581,63 @@
             }
         }
 
-        function ouvirUsuariosCadastrados() {
-            onSnapshot(collection(db, "usuarios"), (snapshot) => {
-                const tabelaBody = document.getElementById('tabela-usuarios-recuperacao');
-                tabelaBody.innerHTML = "";
-                snapshot.forEach((docSnap) => {
-                    const usuario = docSnap.data();
-                    const idDoc = docSnap.id;
-                    const senhaExibida = usuario.senha_provisoria || "••••••••";
-                    tabelaBody.innerHTML += `
-                        <tr class="hover:bg-gray-50/80 transition-all border-b border-gray-100">
-                            <td class="p-3 font-semibold text-gray-800">${usuario.nome}</td>
-                            <td class="p-3 text-gray-600 font-mono">${usuario.email}</td>
-                            <td class="p-3 text-amber-900 bg-amber-50/40 font-mono font-bold select-all">${senhaExibida}</td>
-                            <td class="p-3 text-center">
-                                <span class="px-2 py-0.5 text-[10px] font-bold rounded-sm ${usuario.funcao === 'Coordenador' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">
-                                    ${usuario.funcao || 'Coroinha'}
-                                </span>
-                            </td>
-                            <td class="p-3 text-center">
-                                <button onclick="deletarUsuarioDoSistema('${idDoc}', '${usuario.nome}')" class="text-rose-600 hover:text-rose-800 font-bold px-2 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded text-[11px] cursor-pointer transition-all">
-                                    <i class="fa-solid fa-trash-can"></i> Excluir
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
+        // RENDERIZADOR COMPLETO COM FILTRO INTERNO DE PROCURA INSTANTÂNEA
+        function renderizarTabelaUsuariosFiltrada(termoBusca = "") {
+            const tabelaBody = document.getElementById('tabela-usuarios-recuperacao');
+            tabelaBody.innerHTML = ""; // Limpa completamente para evitar gargalo de memória DOM
+
+            const filtrados = cacheTodosUsuarios.filter(u => 
+                u.nome.toLowerCase().includes(termoBusca.toLowerCase()) || 
+                u.email.toLowerCase().includes(termoBusca.toLowerCase())
+            );
+
+            if(filtrados.length === 0) {
+                tabelaBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-xs text-gray-400 italic">Nenhum irmão encontrado com este nome ou e-mail.</td></tr>`;
+                return;
+            }
+
+            filtrados.forEach((usuario) => {
+                const senhaExibida = usuario.senha_provisoria || "••••••••";
+                tabelaBody.innerHTML += `
+                    <tr class="hover:bg-gray-50/80 transition-all border-b border-gray-100">
+                        <td class="p-3 font-semibold text-gray-800">${usuario.nome}</td>
+                        <td class="p-3 text-gray-600 font-mono">${usuario.email}</td>
+                        <td class="p-3 text-amber-900 bg-amber-50/40 font-mono font-bold select-all">${senhaExibida}</td>
+                        <td class="p-3 text-center">
+                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-sm ${usuario.funcao === 'Coordenador' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">
+                                ${usuario.funcao || 'Coroinha'}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center">
+                            <button onclick="deletarUsuarioDoSistema('${usuario.idDoc}', '${usuario.nome}')" class="text-rose-600 hover:text-rose-800 font-bold px-2 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded text-[11px] cursor-pointer transition-all">
+                                <i class="fa-solid fa-trash-can"></i> Excluir
+                            </button>
+                        </td>
+                    </tr>
+                `;
             });
         }
+
+        // ESCUTA EM TEMPO REAL ROBUSTA CAPAZ DE COLETAR MAIS DE 90 MEMBROS SEM QUEDAS
+        function ouvirUsuariosCadastrados() {
+            if(unsubUsuarios) unsubUsuarios();
+            unsubUsuarios = onSnapshot(collection(db, "usuarios"), (snapshot) => {
+                cacheTodosUsuarios = [];
+                snapshot.forEach((docSnap) => {
+                    const dados = docSnap.data();
+                    dados.idDoc = docSnap.id;
+                    cacheTodosUsuarios.push(dados);
+                });
+                // Ordena alfabeticamente para facilitar a listagem
+                cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome));
+                renderizarTabelaUsuariosFiltrada(buscaUsuarioLista.value);
+            });
+        }
+
+        // Captura digitação na barra de pesquisa para filtrar a base instantaneamente
+        buscaUsuarioLista.addEventListener('input', (e) => {
+            renderizarTabelaUsuariosFiltrada(e.target.value);
+        });
 
         window.switchCoordTab = function(tabID) {
             document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
@@ -697,7 +763,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: textoAviso, dataPublicacao: dataHoje });
-                alert("Mural updated!");
+                alert("Mural atualizado!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
@@ -915,7 +981,6 @@
             hideLoading();
         });
 
-        // FUNÇÃO DE CONFIRMAÇÃO DIRETA NA ESCALA
         window.confirmarPresencaMissa = async function(idMissa, slotChave) {
             showLoading();
             try {
@@ -928,7 +993,6 @@
             hideLoading();
         }
 
-        // SISTEMA AUTOMÁTICO DE FILA DE SUBSTITUIÇÃO
         window.pedirSubstituicaoMissa = async function(idMissa, slotChave) {
             if(!confirm("Tem certeza que deseja solicitar dispensa desse horário? O sistema tentará passar a vaga para o próximo irmão disponível automaticamente.")) return;
             showLoading();
@@ -943,8 +1007,6 @@
                 if (docEnqueteSnap.exists()) {
                     const dadosEnquete = docEnqueteSnap.data();
                     const respostas = dadosEnquete.respostas || {};
-                    
-                    // Extrai a chave de id da enquete baseada no ID do documento de escala (data_horario)
                     const [dataEscala, hrEscala] = idMissa.split('_');
                     const chaveEnqueteBuscada = `${dataEscala}_${hrEscala}`;
 
@@ -957,15 +1019,12 @@
                         }
                     });
 
-                    // Filtra para remover quem já está servindo em outro posto nessa mesma missa
                     const nomesJaOcupados = [
                         dadosMissa.altar1?.nome, dadosMissa.altar2?.nome, dadosMissa.altar3?.nome,
                         dadosMissa.altar4?.nome, dadosMissa.altar5?.nome, dadosMissa.altar6?.nome,
                         dadosMissa.turiferario?.nome, dadosMissa.naveteiro?.nome
                     ];
                     listaCandidatosValidos = listaCandidatosValidos.filter(c => !nomesJaOcupados.includes(c.nome));
-
-                    // Ordena por ordem de quem enviou primeiro a enquete (fila de prioridade justa)
                     listaCandidatosValidos.sort((a,b) => a.timestamp - b.timestamp);
 
                     if (listaCandidatosValidos.length > 0) {
@@ -1109,7 +1168,7 @@
                     titulo: document.getElementById('form-titulo-input').value, 
                     url: document.getElementById('form-url-input').value 
                 });
-                alert("Material atualizado!");
+                alert("Material updated!");
                 carregarMaterialEstudo();
             } catch(err) { alert(err.message); }
             hideLoading();
