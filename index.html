@@ -139,7 +139,7 @@
 
                         <div id="lista-presbiterio" class="divide-y divide-gray-100"></div>
 
-                        <div id="card-notificacao" class="hidden bg-amber-50 p-4 border-t-2 border-amber-600 flex flex-col justify-between items-start gap-3">
+                        <div id="card-notificacao" class="hidden bg-amber-50 p-4 border-t-2 border-amber-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                             <div class="flex gap-2.5 items-start">
                                 <i class="fa-solid fa-bell text-amber-700 text-sm mt-0.5 animate-bounce"></i>
                                 <div>
@@ -147,12 +147,11 @@
                                     <p class="text-[10px] text-gray-500 font-medium">Confirme sua presença ou solicite um substituto imediatamente.</p>
                                 </div>
                             </div>
-                            <div id="botoes-notificacao-container" class="w-full space-y-1">
-                                </div>
+                            <div id="botoes-notificacao-container" class="flex gap-2 w-full sm:w-auto"></div>
                         </div>
                     </div>
 
-                    <div id="card-convite-substituto" class="hidden bg-rose-50 border border-rose-200 p-4 rounded-xl flex flex-col justify-between items-start gap-3">
+                    <div id="card-convite-substituto" class="hidden bg-rose-50 border border-rose-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <div class="flex gap-2">
                             <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
                             <div>
@@ -160,8 +159,7 @@
                                 <p class="text-[10px] text-rose-700">Um irmão precisou de substituto. Deseja assumir este posto no altar?</p>
                             </div>
                         </div>
-                        <div id="botoes-cobertura-container" class="w-full flex flex-col gap-1">
-                            </div>
+                        <div id="botoes-cobertura-container" class="flex flex-wrap gap-2 w-full sm:w-auto"></div>
                     </div>
                 </div>
 
@@ -252,10 +250,12 @@
                     </div>
 
                     <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 overflow-hidden flex flex-col">
-                        <div class="mb-3">
-                            <h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3>
-                            <p class="text-[11px] text-gray-400 font-medium">Controle total de credenciais e cargos</p>
-                            <input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="mt-2 w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium focus:outline-hidden focus:border-amber-700">
+                        <div class="mb-3 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3>
+                                <p class="text-[11px] text-gray-400 font-medium">Controle total de credenciais e cargos</p>
+                            </div>
+                            <input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-xs font-medium focus:outline-hidden focus:border-amber-700">
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
@@ -302,12 +302,16 @@
                             </div>
                         </div>
                         <hr class="border-gray-100">
+                        <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-100 space-y-1.5">
+                            <h4 class="text-[11px] font-bold text-amber-900 uppercase">Fila de Prioridade (Envio)</h4>
+                            <div id="lista-fila-prioridade" class="space-y-1 max-h-24 overflow-y-auto"></div>
+                        </div>
+                        <hr class="border-gray-100">
                         <form id="form-escala-automatica" class="space-y-3">
                             <div>
                                 <h4 class="text-xs font-bold text-gray-700 uppercase">Processar Lote Automático</h4>
                                 <p class="text-[10px] text-gray-400 font-medium">Cruza as respostas e preenche o mês de forma randômica pura</p>
                             </div>
-                            <input type="hidden" id="auto-mes">
                             <div>
                                 <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Título Padrão das Celebrações</label>
                                 <input type="text" id="auto-titulo" required placeholder="Ex: Santa Missa Dominical" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium">
@@ -320,9 +324,6 @@
 
                     <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 space-y-3">
                         <div>
-                            <h3 class="text-sm font-black text-gray-800">Fila de Prioridade / Ordem de Resposta</h3>
-                            <div id="lista-fila-prioridade" class="space-y-1 max-h-32 overflow-y-auto bg-gray-50 p-2 rounded-lg border text-xs mb-3"></div>
-                            
                             <h3 class="text-sm font-black text-gray-800">Lista de Respostas / Disponíveis</h3>
                             <p class="text-[11px] text-gray-400 font-medium">Voluntários mapeados por dia (Base para o Sorteador)</p>
                         </div>
@@ -844,7 +845,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural updated successfully!");
+                alert("Mural updated com sucesso!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
@@ -884,32 +885,35 @@
             showLoading();
 
             try {
-                const docEnqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
-                if (!docEnqueteSnap.exists()) {
-                    hideLoading();
-                    alert("Nenhuma enquete configurada no banco.");
-                    return;
-                }
-
-                const dadosEnquete = docEnqueteSnap.data();
-                const mesSelecionado = dadosEnquete.mesReferencia; 
-                const tituloBase = document.getElementById('auto-titulo').value;
+                const mesAlvoInput = document.getElementById('enq-mes-alvo');
+                const mesSelecionado = mesAlvoInput ? mesAlvoInput.value : null;
 
                 if (!mesSelecionado) {
                     hideLoading();
-                    alert("O mês de referência não foi identificado.");
+                    alert("Por favor, selecione o Mês de Referência no campo acima antes de gerar as escalas.");
                     return;
                 }
 
                 const [ano, mes] = mesSelecionado.split('-').map(Number);
                 const cronogramaDoMes = mapearDatasDoMes(ano, mes);
 
+                if (cronogramaDoMes.length === 0) {
+                    hideLoading();
+                    alert("Nenhuma data correspondente encontrada para este mês baseado no cronograma da paróquia.");
+                    return;
+                }
+
+                const tituloBase = document.getElementById('auto-titulo').value.trim();
+
                 for (const cel of cronogramaDoMes) {
                     let disponiveis = [];
+                    
                     Object.keys(mapaRespostasGerais).forEach(nome => {
                         const alvo = mapaRespostasGerais[nome];
                         const listas = alvo.escolhas || (Array.isArray(alvo) ? alvo : []);
-                        if (listas.includes(cel.idChave)) disponiveis.push(nome);
+                        if (listas.includes(cel.idChave)) {
+                            disponiveis.push(nome);
+                        }
                     });
                     
                     disponiveis.sort(() => Math.random() - 0.5);
@@ -933,10 +937,16 @@
                 }
 
                 hideLoading();
-                alert("Escala preenchida e gerada com sucesso!");
+                alert("Escalas mensais processadas, cruzadas e salvas com sucesso!");
                 formEscalaAutomatica.reset();
-                if (editorEscalaData) carregarEditorEscalasPorData(editorEscalaData.value);
-            } catch (err) { hideLoading(); alert(err.message); }
+                
+                if (editorEscalaData) {
+                    carregarEditorEscalasPorData(editorEscalaData.value);
+                }
+            } catch (err) { 
+                hideLoading(); 
+                alert("Erro ao processar escala automática: " + err.message); 
+            }
         });
     }
 
@@ -977,7 +987,7 @@
                         </div>
                     </div>
                     <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md">
-                        Atualizar Cronograma Oficinal
+                        Atualizar Cronograma Oficial
                     </button>
                 `;
                 containerEditoresMissa.appendChild(divEdicao);
@@ -1211,11 +1221,10 @@
                             if(cardNotificacao) cardNotificacao.classList.remove('hidden');
                             if(botoesContainer) {
                                 botoesContainer.innerHTML += `
-                                    <div class="pb-1 mb-1 border-b flex items-center justify-between gap-2 bg-white p-2 rounded-lg border">
-                                        <span class="font-bold text-amber-900">${p.label} (${dados.horario}h):</span>
+                                    <div class="pb-1 mb-1 border-b">
                                         <div class="flex gap-1">
-                                            <button onclick="confirmarPresencaMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-emerald-700 text-white text-[10px] px-2 py-1 rounded cursor-pointer font-bold">Confirmar</button>
-                                            <button onclick="pedirSubstituicaoMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded cursor-pointer font-bold">Pedir Troca</button>
+                                            <button onclick="confirmarPresencaMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-emerald-700 text-white text-[10px] px-2 py-1 rounded cursor-pointer">Confirmar</button>
+                                            <button onclick="pedirSubstituicaoMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded cursor-pointer">Pedir Troca</button>
                                         </div>
                                     </div>
                                 `;
@@ -1225,8 +1234,8 @@
                         if (isVagaLivre && botoesCoberturaContainer) {
                             temVagaDisponivel = true;
                             botoesCoberturaContainer.innerHTML += `
-                                <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="w-full bg-indigo-700 text-white text-[10px] p-2 rounded-lg text-left font-bold cursor-pointer hover:bg-indigo-800 transition-all">
-                                    <i class="fa-solid fa-plus-circle mr-1"></i> Assumir ${p.label} às ${dados.horario}h
+                                <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="bg-indigo-700 text-white text-[10px] px-2 py-1 rounded cursor-pointer">
+                                    Assumir ${p.label} às ${dados.horario}h
                                 </button>
                             `;
                         }
