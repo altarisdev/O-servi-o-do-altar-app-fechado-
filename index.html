@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Altaris - Gestão de Acólitos</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link class="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .active-tab {
             border-bottom: 3px solid #b45309;
@@ -218,7 +217,7 @@
                     <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 h-fit space-y-4">
                         <div>
                             <h3 class="text-sm font-black text-gray-800">Cadastrar Novo Membro</h3>
-                            <p class="text-[11px] text-gray-400 font-medium">Ativa automaticamente o login e salva o perfil</p>
+                            <p class="text-[11px] text-gray-400 font-medium">Ativa automaticamente o login, salva o perfil e notifica por e-mail</p>
                         </div>
                         <form id="form-cadastro-usuario" class="space-y-3">
                             <div>
@@ -244,7 +243,7 @@
                                 </select>
                             </div>
                             <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-2.5 rounded-lg transition-all mt-2 cursor-pointer shadow-xs">
-                                <i class="fa-solid fa-user-plus mr-1"></i> Ativar Conta e Gravar Perfil
+                                <i class="fa-solid fa-user-plus mr-1"></i> Ativar Conta e Enviar E-mail
                             </button>
                         </form>
                     </div>
@@ -386,10 +385,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
-    if (typeof emailjs !== 'undefined') {
-        emailjs.init("bwcOObTQavlK3QCuP");
-    }
 
     const formLogin = document.getElementById('form-login');
     const erroLogin = document.getElementById('erro-login');
@@ -617,6 +612,9 @@
         });
     }
 
+    // ==========================================
+    // ABORDAGEM 2: CADASTRO + REQUISIÇÃO AO RESEND
+    // ==========================================
     const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
     if(formCadastroUsuario) {
         formCadastroUsuario.addEventListener('submit', async (e) => {
@@ -629,6 +627,7 @@
 
             try {
                 const idTemporaria = "pre_" + Date.now();
+                // 1. Salva no banco de dados Firestore
                 await setDoc(doc(db, "usuarios", idTemporaria), {
                     nome: nome,
                     email: email,
@@ -636,7 +635,24 @@
                     funcao: funcao
                 });
                 
-                alert(`Perfil de ${nome} gravado com sucesso!`);
+                // 2. Dispara a requisição HTTP para a rota backend segura do Resend
+                // NOTA: Substitua a URL abaixo pela URL real da sua API (Ex: Vercel, Render ou Cloud Function)
+                try {
+                    await fetch('https://sua-api.com/api/enviar-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: email,
+                            nome: nome,
+                            senhaProvisoria: senha
+                        })
+                    });
+                    alert(`Perfil de ${nome} gravado e e-mail enviado com sucesso via Resend!`);
+                } catch (emailErr) {
+                    console.error("Falha no disparo da API do Resend:", emailErr);
+                    alert(`Perfil de ${nome} foi gravado no banco, mas a notificação por e-mail falhou.`);
+                }
+
                 formCadastroUsuario.reset();
             } catch (err) {
                 alert("Erro ao salvar no banco: " + err.message);
@@ -845,7 +861,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural updated com sucesso!");
+                alert("Mural atualizado com sucesso!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
