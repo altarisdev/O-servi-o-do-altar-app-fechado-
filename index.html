@@ -601,14 +601,15 @@
         return datasMapeadas;
     }
 
-    const btnGerarSenha = document.getElementById('btn-gerar-senha');
-    if(btnGerarSenha) {
-        btnGerarSenha.addEventListener('click', () => {
-            const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
-            let novaSenha = '';
-            for (let i = 0; i < 8; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-            const cadSenhaInput = document.getElementById('cad-senha');
-            if(cadSenhaInput) cadSenhaInput.value = novaSenha;
+;const btnGerarSenha = document.getElementById('btn-gerar-senha');
+if(btnGerarSenha) {
+    btnGerarSenha.addEventListener('click', () => {
+        // Aumentado para 12 caracteres para garantir que passe do limite de 6 do Firebase
+        const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
+        let novaSenha = '';
+        for (let i = 0; i < 12; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+        const cadSenhaInput = document.getElementById('cad-senha');
+        if(cadSenhaInput) cadSenhaInput.value = novaSenha;
         });
     }
 
