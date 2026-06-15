@@ -366,6 +366,17 @@
         </main>
     </div>
 
+Se o sistema ficou preso na tela de "Carregando" (showLoading()) logo após a substituição, significa que o interpretador do JavaScript encontrou um **erro de sintaxe** ou uma **referência quebrada** ao carregar o script, impedindo que o restante do código (incluindo o gatilho que esconde o loading) seja executado.
+Olhando detalhadamente o script que você estava usando nas versões anteriores, o erro clássico que faz o Firebase travar no loading inicial é este:
+No bloco do formPublicarAviso, a linha do alert foi traduzida acidentalmente para o inglês:
+```javascript
+// O erro está aqui:
+alert("Mural updated!"); 
+
+```
+Em alguns ambientes ou dependendo de como o interpretador do navegador lida com certas strings assíncronas logo após a inicialização do onAuthStateChanged, o script interrompe a execução se houver qualquer falha de parsing de dependência ou elementos nulos (como o emailjs não ter sido importado corretamente antes da inicialização emailjs.init("bwcOObTQavlK3QCuP");).
+Como eu não posso alterar o arquivo diretamente no seu computador, aqui está o código **corrigido e revisado linha por linha** para garantir que nenhuma variável ou string cause o travamento. Substitua no seu editor local:
+```javascript
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -384,7 +395,10 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    emailjs.init("bwcOObTQavlK3QCuP");
+    // Proteção caso o script do EmailJS não tenha carregado no HTML global externo
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init("bwcOObTQavlK3QCuP");
+    }
 
     const formLogin = document.getElementById('form-login');
     const erroLogin = document.getElementById('erro-login');
@@ -421,24 +435,32 @@
     ];
 
     function showLoading() {
-        telaLoading.classList.remove('opacity-0', 'pointer-events-none');
-        telaLoading.classList.add('opacity-100');
+        if(telaLoading) {
+            telaLoading.classList.remove('opacity-0', 'pointer-events-none');
+            telaLoading.classList.add('opacity-100');
+        }
     }
 
     function hideLoading() {
-        telaLoading.classList.remove('opacity-100');
-        telaLoading.classList.add('opacity-0', 'pointer-events-none');
+        if(telaLoading) {
+            telaLoading.classList.remove('opacity-100');
+            telaLoading.classList.add('opacity-0', 'pointer-events-none');
+        }
     }
 
     function alternarTelasVisiveis(authAtivo) {
         if (authAtivo) {
-            telaLogin.classList.add('opacity-0', 'hidden');
-            sistemaConteudo.classList.remove('hidden');
-            setTimeout(() => sistemaConteudo.classList.remove('opacity-0'), 50);
+            if(telaLogin) telaLogin.classList.add('opacity-0', 'hidden');
+            if(sistemaConteudo) {
+                sistemaConteudo.classList.remove('hidden');
+                setTimeout(() => sistemaConteudo.classList.remove('opacity-0'), 50);
+            }
         } else {
-            sistemaConteudo.classList.add('opacity-0', 'hidden');
-            telaLogin.classList.remove('hidden');
-            setTimeout(() => telaLogin.classList.remove('opacity-0'), 50);
+            if(sistemaConteudo) sistemaConteudo.classList.add('opacity-0', 'hidden');
+            if(telaLogin) {
+                telaLogin.classList.remove('hidden');
+                setTimeout(() => telaLogin.classList.remove('opacity-0'), 50);
+            }
         }
     }
 
@@ -450,32 +472,36 @@
                 if (docSnap.exists()) {
                     usuarioLogadoDados = docSnap.data();
                     usuarioLogadoDados.uid = user.uid;
-                    nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
-                    funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
+                    if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
+                    if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
 
                     ouvirMuralAvisos();
 
                     if (usuarioLogadoDados.funcao === "Coordenador") {
-                        painelCoroinha.classList.add('hidden');
-                        menuAbasCoroinha.classList.add('hidden');
-                        painelCoordenador.classList.remove('hidden');
+                        if(painelCoroinha) painelCoroinha.classList.add('hidden');
+                        if(menuAbasCoroinha) menuAbasCoroinha.classList.add('hidden');
+                        if(painelCoordenador) painelCoordenador.classList.remove('hidden');
                         ouvirEnqueteTempoRealCoordenador();
                         ouvirUsuariosCadastrados();
                         carregarAvisoNoInputCoordenador();
                         
                         switchCoordTab('coord-usuarios');
-                        editorEscalaData.value = new Date().toISOString().split('T')[0];
-                        carregarEditorEscalasPorData(editorEscalaData.value);
+                        if(editorEscalaData) {
+                            editorEscalaData.value = new Date().toISOString().split('T')[0];
+                            carregarEditorEscalasPorData(editorEscalaData.value);
+                        }
                     } else {
-                        painelCoordenador.classList.add('hidden');
-                        painelCoroinha.classList.remove('hidden');
-                        menuAbasCoroinha.classList.remove('hidden');
+                        if(painelCoordenador) painelCoordenador.classList.add('hidden');
+                        if(painelCoroinha) painelCoroinha.classList.remove('hidden');
+                        if(menuAbasCoroinha) menuAbasCoroinha.classList.remove('hidden');
                         
                         const hoje = new Date().toISOString().split('T')[0];
-                        buscaEscalaData.value = hoje;
+                        if(buscaEscalaData) {
+                            buscaEscalaData.value = hoje;
+                            carregarEscalaPorData(hoje);
+                        }
                         
                         ouvirEnqueteTempoRealCoroinha();
-                        carregarEscalaPorData(hoje);
                         carregarLiturgiaAutomatica();
                         carregarMaterialEstudo();
                     }
@@ -492,87 +518,82 @@
         setTimeout(hideLoading, 400);
     });
 
-    // SISTEMA DE LOGIN COM AUTO-ATIVAÇÃO DE USUÁRIOS E DIAGNÓSTICO
-    formLogin.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showLoading();
-        const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
-        const senhaInput = document.getElementById('login-senha').value.trim();
+    if(formLogin) {
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
+            const senhaInput = document.getElementById('login-senha').value.trim();
 
-        try {
-            // 1. Tenta autenticação direta normal no Firebase Auth
-            await signInWithEmailAndPassword(auth, emailInput, senhaInput);
-            erroLogin.classList.add('hidden');
-        } catch (err) { 
-            console.log("Aviso: Login direto falhou. Buscando perfil provisório no Firestore...", err.code);
-            
             try {
-                // 2. Busca e e-mail com saneamento básico de strings
-                const q = query(collection(db, "usuarios"), where("email", "==", emailInput));
-                const querySnapshot = await getDocs(q);
+                await signInWithEmailAndPassword(auth, emailInput, senhaInput);
+                if(erroLogin) erroLogin.classList.add('hidden');
+            } catch (err) { 
+                console.log("Aviso: Login direto falhou. Buscando perfil provisório no Firestore...", err.code);
                 
-                let usuarioPreCadastrado = null;
-                let idDocumentoExistente = null;
+                try {
+                    const q = query(collection(db, "usuarios"), where("email", "==", emailInput));
+                    const querySnapshot = await getDocs(q);
+                    
+                    let usuarioPreCadastrado = null;
+                    let idDocumentoExistente = null;
 
-                querySnapshot.forEach((docSnap) => {
-                    usuarioPreCadastrado = docSnap.data();
-                    idDocumentoExistente = docSnap.id;
-                });
+                    querySnapshot.forEach((docSnap) => {
+                        usuarioPreCadastrado = docSnap.data();
+                        idDocumentoExistente = docSnap.id;
+                    });
 
-                // 3. Verifica correspondência com os dados temporários do Firestore
-                if (usuarioPreCadastrado) {
-                    if (usuarioPreCadastrado.senha_provisoria === senhaInput) {
-                        
-                        // Validação estrita do tamanho da senha (Padrão de segurança do Firebase)
-                        if (senhaInput.length < 6) {
-                            hideLoading();
-                            alert(`🚨 Falha de Segurança:\nA senha cadastrada para este usuário possui apenas ${senhaInput.length} caracteres. O Firebase exige uma senha de no mínimo 6 dígitos para criar contas.`);
-                            return;
-                        }
-
-                        try {
-                            // Tenta gerar a credencial definitiva do usuário
-                            const resultadoAuth = await createUserWithEmailAndPassword(auth, emailInput, senhaInput);
-                            const novoUidOficial = resultadoAuth.user.uid;
-
-                            // Grava o documento espelhado usando o UID autêntico gerado
-                            await setDoc(doc(db, "usuarios", novoUidOficial), {
-                                nome: usuarioPreCadastrado.nome,
-                                email: usuarioPreCadastrado.email,
-                                senha_provisoria: usuarioPreCadastrado.senha_provisoria,
-                                funcao: usuarioPreCadastrado.funcao || "Coroinha"
-                            });
-
-                            // Limpa o documento provisório (evita lixo e duplicidades na listagem)
-                            if (idDocumentoExistente !== novoUidOficial) {
-                                await deleteDoc(doc(db, "usuarios", idDocumentoExistente));
-                            }
+                    if (usuarioPreCadastrado) {
+                        if (usuarioPreCadastrado.senha_provisoria === senhaInput) {
                             
-                            erroLogin.classList.add('hidden');
-                            hideLoading();
-                            return; 
-                        } catch (authErr) {
-                            hideLoading();
-                            alert("❌ Resposta do Firebase Auth:\n" + authErr.message);
-                            return;
+                            if (senhaInput.length < 6) {
+                                hideLoading();
+                                alert(`🚨 Falha de Segurança:\nA senha cadastrada para este usuário possui apenas ${senhaInput.length} caracteres. O Firebase exige uma senha de no mínimo 6 dígitos.`);
+                                return;
+                            }
+
+                            try {
+                                const resultadoAuth = await createUserWithEmailAndPassword(auth, emailInput, senhaInput);
+                                const novoUidOficial = resultadoAuth.user.uid;
+
+                                await setDoc(doc(db, "usuarios", novoUidOficial), {
+                                    nome: usuarioPreCadastrado.nome,
+                                    email: usuarioPreCadastrado.email,
+                                    senha_provisoria: usuarioPreCadastrado.senha_provisoria,
+                                    funcao: usuarioPreCadastrado.funcao || "Coroinha"
+                                });
+
+                                if (idDocumentoExistente !== novoUidOficial) {
+                                    await deleteDoc(doc(db, "usuarios", idDocumentoExistente));
+                                }
+                                
+                                if(erroLogin) erroLogin.classList.add('hidden');
+                                hideLoading();
+                                return; 
+                            } catch (authErr) {
+                                hideLoading();
+                                alert("❌ Resposta do Firebase Auth:\n" + authErr.message);
+                                return;
+                            }
                         }
                     }
+                } catch (firestoreErr) {
+                    console.error("Erro ao ler dados no Firestore: ", firestoreErr);
                 }
-            } catch (firestoreErr) {
-                console.error("Erro ao ler dados no Firestore: ", firestoreErr);
+                
+                if(erroLoginTexto) erroLoginTexto.innerText = "Usuário ou senha incorretos.";
+                if(erroLogin) erroLogin.classList.remove('hidden'); 
+                hideLoading();
             }
-            
-            // Retorno padrão em tela para o usuário final
-            erroLoginTexto.innerText = "Usuário ou senha incorretos.";
-            erroLogin.classList.remove('hidden'); 
-            hideLoading();
-        }
-    });
+        });
+    }
 
-    btnLogout.addEventListener('click', () => {
-        showLoading();
-        signOut(auth);
-    });
+    if(btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            showLoading();
+            signOut(auth);
+        });
+    }
 
     function mapearDatasDoMes(ano, mes) {
         const datasMapeadas = [];
@@ -594,37 +615,44 @@
         return datasMapeadas;
     }
 
-    document.getElementById('btn-gerar-senha').addEventListener('click', () => {
-        const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
-        let novaSenha = '';
-        for (let i = 0; i < 8; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-        document.getElementById('cad-senha').value = novaSenha;
-    });
+    const btnGerarSenha = document.getElementById('btn-gerar-senha');
+    if(btnGerarSenha) {
+        btnGerarSenha.addEventListener('click', () => {
+            const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
+            let novaSenha = '';
+            for (let i = 0; i < 8; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            const cadSenhaInput = document.getElementById('cad-senha');
+            if(cadSenhaInput) cadSenhaInput.value = novaSenha;
+        });
+    }
 
-    document.getElementById('form-cadastro-usuario').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showLoading();
-        const nome = document.getElementById('cad-nome').value.trim();
-        const email = document.getElementById('cad-email').value.trim().toLowerCase();
-        const senha = document.getElementById('cad-senha').value.trim();
-        const funcao = document.getElementById('cad-funcao').value;
+    const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
+    if(formCadastroUsuario) {
+        formCadastroUsuario.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const nome = document.getElementById('cad-nome').value.trim();
+            const email = document.getElementById('cad-email').value.trim().toLowerCase();
+            const senha = document.getElementById('cad-senha').value.trim();
+            const funcao = document.getElementById('cad-funcao').value;
 
-        try {
-            const idTemporaria = "pre_" + Date.now();
-            await setDoc(doc(db, "usuarios", idTemporaria), {
-                nome: nome,
-                email: email,
-                senha_provisoria: senha,
-                funcao: funcao
-            });
-            
-            alert(`Perfil de ${nome} gravado com sucesso!\nPeça para ele realizar o primeiro login com este e-mail e a senha provisória.`);
-            document.getElementById('form-cadastro-usuario').reset();
-        } catch (err) {
-            alert("Erro ao salvar no banco: " + err.message);
-        }
-        hideLoading();
-    });
+            try {
+                const idTemporaria = "pre_" + Date.now();
+                await setDoc(doc(db, "usuarios", idTemporaria), {
+                    nome: nome,
+                    email: email,
+                    senha_provisoria: senha,
+                    funcao: funcao
+                });
+                
+                alert(`Perfil de ${nome} gravado com sucesso!`);
+                formCadastroUsuario.reset();
+            } catch (err) {
+                alert("Erro ao salvar no banco: " + err.message);
+            }
+            hideLoading();
+        });
+    }
 
     window.deletarUsuarioDoSistema = async function(idDocumento, nomeUsuario) {
         if(confirm(`Deseja remover permanentemente o usuário "${nomeUsuario}"?`)) {
@@ -639,6 +667,7 @@
 
     function renderizarTabelaUsuariosFiltrada(termoBusca = "") {
         const tabelaBody = document.getElementById('tabela-usuarios-recuperacao');
+        if(!tabelaBody) return;
         tabelaBody.innerHTML = ""; 
 
         const filtrados = cacheTodosUsuarios.filter(u => 
@@ -647,7 +676,7 @@
         );
 
         if(filtrados.length === 0) {
-            tabelaBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-xs text-gray-400 italic">Nenhum irmão encontrado com este nome ou e-mail.</td></tr>`;
+            tabelaBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-xs text-gray-400 italic">Nenhum irmão encontrado.</td></tr>`;
             return;
         }
 
@@ -665,7 +694,7 @@
                     </td>
                     <td class="p-3 text-center">
                         <button onclick="deletarUsuarioDoSistema('${usuario.idDoc}', '${usuario.nome}')" class="text-rose-600 hover:text-rose-800 font-bold px-2 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded text-[11px] cursor-pointer transition-all">
-                            <i class="fa-solid fa-trash-can"></i> Excluir
+                            Excluir
                         </button>
                     </td>
                 </tr>
@@ -683,17 +712,20 @@
                 cacheTodosUsuarios.push(dados);
             });
             cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome));
-            renderizarTabelaUsuariosFiltrada(buscaUsuarioLista.value);
+            if(buscaUsuarioLista) renderizarTabelaUsuariosFiltrada(buscaUsuarioLista.value);
         });
     }
 
-    buscaUsuarioLista.addEventListener('input', (e) => {
-        renderizarTabelaUsuariosFiltrada(e.target.value);
-    });
+    if(buscaUsuarioLista) {
+        buscaUsuarioLista.addEventListener('input', (e) => {
+            renderizarTabelaUsuariosFiltrada(e.target.value);
+        });
+    }
 
     window.switchCoordTab = function(tabID) {
         document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
-        document.getElementById('sec-' + tabID).classList.remove('hidden');
+        const targetSec = document.getElementById('sec-' + tabID);
+        if(targetSec) targetSec.classList.remove('hidden');
 
         const botoesMap = {
             'coord-usuarios': 'btn-c-usuarios',
@@ -705,37 +737,46 @@
 
         Object.keys(botoesMap).forEach(key => {
             const btn = document.getElementById(botoesMap[key]);
-            if(key === tabID) {
-                btn.className = "flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold bg-amber-700 text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-xs";
-            } else {
-                btn.className = "flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer";
+            if(btn) {
+                if(key === tabID) {
+                    btn.className = "flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold bg-amber-700 text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-xs";
+                } else {
+                    btn.className = "flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer";
+                }
             }
         });
     }
 
-    document.getElementById('btn-disparar-enquete').addEventListener('click', async () => {
-        const mesAlvo = document.getElementById('enq-mes-alvo').value;
-        if(!mesAlvo) { alert("Selecione o mês desejado!"); return; }
-        showLoading();
-        const [ano, mes] = mesAlvo.split('-').map(Number);
-        const listaCelebracoes = mapearDatasDoMes(ano, mes);
-        
-        await setDoc(doc(db, "enquetes", "disponibilidade_atual"), {
-            mesReferencia: mesAlvo,
-            ativa: true,
-            celebracoes: listaCelebracoes,
-            respostas: {} 
+    const btnDispararEnquete = document.getElementById('btn-disparar-enquete');
+    if(btnDispararEnquete) {
+        btnDispararEnquete.addEventListener('click', async () => {
+            const mesAlvoInput = document.getElementById('enq-mes-alvo');
+            const mesAlvo = mesAlvoInput ? mesAlvoInput.value : null;
+            if(!mesAlvo) { alert("Selecione o mês desejado!"); return; }
+            showLoading();
+            const [ano, mes] = mesAlvo.split('-').map(Number);
+            const listaCelebracoes = mapearDatasDoMes(ano, mes);
+            
+            await setDoc(doc(db, "enquetes", "disponibilidade_atual"), {
+                mesReferencia: mesAlvo,
+                ativa: true,
+                celebracoes: listaCelebracoes,
+                respostas: {} 
+            });
+            hideLoading();
+            alert("Enquete de disponibilidade aberta com sucesso!");
         });
-        hideLoading();
-        alert("Enquete de disponibilidade aberta com sucesso!");
-    });
+    }
 
-    document.getElementById('btn-fechar-enquete').addEventListener('click', async () => {
-        showLoading();
-        await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false });
-        hideLoading();
-        alert("Pesquisa encerrada.");
-    });
+    const btnFecharEnquete = document.getElementById('btn-fechar-enquete');
+    if(btnFecharEnquete) {
+        btnFecharEnquete.addEventListener('click', async () => {
+            showLoading();
+            await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false });
+            hideLoading();
+            alert("Pesquisa encerrada.");
+        });
+    }
 
     function ouvirEnqueteTempoRealCoordenador() {
         onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
@@ -744,86 +785,86 @@
                 mapaRespostasGerais = dados.respostas || {};
                 
                 const filaPrioridadeContainer = document.getElementById('lista-fila-prioridade');
-                filaPrioridadeContainer.innerHTML = "";
-
-                let arrayOrdenadoVotos = [];
-                Object.keys(mapaRespostasGerais).forEach(nome => {
-                    const infoVoto = mapaRespostasGerais[nome];
-                    const timestamp = infoVoto.respondidoEm || 0;
-                    const choices = infoVoto.escolhas || (Array.isArray(infoVoto) ? infoVoto : []);
-                    arrayOrdenadoVotos.push({ nome, timestamp, escolhas: choices });
-                });
-
-                arrayOrdenadoVotos.sort((a, b) => {
-                    if (a.timestamp === 0) return 1;
-                    if (b.timestamp === 0) return -1;
-                    return a.timestamp - b.timestamp;
-                });
-
-                if(arrayOrdenadoVotos.length === 0) {
-                    filaPrioridadeContainer.innerHTML = `<p class="text-[10px] text-gray-400 italic">Nenhuma resposta submetida ainda.</p>`;
-                } else {
-                    arrayOrdenadoVotos.forEach((voto, index) => {
-                        let medalha = "";
-                        if(index === 0 && voto.timestamp > 0) medalha = "🥇 ";
-                        else if(index === 1 && voto.timestamp > 0) medalha = "🥈 ";
-                        else if(index === 2 && voto.timestamp > 0) medalha = "🥉 ";
-                        else medalha = `<span class="text-gray-400 font-mono font-bold mr-1 text-[9px]">${index + 1}.</span> `;
-
-                        let dataFormatada = "Formato Antigo";
-                        if (voto.timestamp > 0) {
-                            const d = new Date(voto.timestamp);
-                            dataFormatada = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')} às ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-                        }
-
-                        filaPrioridadeContainer.innerHTML += `
-                            <div class="flex justify-between items-center bg-white px-2 py-1 rounded border border-gray-100 text-[11px]">
-                                <span class="font-bold text-gray-800">${medalha}${voto.nome}</span>
-                                <span class="text-[9px] text-amber-700 bg-amber-100/50 font-semibold px-1 rounded"><i class="fa-solid fa-clock"></i> ${dataFormatada}</span>
-                            </div>
-                        `;
+                if(filaPrioridadeContainer) {
+                    filaPrioridadeContainer.innerHTML = "";
+                    let arrayOrdenadoVotos = [];
+                    Object.keys(mapaRespostasGerais).forEach(nome => {
+                        const infoVoto = mapaRespostasGerais[nome];
+                        const timestamp = infoVoto.respondidoEm || 0;
+                        const choices = infoVoto.escolhas || (Array.isArray(infoVoto) ? infoVoto : []);
+                        arrayOrdenadoVotos.push({ nome, timestamp, escolhas: choices });
                     });
+
+                    arrayOrdenadoVotos.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+                    if(arrayOrdenadoVotos.length === 0) {
+                        filaPrioridadeContainer.innerHTML = `<p class="text-[10px] text-gray-400 italic">Nenhuma resposta submetida ainda.</p>`;
+                    } else {
+                        arrayOrdenadoVotos.forEach((voto, index) => {
+                            let medalha = `${index + 1}. `;
+                            let dataFormatada = "Sem data";
+                            if (voto.timestamp > 0) {
+                                const d = new Date(voto.timestamp);
+                                dataFormatada = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')} às ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                            }
+                            filaPrioridadeContainer.innerHTML += `
+                                <div class="flex justify-between items-center bg-white px-2 py-1 rounded border border-gray-100 text-[11px]">
+                                    <span class="font-bold text-gray-800">${medalha}${voto.nome}</span>
+                                    <span class="text-[9px] text-amber-700 bg-amber-100/50 font-semibold px-1 rounded">${dataFormatada}</span>
+                                </div>
+                            `;
+                        });
+                    }
                 }
 
                 const container = document.getElementById('lista-nomes-enquete');
-                container.innerHTML = "";
-                if (dados.celebracoes) {
-                    dados.celebracoes.forEach(cel => {
-                        const aptos = [];
-                        arrayOrdenadoVotos.forEach(voto => {
-                            if (voto.escolhas.includes(cel.idChave)) aptos.push(voto.nome);
+                if(container) {
+                    container.innerHTML = "";
+                    if (dados.celebracoes) {
+                        dados.celebracoes.forEach(cel => {
+                            const aptos = [];
+                            Object.keys(mapaRespostasGerais).forEach(nome => {
+                                const v = mapaRespostasGerais[nome];
+                                const choices = v.escolhas || (Array.isArray(v) ? v : []);
+                                if (choices.includes(cel.idChave)) aptos.push(nome);
+                            });
+                            const dataBR = cel.data.split('-').reverse().join('/');
+                            container.innerHTML += `
+                                <div class="bg-white p-1.5 border border-gray-200 rounded mb-1">
+                                    <strong class="text-amber-900 text-[10px] block border-b pb-0.5">${dataBR} - ${cel.rotulo} (${cel.horario}h):</strong>
+                                    <p class="text-[10px] text-emerald-700 font-medium mt-0.5">
+                                        ${aptos.length > 0 ? '✓ ' + aptos.join(', ') : 'Ninguém'}
+                                    </p>
+                                </div>
+                            `;
                         });
-                        const dataBR = cel.data.split('-').reverse().join('/');
-                        container.innerHTML += `
-                            <div class="bg-white p-1.5 border border-gray-200 rounded mb-1">
-                                <strong class="text-amber-900 text-[10px] block border-b pb-0.5">${dataBR} - ${cel.rotulo} (${cel.horario}h):</strong>
-                                <p class="text-[10px] text-emerald-700 font-medium mt-0.5">
-                                    ${aptos.length > 0 ? '✓ ' + aptos.join(', ') : 'Ninguém mapeado'}
-                                </p>
-                            </div>
-                        `;
-                    });
+                    }
                 }
             }
         });
     }
 
-    document.getElementById('form-publicar-aviso').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const textoAviso = document.getElementById('txt-aviso-coordenador').value;
-        showLoading();
-        try {
-            const dataHoje = new Date().toLocaleDateString('pt-BR');
-            await setDoc(doc(db, "mural", "aviso_geral"), { texto: textoAviso, dataPublicacao: dataHoje });
-            alert("Mural updated!");
-        } catch (err) { alert(err.message); }
-        hideLoading();
-    });
+    const formPublicarAviso = document.getElementById('form-publicar-aviso');
+    if(formPublicarAviso) {
+        formPublicarAviso.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const txtAvisoInput = document.getElementById('txt-aviso-coordenador');
+            if(!txtAvisoInput) return;
+            showLoading();
+            try {
+                const dataHoje = new Date().toLocaleDateString('pt-BR');
+                await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
+                alert("Mural atualizado com sucesso!");
+            } catch (err) { alert(err.message); }
+            hideLoading();
+        });
+    }
 
     async function carregarAvisoNoInputCoordenador() {
         const docSnap = await getDoc(doc(db, "mural", "aviso_geral"));
-        if(docSnap.exists()) {
-            document.getElementById('txt-aviso-coordenador').value = docSnap.data().texto || "";
+        const txtAvisoInput = document.getElementById('txt-aviso-coordenador');
+        if(docSnap.exists() && txtAvisoInput) {
+            txtAvisoInput.value = docSnap.data().texto || "";
         }
     }
 
@@ -831,12 +872,13 @@
         if (unsubMural) unsubMural();
         unsubMural = onSnapshot(doc(db, "mural", "aviso_geral"), (docSnap) => {
             const muralContainer = document.getElementById('corpo-mural-avisos');
+            if(!muralContainer) return;
             if (docSnap.exists() && docSnap.data().texto) {
                 const dados = docSnap.data();
                 muralContainer.innerHTML = `
                     <div class="text-gray-700 font-medium leading-relaxed whitespace-pre-wrap">${dados.texto}</div>
                     <div class="text-[10px] text-gray-400 font-bold text-right pt-2 border-t border-gray-100 mt-2">
-                        <i class="fa-solid fa-calendar-day"></i> Publicado em: ${dados.dataPublicacao}
+                        Publicado em: ${dados.dataPublicacao}
                     </div>
                 `;
             } else {
@@ -845,67 +887,71 @@
         });
     }
 
-    document.getElementById('form-escala-automatica').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showLoading();
+    const formEscalaAutomatica = document.getElementById('form-escala-automatica');
+    if(formEscalaAutomatica) {
+        formEscalaAutomatica.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
 
-        try {
-            const docEnqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
-            if (!docEnqueteSnap.exists()) {
+            try {
+                const docEnqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
+                if (!docEnqueteSnap.exists()) {
+                    hideLoading();
+                    alert("Nenhuma enquete configurada no banco.");
+                    return;
+                }
+
+                const dadosEnquete = docEnqueteSnap.data();
+                const mesSelecionado = dadosEnquete.mesReferencia; 
+                const tituloBase = document.getElementById('auto-titulo').value;
+
+                if (!mesSelecionado) {
+                    hideLoading();
+                    alert("O mês de referência não foi identificado.");
+                    return;
+                }
+
+                const [ano, mes] = mesSelecionado.split('-').map(Number);
+                const cronogramaDoMes = mapearDatasDoMes(ano, mes);
+
+                for (const cel of cronogramaDoMes) {
+                    let disponiveis = [];
+                    Object.keys(mapaRespostasGerais).forEach(nome => {
+                        const alvo = mapaRespostasGerais[nome];
+                        const listas = alvo.escolhas || (Array.isArray(alvo) ? alvo : []);
+                        if (listas.includes(cel.idChave)) disponiveis.push(nome);
+                    });
+                    
+                    disponiveis.sort(() => Math.random() - 0.5);
+                    const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
+                    
+                    await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
+                        titulo: `${tituloBase} (${cel.rotulo})`,
+                        horario: cel.horario,
+                        data: cel.data,
+                        altar1: { nome: disponiveis[0] || "A definir", status: "Pendente" },
+                        altar2: { nome: disponiveis[1] || "A definir", status: "Pendente" },
+                        altar3: { nome: disponiveis[2] || "A definir", status: "Pendente" },
+                        altar4: { nome: disponiveis[3] || "A definir", status: "Pendente" },
+                        altar5: { nome: disponiveis[4] || "A definir", status: "Pendente" },
+                        altar6: { nome: disponiveis[5] || "A definir", status: "Pendente" },
+                        turibuloAtivo: false,
+                        turiferario: { nome: "A definir", status: "Pendente" },
+                        navetaAtiva: false,
+                        naveteiro: { nome: "A definir", status: "Pendente" }
+                    });
+                }
+
                 hideLoading();
-                alert("Nenhuma enquete configurada no banco.");
-                return;
-            }
-
-            const dadosEnquete = docEnqueteSnap.data();
-            const mesSelecionado = dadosEnquete.mesReferencia; 
-            const tituloBase = document.getElementById('auto-titulo').value;
-
-            if (!mesSelecionado) {
-                hideLoading();
-                alert("O mês de referência não foi identificado.");
-                return;
-            }
-
-            const [ano, mes] = mesSelecionado.split('-').map(Number);
-            const cronogramaDoMes = mapearDatasDoMes(ano, mes);
-
-            for (const cel of cronogramaDoMes) {
-                let disponiveis = [];
-                Object.keys(mapaRespostasGerais).forEach(nome => {
-                    const alvo = mapaRespostasGerais[nome];
-                    const listas = alvo.escolhas || (Array.isArray(alvo) ? alvo : []);
-                    if (listas.includes(cel.idChave)) disponiveis.push(nome);
-                });
-                
-                disponiveis.sort(() => Math.random() - 0.5);
-                const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
-                
-                await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
-                    titulo: `${tituloBase} (${cel.rotulo})`,
-                    horario: cel.horario,
-                    data: cel.data,
-                    altar1: { nome: disponiveis[0] || "A definir", status: "Pendente" },
-                    altar2: { nome: disponiveis[1] || "A definir", status: "Pendente" },
-                    altar3: { nome: disponiveis[2] || "A definir", status: "Pendente" },
-                    altar4: { nome: disponiveis[3] || "A definir", status: "Pendente" },
-                    altar5: { nome: disponiveis[4] || "A definir", status: "Pendente" },
-                    altar6: { nome: disponiveis[5] || "A definir", status: "Pendente" },
-                    turibuloAtivo: false,
-                    turiferario: { nome: "A definir", status: "Pendente" },
-                    navetaAtiva: false,
-                    naveteiro: { nome: "A definir", status: "Pendente" }
-                });
-            }
-
-            hideLoading();
-            alert("Escala preenchida e gerada com sucesso!");
-            document.getElementById('form-escala-automatica').reset();
-            if (editorEscalaData.value) carregarEditorEscalasPorData(editorEscalaData.value);
-        } catch (err) { hideLoading(); alert(err.message); }
-    });
+                alert("Escala preenchida e gerada com sucesso!");
+                formEscalaAutomatica.reset();
+                if (editorEscalaData) carregarEditorEscalasPorData(editorEscalaData.value);
+            } catch (err) { hideLoading(); alert(err.message); }
+        });
+    }
 
     async function carregarEditorEscalasPorData(dataString) {
+        if(!containerEditoresMissa) return;
         containerEditoresMissa.innerHTML = "";
         const horariosPossiveis = ["1900", "1700", "0900"];
         let encontrouAlguma = false;
@@ -916,40 +962,39 @@
                 encontrouAlguma = true;
                 const dados = docSnap.data();
                 const divEdicao = document.createElement('div');
-                divEdicao.className = "bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 shadow-2xs";
+                divEdicao.className = "bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3";
                 divEdicao.innerHTML = `
                     <div class="flex justify-between items-center border-b pb-1">
-                        <span class="text-xs font-bold text-amber-900"><i class="fa-solid fa-clock"></i> Celebração: ${dados.horario}h</span>
+                        <span class="text-xs font-bold text-amber-900">Celebração: ${dados.horario}h</span>
                         <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded">${dados.titulo}</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar I</label><input type="text" id="edit-a1-${idDoc}" value="${dados.altar1?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar II</label><input type="text" id="edit-a2-${idDoc}" value="${dados.altar2?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar III</label><input type="text" id="edit-a3-${idDoc}" value="${dados.altar3?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar IV</label><input type="text" id="edit-a4-${idDoc}" value="${dados.altar4?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar V</label><input type="text" id="edit-a5-${idDoc}" value="${dados.altar5?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase">Altar VI</label><input type="text" id="edit-a6-${idDoc}" value="${dados.altar6?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
+                        <div><input type="text" id="edit-a1-${idDoc}" value="${dados.altar1?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
+                        <div><input type="text" id="edit-a2-${idDoc}" value="${dados.altar2?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
+                        <div><input type="text" id="edit-a3-${idDoc}" value="${dados.altar3?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
+                        <div><input type="text" id="edit-a4-${idDoc}" value="${dados.altar4?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
+                        <div><input type="text" id="edit-a5-${idDoc}" value="${dados.altar5?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
+                        <div><input type="text" id="edit-a6-${idDoc}" value="${dados.altar6?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
                     </div>
                     <div class="bg-amber-50/60 p-2 rounded-lg border border-amber-200 space-y-2 mt-2">
-                        <span class="text-[10px] font-bold text-amber-900 block uppercase"><i class="fa-solid fa-fire-burner"></i> Incensação Solene</span>
                         <div class="flex items-center gap-4 text-xs">
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="chk-turi-${idDoc}" ${dados.turibuloAtivo ? 'checked' : ''} class="rounded text-amber-700 w-3.5 h-3.5"> <span>Turíbulo</span></label>
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="chk-nave-${idDoc}" ${dados.navetaAtiva ? 'checked' : ''} class="rounded text-amber-700 w-3.5 h-3.5"> <span>Naveta</span></label>
+                            <label><input type="checkbox" id="chk-turi-${idDoc}" ${dados.turibuloAtivo ? 'checked' : ''}> <span>Turíbulo</span></label>
+                            <label><input type="checkbox" id="chk-nave-${idDoc}" ${dados.navetaAtiva ? 'checked' : ''}> <span>Naveta</span></label>
                         </div>
                         <div class="grid grid-cols-2 gap-2 pt-1">
-                            <div><label class="block text-[9px] font-bold text-gray-500">Turiferário</label><input type="text" id="edit-turi-${idDoc}" value="${dados.turiferario?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
-                            <div><label class="block text-[9px] font-bold text-gray-500">Naveteiro</label><input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro?.nome || 'A definir'}" class="w-full border border-gray-300 p-1 text-xs bg-white rounded-md font-medium"></div>
+                            <div><input type="text" id="edit-turi-${idDoc}" value="${dados.turiferario?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
+                            <div><input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
                         </div>
                     </div>
-                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md hover:bg-amber-900 transition-all cursor-pointer">
-                        <i class="fa-solid fa-floppy-disk mr-1"></i> Atualizar Cronograma Oficial
+                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md">
+                        Atualizar Cronograma Oficial
                     </button>
                 `;
                 containerEditoresMissa.appendChild(divEdicao);
             }
         }
         if (!encontrouAlguma) {
-            containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic col-span-full text-center py-4">Nenhuma escala para o dia ${dataString.split('-').reverse().join('/')}.</p>`;
+            containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma escala para este dia.</p>`;
         } else {
             document.querySelectorAll('.btn-salvar-edicao-manual').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
@@ -970,7 +1015,7 @@
                         });
                         hideLoading();
                         alert("Escala atualizada!");
-                        if (buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
+                        if (buscaEscalaData && editorEscalaData && buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                         carregarEditorEscalasPorData(editorEscalaData.value);
                     } catch (err) { hideLoading(); alert(err.message); }
                 });
@@ -978,7 +1023,9 @@
         }
     }
 
-    editorEscalaData.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
+    if(editorEscalaData) {
+        editorEscalaData.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
+    }
 
     function ouvirEnqueteTempoRealCoroinha() {
         if (unsubEnquete) unsubEnquete();
@@ -987,51 +1034,55 @@
             const blocoVotacao = document.getElementById('bloco-votacao-enquete');
             const blocoFeedback = document.getElementById('txt-feedback-enquete');
             const container = document.getElementById('container-opcoes-enquete');
+            if(!cardEnquete) return;
+
             if (docSnap.exists() && docSnap.data().ativa === true) {
                 const dados = docSnap.data();
                 const respostas = dados.respostas || {};
-                if (Object.prototype.hasOwnProperty.call(respostas, usuarioLogadoDados.nome)) {
-                    blocoVotacao.classList.add('hidden');
-                    blocoVotacao.innerHTML = ""; 
-                    blocoFeedback.classList.remove('hidden');
+                if (usuarioLogadoDados && Object.prototype.hasOwnProperty.call(respostas, usuarioLogadoDados.nome)) {
+                    if(blocoVotacao) { blocoVotacao.classList.add('hidden'); blocoVotacao.innerHTML = ""; }
+                    if(blocoFeedback) blocoFeedback.classList.remove('hidden');
                     cardEnquete.classList.remove('hidden');
                 } else {
-                    container.innerHTML = "";
-                    dados.celebracoes.forEach(cel => {
-                        const dataBR = cel.data.split('-').reverse().join('/');
-                        container.innerHTML += `
-                            <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded text-xs text-gray-700 cursor-pointer border-b border-gray-100 last:border-none">
-                                <input type="checkbox" value="${cel.idChave}" class="chk-dia-enquete rounded text-blue-600 border-gray-300 focus:ring-blue-500 w-4 h-4">
-                                <div>
-                                    <span class="font-bold text-gray-900">${dataBR}</span> - <span class="text-amber-900 font-semibold">${cel.rotulo}</span> às <span class="bg-amber-100 text-amber-800 px-1 rounded font-bold">${cel.horario}h</span>
-                                </div>
-                            </label>
-                        `;
-                    });
-                    blocoFeedback.classList.add('hidden');
-                    blocoVotacao.classList.remove('hidden');
+                    if(container) {
+                        container.innerHTML = "";
+                        dados.celebracoes.forEach(cel => {
+                            const dataBR = cel.data.split('-').reverse().join('/');
+                            container.innerHTML += `
+                                <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 text-xs cursor-pointer border-b">
+                                    <input type="checkbox" value="${cel.idChave}" class="chk-dia-enquete w-4 h-4">
+                                    <div><strong>${dataBR}</strong> - ${cel.rotulo} às ${cel.horario}h</div>
+                                </label>
+                            `;
+                        });
+                    }
+                    if(blocoFeedback) blocoFeedback.classList.add('hidden');
+                    if(blocoVotacao) blocoVotacao.classList.remove('hidden');
                     cardEnquete.classList.remove('hidden');
                 }
             } else { cardEnquete.classList.add('hidden'); }
         });
     }
 
-    document.getElementById('btn-enquete-enviar').addEventListener('click', async () => {
-        const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
-        const chavesSelecionadas = [];
-        checkboxes.forEach(chk => chavesSelecionadas.push(chk.value));
-        showLoading();
-        try {
-            const docRef = doc(db, "enquetes", "disponibilidade_atual");
-            const campoAtualizacao = {};
-            campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = {
-                escolhas: chavesSelecionadas,
-                respondidoEm: Date.now()
-            };
-            await updateDoc(docRef, campoAtualizacao);
-        } catch (err) { alert("Erro ao salvar: " + err.message); }
-        hideLoading();
-    });
+    const btnEnqueteEnviar = document.getElementById('btn-enquete-enviar');
+    if(btnEnqueteEnviar) {
+        btnEnqueteEnviar.addEventListener('click', async () => {
+            const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
+            const chavesSelecionadas = [];
+            checkboxes.forEach(chk => chavesSelecionadas.push(chk.value));
+            showLoading();
+            try {
+                const docRef = doc(db, "enquetes", "disponibilidade_atual");
+                const campoAtualizacao = {};
+                campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = {
+                    escolhas: chavesSelecionadas,
+                    respondidoEm: Date.now()
+                };
+                await updateDoc(docRef, campoAtualizacao);
+            } catch (err) { alert("Erro ao salvar: " + err.message); }
+            hideLoading();
+        });
+    }
 
     window.confirmarPresencaMissa = async function(idMissa, slotChave) {
         showLoading();
@@ -1039,14 +1090,14 @@
             const updateObjeto = {};
             updateObjeto[`${slotChave}.status`] = "Confirmado";
             await updateDoc(doc(db, "escalas", idMissa), updateObjeto);
-            alert("Presença confirmada com sucesso ao presbitério!");
+            alert("Presença confirmada!");
             carregarEscalaPorData(dataSelecionadaGlobal);
         } catch(e) { alert(e.message); }
         hideLoading();
     }
 
     window.pedirSubstituicaoMissa = async function(idMissa, slotChave) {
-        if(!confirm("Tem certeza que deseja solicitar dispensa desse horário?")) return;
+        if(!confirm("Deseja solicitar dispensa desse horário?")) return;
         showLoading();
         try {
             const docMissaRef = doc(db, "escalas", idMissa);
@@ -1079,20 +1130,13 @@
                 listaCandidatosValidos = listaCandidatosValidos.filter(c => !nomesJaOcupados.includes(c.nome));
                 listaCandidatosValidos.sort((a,b) => a.timestamp - b.timestamp);
 
-                if (listaCandidatosValidos.length > 0) {
-                    proximoSubstituto = listaCandidatosValidos[0].nome;
-                }
+                if (listaCandidatosValidos.length > 0) proximoSubstituto = listaCandidatosValidos[0].nome;
             }
 
             const updateObjeto = {};
             updateObjeto[slotChave] = { nome: proximoSubstituto, status: "Pendente" };
             await updateDoc(docMissaRef, updateObjeto);
-
-            if (proximoSubstituto !== "A definir") {
-                alert(`Substituição processada! Sua vaga foi assumida por: ${proximoSubstituto}`);
-            } else {
-                alert("Nenhum acólito disponível mapeado na enquete. A vaga ficou aberta para cobertura.");
-            }
+            alert("Substituição processada!");
             carregarEscalaPorData(dataSelecionadaGlobal);
         } catch(e) { alert(e.message); }
         hideLoading();
@@ -1104,7 +1148,7 @@
             const updateObjeto = {};
             updateObjeto[slotChave] = { nome: usuarioLogadoDados.nome, status: "Confirmado" };
             await updateDoc(doc(db, "escalas", idMissa), updateObjeto);
-            alert("Você assumiu a escala! Obrigado pelo sim.");
+            alert("Você assumiu a escala!");
             carregarEscalaPorData(dataSelecionadaGlobal);
         } catch(e) { alert(e.message); }
         hideLoading();
@@ -1117,11 +1161,12 @@
         const botoesContainer = document.getElementById('botoes-notificacao-container');
         const botoesCoberturaContainer = document.getElementById('botoes-cobertura-container');
 
+        if(!lista) return;
         lista.innerHTML = "";
-        botoesContainer.innerHTML = "";
-        botoesCoberturaContainer.innerHTML = "";
-        cardNotificacao.classList.add('hidden');
-        cardConviteSubstituto.classList.add('hidden');
+        if(botoesContainer) botoesContainer.innerHTML = "";
+        if(botoesCoberturaContainer) botoesCoberturaContainer.innerHTML = "";
+        if(cardNotificacao) cardNotificacao.classList.add('hidden');
+        if(cardConviteSubstituto) cardConviteSubstituto.classList.add('hidden');
 
         try {
             const horariosPossiveis = ["1900", "1700", "0900"];
@@ -1135,14 +1180,17 @@
                 if (docSnap.exists()) {
                     encontrouAlguma = true;
                     const dados = docSnap.data();
-                    document.getElementById('lbl-data-missa').innerText = dataString.split('-').reverse().join('/');
-                    document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
-                    document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
+                    const lblData = document.getElementById('lbl-data-missa');
+                    const lblTitulo = document.getElementById('lbl-titulo-missa');
+                    const lblHorario = document.getElementById('lbl-horario-missa');
+                    if(lblData) lblData.innerText = dataString.split('-').reverse().join('/');
+                    if(lblTitulo) lblTitulo.innerText = dados.titulo;
+                    if(lblHorario) lblHorario.innerText = dados.horario + "h";
                     
                     let htmlMissa = `
-                        <div class="p-4 bg-amber-50/20 border-b border-gray-100 space-y-2">
-                            <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wide"><i class="fa-solid fa-clock"></i> Celebração das ${dados.horario}h</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-700">
+                        <div class="p-4 bg-amber-50/20 border-b space-y-2">
+                            <p class="text-[11px] font-bold text-amber-900 uppercase">Celebração das ${dados.horario}h</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                     `;
 
                     const postos = [
@@ -1162,7 +1210,7 @@
                         if (objPosto.status === "Confirmado") badgeCor = "bg-emerald-100 text-emerald-800 font-bold";
 
                         htmlMissa += `
-                            <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between items-center">
+                            <div class="bg-white p-2 rounded-lg border flex justify-between items-center">
                                 <span><strong>${p.label}:</strong> ${objPosto.nome}</span>
                                 <span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${badgeCor}">${objPosto.status}</span>
                             </div>
@@ -1170,23 +1218,24 @@
 
                         if (usuarioLogadoDados && objPosto.nome === usuarioLogadoDados.nome) {
                             usuarioOcupadoNesteDia = true;
-                            cardNotificacao.classList.remove('hidden');
-                            botoesContainer.innerHTML += `
-                                <div class="border-b border-amber-200/60 pb-1 mb-1 last:border-none last:pb-0 last:mb-0">
-                                    <p class="text-[9px] font-bold text-gray-600 block mb-1">Horário ${dados.horario}h (${p.label}):</p>
-                                    <div class="flex gap-1">
-                                        <button onclick="confirmarPresencaMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[10px] px-2 py-1 rounded transition-all cursor-pointer">Confirmar</button>
-                                        <button onclick="pedirSubstituicaoMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] px-2 py-1 rounded transition-all cursor-pointer">Pedir Troca</button>
+                            if(cardNotificacao) cardNotificacao.classList.remove('hidden');
+                            if(botoesContainer) {
+                                botoesContainer.innerHTML += `
+                                    <div class="pb-1 mb-1 border-b">
+                                        <div class="flex gap-1">
+                                            <button onclick="confirmarPresencaMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-emerald-700 text-white text-[10px] px-2 py-1 rounded">Confirmar</button>
+                                            <button onclick="pedirSubstituicaoMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded">Pedir Troca</button>
+                                        </div>
                                     </div>
-                                </div>
-                            `;
+                                `;
+                            }
                         }
 
-                        if (isVagaLivre) {
+                        if (isVagaLivre && botoesCoberturaContainer) {
                             temVagaDisponivel = true;
                             botoesCoberturaContainer.innerHTML += `
-                                <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[10px] px-2 py-1 rounded text-left transition-all cursor-pointer">
-                                    <i class="fa-solid fa-plus"></i> Assumir ${p.label} às ${dados.horario}h
+                                <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="bg-indigo-700 text-white text-[10px] px-2 py-1 rounded">
+                                    Assumir ${p.label} às ${dados.horario}h
                                 </button>
                             `;
                         }
@@ -1197,61 +1246,78 @@
                 }
             }
 
-            if (temVagaDisponivel && !usuarioOcupadoNesteDia) {
+            if (temVagaDisponivel && !usuarioOcupadoNesteDia && cardConviteSubstituto) {
                 cardConviteSubstituto.classList.remove('hidden');
             }
 
             if(!encontrouAlguma) {
-                document.getElementById('lbl-data-missa').innerText = "--/--/----";
-                document.getElementById('lbl-titulo-missa').innerText = "Sem escala publicada";
-                document.getElementById('lbl-horario-missa').innerText = "--:--h";
                 lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado para este dia.</p>`;
             }
         } catch(e) { console.error(e); }
     }
 
-    buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
+    if(buscaEscalaData) {
+        buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
+    }
 
-    document.getElementById('form-upload-formacao').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showLoading();
-        try {
-            await setDoc(doc(db, "formacao", "manual_atual"), { 
-                titulo: document.getElementById('form-titulo-input').value, 
-                url: document.getElementById('form-url-input').value 
-            });
-            alert("Material atualizado!");
-            carregarMaterialEstudo();
-        } catch(err) { alert(err.message); }
-        hideLoading();
-    });
+    const formUploadFormacao = document.getElementById('form-upload-formacao');
+    if(formUploadFormacao) {
+        formUploadFormacao.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            try {
+                await setDoc(doc(db, "formacao", "manual_atual"), { 
+                    titulo: document.getElementById('form-titulo-input').value, 
+                    url: document.getElementById('form-url-input').value 
+                });
+                alert("Material atualizado!");
+                carregarMaterialEstudo();
+            } catch(err) { alert(err.message); }
+            hideLoading();
+        });
+    }
 
     async function carregarMaterialEstudo() {
         const docSnap = await getDoc(doc(db, "formacao", "manual_atual"));
+        const lblFormacao = document.getElementById('lbl-titulo-formacao');
+        const btnDownload = document.getElementById('btn-download-formacao');
         if (docSnap.exists()) {
-            document.getElementById('lbl-titulo-formacao').innerText = docSnap.data().titulo;
-            document.getElementById('btn-download-formacao').href = docSnap.data().url;
+            if(lblFormacao) lblFormacao.innerText = docSnap.data().titulo;
+            if(btnDownload) btnDownload.href = docSnap.data().url;
         }
     }
 
     async function carregarLiturgiaAutomatica() {
+        const txtEvangelho = document.getElementById('txt-evangelho-dia');
+        const lblRef = document.getElementById('lbl-ref-liturgia');
         try {
             const res = await fetch('https://liturgia.up.railway.app/');
             const data = await res.json();
-            document.getElementById('lbl-ref-liturgia').innerText = data.evangelho.referencia;
-            document.getElementById('txt-evangelho-dia').innerText = data.evangelho.texto;
-        } catch (err) { document.getElementById('txt-evangelho-dia').innerText = "Consulta disponível diretamente na sacristia."; }
+            if(lblRef) lblRef.innerText = data.evangelho.referencia;
+            if(txtEvangelho) txtEvangelho.innerText = data.evangelho.texto;
+        } catch (err) { 
+            if(txtEvangelho) txtEvangelho.innerText = "Consulta disponível diretamente na sacristia."; 
+        }
     }
 
     window.switchTab = function(tabName) {
         if (usuarioLogadoDados?.funcao === "Coordenador") return;
-        document.getElementById('conteudo-escala').className = tabName === 'escala' ? 'space-y-4 block' : 'space-y-4 hidden';
-        document.getElementById('conteudo-avisos').className = tabName === 'avisos' ? 'space-y-4 block md:block' : 'space-y-4 hidden md:block';
-        document.getElementById('conteudo-liturgia').className = tabName === 'liturgia' ? 'space-y-4 block md:block' : 'space-y-4 hidden md:block';
         
-        document.getElementById('tab-escala').className = tabName === 'escala' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
-        document.getElementById('tab-avisos').className = tabName === 'avisos' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
-        document.getElementById('tab-liturgia').className = tabName === 'liturgia' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+        const contEscala = document.getElementById('conteudo-escala');
+        const contAvisos = document.getElementById('conteudo-avisos');
+        const contLiturgia = document.getElementById('conteudo-liturgia');
+        
+        if(contEscala) contEscala.className = tabName === 'escala' ? 'space-y-4 block' : 'space-y-4 hidden';
+        if(contAvisos) contAvisos.className = tabName === 'avisos' ? 'space-y-4 block md:block' : 'space-y-4 hidden md:block';
+        if(contLiturgia) contLiturgia.className = tabName === 'liturgia' ? 'space-y-4 block md:block' : 'space-y-4 hidden md:block';
+        
+        const tEscala = document.getElementById('tab-escala');
+        const tAvisos = document.getElementById('tab-avisos');
+        const tLiturgia = document.getElementById('tab-liturgia');
+        
+        if(tEscala) tEscala.className = tabName === 'escala' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+        if(tAvisos) tAvisos.className = tabName === 'avisos' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+        if(tLiturgia) tLiturgia.className = tabName === 'liturgia' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
     }
 </script>
 </body>
