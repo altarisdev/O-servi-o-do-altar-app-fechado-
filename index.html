@@ -108,11 +108,11 @@
                             <div class="bg-white/20 p-2 rounded-xl text-lg"><i class="fa-solid fa-clipboard-question"></i></div>
                             <div>
                                 <h3 class="text-sm font-black tracking-wide">Pesquisa de Disponibilidade Aberta!</h3>
-                                <p class="text-[11px] text-blue-100">Marque todas as celebrações em que você poderá servir no próximo mês.</p>
+                                <p class="text-[11px] text-blue-100">Marque individualmente os horários específicos em que você pode servir.</p>
                             </div>
                         </div>
                         
-                        <div id="bloco-votacao-enquete" class="bg-white text-gray-800 rounded-xl p-3 max-h-48 overflow-y-auto space-y-1.5">
+                        <div id="bloco-votacao-enquete" class="bg-white text-gray-800 rounded-xl p-3 max-h-64 overflow-y-auto space-y-1.5">
                             <div id="container-opcoes-enquete" class="space-y-1"></div>
                             <button id="btn-enquete-enviar" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-lg text-xs transition-all mt-2 cursor-pointer">
                                 Enviar Minha Disponibilidade
@@ -142,14 +142,12 @@
                             <div class="flex gap-2.5 items-start">
                                 <i class="fa-solid fa-bell text-amber-700 text-sm mt-0.5"></i>
                                 <div>
-                                    <p class="text-xs font-bold text-amber-900">Você está escalado para esta celebração!</p>
-                                    <p class="text-[10px] text-gray-500 font-medium">Confirme sua presença ou solicite um substituto imediatamente.</p>
+                                    <p class="text-xs font-bold text-amber-900">Você está alocado em um horário neste dia!</p>
+                                    <p class="text-[10px] text-gray-500 font-medium">Escolha uma ação para o seu horário correspondente.</p>
                                 </div>
                             </div>
-                            <div class="flex gap-2 w-full sm:w-auto">
-                                <button class="flex-1 sm:flex-none bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[11px] px-3 py-1.5 rounded-md transition-all cursor-pointer">Confirmar</button>
-                                <button class="flex-1 sm:flex-none bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] px-3 py-1.5 rounded-md transition-all cursor-pointer">Pedir Troca</button>
-                            </div>
+                            <div id="botoes-notificacao-container" class="flex flex-col gap-2 w-full sm:w-auto">
+                                </div>
                         </div>
 
                         <div id="card-convite-substituto" class="hidden bg-indigo-50 p-4 border-t-2 border-indigo-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -157,12 +155,10 @@
                                 <i class="fa-solid fa-handshake-angle text-indigo-700 text-sm mt-0.5"></i>
                                 <div>
                                     <p class="text-xs font-bold text-indigo-900">Vaga disponível nesta escala!</p>
-                                    <p class="text-[10px] text-gray-500 font-medium">Um irmão pediu substituição. Deseja cobrir essa vaga?</p>
+                                    <p class="text-[10px] text-gray-500 font-medium">Um irmão pediu substituição ou a vaga está aberta. Deseja cobrir?</p>
                                 </div>
                             </div>
-                            <button class="w-full sm:w-auto bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[11px] px-4 py-1.5 rounded-md transition-all cursor-pointer">
-                                Cobrir Vaga
-                            </button>
+                            <div id="botoes-cobertura-container" class="flex flex-col gap-1 w-full sm:w-auto"></div>
                         </div>
                     </div>
                 </div>
@@ -413,14 +409,13 @@
         let mapaRespostasGerais = {}; 
         let unsubEnquete = null;
         let unsubMural = null;
-        let missaAtivaParaRespostaCoroinha = null; 
 
         const CRONOGRAMA_PAROQUIA = [
             { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
             { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
             { diaSemana: 6, horario: "19:00", rotulo: "Sábado" },
-            { diaSemana: 0, horario: "09:00", rotulo: "Domingo" },
-            { diaSemana: 0, horario: "19:00", rotulo: "Domingo" }
+            { diaSemana: 0, horario: "09:00", rotulo: "Domingo de Manhã" },
+            { diaSemana: 0, horario: "19:00", rotulo: "Domingo de Noite" }
         ];
 
         function showLoading() {
@@ -520,7 +515,7 @@
                 correspondencias.forEach(item => {
                     const dataString = dataCorrente.toISOString().split('T')[0];
                     datasMapeadas.push({
-                        idChave: `${dataString}_${item.horario}`, 
+                        idChave: `${dataString}_${item.horario.replace(':', '')}`, 
                         data: dataString,
                         horario: item.horario,
                         rotulo: item.rotulo
@@ -702,7 +697,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: textoAviso, dataPublicacao: dataHoje });
-                alert("Mural atualizado!");
+                alert("Mural updated!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
@@ -890,7 +885,7 @@
                                 <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded text-xs text-gray-700 cursor-pointer border-b border-gray-100 last:border-none">
                                     <input type="checkbox" value="${cel.idChave}" class="chk-dia-enquete rounded text-blue-600 border-gray-300 focus:ring-blue-500 w-4 h-4">
                                     <div>
-                                        <span class="font-bold text-gray-900">${dataBR}</span> - ${cel.rotulo} às <span class="bg-amber-100 text-amber-800 px-1 rounded font-bold">${cel.horario}h</span>
+                                        <span class="font-bold text-gray-900">${dataBR}</span> - <span class="text-amber-900 font-semibold">${cel.rotulo}</span> às <span class="bg-amber-100 text-amber-800 px-1 rounded font-bold">${cel.horario}h</span>
                                     </div>
                                 </label>
                             `;
@@ -911,28 +906,118 @@
             try {
                 const docRef = doc(db, "enquetes", "disponibilidade_atual");
                 const campoAtualizacao = {};
-                
                 campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = {
                     escolhas: chavesSelecionadas,
                     respondidoEm: Date.now()
                 };
-                
                 await updateDoc(docRef, campoAtualizacao);
             } catch (err) { alert("Erro ao salvar: " + err.message); }
             hideLoading();
         });
 
+        // FUNÇÃO DE CONFIRMAÇÃO DIRETA NA ESCALA
+        window.confirmarPresencaMissa = async function(idMissa, slotChave) {
+            showLoading();
+            try {
+                const updateObjeto = {};
+                updateObjeto[`${slotChave}.status`] = "Confirmado";
+                await updateDoc(doc(db, "escalas", idMissa), updateObjeto);
+                alert("Presença confirmada com sucesso ao presbitério!");
+                carregarEscalaPorData(dataSelecionadaGlobal);
+            } catch(e) { alert(e.message); }
+            hideLoading();
+        }
+
+        // SISTEMA AUTOMÁTICO DE FILA DE SUBSTITUIÇÃO
+        window.pedirSubstituicaoMissa = async function(idMissa, slotChave) {
+            if(!confirm("Tem certeza que deseja solicitar dispensa desse horário? O sistema tentará passar a vaga para o próximo irmão disponível automaticamente.")) return;
+            showLoading();
+            try {
+                const docMissaRef = doc(db, "escalas", idMissa);
+                const docMissaSnap = await getDoc(docMissaRef);
+                const dadosMissa = docMissaSnap.data();
+
+                const docEnqueteSnap = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
+                let proximoSubstituto = "A definir";
+
+                if (docEnqueteSnap.exists()) {
+                    const dadosEnquete = docEnqueteSnap.data();
+                    const respostas = dadosEnquete.respostas || {};
+                    
+                    // Extrai a chave de id da enquete baseada no ID do documento de escala (data_horario)
+                    const [dataEscala, hrEscala] = idMissa.split('_');
+                    const chaveEnqueteBuscada = `${dataEscala}_${hrEscala}`;
+
+                    let listaCandidatosValidos = [];
+                    Object.keys(respostas).forEach(nome => {
+                        const r = respostas[nome];
+                        const escolhas = r.escolhas || (Array.isArray(r) ? r : []);
+                        if (escolhas.includes(chaveEnqueteBuscada) && nome !== usuarioLogadoDados.nome) {
+                            listaCandidatosValidos.push({ nome, timestamp: r.respondidoEm || 0 });
+                        }
+                    });
+
+                    // Filtra para remover quem já está servindo em outro posto nessa mesma missa
+                    const nomesJaOcupados = [
+                        dadosMissa.altar1?.nome, dadosMissa.altar2?.nome, dadosMissa.altar3?.nome,
+                        dadosMissa.altar4?.nome, dadosMissa.altar5?.nome, dadosMissa.altar6?.nome,
+                        dadosMissa.turiferario?.nome, dadosMissa.naveteiro?.nome
+                    ];
+                    listaCandidatosValidos = listaCandidatosValidos.filter(c => !nomesJaOcupados.includes(c.nome));
+
+                    // Ordena por ordem de quem enviou primeiro a enquete (fila de prioridade justa)
+                    listaCandidatosValidos.sort((a,b) => a.timestamp - b.timestamp);
+
+                    if (listaCandidatosValidos.length > 0) {
+                        proximoSubstituto = listaCandidatosValidos[0].nome;
+                    }
+                }
+
+                const updateObjeto = {};
+                updateObjeto[slotChave] = { nome: proximoSubstituto, status: "Pendente" };
+                await updateDoc(docMissaRef, updateObjeto);
+
+                if (proximoSubstituto !== "A definir") {
+                    alert(`Substituição processada! Sua vaga foi assumida por: ${proximoSubstituto}`);
+                } else {
+                    alert("Nenhum acólito disponível mapeado na enquete para este horário. A vaga ficou aberta para cobertura manual.");
+                }
+                carregarEscalaPorData(dataSelecionadaGlobal);
+            } catch(e) { alert(e.message); }
+            hideLoading();
+        }
+
+        window.cobrirVagaAberta = async function(idMissa, slotChave) {
+            showLoading();
+            try {
+                const updateObjeto = {};
+                updateObjeto[slotChave] = { nome: usuarioLogadoDados.nome, status: "Confirmado" };
+                await updateDoc(doc(db, "escalas", idMissa), updateObjeto);
+                alert("Você assumiu a escala! Obrigado pelo sim.");
+                carregarEscalaPorData(dataSelecionadaGlobal);
+            } catch(e) { alert(e.message); }
+            hideLoading();
+        }
+
         async function carregarEscalaPorData(dataString) {
             dataSelecionadaGlobal = dataString;
             const lista = document.getElementById('lista-presbiterio');
             const cardNotificacao = document.getElementById('card-notificacao');
+            const botoesContainer = document.getElementById('botoes-notificacao-container');
+            const botoesCoberturaContainer = document.getElementById('botoes-cobertura-container');
+
             lista.innerHTML = "";
+            botoesContainer.innerHTML = "";
+            botoesCoberturaContainer.innerHTML = "";
             cardNotificacao.classList.add('hidden');
             cardConviteSubstituto.classList.add('hidden');
-            missaAtivaParaRespostaCoroinha = null;
+
             try {
                 const horariosPossiveis = ["1900", "1700", "0900"];
                 let encontrouAlguma = false;
+                let usuarioOcupadoNesteDia = false;
+                let temVagaDisponivel = false;
+
                 for(const hr of horariosPossiveis) {
                     const idDocumentoMissa = `${dataString}_${hr}`;
                     const docSnap = await getDoc(doc(db, "escalas", idDocumentoMissa));
@@ -942,43 +1027,69 @@
                         document.getElementById('lbl-data-missa').innerText = dataString.split('-').reverse().join('/');
                         document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
                         document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
+                        
                         let htmlMissa = `
                             <div class="p-4 bg-amber-50/20 border-b border-gray-100 space-y-2">
                                 <p class="text-[11px] font-bold text-amber-900 uppercase tracking-wide"><i class="fa-solid fa-clock"></i> Celebração das ${dados.horario}h</p>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-700">
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar I:</strong> ${dados.altar1?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar1?.status || 'Pendente'}</span></div>
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar II:</strong> ${dados.altar2?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar2?.status || 'Pendente'}</span></div>
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar III:</strong> ${dados.altar3?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar3?.status || 'Pendente'}</span></div>
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar IV:</strong> ${dados.altar4?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar4?.status || 'Pendente'}</span></div>
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar V:</strong> ${dados.altar5?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar5?.status || 'Pendente'}</span></div>
-                                    <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between"><span><strong>Altar VI:</strong> ${dados.altar6?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">${dados.altar6?.status || 'Pendente'}</span></div>
                         `;
-                        if (dados.turibuloAtivo) {
-                            htmlMissa += `<div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between"><span><i class="fa-solid fa-fire text-amber-700"></i> <strong>Turiferário:</strong> ${dados.turiferario?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-600 text-white rounded">${dados.turiferario?.status || 'Pendente'}</span></div>`;
-                        }
-                        if (dados.navetaAtiva) {
-                            htmlMissa += `<div class="bg-amber-100/60 p-2 rounded-lg border border-amber-300 col-span-full flex justify-between"><span><i class="fa-solid fa-box text-amber-700"></i> <strong>Naveteiro:</strong> ${dados.naveteiro?.nome || 'A definir'}</span><span class="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-600 text-white rounded">${dados.naveteiro?.status || 'Pendente'}</span></div>`;
-                        }
+
+                        const postos = [
+                            { chave: 'altar1', label: 'Altar I' }, { chave: 'altar2', label: 'Altar II' },
+                            { chave: 'altar3', label: 'Altar III' }, { chave: 'altar4', label: 'Altar IV' },
+                            { chave: 'altar5', label: 'Altar V' }, { chave: 'altar6', label: 'Altar VI' }
+                        ];
+
+                        if (dados.turibuloAtivo) postos.push({ chave: 'turiferario', label: 'Turiferário' });
+                        if (dados.navetaAtiva) postos.push({ chave: 'naveteiro', label: 'Naveteiro' });
+
+                        postos.forEach(p => {
+                            const objPosto = dados[p.chave] || { nome: 'A definir', status: 'Pendente' };
+                            const isVagaLivre = (objPosto.nome === "A definir" || objPosto.nome === "");
+                            
+                            let badgeCor = "bg-amber-100 text-amber-800";
+                            if (objPosto.status === "Confirmado") badgeCor = "bg-emerald-100 text-emerald-800 font-bold";
+
+                            htmlMissa += `
+                                <div class="bg-white p-2 rounded-lg border border-gray-100 flex justify-between items-center">
+                                    <span><strong>${p.label}:</strong> ${objPosto.nome}</span>
+                                    <span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${badgeCor}">${objPosto.status}</span>
+                                </div>
+                            `;
+
+                            if (usuarioLogadoDados && objPosto.nome === usuarioLogadoDados.nome) {
+                                usuarioOcupadoNesteDia = true;
+                                cardNotificacao.classList.remove('hidden');
+                                botoesContainer.innerHTML += `
+                                    <div class="border-b border-amber-200/60 pb-1 mb-1 last:border-none last:pb-0 last:mb-0">
+                                        <p class="text-[9px] font-bold text-gray-600 block mb-1">Horário ${dados.horario}h (${p.label}):</p>
+                                        <div class="flex gap-1">
+                                            <button onclick="confirmarPresencaMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[10px] px-2 py-1 rounded transition-all cursor-pointer">Confirmar</button>
+                                            <button onclick="pedirSubstituicaoMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] px-2 py-1 rounded transition-all cursor-pointer">Pedir Troca</button>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+
+                            if (isVagaLivre) {
+                                temVagaDisponivel = true;
+                                botoesCoberturaContainer.innerHTML += `
+                                    <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[10px] px-2 py-1 rounded text-left transition-all cursor-pointer">
+                                        <i class="fa-solid fa-plus"></i> Assumir ${p.label} às ${dados.horario}h
+                                    </button>
+                                `;
+                            }
+                        });
+
                         htmlMissa += `</div></div>`;
                         lista.innerHTML += htmlMissa;
-                        
-                        if (usuarioLogadoDados) {
-                            let escaladoNestaMissa = 
-                                dados.altar1?.nome === usuarioLogadoDados.nome ||
-                                dados.altar2?.nome === usuarioLogadoDados.nome ||
-                                dados.altar3?.nome === usuarioLogadoDados.nome ||
-                                dados.altar4?.nome === usuarioLogadoDados.nome ||
-                                dados.altar5?.nome === usuarioLogadoDados.nome ||
-                                dados.altar6?.nome === usuarioLogadoDados.nome ||
-                                (dados.turibuloAtivo && dados.turiferario?.nome === usuarioLogadoDados.nome) ||
-                                (dados.navetaAtiva && dados.naveteiro?.nome === usuarioLogadoDados.nome);
-                            if (escaladoNestaMissa) {
-                                missaAtivaParaRespostaCoroinha = { idDocumentoMissa };
-                                cardNotificacao.classList.remove('hidden');
-                            }
-                        }
                     }
                 }
+
+                if (temVagaDisponivel && !usuarioOcupadoNesteDia) {
+                    cardConviteSubstituto.classList.remove('hidden');
+                }
+
                 if(!encontrouAlguma) {
                     document.getElementById('lbl-data-missa').innerText = "--/--/----";
                     document.getElementById('lbl-titulo-missa').innerText = "Sem escala publicada";
