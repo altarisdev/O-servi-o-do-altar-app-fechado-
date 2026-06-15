@@ -365,18 +365,6 @@
             </div>
         </main>
     </div>
-
-Se o sistema ficou preso na tela de "Carregando" (showLoading()) logo após a substituição, significa que o interpretador do JavaScript encontrou um **erro de sintaxe** ou uma **referência quebrada** ao carregar o script, impedindo que o restante do código (incluindo o gatilho que esconde o loading) seja executado.
-Olhando detalhadamente o script que você estava usando nas versões anteriores, o erro clássico que faz o Firebase travar no loading inicial é este:
-No bloco do formPublicarAviso, a linha do alert foi traduzida acidentalmente para o inglês:
-```javascript
-// O erro está aqui:
-alert("Mural updated!"); 
-
-```
-Em alguns ambientes ou dependendo de como o interpretador do navegador lida com certas strings assíncronas logo após a inicialização do onAuthStateChanged, o script interrompe a execução se houver qualquer falha de parsing de dependência ou elementos nulos (como o emailjs não ter sido importado corretamente antes da inicialização emailjs.init("bwcOObTQavlK3QCuP");).
-Como eu não posso alterar o arquivo diretamente no seu computador, aqui está o código **corrigido e revisado linha por linha** para garantir que nenhuma variável ou string cause o travamento. Substitua no seu editor local:
-```javascript
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
