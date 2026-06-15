@@ -509,15 +509,15 @@
         formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
+            if(erroLogin) erroLogin.classList.add('hidden');
+            
             const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
             const senhaInput = document.getElementById('login-senha').value.trim();
 
             try {
                 await signInWithEmailAndPassword(auth, emailInput, senhaInput);
-                if(erroLogin) erroLogin.classList.add('hidden');
             } catch (err) { 
-                console.log("Aviso: Login direto falhou. Buscando perfil provisório no Firestore...", err.code);
-                
+                console.log("Tentando interceptar registro pendente da coordenação...");
                 try {
                     const q = query(collection(db, "usuarios"), where("email", "==", emailInput));
                     const querySnapshot = await getDocs(q);
@@ -530,44 +530,33 @@
                         idDocumentoExistente = docSnap.id;
                     });
 
-                    if (usuarioPreCadastrado) {
-                        if (usuarioPreCadastrado.senha_provisoria === senhaInput) {
-                            if (senhaInput.length < 6) {
-                                hideLoading();
-                                alert(`🚨 Falha de Segurança:\nA senha cadastrada para este usuário possui apenas ${senhaInput.length} caracteres. O Firebase exige uma senha de no mínimo 6 dígitos.`);
-                                return;
+                    if (usuarioPreCadastrado && usuarioPreCadastrado.senha_provisoria === senhaInput) {
+                        try {
+                            const resultadoAuth = await createUserWithEmailAndPassword(auth, emailInput, senhaInput);
+                            const novoUidOficial = resultadoAuth.user.uid;
+
+                            await setDoc(doc(db, "usuarios", novoUidOficial), {
+                                nome: usuarioPreCadastrado.nome,
+                                email: usuarioPreCadastrado.email,
+                                senha_provisoria: usuarioPreCadastrado.senha_provisoria,
+                                funcao: usuarioPreCadastrado.funcao || "Coroinha"
+                            });
+
+                            if (idDocumentoExistente !== novoUidOficial) {
+                                await deleteDoc(doc(db, "usuarios", idDocumentoExistente));
                             }
-
-                            try {
-                                const resultadoAuth = await createUserWithEmailAndPassword(auth, emailInput, senhaInput);
-                                const novoUidOficial = resultadoAuth.user.uid;
-
-                                await setDoc(doc(db, "usuarios", novoUidOficial), {
-                                    nome: usuarioPreCadastrado.nome,
-                                    email: usuarioPreCadastrado.email,
-                                    senha_provisoria: usuarioPreCadastrado.senha_provisoria,
-                                    funcao: usuarioPreCadastrado.funcao || "Coroinha"
-                                });
-
-                                if (idDocumentoExistente !== novoUidOficial) {
-                                    await deleteDoc(doc(db, "usuarios", idDocumentoExistente));
-                                }
-                                
-                                if(erroLogin) erroLogin.classList.add('hidden');
-                                hideLoading();
-                                return; 
-                            } catch (authErr) {
-                                hideLoading();
-                                alert("❌ Resposta do Firebase Auth:\n" + authErr.message);
-                                return;
-                            }
+                            hideLoading();
+                            return; 
+                        } catch (authErr) {
+                            if(erroLoginTexto) erroLoginTexto.innerText = "Erro do Firebase Auth: " + authErr.message;
+                            if(erroLogin) erroLogin.classList.remove('hidden');
+                            hideLoading();
+                            return;
                         }
                     }
-                } catch (firestoreErr) {
-                    console.error("Erro ao ler dados no Firestore: ", firestoreErr);
-                }
+                } catch (firestoreErr) { console.error(firestoreErr); }
                 
-                if(erroLoginTexto) erroLoginTexto.innerText = "Usuário ou senha incorretos.";
+                if(erroLoginTexto) erroLoginTexto.innerText = "E-mail ou senha incorretos.";
                 if(erroLogin) erroLogin.classList.remove('hidden'); 
                 hideLoading();
             }
@@ -622,8 +611,13 @@
             const senha = document.getElementById('cad-senha').value.trim();
             const funcao = document.getElementById('cad-funcao').value;
 
+            if(senha.length < 6) {
+                hideLoading();
+                alert("A senha precisa ter no mínimo 6 dígitos exigidos pelo Firebase.");
+                return;
+            }
+
             try {
-                // Correção de lógica: Para evitar conflitos de ID temporário e garantir a listagem síncrona imediata, usamos uma string limpa ou o timestamp.
                 const idTemporaria = "pre_" + Date.now();
                 await setDoc(doc(db, "usuarios", idTemporaria), {
                     nome: nome,
@@ -699,8 +693,6 @@
                 cacheTodosUsuarios.push(dados);
             });
             cacheTodosUsuarios.sort((a,b) => (a.nome || "").localeCompare(b.nome || ""));
-            
-            // Verificação de segurança para renderizar mesmo se o campo de busca estiver vazio ou nulo
             const valorBusca = buscaUsuarioLista ? buscaUsuarioLista.value : "";
             renderizarTabelaUsuariosFiltrada(valorBusca);
         });
@@ -811,7 +803,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural updated!");
+                alert("Mural atualizado!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
