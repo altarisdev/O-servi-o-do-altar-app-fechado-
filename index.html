@@ -398,6 +398,7 @@
 
     // Seletores do DOM
     const formLogin = document.getElementById('form-login');
+    const formCadastroUsuario = document.getElementById('form-cadastro-usuario'); // CORRIGIDO: Seletor adicionado
     const erroLogin = document.getElementById('erro-login');
     const erroLoginTexto = document.getElementById('erro-login-texto');
     const btnLogout = document.getElementById('btn-logout');
@@ -424,7 +425,7 @@
     let unsubMural = null;
     let unsubUsuarios = null;
 
-    // Cronograma Base da Paróquia (0=Domingo, 1=Segunda, 2=Terça...)
+    // Cronograma Base da Paróquia
     const CRONOGRAMA_PAROQUIA = [
         { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
         { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
@@ -463,7 +464,7 @@
         }
     }
 
-    // LISTENER DE AUTH DO FIREBASE COM REGRA ANTI-TRAVAMENTO
+    // LISTENER DE AUTH DO FIREBASE
     onAuthStateChanged(auth, async (user) => {
         showLoading();
         if (user) {
@@ -483,7 +484,6 @@
                 signOut(auth);
             }
         } else {
-            // Se o usuário não está logado no Firebase, checa se há sessão ativa do DEV BYPASS
             const devSession = sessionStorage.getItem("dev_user");
             if (devSession) {
                 usuarioLogadoDados = JSON.parse(devSession);
@@ -549,7 +549,6 @@
             const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
             const senhaInput = document.getElementById('login-senha').value.trim();
 
-            // ─── LOGIN DO DEV (BYPASS LOCAL) ───
             if (emailInput === "dev@altaris.com" && senhaInput === "dev1234") {
                 console.log("Acesso DEV Bypass ativado.");
                 usuarioLogadoDados = {
@@ -564,7 +563,6 @@
                 return;
             }
 
-            // LOGIN NORMAL VIA FIREBASE AUTH
             try {
                 await signInWithEmailAndPassword(auth, emailInput, senhaInput);
                 if(erroLogin) erroLogin.classList.add('hidden');
@@ -587,7 +585,8 @@
         btnLogout.addEventListener('click', () => {
             showLoading();
             sessionStorage.removeItem("dev_user");
-            signOut(auth).window.location.reload();
+            signOut(auth);
+            window.location.reload();
         });
     }
 
@@ -638,13 +637,9 @@
                 return;
             }
 
-            // Verifica se o e-mail já existe na nossa lista cacheada (Indicação de Irmãos)
             const emailJaExiste = cacheTodosUsuarios.some(user => user.email === email);
 
             if (emailJaExiste) {
-                // ─── LÓGICA DE IRMÃOS (MESMO E-MAIL) ───
-                // Como o Firebase Auth bloqueia a criação de contas com o mesmo e-mail, salvamos este irmão 
-                // apenas no Firestore como "Não-Oficial/Pré-cadastrado" usando um ID manual customizado.
                 const idIrmaoManual = "pre_" + Date.now();
                 try {
                     await setDoc(doc(db, "usuarios", idIrmaoManual), {
@@ -663,7 +658,6 @@
                 return;
             }
 
-            // CADASTRO NORMAL DE NOVO MEMBRO OFICIAL (E-MAIL EXCLUSIVO)
             try {
                 const resultadoAuth = await createUserWithEmailAndPassword(authSecundario, email, senha);
                 const novoUidOficial = resultadoAuth.user.uid;
@@ -909,7 +903,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural de avisos atualizado!");
+                alert("Mural de avisos updated!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
@@ -1178,7 +1172,8 @@
                 Object.keys(respostas).forEach(nome => {
                     const r = respostas[nome];
                     const escolhas = r.escolhas || (Array.isArray(r) ? r : []);
-                    if (choices.includes(chaveEnqueteBuscada) && nome !== usuarioLogadoDados.nome) {
+                    // CORRIGIDO: Referência mudada de 'choices.includes' para 'escolhas.includes'
+                    if (escolhas.includes(chaveEnqueteBuscada) && nome !== usuarioLogadoDados.nome) {
                         listaCandidatosValidos.push({ nome, timestamp: r.respondidoEm || 0 });
                     }
                 });
