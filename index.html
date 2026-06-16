@@ -244,19 +244,9 @@
                                 <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nível de Acesso (Função)</label>
                                 <select id="cad-funcao" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-semibold text-gray-700">
                                     <option value="Coroinha">Coroinha / Acólito</option>
-                                    <option value="Coroinha (Irmão)">Coroinha (Irmão/Parente)</option>
                                     <option value="Coordenador">Coordenador</option>
                                 </select>
                             </div>
-                            
-                            <div id="bloco-selecao-irmao" class="hidden bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-1">
-                                <label class="block text-[10px] font-bold text-amber-900 uppercase">Selecione o Irmão/Parente Vinculado</label>
-                                <select id="cad-irmao-vinculado" class="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-medium text-gray-700">
-                                    <option value="">Carregando lista...</option>
-                                </select>
-                                <p class="text-[9px] text-amber-700 italic">Isso ajudará o sistema a colocá-los na mesma celebração.</p>
-                            </div>
-
                             <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-2.5 rounded-lg transition-all mt-2 cursor-pointer shadow-xs">
                                 <i class="fa-solid fa-user-plus mr-1"></i> Ativar Conta e Enviar E-mail
                             </button>
@@ -383,7 +373,7 @@
             </div>
         </main>
     </div>
-    <script type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -401,6 +391,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // Instância secundária para criar contas sem deslogar o coordenador logado
     const appSecundario = initializeApp(firebaseConfig, "SecondaryApp");
     const authSecundario = getAuth(appSecundario);
 
@@ -422,11 +413,6 @@
     const cardConviteSubstituto = document.getElementById('card-convite-substituto');
     const buscaUsuarioLista = document.getElementById('busca-usuario-lista');
 
-    // Elementos do campo dinâmico de vínculo familiar (Irmão)
-    const cadFuncao = document.getElementById('cad-funcao');
-    const containerSelecionarIrmao = document.getElementById('container-selecionar-irmao'); // Certifique-se de que a div em volta do select de irmãos tenha este ID
-    const cadIrmaoSelect = document.getElementById('cad-irmao-select'); // Certifique-se de que o select de irmãos tenha este ID
-
     let usuarioLogadoDados = null;
     let dataSelecionadaGlobal = "";
     let mapaRespostasGerais = {}; 
@@ -434,7 +420,6 @@
     let unsubEnquete = null;
     let unsubMural = null;
     let unsubUsuarios = null;
-    let enqueteCarregada = false;
 
     const CRONOGRAMA_PAROQUIA = [
         { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
@@ -474,7 +459,6 @@
         }
     }
 
-    // CORREÇÃO: Tratamento do nível de acesso do Dev e Coordenador em conjunto
     onAuthStateChanged(auth, async (user) => {
         showLoading();
         if (user) {
@@ -488,18 +472,14 @@
 
                     ouvirMuralAvisos();
 
-                    // Dev ganha as mesmas permissões estruturais de visualização do painel administrativo
-                    if (usuarioLogadoDados.funcao === "Coordenador" || usuarioLogadoDados.funcao === "Dev" || usuarioLogadoDados.funcao === "Developer") {
+                    if (usuarioLogadoDados.funcao === "Coordenador") {
                         if(painelCoroinha) painelCoroinha.classList.add('hidden');
                         if(menuAbasCoroinha) menuAbasCoroinha.classList.add('hidden');
+                        if(painelCoordenador) painelCoordenador.classList.remove('hidden');
                         
-                        if(painelCoordenador) {
-                            painelCoordenador.classList.remove('hidden');
-                            painelCoordenador.classList.add('grid');
-                        }
-                        
-                        ouvirEnqueteTempoRealCoordenador();
-                        ouvirUsuariosCadastrados();
+                        // Executa com segurança para prevenir travamentos se as regras do banco bloquearem
+                        try { ouvirEnqueteTempoRealCoordenador(); } catch(e) { console.error(e); }
+                        try { ouvirUsuariosCadastrados(); } catch(e) { console.error(e); }
                         carregarAvisoNoInputCoordenador();
                         
                         switchCoordTab('coord-usuarios');
@@ -508,15 +488,8 @@
                             carregarEditorEscalasPorData(editorEscalaData.value);
                         }
                     } else {
-                        // Fluxo normal para Coroinhas / Coroinha Irmão
-                        if(painelCoordenador) {
-                            painelCoordenador.classList.add('hidden');
-                            painelCoordenador.classList.remove('grid');
-                        }
-                        if(painelCoroinha) {
-                            painelCoroinha.classList.remove('hidden');
-                            painelCoroinha.classList.add('grid');
-                        }
+                        if(painelCoordenador) painelCoordenador.classList.add('hidden');
+                        if(painelCoroinha) painelCoroinha.classList.remove('hidden');
                         if(menuAbasCoroinha) menuAbasCoroinha.classList.remove('hidden');
                         
                         const hoje = new Date().toISOString().split('T')[0];
@@ -525,14 +498,20 @@
                             carregarEscalaPorData(hoje);
                         }
                         
-                        enqueteCarregada = false; 
                         ouvirEnqueteTempoRealCoroinha();
                         carregarLiturgiaAutomatica();
                         carregarMaterialEstudo();
                     }
                     alternarTelasVisiveis(true);
+                } else {
+                    alert("Seu usuário está autenticado, mas o perfil correspondente não foi localizado.");
+                    signOut(auth);
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error("Erro crítico ao sincronizar perfil:", e); 
+                alert("Falha de permissão no Firestore. Garanta que as regras de segurança permitam a leitura.");
+                signOut(auth);
+            }
         } else {
             if (unsubEnquete) { unsubEnquete(); unsubEnquete = null; }
             if (unsubMural) { unsubMural(); unsubMural = null; }
@@ -554,8 +533,14 @@
                 await signInWithEmailAndPassword(auth, emailInput, senhaInput);
                 if(erroLogin) erroLogin.classList.add('hidden');
             } catch (err) { 
-                console.error("Erro de login direto: ", err.code);
-                if(erroLoginTexto) erroLoginTexto.innerText = "E-mail ou senha incorretos.";
+                console.error("Erro interno de autenticação: ", err.code);
+                if(erroLoginTexto) {
+                    if(err.code === "auth/invalid-credential" || err.code === "auth/wrong-password" || err.code === "auth/user-not-found") {
+                        erroLoginTexto.innerText = "E-mail ou senha incorretos.";
+                    } else {
+                        erroLoginTexto.innerText = "Erro ao conectar: " + err.message;
+                    }
+                }
                 if(erroLogin) erroLogin.classList.remove('hidden'); 
                 hideLoading();
             }
@@ -589,6 +574,7 @@
         return datasMapeadas;
     }
 
+    const btnGerarSenha = document.getElementById('btn-gerar-senha');
     if(btnGerarSenha) {
         btnGerarSenha.addEventListener('click', () => {
             const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
@@ -596,34 +582,6 @@
             for (let i = 0; i < 8; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
             const cadSenhaInput = document.getElementById('cad-senha');
             if(cadSenhaInput) cadSenhaInput.value = novaSenha;
-        });
-    }
-
-    // CORREÇÃO: Escuta a mudança de função para exibir a seleção de irmão e preenche os nomes disponíveis
-    if (cadFuncao) {
-        cadFuncao.addEventListener('change', (e) => {
-            const funcaoSelecionada = e.target.value;
-            // Altere para o valor exato correspondente ao option do seu HTML (ex: "Coroinha Irmão" ou "Irmao")
-            if (funcaoSelecionada === "Coroinha Irmão" || funcaoSelecionada === "irmao") {
-                if (containerSelecionarIrmao) {
-                    containerSelecionarIrmao.classList.remove('hidden');
-                    containerSelecionarIrmao.classList.add('block');
-                }
-                
-                // Preenche o select de irmãos com os usuários cadastrados no cache para referência
-                if (cadIrmaoSelect) {
-                    cadIrmaoSelect.innerHTML = '<option value="">Selecione o irmão/irmã...</option>';
-                    cacheTodosUsuarios.forEach(usr => {
-                        cadIrmaoSelect.innerHTML += `<option value="${usr.nome}">${usr.nome}</option>`;
-                    });
-                }
-            } else {
-                if (containerSelecionarIrmao) {
-                    containerSelecionarIrmao.classList.add('hidden');
-                    containerSelecionarIrmao.classList.remove('block');
-                }
-                if (cadIrmaoSelect) cadIrmaoSelect.innerHTML = '<option value="">Selecione o irmão/irmã...</option>';
-            }
         });
     }
 
@@ -636,7 +594,6 @@
             const email = document.getElementById('cad-email').value.trim().toLowerCase();
             const senha = document.getElementById('cad-senha').value.trim();
             const funcao = document.getElementById('cad-funcao').value;
-            const vinculadoAIrmao = cadIrmaoSelect ? cadIrmaoSelect.value : "";
 
             if (senha.length < 6) {
                 hideLoading();
@@ -648,36 +605,34 @@
                 const resultadoAuth = await createUserWithEmailAndPassword(authSecundario, email, senha);
                 const novoUidOficial = resultadoAuth.user.uid;
                 
-                const objetoUsuario = {
+                await setDoc(doc(db, "usuarios", novoUidOficial), {
                     nome: nome,
                     email: email,
                     senha_provisoria: senha,
                     funcao: funcao
-                };
+                });
 
-                if(vinculadoAIrmao) {
-                    objetoUsuario.vinculo_irmao = vinculadoAIrmao;
-                }
-                
-                await setDoc(doc(db, "usuarios", novoUidOficial), objetoUsuario);
                 await signOut(authSecundario);
                 
                 try {
-                    const mensagemTexto = `Olá ${nome}! Sua conta no Serviço do Altar foi ativada com sucesso.\n\nSeu acesso:\nE-mail: ${email}\nSenha Provisória: ${senha}\n\nEntre no sistema para atualizar suas preferências e conferir o cronograma.`;
+                    const textMessage = `Olá ${nome}! Sua conta no Serviço do Altar foi ativada com sucesso.\n\nSeu acesso:\nE-mail: ${email}\nSenha Provisória: ${senha}\n\nEntre no sistema para atualizar suas preferências e conferir o cronograma.`;
                     
                     await fetch('https://o-servi-o-do-altar-app-fechado.vercel.app/api/enviar-email', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nome: nome, email: email, mensagem: mensagemTexto })
+                        body: JSON.stringify({
+                            nome: nome,
+                            email: email,
+                            mensagem: textMessage
+                        })
                     });
                     alert(`Conta oficial de ${nome} ativada no sistema e e-mail disparado!`);
                 } catch (emailErr) {
                     console.error("Falha no disparo do e-mail:", emailErr);
-                    alert(`Conta criada com ID correto no banco! Porém, a mensagem de notificação falhou por problemas de SMTP.`);
+                    alert(`Conta criada com sucesso no banco! A mensagem automática via Vercel falhou.`);
                 }
 
                 formCadastroUsuario.reset();
-                if(containerSelecionarIrmao) containerSelecionarIrmao.classList.add('hidden');
             } catch (err) {
                 console.error(err);
                 alert("Erro ao registrar conta oficial: " + err.message);
@@ -715,13 +670,10 @@
         filtrados.forEach((usuario) => {
             const senhaExibida = usuario.senha_provisoria || "••••••••";
             const identificadorExibido = usuario.idDoc.startsWith('pre_') ? "🚫 Não-Oficial" : "✓ Ativo";
-            const tagIrmao = usuario.vinculo_irmao ? `<span class="block text-[9px] text-indigo-600 font-medium">Irmão de: ${usuario.vinculo_irmao}</span>` : "";
-            
             tabelaBody.innerHTML += `
                 <tr class="hover:bg-gray-50/80 transition-all border-b border-gray-100">
                     <td class="p-3 font-semibold text-gray-800">
                         ${usuario.nome}
-                        ${tagIrmao}
                         <span class="block text-[9px] font-bold ${usuario.idDoc.startsWith('pre_') ? 'text-rose-600' : 'text-emerald-600'}">${identificadorExibido}</span>
                     </td>
                     <td class="p-3 text-gray-600 font-mono">${usuario.email}</td>
@@ -752,16 +704,8 @@
             });
             cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome));
             if(buscaUsuarioLista) renderizarTabelaUsuariosFiltrada(buscaUsuarioLista.value);
-            
-            // Atualiza dinamicamente o select de irmãos caso o coordenador esteja na aba de cadastro ativa
-            if (cadFuncao && (cadFuncao.value === "Coroinha Irmão" || cadFuncao.value === "irmao") && cadIrmaoSelect) {
-                const valorAtual = cadIrmaoSelect.value;
-                cadIrmaoSelect.innerHTML = '<option value="">Selecione o irmão/irmã...</option>';
-                cacheTodosUsuarios.forEach(usr => {
-                    cadIrmaoSelect.innerHTML += `<option value="${usr.nome}">${usr.nome}</option>`;
-                });
-                cadIrmaoSelect.value = valorAtual;
-            }
+        }, (error) => {
+            console.error("Erro na escuta de usuários ativos:", error);
         });
     }
 
@@ -772,23 +716,9 @@
     }
 
     window.switchCoordTab = function(tabID) {
-        ['sec-coord-usuarios', 'sec-coord-escalas', 'sec-coord-sorteio', 'sec-coord-material', 'sec-coord-avisos-tab'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.classList.add('hidden');
-                el.classList.remove('grid', 'block');
-            }
-        });
-
+        document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
         const targetSec = document.getElementById('sec-' + tabID);
-        if(targetSec) {
-            targetSec.classList.remove('hidden');
-            if(tabID === 'coord-usuarios' || tabID === 'coord-sorteio') {
-                targetSec.classList.add('grid');
-            } else {
-                targetSec.classList.add('block');
-            }
-        }
+        if(targetSec) targetSec.classList.remove('hidden');
 
         const botoesMap = {
             'coord-usuarios': 'btn-c-usuarios',
@@ -826,7 +756,6 @@
                 celebracoes: listaCelebracoes,
                 respostas: {} 
             });
-            enqueteCarregada = false; 
             hideLoading();
             alert("Enquete de disponibilidade aberta com sucesso!");
         });
@@ -905,6 +834,8 @@
                     }
                 }
             }
+        }, (error) => {
+            console.error("Erro na escuta da enquete ativa:", error);
         });
     }
 
@@ -972,7 +903,7 @@
 
                 if (cronogramaDoMes.length === 0) {
                     hideLoading();
-                    alert("Nenhuma data correspondente encontrada para este mês baseado no cronograma.");
+                    alert("Nenhuma data correspondente encontrada para este mês baseado no cronograma da paróquia.");
                     return;
                 }
 
@@ -1059,7 +990,7 @@
                             <div><input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
                         </div>
                     </div>
-                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md cursor-pointer">
+                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md">
                         Atualizar Cronograma Oficial
                     </button>
                 `;
@@ -1087,7 +1018,7 @@
                             "naveteiro.nome": document.getElementById(`edit-nave-${idDocumentoMissa}`).value
                         });
                         hideLoading();
-                        alert("Escala updated!");
+                        alert("Escala atualizada!");
                         if (buscaEscalaData && editorEscalaData && buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                         carregarEditorEscalasPorData(editorEscalaData.value);
                     } catch (err) { hideLoading(); alert(err.message); }
@@ -1112,24 +1043,22 @@
             if (docSnap.exists() && docSnap.data().ativa === true) {
                 const dados = docSnap.data();
                 const respostas = dados.respostas || {};
-                
                 if (usuarioLogadoDados && Object.prototype.hasOwnProperty.call(respostas, usuarioLogadoDados.nome)) {
-                    if(blocoVotacao) { blocoVotacao.classList.add('hidden'); }
+                    if(blocoVotacao) { blocoVotacao.classList.add('hidden'); blocoVotacao.innerHTML = ""; }
                     if(blocoFeedback) blocoFeedback.classList.remove('hidden');
                     cardEnquete.classList.remove('hidden');
                 } else {
-                    if(container && !enqueteCarregada) {
+                    if(container) {
                         container.innerHTML = "";
                         dados.celebracoes.forEach(cel => {
                             const dataBR = cel.data.split('-').reverse().join('/');
                             container.innerHTML += `
                                 <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 text-xs cursor-pointer border-b">
-                                    <input type="checkbox" value="${cel.idChave}" class="chk-dia-enquete w-4 h-4 cursor-pointer">
+                                    <input type="checkbox" value="${cel.idChave}" class="chk-dia-enquete w-4 h-4">
                                     <div><strong>${dataBR}</strong> - ${cel.rotulo} às ${cel.horario}h</div>
                                 </label>
                             `;
                         });
-                        enqueteCarregada = true; 
                     }
                     if(blocoFeedback) blocoFeedback.classList.add('hidden');
                     if(blocoVotacao) blocoVotacao.classList.remove('hidden');
@@ -1145,12 +1074,6 @@
             const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
             const chavesSelecionadas = [];
             checkboxes.forEach(chk => chavesSelecionadas.push(chk.value));
-            
-            if(chavesSelecionadas.length === 0) {
-                alert("Selecione ao menos um dia!");
-                return;
-            }
-            
             showLoading();
             try {
                 const docRef = doc(db, "enquetes", "disponibilidade_atual");
@@ -1160,7 +1083,6 @@
                     respondidoEm: Date.now()
                 };
                 await updateDoc(docRef, campoAtualizacao);
-                enqueteCarregada = false; 
             } catch (err) { alert("Erro ao salvar: " + err.message); }
             hideLoading();
         });
@@ -1179,7 +1101,7 @@
     }
 
     window.pedirSubstituicaoMissa = async function(idMissa, slotChave) {
-        if(!confirm("Deseja solicitar dispensa?")) return;
+        if(!confirm("Deseja solicitar dispensa desse horário?")) return;
         showLoading();
         try {
             const docMissaRef = doc(db, "escalas", idMissa);
@@ -1316,7 +1238,7 @@
                         if (isVagaLivre && botoesCoberturaContainer) {
                             temVagaDisponivel = true;
                             botoesCoberturaContainer.innerHTML += `
-                                <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="bg-indigo-700 text-white text-[10px] px-2 py-1 rounded-sm cursor-pointer m-0.5">
+                                <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="bg-indigo-700 text-white text-[10px] px-2 py-1 rounded cursor-pointer">
                                     Assumir ${p.label} às ${dados.horario}h
                                 </button>
                             `;
@@ -1333,7 +1255,7 @@
             }
 
             if(!encontrouAlguma) {
-                lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado.</p>`;
+                lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado para este dia.</p>`;
             }
         } catch(e) { console.error(e); }
     }
@@ -1352,7 +1274,7 @@
                     titulo: document.getElementById('form-titulo-input').value, 
                     url: document.getElementById('form-url-input').value 
                 });
-                alert("Material de estudo atualizado!");
+                alert("Material de estudo updated!");
                 carregarMaterialEstudo();
             } catch(err) { alert(err.message); }
             hideLoading();
@@ -1383,37 +1305,23 @@
     }
 
     window.switchTab = function(tabName) {
-        if (usuarioLogadoDados?.funcao === "Coordenador" || usuarioLogadoDados?.funcao === "Dev" || usuarioLogadoDados?.funcao === "Developer") return;
+        if (usuarioLogadoDados?.funcao === "Coordenador") return;
         
         const contEscala = document.getElementById('conteudo-escala');
         const contAvisos = document.getElementById('conteudo-avisos');
         const contLiturgia = document.getElementById('conteudo-liturgia');
         
-        [contEscala, contAvisos, contLiturgia].forEach(el => {
-            if(el) el.classList.add('hidden');
-        });
-        
-        if(tabName === 'escala' && contEscala) contEscala.classList.remove('hidden');
-        if(tabName === 'avisos' && contAvisos) contAvisos.classList.remove('hidden');
-        if(tabName === 'liturgia' && contLiturgia) contLiturgia.classList.remove('hidden');
+        if(contEscala) contEscala.className = tabName === 'escala' ? 'space-y-4 block' : 'space-y-4 hidden';
+        if(contAvisos) contAvisos.className = tabName === 'avisos' ? 'space-y-4 block md:block' : 'space-y-4 hidden md:block';
+        if(contLiturgia) contLiturgia.className = tabName === 'liturgia' ? 'space-y-4 block md:block' : 'space-y-4 hidden md:block';
         
         const tEscala = document.getElementById('tab-escala');
         const tAvisos = document.getElementById('tab-avisos');
         const tLiturgia = document.getElementById('tab-liturgia');
         
-        const abas = [tEscala, tAvisos, tLiturgia];
-        abas.forEach(aba => {
-            if(aba) {
-                aba.classList.remove('active-tab', 'text-amber-700');
-                aba.classList.add('text-gray-500');
-            }
-        });
-        
-        const abaAtiva = document.getElementById('tab-' + tabName);
-        if(abaAtiva) {
-            abaAtiva.classList.remove('text-gray-500');
-            abaAtiva.classList.add('active-tab');
-        }
+        if(tEscala) tEscala.className = tabName === 'escala' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+        if(tAvisos) tAvisos.className = tabName === 'avisos' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+        if(tLiturgia) tLiturgia.className = tabName === 'liturgia' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
     }
 </script>
 </body>
