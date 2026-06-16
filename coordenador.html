@@ -42,7 +42,7 @@
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 h-fit space-y-4">
                 <div>
                     <h3 class="text-sm font-black text-gray-800">Cadastrar Novo Membro</h3>
-                    <p class="text-[11px] text-gray-400 font-medium">Contas vinculadas compartilham as credenciais de acesso.</p>
+                    <p class="text-[11px] text-gray-400 font-medium">Cada membro possui seu próprio login e senha individuais.</p>
                 </div>
                 <form id="form-cadastro-usuario" class="space-y-3">
                     <div>
@@ -53,15 +53,13 @@
                         </select>
                     </div>
 
-                    <!-- Checkbox de Possuir Irmão Cadastrado -->
                     <div class="flex items-center gap-2 pt-1 pb-1">
                         <input type="checkbox" id="chk-possui-irmao" class="w-4 h-4 text-amber-700 border-gray-300 rounded focus:ring-amber-500 cursor-pointer">
                         <label for="chk-possui-irmao" class="text-xs font-bold text-gray-700 cursor-pointer select-none">Possui irmão já cadastrado?</label>
                     </div>
 
-                    <!-- Listbox Dinâmica de Vínculo (Oculta por padrão) -->
                     <div id="div-lista-irmaos" class="hidden bg-blue-50/50 p-3 rounded-xl border border-blue-100 space-y-1.5">
-                        <label class="block text-[10px] font-bold text-blue-800 uppercase"><i class="fa-solid fa-link"></i> Selecione o Irmão Mais Velho (Titular)</label>
+                        <label class="block text-[10px] font-bold text-blue-800 uppercase"><i class="fa-solid fa-link"></i> Selecione o Irmão Cadastrado</label>
                         <select id="cad-irmao-titular-select" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs font-medium text-gray-800">
                             <option value="">Selecione um membro...</option>
                         </select>
@@ -69,20 +67,19 @@
 
                     <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nome Completo</label><input type="text" id="cad-nome" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
                     
-                    <div id="div-email-principal"><label id="label-email-principal" class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">E-mail de Login</label><input type="email" id="cad-email" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">E-mail de Login Único</label><input type="email" id="cad-email" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
 
-                    <div id="div-senha-cadastro"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Senha Provisória</label><div class="flex gap-2"><input type="text" id="cad-senha" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-mono font-bold"><button type="button" id="btn-gerar-senha" class="bg-gray-800 text-white px-2.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-key"></i></button></div></div>
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Senha de Acesso</label><div class="flex gap-2"><input type="text" id="cad-senha" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-mono font-bold"><button type="button" id="btn-gerar-senha" class="bg-gray-800 text-white px-2.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-key"></i></button></div></div>
                     
                     <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-xs cursor-pointer"><i class="fa-solid fa-user-plus mr-1"></i> Registrar Membro</button>
                 </form>
             </div>
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 overflow-hidden flex flex-col">
                 <div class="mb-3 flex justify-between items-center"><div><h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3></div><input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-xs font-medium"></div>
-                <div class="overflow-x-auto"><table class="w-full text-left text-xs border-collapse"><thead><tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] border-b"><th class="p-3">Nome</th><th class="p-3">E-mail de Login</th><th class="p-3">Conexão / Vínculo</th><th class="p-3 text-center">Tipo</th><th class="p-3 text-center">Ações</th></tr></thead><tbody id="tabela-usuarios-recuperacao"></tbody></table></div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-xs border-collapse"><thead><tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] border-b"><th class="p-3">Nome</th><th class="p-3">E-mail de Login</th><th class="p-3">Vínculo de Família</th><th class="p-3 text-center">Tipo</th><th class="p-3 text-center">Ações</th></tr></thead><tbody id="tabela-usuarios-recuperacao"></tbody></table></div>
             </div>
         </section>
 
-        <!-- Demais seções mantidas para compatibilidade do painel -->
         <section id="sec-coord-escalas" class="hidden-coord-tab hidden space-y-4">
             <div class="bg-white p-4 rounded-xl shadow-xs border border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div><h3 class="text-sm font-black text-gray-800">Editor Manual de Escalas Oficiais</h3></div><input type="date" id="editor-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold">
@@ -151,12 +148,10 @@
     const containerEditoresMissa = document.getElementById('container-editores-missa');
     const btnLogout = document.getElementById('btn-logout');
 
-    // Elementos do controle clássico por Checkbox e Listbox
+    // Elementos da Checkbox e Listbox de vínculo
     const chkPossuiIrmao = document.getElementById('chk-possui-irmao');
     const divListaIrmaos = document.getElementById('div-lista-irmaos');
     const selectIrmaoTitular = document.getElementById('cad-irmao-titular-select');
-    const divSenhaCadastro = document.getElementById('div-senha-cadastro');
-    const labelEmailPrincipal = document.getElementById('label-email-principal');
 
     let usuarioLogadoDados = null; let mapaRespostasGerais = {}; let cacheTodosUsuarios = []; let unsubUsuarios = null;
 
@@ -167,30 +162,24 @@
 
     function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
 
-    // Gerenciador de exibição baseado na Checkbox
+    // Controla a exibição da listbox ao clicar na checkbox
     chkPossuiIrmao?.addEventListener('change', (e) => {
         if(e.target.checked) {
             divListaIrmaos.classList.remove('hidden');
             selectIrmaoTitular.setAttribute('required', 'true');
-            labelEmailPrincipal.innerText = "E-mail Novo do Irmão (Opcional/Gerado)";
-            divSenhaCadastro.classList.add('hidden');
-            document.getElementById('cad-senha').removeAttribute('required');
             atualizarListboxMembros();
         } else {
             divListaIrmaos.classList.add('hidden');
             selectIrmaoTitular.removeAttribute('required');
-            labelEmailPrincipal.innerText = "E-mail de Login";
-            divSenhaCadastro.classList.remove('hidden');
-            document.getElementById('cad-senha').setAttribute('required', 'true');
         }
     });
 
-    // Popula a Listbox dinamicamente com base nas contas elegíveis no cache
+    // Popula a Listbox com os usuários já cadastrados no cache
     function atualizarListboxMembros() {
         if(!selectIrmaoTitular) return;
         selectIrmaoTitular.innerHTML = '<option value="">Selecione um membro...</option>';
         cacheTodosUsuarios
-            .filter(u => u.funcao !== "Coordenador" && u.tipoConta !== "IrmaoVinculado")
+            .filter(u => u.funcao !== "Coordenador")
             .forEach(u => {
                 const opt = document.createElement('option');
                 opt.value = u.email;
@@ -245,47 +234,36 @@
             e.preventDefault();
             const nome = document.getElementById('cad-nome').value.trim();
             const funcao = document.getElementById('cad-funcao').value;
-            const ehIrmao = chkPossuiIrmao ? chkPossuiIrmao.checked : false;
-
-            if (ehIrmao) {
-                const emailTitular = selectIrmaoTitular.value;
-                if(!emailTitular) { alert("Por favor, selecione o irmão titular na lista!"); return; }
-
-                let emailInserido = document.getElementById('cad-email').value.trim().toLowerCase();
-                
-                if(!emailInserido || emailInserido === emailTitular.toLowerCase()){
-                    emailInserido = emailTitular.replace("@", "+irmao" + Date.now().toString().slice(-4) + "@");
-                }
-
-                const titularDoc = cacheTodosUsuarios.find(u => u.email === emailTitular);
-                const senhaCompartilhada = titularDoc ? (titularDoc.senha_provisoria || "123456") : "123456";
-
-                const idGerado = "irmao_" + Date.now();
-                await setDoc(doc(db, "usuarios", idGerado), { 
-                    nome, 
-                    email: emailInserido, 
-                    email_conexao: emailTitular,
-                    senha_provisoria: senhaCompartilhada, 
-                    funcao: "Coroinha", 
-                    tipoConta: "IrmaoVinculado" 
-                });
-                
-                alert(`Sucesso! Vínculo criado. O irmão usará o login do titular (${emailTitular}) para acessar.`); 
-                formCadastroUsuario.reset();
-                divListaIrmaos.classList.add('hidden');
-                labelEmailPrincipal.innerText = "E-mail de Login";
-                divSenhaCadastro.classList.remove('hidden');
-                return;
-            }
-
             const email = document.getElementById('cad-email').value.trim().toLowerCase();
             const senha = document.getElementById('cad-senha').value.trim();
+            const ehIrmao = chkPossuiIrmao ? chkPossuiIrmao.checked : false;
 
             try {
+                // Cria SEMPRE uma nova conta única e independente no Auth
                 const res = await createUserWithEmailAndPassword(authSecundario, email, senha);
-                await setDoc(doc(db, "usuarios", res.user.uid), { nome, email, senha_provisoria: senha, funcao, tipoConta: "Oficial" });
+                
+                // Objeto base do usuário
+                const novoUsuario = { 
+                    nome, 
+                    email, 
+                    senha_provisoria: senha, 
+                    funcao, 
+                    tipoConta: "Oficial" 
+                };
+
+                // Se a caixinha foi marcada, adiciona o e-mail do irmão como atributo de vínculo
+                if (ehIrmao && selectIrmaoTitular.value) {
+                    novoUsuario.email_conexao = selectIrmaoTitular.value.toLowerCase();
+                    novoUsuario.tipoConta = "ComVinculo";
+                }
+
+                // Grava no Firestore usando o UID próprio gerado para ele
+                await setDoc(doc(db, "usuarios", res.user.uid), novoUsuario);
                 await signOut(authSecundario);
-                alert("Conta criada com sucesso!"); formCadastroUsuario.reset();
+                
+                alert("Membro cadastrado com sucesso! Conta independente criada."); 
+                formCadastroUsuario.reset();
+                divListaIrmaos.classList.add('hidden');
             } catch (err) { alert(err.message); }
         });
     }
@@ -312,18 +290,22 @@
         
         cacheTodosUsuarios.filter(u => u.nome.toLowerCase().includes(termo)).forEach(u => {
             let badgeTipo = "";
-            let colunaConexao = `<span class="text-gray-400 italic text-[11px]">Nenhuma</span>`;
+            let colunaConexao = `<span class="text-gray-400 italic text-[11px]">Nenhum</span>`;
 
             if (u.funcao === "Coordenador") {
                 badgeTipo = `<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Coordenação</span>`;
-            } else if (u.tipoConta === "IrmaoVinculado") {
-                badgeTipo = `<span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-[10px]">Irmão Vinculado</span>`;
-                colunaConexao = `<span class="text-blue-700 font-bold font-mono text-[11px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200"><i class="fa-solid fa-link"></i> ${u.email_conexao || 'E-mail Mãe'}</span>`;
             } else {
                 badgeTipo = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Oficial</span>`;
-                const temIrmaos = cacheTodosUsuarios.filter(i => i.email_conexao === u.email);
-                if(temIrmaos.length > 0) {
-                    colunaConexao = `<span class="text-emerald-700 text-[10px] font-medium block">Titular de: ${temIrmaos.map(i => i.nome.split(' ')[0]).join(', ')}</span>`;
+                
+                // Se o próprio usuário possuir um irmão selecionado
+                if (u.email_conexao) {
+                    colunaConexao = `<span class="text-blue-700 font-bold text-[11px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200"><i class="fa-solid fa-user-friends"></i> Irmão de: ${u.email_conexao}</span>`;
+                } else {
+                    // Verificação inversa: ver se alguém marcou ele como irmão
+                    const temIrmaos = cacheTodosUsuarios.filter(i => i.email_conexao === u.email);
+                    if(temIrmaos.length > 0) {
+                        colunaConexao = `<span class="text-emerald-700 text-[10px] font-medium block"><i class="fa-solid fa-link"></i> Vinculado a: ${temIrmaos.map(i => i.nome.split(' ')[0]).join(', ')}</span>`;
+                    }
                 }
             }
 
@@ -341,7 +323,7 @@
     }
     buscaUsuarioLista?.addEventListener('input', renderizarTabelaUsuarios);
 
-    // Funções complementares do sistema
+    // Métodos secundários de enquetes e cronogramas mantidos abaixo...
     function ouvirEnqueteTempoRealCoordenador() {
         onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
             if (!docSnap.exists()) return;
@@ -351,7 +333,7 @@
                 fila.innerHTML = "";
                 let arr = Object.keys(mapaRespostasGerais).map(n => ({nome: n, t: mapaRespostasGerais[n].respondidoEm || 0}));
                 arr.sort((a,b) => a.t - b.t);
-                if(arr.length===0) fila.innerHTML = `<p class="text-[10px] text-gray-400 italic">Ninguém responderu.</p>`;
+                if(arr.length===0) fila.innerHTML = `<p class="text-[10px] text-gray-400 italic">Ninguém respondeu ainda.</p>`;
                 else arr.forEach((v, i) => fila.innerHTML += `<div class="flex justify-between bg-white px-2 py-0.5 rounded border text-[11px]"><span class="font-bold">${i+1}. ${v.nome}</span></div>`);
             }
             const container = document.getElementById('lista-nomes-enquete');
@@ -388,7 +370,7 @@
             curr.setDate(curr.setDate() + 1);
         }
         await setDoc(doc(db, "enquetes", "disponibilidade_atual"), { mesReferencia: mes, ativa: true, celebracoes: list, respostas: {} });
-        alert("Pesquisa de disponibilidade aberta!");
+        alert("Pesquisa de escala disparada!");
     });
 
     document.getElementById('btn-fechar-enquete')?.addEventListener('click', async () => {
@@ -419,7 +401,7 @@
                 turibuloAtivo: false, turiferario: { nome: "A definir", status: "Pendente" }, navetaAtiva: false, naveteiro: { nome: "A definir", status: "Pendente" }
             });
         }
-        alert("Escalas automatizadas geradas com sucesso!");
+        alert("Escalas automatizadas salvas!");
     });
 
     async function carregarEditorEscalasPorData(dataString) {
