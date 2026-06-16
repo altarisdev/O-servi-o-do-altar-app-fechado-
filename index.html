@@ -364,7 +364,7 @@
                             <input type="url" id="form-url-input" required placeholder="https://drive.google.com/..." class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium">
                         </div>
                         <button type="submit" class="w-full bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold py-2.5 rounded-lg transition-all cursor-pointer">
-                            <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Atualizar Link do Manual
+                            <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Atuais Link do Manual
                         </button>
                     </form>
                 </section>
@@ -428,6 +428,7 @@
     const containerEditoresMissa = document.getElementById('container-editores-missa');
     const cardConviteSubstituto = document.getElementById('card-convite-substituto');
     const buscaUsuarioLista = document.getElementById('busca-usuario-lista');
+    const formEscalaAutomatica = document.getElementById('form-escala-automatica');
     
     // Seletores da funcionalidade de irmão
     const chkTemIrmao = document.getElementById('chk-tem-irmao');
@@ -754,7 +755,6 @@
 
                 await signOut(authSecundario);
                 
-                // Dispara o e-mail usando o novo serviço Resend estruturado
                 await dispararEmailBoasVindasResend(nome, email, senha);
 
                 formCadastroUsuario.reset();
@@ -978,7 +978,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural de avisos updated!");
+                alert("Mural de avisos atualizado!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
@@ -1210,14 +1210,17 @@
         });
     }
 
-    // CORREÇÃO DA SUBMISSÃO DAS CHECKBOXES DA ENQUETE
     const btnEnqueteEnviar = document.getElementById('btn-enquete-enviar');
     if(btnEnqueteEnviar) {
         btnEnqueteEnviar.addEventListener('click', async () => {
-            // Seletor corrigido de forma precisa para mapear a classe gerada dinamicamente
-            const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
+            const checkboxes = document.getElementsByClassName('chk-dia-enquete');
             const chavesSelecionadas = [];
-            checkboxes.forEach(chk => chavesSelecionadas.push(chk.value));
+            
+            Array.from(checkboxes).forEach(chk => {
+                if (chk.checked) {
+                    chavesSelecionadas.push(chk.value);
+                }
+            });
             
             showLoading();
             try {
@@ -1228,7 +1231,7 @@
                     respondidoEm: Date.now()
                 };
                 await updateDoc(docRef, campoAtualizacao);
-                alert("Sua disponibilidade foi salva!");
+                alert("Sua disponibilidade foi salva com sucesso!");
             } catch (err) { alert("Erro ao salvar: " + err.message); }
             hideLoading();
         });
@@ -1292,7 +1295,6 @@
         hideLoading();
     }
 
-    // CORREÇÃO DE ASSUMIR VAGA / COBRIR ALTO (SINCRONIZAÇÃO DA DATA SELECIONADA)
     window.cobrirVagaAberta = async function(idMissa, slotChave) {
         showLoading();
         try {
@@ -1301,7 +1303,6 @@
             await updateDoc(doc(db, "escalas", idMissa), updateObjeto);
             alert("Você assumiu a escala com sucesso!");
             
-            // Força a sincronia caso a data selecionada global estivesse vazia na inicialização
             if (!dataSelecionadaGlobal) {
                 dataSelecionadaGlobal = idMissa.split('_')[0];
             }
@@ -1457,6 +1458,7 @@
         }
     }
 
+    // EXPOSIÇÃO GLOBAL DA TROCA DE ABAS DO COROINHA (CORREÇÃO DO REFERENCE_ERROR)
     window.switchTab = function(tabName) {
         if (usuarioLogadoDados?.funcao === "Coordenador") return;
         
@@ -1464,9 +1466,9 @@
         const contAvisos = document.getElementById('conteudo-avisos');
         const contLiturgia = document.getElementById('conteudo-liturgia');
         
-        if(contEscala) contEscala.className = tabName === 'escala' ? 'space-y-4 block' : 'space-y-4 hidden';
-        if(contAvisos) contAvisos.className = tabName === 'avisos' ? 'space-y-4 block md:block' : 'space-y-4 hidden md:block';
-        if(contLiturgia) contLiturgia.className = tabName === 'liturgia' ? 'space-y-4 block md:block' : 'space-y-4 hidden md:block';
+        if(contEscala) contEscala.className = tabName === 'escala' ? 'space-y-4 block md:col-span-2' : 'space-y-4 hidden md:col-span-2';
+        if(contAvisos) contAvisos.className = tabName === 'avisos' ? 'space-y-4 block' : 'space-y-4 hidden md:block';
+        if(contLiturgia) contLiturgia.className = tabName === 'liturgia' ? 'space-y-4 block' : 'space-y-4 hidden md:block';
         
         const tEscala = document.getElementById('tab-escala');
         const tAvisos = document.getElementById('tab-avisos');
