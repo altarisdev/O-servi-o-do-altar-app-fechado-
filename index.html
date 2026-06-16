@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Altaris - Gestão de Acólitos</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link class="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .active-tab {
             border-bottom: 3px solid #b45309;
@@ -16,9 +16,9 @@
 </head>
 <body class="bg-gray-100 font-sans min-h-screen flex flex-col">
 
-    <div id=\"tela-loading\" class=\"fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-none opacity-0\">
-        <div class=\"animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-amber-700 mb-4\"></div>
-        <p class=\"text-xs font-semibold text-gray-500 tracking-wider uppercase\">Sincronizando Presbitério...</p>
+    <div id="tela-loading" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-none opacity-0">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-amber-700 mb-4"></div>
+        <p class="text-xs font-semibold text-gray-500 tracking-wider uppercase">Sincronizando Presbitério...</p>
     </div>
 
     <div id="tela-login" class="flex-1 flex items-center justify-center p-4 transition-all duration-300">
@@ -28,7 +28,7 @@
                     <i class="fa-solid fa-church text-2xl"></i>
                 </div>
                 <h1 class="text-2xl font-black text-gray-800 tracking-tight">ALTARIS</h1>
-                <p class="text-xs font-bold text-amber-700 uppercase tracking-widest mt-0.5">Paróquia São Cristóvão</p>
+                <p id="nome-paroquia-login" class="text-xs font-bold text-amber-700 uppercase tracking-widest mt-0.5">Paróquia Nossa Senhora do Livramento</p>
             </div>
             
             <form id="form-login" class="space-y-4">
@@ -36,7 +36,7 @@
                     <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 tracking-wider">E-mail Institucional</label>
                     <div class="relative">
                         <i class="fa-solid fa-envelope absolute left-3 top-3.5 text-gray-400 text-xs"></i>
-                        <input type="email" id="login-email" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-9 pr-4 text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600 transition-all font-medium text-gray-700" placeholder="exemplo@igreja.com">
+                        <input type="email" id="login-email" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600 transition-all font-medium text-gray-700" placeholder="exemplo@igreja.com">
                     </div>
                 </div>
                 <div>
@@ -45,7 +45,7 @@
                     </div>
                     <div class="relative">
                         <i class="fa-solid fa-lock absolute left-3 top-3.5 text-gray-400 text-xs"></i>
-                        <input type="password" id="login-senha" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-9 pr-4 text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600 transition-all font-medium text-gray-700" placeholder="••••••••">
+                        <input type="password" id="login-senha" required class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600 transition-all font-medium text-gray-700" placeholder="••••••••">
                     </div>
                 </div>
                 <button type="submit" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-md shadow-amber-700/10 hover:shadow-lg cursor-pointer">
@@ -64,7 +64,7 @@
                     </div>
                     <div>
                         <span class="font-black text-gray-800 text-sm tracking-tight block">ALTARIS</span>
-                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block -mt-1">Painel Geral</span>
+                        <span id="nome-paroquia-painel" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block -mt-1">Paróquia Nossa Senhora do Livramento</span>
                     </div>
                 </div>
                 
@@ -118,7 +118,7 @@
                     <div id="lista-avisos-mural" class="space-y-3"></div>
                 </div>
                 
-                <div id="bloco-enquete-disponibilidade" class="bg-white p-4 rounded-xl border border-emerald-100 shadow-xs bg-linear-to-b from-white to-emerald-50/20 hidden">
+                <div id="bloco-enquete-disponibilidade" class="bg-white p-4 rounded-xl border border-emerald-100 shadow-xs bg-gradient-to-b from-white to-emerald-50/20 hidden">
                     <div class="flex items-center gap-2 text-emerald-800 mb-1">
                         <i class="fa-solid fa-clipboard-question text-sm"></i>
                         <h3 class="font-black text-xs uppercase tracking-wider">Disponibilidade Mensal</h3>
@@ -238,7 +238,7 @@
                             <h3 class="text-sm font-black text-gray-800 tracking-tight">Banco de Dados do Presbitério</h3>
                             <p class="text-[10px] text-gray-400 font-medium">Lista de contas e credenciais provisórias registradas.</p>
                         </div>
-                        <input type="text" id="busca-usuario-lista" placeholder="Filtrar por nome ou e-mail..." class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-700 focus:outline-hidden focus:border-amber-600 w-full sm:w-64">
+                        <input type="text" id="busca-usuario-lista" placeholder="Filtrar por nome ou e-mail..." class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-700 focus:outline-none focus:border-amber-600 w-full sm:w-64">
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs border-collapse">
@@ -247,7 +247,8 @@
                                     <th class="p-3">Nome</th>
                                     <th class="p-3">E-mail</th>
                                     <th class="p-3 text-amber-900 bg-amber-50/40 font-mono font-bold">Senha Prov.</th>
-                                    <th class="p-3 text-center">Irmão Vinculado</th> <th class="p-3 text-center">Função</th>
+                                    <th class="p-3 text-center">Irmão Vinculado</th>
+                                    <th class="p-3 text-center">Função</th>
                                     <th class="p-3 text-center">Ações</th>
                                 </tr>
                             </thead>
@@ -264,7 +265,7 @@
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10/firebase-firestore.js";
 
-        // IMPORTANTE: Insira as suas credenciais reais do Firebase aqui
+        // Substitua pelas suas configurações reais do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSy...",
             authDomain: "seu-app.firebaseapp.com",
@@ -290,12 +291,28 @@
         const viewPainel = document.getElementById('painel-principal');
         const formLogin = document.getElementById('form-login');
 
-        function mostrarLoader() { if(loader) loader.className = "fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-auto opacity-100"; }
-        function ocultarLoader() { if(loader) loader.className = "fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-none opacity-0"; }
+        function mostrarLoader() { if(loader) { loader.classList.remove('pointer-events-none', 'opacity-0'); loader.classList.add('pointer-events-auto', 'opacity-100'); } }
+        function ocultarLoader() { if(loader) { loader.classList.remove('pointer-events-auto', 'opacity-100'); loader.classList.add('pointer-events-none', 'opacity-0'); } }
 
         mostrarLoader();
 
+        // Lógica para carregar o nome da Paróquia de forma dinâmica do Firebase se configurado
+        async function sincronizarNomeParoquia() {
+            try {
+                const docRef = doc(db, "configuracoes", "sistema");
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists() && docSnap.data().nomeParoquia) {
+                    const nomeReal = docSnap.data().nomeParoquia;
+                    document.getElementById('nome-paroquia-login').innerText = nomeReal;
+                    document.getElementById('nome-paroquia-painel').innerText = nomeReal;
+                }
+            } catch (e) {
+                console.log("Mantendo nome padrão da paróquia.");
+            }
+        }
+
         onAuthStateChanged(auth, async (user) => {
+            await sincronizarNomeParoquia();
             if (user) {
                 try {
                     const docRef = doc(db, "usuarios", user.uid);
@@ -420,7 +437,6 @@
                 });
                 cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome));
                 
-                // ATUALIZAÇÃO: Alimenta dinamicamente o select de irmãos do cadastro
                 const selectIrmao = document.getElementById('cad-irmao');
                 if(selectIrmao) {
                     selectIrmao.innerHTML = '<option value="">Nenhum</option>';
@@ -434,7 +450,6 @@
             });
         }
 
-        // ATUALIZAÇÃO: Renderiza a tabela de usuários com a caixa de alteração do irmão
         function renderizarTabelaUsuariosFiltrada(termoBusca = "") {
             const tabelaBody = document.getElementById('tabela-usuarios-recuperacao');
             if(!tabelaBody) return;
@@ -454,7 +469,6 @@
                 const senhaExibida = usuario.senha_provisoria || "••••••••";
                 const identificadorExibido = usuario.idDoc.startsWith('pre_') ? "🚫 Pré-Inscrito" : "✓ Ativo";
                 
-                // Monta dinamicamente as opções de irmãos ocultando o próprio usuário da lista
                 let opcoesIrmaos = `<option value="">Nenhum</option>`;
                 cacheTodosUsuarios.forEach(u => {
                     if(u.idDoc !== usuario.idDoc) {
@@ -490,7 +504,6 @@
             });
         }
 
-        // ATUALIZAÇÃO: Vincula os irmãos cruzando as informações no Firestore em tempo real
         window.vincularIrmaoEmTempoReal = async function(usuarioId, irmaoId) {
             try {
                 await updateDoc(doc(db, "usuarios", usuarioId), { irmaoId: irmaoId });
@@ -524,7 +537,7 @@
             const nome = document.getElementById('cad-nome').value.trim();
             const email = document.getElementById('cad-email').value.trim();
             const funcao = document.getElementById('cad-funcao').value;
-            const irmaoId = document.getElementById('cad-irmao').value; // ATUALIZAÇÃO: Captura do select
+            const irmaoId = document.getElementById('cad-irmao').value;
 
             const caracteres = 'abcdefghijklmnopqrstuvwxyz0123456789@#%';
             let senha = '';
@@ -535,7 +548,6 @@
             try {
                 const novoUidOficial = "pre_" + Date.now();
                 
-                // ATUALIZAÇÃO: Gravando com o parâmetro irmaoId incluído
                 await setDoc(doc(db, "usuarios", novoUidOficial), {
                     nome: nome,
                     email: email,
@@ -701,7 +713,6 @@
                 const cronogramaDoMes = enqueteSnap.data().celebracoes || [];
                 const mapaRespostasGerais = respostasSnap.exists() ? respostasSnap.data() : {};
 
-                // ATUALIZAÇÃO: Algoritmo de sorteio que agrupa e prioriza os irmãos juntos nas escalas
                 for (const cel of cronogramaDoMes) {
                     let disponiveisNomes = [];
                     
@@ -722,7 +733,7 @@
                         if (!escaladosFinais.includes(pessoa)) {
                             escaladosFinais.push(pessoa);
 
-                            const dadosUsuario = cacheTodosUsuarios.find(u => u.nome === pessoa);
+                            const dadosUsuario = cacheTodosUsuarios.find(u => u.nome === donkey);
                             if(dadosUsuario && dadosUsuario.irmaoId) {
                                 const dadosIrmao = cacheTodosUsuarios.find(u => u.idDoc === dadosUsuario.irmaoId);
                                 
@@ -797,15 +808,15 @@
                     for(let i=1; i<=6; i++) {
                         const slot = escala[`altar${i}`];
                         if(slot && slot.nome) {
-                            slotsHtml += renderizarLinhaAcólitoServindo(escala.idDoc, `altar${i}`, slot.nome, slot.status);
+                            slotsHtml += renderizarLinhaAcolitoServindo(escala.idDoc, `altar${i}`, slot.nome, slot.status);
                         }
                     }
 
                     if(escala.turibuloAtivo) {
-                        slotsHtml += renderizarLinhaAcólitoServindo(escala.idDoc, `turiferario`, escala.turiferario?.nome || "A definir", escala.turiferario?.status || "Pendente", "fa-smudge");
+                        slotsHtml += renderizarLinhaAcolitoServindo(escala.idDoc, `turiferario`, escala.turiferario?.nome || "A definir", escala.turiferario?.status || "Pendente");
                     }
                     if(escala.navetaAtiva) {
-                        slotsHtml += renderizarLinhaAcólitoServindo(escala.idDoc, `naveteiro`, escala.naveteiro?.nome || "A definir", escala.naveteiro?.status || "Pendente", "fa-box-tissue");
+                        slotsHtml += renderizarLinhaAcolitoServindo(escala.idDoc, `naveteiro`, escala.naveteiro?.nome || "A definir", escala.naveteiro?.status || "Pendente");
                     }
 
                     conteiner.innerHTML += `
@@ -826,7 +837,7 @@
             });
         }
 
-        function renderizarLinhaAcólitoServindo(idEscala, keySlot, nome, status, iconeCustom = "fa-user-check") {
+        function renderizarLinhaAcolitoServindo(idEscala, keySlot, nome, status) {
             let classeCorStatus = "bg-amber-500";
             if(status === "Confirmado") classeCorStatus = "bg-emerald-600";
             if(status === "Recusado") classeCorStatus = "bg-rose-600";
