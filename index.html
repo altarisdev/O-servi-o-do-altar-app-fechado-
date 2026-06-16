@@ -247,6 +247,20 @@
                                     <option value="Coordenador">Coordenador</option>
                                 </select>
                             </div>
+                            
+                            <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2">
+                                <label class="flex items-center gap-2 text-xs font-bold text-gray-700 cursor-pointer">
+                                    <input type="checkbox" id="chk-tem-irmao" class="w-4 h-4 rounded text-amber-700 focus:ring-amber-500">
+                                    <span>Possui irmão no presbitério?</span>
+                                </label>
+                                <div id="bloco-selecao-irmao" class="hidden">
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Selecione o Irmão Existente</label>
+                                    <select id="cad-irmao-vinculo" class="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-semibold text-gray-700">
+                                        <option value="">Selecione um membro...</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-2.5 rounded-lg transition-all mt-2 cursor-pointer shadow-xs">
                                 <i class="fa-solid fa-user-plus mr-1"></i> Ativar Conta e Registrar Membro
                             </button>
@@ -392,13 +406,12 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Instância secundária para criar contas sem deslogar o coordenador logado
     const appSecundario = initializeApp(firebaseConfig, "SecondaryApp");
     const authSecundario = getAuth(appSecundario);
 
     // Seletores do DOM
     const formLogin = document.getElementById('form-login');
-    const formCadastroUsuario = document.getElementById('form-cadastro-usuario'); // CORRIGIDO: Seletor adicionado
+    const formCadastroUsuario = document.getElementById('form-cadastro-usuario'); 
     const erroLogin = document.getElementById('erro-login');
     const erroLoginTexto = document.getElementById('erro-login-texto');
     const btnLogout = document.getElementById('btn-logout');
@@ -415,6 +428,11 @@
     const containerEditoresMissa = document.getElementById('container-editores-missa');
     const cardConviteSubstituto = document.getElementById('card-convite-substituto');
     const buscaUsuarioLista = document.getElementById('busca-usuario-lista');
+    
+    // Novos seletores da funcionalidade de irmão
+    const chkTemIrmao = document.getElementById('chk-tem-irmao');
+    const blocoSelecaoIrmao = document.getElementById('bloco-selecao-irmao');
+    const cadIrmaoVinculo = document.getElementById('cad-irmao-vinculo');
 
     // Variáveis de Estado Globais
     let usuarioLogadoDados = null;
@@ -425,7 +443,6 @@
     let unsubMural = null;
     let unsubUsuarios = null;
 
-    // Cronograma Base da Paróquia
     const CRONOGRAMA_PAROQUIA = [
         { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
         { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
@@ -464,7 +481,6 @@
         }
     }
 
-    // LISTENER DE AUTH DO FIREBASE
     onAuthStateChanged(auth, async (user) => {
         showLoading();
         if (user) {
@@ -541,7 +557,6 @@
         usuarioLogadoDados = null;
     }
 
-    // FORMULÁRIO DE LOGIN COM SUPORTE AO LOGIN DO DEV (BYPASS)
     if(formLogin) {
         formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -621,7 +636,32 @@
         });
     }
 
-    // FORMULÁRIO DE CADASTRO COM LÓGICA DE IRMÃOS (MESMO E-MAIL)
+    // LISTENER DA CHECKBOX DE IRMÃO (EXIBE/OCULTA A LISTBOX)
+    if(chkTemIrmao) {
+        chkTemIrmao.addEventListener('change', (e) => {
+            if(e.target.checked) {
+                blocoSelecaoIrmao.classList.remove('hidden');
+            } else {
+                blocoSelecaoIrmao.classList.add('hidden');
+                if(cadIrmaoVinculo) cadIrmaoVinculo.value = "";
+            }
+        });
+    }
+
+    // ATUALIZA A LISTBOX DE IRMÃOS COM OS DADOS DO CACHE DO FIREBASE
+    function atualizarListBoxIrmaos() {
+        if(!cadIrmaoVinculo) return;
+        const valorSelecionado = cadIrmaoVinculo.value;
+        cadIrmaoVinculo.innerHTML = '<option value="">Selecione um membro...</option>';
+        cacheTodosUsuarios.forEach(u => {
+            if(u.funcao !== 'Coordenador') {
+                cadIrmaoVinculo.innerHTML += `<option value="${u.nome}">${u.nome}</option>`;
+            }
+        });
+        cadIrmaoVinculo.value = valorSelecionado;
+    }
+
+    // FORMULÁRIO DE CADASTRO ATUALIZADO COM VÍNCULO DE IRMÃO
     if(formCadastroUsuario) {
         formCadastroUsuario.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -630,6 +670,10 @@
             const email = document.getElementById('cad-email').value.trim().toLowerCase();
             const senha = document.getElementById('cad-senha').value.trim();
             const funcao = document.getElementById('cad-funcao').value;
+            
+            // Pega o irmão vinculado se a checkbox estiver ativa
+            const temIrmaoMarcado = chkTemIrmao ? chkTemIrmao.checked : false;
+            const irmaoNomeVinculado = (temIrmaoMarcado && cadIrmaoVinculo) ? cadIrmaoVinculo.value : "";
 
             if (senha.length < 6) {
                 hideLoading();
@@ -642,15 +686,28 @@
             if (emailJaExiste) {
                 const idIrmaoManual = "pre_" + Date.now();
                 try {
-                    await setDoc(doc(db, "usuarios", idIrmaoManual), {
+                    const dadosCadastro = {
                         nome: nome,
                         email: email,
                         senha_provisoria: senha,
                         funcao: funcao,
                         tipoConta: "IrmaoVinculado"
-                    });
+                    };
+                    if(irmaoNomeVinculado) dadosCadastro.irmaoVinculado = irmaoNomeVinculado;
+
+                    await setDoc(doc(db, "usuarios", idIrmaoManual), dadosCadastro);
+                    
+                    // Se foi linkado um irmão invertido, atualiza o irmão existente também para criar o vínculo mútuo
+                    if(irmaoNomeVinculado) {
+                        const irmaoNoBanco = cacheTodosUsuarios.find(u => u.nome === irmaoNomeVinculado);
+                        if(irmaoNoBanco) {
+                            await updateDoc(doc(db, "usuarios", irmaoNoBanco.idDoc), { irmaoVinculado: nome });
+                        }
+                    }
+
                     alert(`Cadastro de irmão detectado! ${nome} foi adicionado com sucesso ao banco vinculando o e-mail: ${email}. Ele usará as mesmas credenciais para acessar a própria escala.`);
                     formCadastroUsuario.reset();
+                    if(blocoSelecaoIrmao) blocoSelecaoIrmao.classList.add('hidden');
                 } catch(err) {
                     alert("Erro ao cadastrar irmão vinculado: " + err.message);
                 }
@@ -662,13 +719,23 @@
                 const resultadoAuth = await createUserWithEmailAndPassword(authSecundario, email, senha);
                 const novoUidOficial = resultadoAuth.user.uid;
                 
-                await setDoc(doc(db, "usuarios", novoUidOficial), {
+                const dadosCadastroOficial = {
                     nome: nome,
                     email: email,
                     senha_provisoria: senha,
                     funcao: funcao,
                     tipoConta: "Oficial"
-                });
+                };
+                if(irmaoNomeVinculado) dadosCadastroOficial.irmaoVinculado = irmaoNomeVinculado;
+
+                await setDoc(doc(db, "usuarios", novoUidOficial), dadosCadastroOficial);
+
+                if(irmaoNomeVinculado) {
+                    const irmaoNoBanco = cacheTodosUsuarios.find(u => u.nome === irmaoNomeVinculado);
+                    if(irmaoNoBanco) {
+                        await updateDoc(doc(db, "usuarios", irmaoNoBanco.idDoc), { irmaoVinculado: nome });
+                    }
+                }
 
                 await signOut(authSecundario);
                 
@@ -687,6 +754,7 @@
                 }
 
                 formCadastroUsuario.reset();
+                if(blocoSelecaoIrmao) blocoSelecaoIrmao.classList.add('hidden');
             } catch (err) {
                 console.error(err);
                 alert("Erro ao registrar conta oficial: " + err.message);
@@ -724,11 +792,13 @@
         filtrados.forEach((usuario) => {
             const senhaExibida = usuario.senha_provisoria || "••••••••";
             const identificadorExibido = usuario.idDoc.startsWith('pre_') ? "🚫 Compartilhada (Irmão)" : "✓ Oficial";
+            const tagIrmao = usuario.irmaoVinculado ? `<span class="block text-[9px] text-indigo-600 font-medium"><i class="fa-solid fa-link"></i> Irmão de: ${usuario.irmaoVinculado}</span>` : '';
             tabelaBody.innerHTML += `
                 <tr class="hover:bg-gray-50/80 transition-all border-b border-gray-100">
                     <td class="p-3 font-semibold text-gray-800">
                         ${usuario.nome}
                         <span class="block text-[9px] font-bold ${usuario.idDoc.startsWith('pre_') ? 'text-amber-600' : 'text-emerald-600'}">${identificadorExibido}</span>
+                        ${tagIrmao}
                     </td>
                     <td class="p-3 text-gray-600 font-mono">${usuario.email}</td>
                     <td class="p-3 text-amber-900 bg-amber-50/40 font-mono font-bold select-all">${senhaExibida}</td>
@@ -758,6 +828,7 @@
             });
             cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome));
             if(buscaUsuarioLista) renderizarTabelaUsuariosFiltrada(buscaUsuarioLista.value);
+            atualizarListBoxIrmaos(); // Atualiza dinamicamente as opções do formulário
         }, (error) => {
             console.error("Erro na escuta de usuários ativos:", error);
         });
@@ -903,7 +974,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural de avisos updated!");
+                alert("Mural de avisos atualizado!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
@@ -936,7 +1007,7 @@
         });
     }
 
-    const formEscalaAutomatica = document.getElementById('form-escala-automatica');
+    // LÓGICA DO SORTEADOR AUTOMÁTICO ADAPTADA PARA CASAR IRMÃOS NO MESMO DIA/HORÁRIO
     if(formEscalaAutomatica) {
         formEscalaAutomatica.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -974,19 +1045,44 @@
                         }
                     });
                     
+                    // Embaralha a lista inicial para garantir o fator aleatório (randômico puro)
                     disponiveis.sort(() => Math.random() - 0.5);
+                    
+                    // VETOR DE RESULTADO FINAL DO PREBITÉRIO PARA ESTA MISSA
+                    let escaladosFinais = [];
+                    
+                    // Enquanto houver vagas no altar (6 postos tradicionais) e pessoas disponíveis
+                    while(disponiveis.length > 0 && escaladosFinais.length < 6) {
+                        const corrente = disponiveis.shift(); // Tira o primeiro da fila aleatória
+                        escaladosFinais.push(corrente);
+                        
+                        // Busca se a pessoa possui um irmão cadastrado no sistema
+                        const perfilUsuario = cacheTodosUsuarios.find(u => u.nome === corrente);
+                        if(perfilUsuario && perfilUsuario.irmaoVinculado) {
+                            const nomeIrmao = perfilUsuario.irmaoVinculado;
+                            
+                            // Verifica se o irmão também respondeu que pode ir nessa missa e ainda não foi puxado
+                            const irmaoDisponivelIndex = disponiveis.indexOf(nomeIrmao);
+                            if(irmaoDisponivelIndex !== -1 && escaladosFinais.length < 6) {
+                                // Remove o irmão da lista de disponíveis e joga imediatamente na vaga seguinte
+                                disponiveis.splice(irmaoDisponivelIndex, 1);
+                                escaladosFinais.push(nomeIrmao);
+                            }
+                        }
+                    }
+                    
                     const chaveEscalaDocumento = `${cel.data}_${cel.horario.replace(':', '')}`;
                     
                     await setDoc(doc(db, "escalas", chaveEscalaDocumento), {
                         titulo: `${tituloBase} (${cel.rotulo})`,
                         horario: cel.horario,
                         data: cel.data,
-                        altar1: { nome: disponiveis[0] || "A definir", status: "Pendente" },
-                        altar2: { nome: disponiveis[1] || "A definir", status: "Pendente" },
-                        altar3: { nome: disponiveis[2] || "A definir", status: "Pendente" },
-                        altar4: { nome: disponiveis[3] || "A definir", status: "Pendente" },
-                        altar5: { nome: disponiveis[4] || "A definir", status: "Pendente" },
-                        altar6: { nome: disponiveis[5] || "A definir", status: "Pendente" },
+                        altar1: { nome: escaladosFinais[0] || "A definir", status: "Pendente" },
+                        altar2: { nome: escaladosFinais[1] || "A definir", status: "Pendente" },
+                        altar3: { nome: escaladosFinais[2] || "A definir", status: "Pendente" },
+                        altar4: { nome: escaladosFinais[3] || "A definir", status: "Pendente" },
+                        altar5: { nome: escaladosFinais[4] || "A definir", status: "Pendente" },
+                        altar6: { nome: escaladosFinais[5] || "A definir", status: "Pendente" },
                         turibuloAtivo: false,
                         turiferario: { nome: "A definir", status: "Pendente" },
                         navetaAtiva: false,
@@ -995,7 +1091,7 @@
                 }
 
                 hideLoading();
-                alert("Escalas mensais processadas com sucesso!");
+                alert("Escalas mensais processadas com sucesso! Irmãos mapeados foram agrupados no mesmo horário.");
                 formEscalaAutomatica.reset();
                 if (editorEscalaData) carregarEditorEscalasPorData(editorEscalaData.value);
             } catch (err) { 
@@ -1069,7 +1165,7 @@
                             "naveteiro.nome": document.getElementById(`edit-nave-${idDocumentoMissa}`).value
                         });
                         hideLoading();
-                        alert("Escala atualizada!");
+                        alert("Escala updated!");
                         if (buscaEscalaData && editorEscalaData && buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                         carregarEditorEscalasPorData(editorEscalaData.value);
                     } catch (err) { hideLoading(); alert(err.message); }
@@ -1172,7 +1268,6 @@
                 Object.keys(respostas).forEach(nome => {
                     const r = respostas[nome];
                     const escolhas = r.escolhas || (Array.isArray(r) ? r : []);
-                    // CORRIGIDO: Referência mudada de 'choices.includes' para 'escolhas.includes'
                     if (escolhas.includes(chaveEnqueteBuscada) && nome !== usuarioLogadoDados.nome) {
                         listaCandidatosValidos.push({ nome, timestamp: r.respondidoEm || 0 });
                     }
