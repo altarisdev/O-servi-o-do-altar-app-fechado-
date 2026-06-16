@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Altaris - Gestão de Acólitos</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link class="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .active-tab {
             border-bottom: 3px solid #b45309;
@@ -36,14 +36,14 @@
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-1">E-mail Cadastrado</label>
                     <div class="relative">
                         <i class="fa-solid fa-envelope absolute left-3 top-3.5 text-gray-400 text-xs"></i>
-                        <input type="email" id="login-email" required placeholder="exemplo@igreja.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-hidden focus:border-amber-600 transition-all font-medium">
+                        <input type="email" id="login-email" required placeholder="exemplo@igreja.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Senha de Acesso</label>
                     <div class="relative">
                         <i class="fa-solid fa-lock absolute left-3 top-3.5 text-gray-400 text-xs"></i>
-                        <input type="password" id="login-senha" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-hidden focus:border-amber-600 transition-all font-medium">
+                        <input type="password" id="login-senha" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium">
                     </div>
                 </div>
 
@@ -105,7 +105,7 @@
                             <h3 class="text-sm font-bold text-gray-800"><i class="fa-solid fa-magnifying-glass"></i> Consultar Outro Dia</h3>
                             <p class="text-[11px] text-gray-400 font-medium">Selecione o dia para puxar quem está escalado</p>
                         </div>
-                        <input type="date" id="busca-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-bold text-gray-700 focus:outline-hidden focus:border-amber-700">
+                        <input type="date" id="busca-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-bold text-gray-700 focus:outline-none focus:border-amber-700">
                     </div>
 
                     <div id="card-enquete" class="hidden bg-gradient-to-br from-blue-700 to-indigo-900 text-white p-5 rounded-2xl shadow-md border border-blue-800 space-y-3">
@@ -222,7 +222,7 @@
                     <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 h-fit space-y-4">
                         <div>
                             <h3 class="text-sm font-black text-gray-800">Cadastrar Novo Membro</h3>
-                            <p class="text-[11px] text-gray-400 font-medium">Ativa automaticamente o login, salva o perfil e notifica por e-mail</p>
+                            <p class="text-[11px] text-gray-400 font-medium">Permite e-mails repetidos para irmãos. Contas não-oficiais salvam dados locais.</p>
                         </div>
                         <form id="form-cadastro-usuario" class="space-y-3">
                             <div>
@@ -248,7 +248,7 @@
                                 </select>
                             </div>
                             <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-2.5 rounded-lg transition-all mt-2 cursor-pointer shadow-xs">
-                                <i class="fa-solid fa-user-plus mr-1"></i> Ativar Conta e Enviar E-mail
+                                <i class="fa-solid fa-user-plus mr-1"></i> Ativar Conta e Registrar Membro
                             </button>
                         </form>
                     </div>
@@ -257,9 +257,9 @@
                         <div class="mb-3 flex justify-between items-center">
                             <div>
                                 <h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3>
-                                <p class="text-[11px] text-gray-400 font-medium">Controle total de credenciais e cargos</p>
+                                <p class="text-[11px] text-gray-400 font-medium">Gerencie credenciais oficiais e cadastros de irmãos</p>
                             </div>
-                            <input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-xs font-medium focus:outline-hidden focus:border-amber-700">
+                            <input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-xs font-medium focus:outline-none focus:border-amber-700">
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
@@ -363,7 +363,7 @@
                     <form id="form-publicar-aviso" class="space-y-3">
                         <div>
                             <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Texto do Comunicado</label>
-                            <textarea id="txt-aviso-coordenador" required rows="6" placeholder="Digite aqui o aviso que aparecerá no mural..." class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs font-medium focus:outline-hidden focus:border-amber-700"></textarea>
+                            <textarea id="txt-aviso-coordenador" required rows="6" placeholder="Digite aqui o aviso que aparecerá no mural..." class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs font-medium focus:outline-none focus:border-amber-700"></textarea>
                         </div>
                         <button type="submit" class="w-full bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold py-2.5 rounded-lg transition-all cursor-pointer">
                             <i class="fa-solid fa-bullhorn mr-1"></i> Publicar no Mural Agora
@@ -373,6 +373,7 @@
             </div>
         </main>
     </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -395,6 +396,7 @@
     const appSecundario = initializeApp(firebaseConfig, "SecondaryApp");
     const authSecundario = getAuth(appSecundario);
 
+    // Seletores do DOM
     const formLogin = document.getElementById('form-login');
     const erroLogin = document.getElementById('erro-login');
     const erroLoginTexto = document.getElementById('erro-login-texto');
@@ -413,6 +415,7 @@
     const cardConviteSubstituto = document.getElementById('card-convite-substituto');
     const buscaUsuarioLista = document.getElementById('busca-usuario-lista');
 
+    // Variáveis de Estado Globais
     let usuarioLogadoDados = null;
     let dataSelecionadaGlobal = "";
     let mapaRespostasGerais = {}; 
@@ -421,6 +424,7 @@
     let unsubMural = null;
     let unsubUsuarios = null;
 
+    // Cronograma Base da Paróquia (0=Domingo, 1=Segunda, 2=Terça...)
     const CRONOGRAMA_PAROQUIA = [
         { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
         { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
@@ -459,6 +463,7 @@
         }
     }
 
+    // LISTENER DE AUTH DO FIREBASE COM REGRA ANTI-TRAVAMENTO
     onAuthStateChanged(auth, async (user) => {
         showLoading();
         if (user) {
@@ -467,44 +472,9 @@
                 if (docSnap.exists()) {
                     usuarioLogadoDados = docSnap.data();
                     usuarioLogadoDados.uid = user.uid;
-                    if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
-                    if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
-
-                    ouvirMuralAvisos();
-
-                    if (usuarioLogadoDados.funcao === "Coordenador") {
-                        if(painelCoroinha) painelCoroinha.classList.add('hidden');
-                        if(menuAbasCoroinha) menuAbasCoroinha.classList.add('hidden');
-                        if(painelCoordenador) painelCoordenador.classList.remove('hidden');
-                        
-                        // Executa com segurança para prevenir travamentos se as regras do banco bloquearem
-                        try { ouvirEnqueteTempoRealCoordenador(); } catch(e) { console.error(e); }
-                        try { ouvirUsuariosCadastrados(); } catch(e) { console.error(e); }
-                        carregarAvisoNoInputCoordenador();
-                        
-                        switchCoordTab('coord-usuarios');
-                        if(editorEscalaData) {
-                            editorEscalaData.value = new Date().toISOString().split('T')[0];
-                            carregarEditorEscalasPorData(editorEscalaData.value);
-                        }
-                    } else {
-                        if(painelCoordenador) painelCoordenador.classList.add('hidden');
-                        if(painelCoroinha) painelCoroinha.classList.remove('hidden');
-                        if(menuAbasCoroinha) menuAbasCoroinha.classList.remove('hidden');
-                        
-                        const hoje = new Date().toISOString().split('T')[0];
-                        if(buscaEscalaData) {
-                            buscaEscalaData.value = hoje;
-                            carregarEscalaPorData(hoje);
-                        }
-                        
-                        ouvirEnqueteTempoRealCoroinha();
-                        carregarLiturgiaAutomatica();
-                        carregarMaterialEstudo();
-                    }
-                    alternarTelasVisiveis(true);
+                    inicializarInterfaceUsuario();
                 } else {
-                    alert("Seu usuário está autenticado, mas o perfil correspondente não foi localizado.");
+                    alert("Seu usuário está autenticado, mas o perfil correspondente não foi localizado no Firestore.");
                     signOut(auth);
                 }
             } catch (e) { 
@@ -513,15 +483,65 @@
                 signOut(auth);
             }
         } else {
-            if (unsubEnquete) { unsubEnquete(); unsubEnquete = null; }
-            if (unsubMural) { unsubMural(); unsubMural = null; }
-            if (unsubUsuarios) { unsubUsuarios(); unsubUsuarios = null; }
-            usuarioLogadoDados = null;
-            alternarTelasVisiveis(false);
+            // Se o usuário não está logado no Firebase, checa se há sessão ativa do DEV BYPASS
+            const devSession = sessionStorage.getItem("dev_user");
+            if (devSession) {
+                usuarioLogadoDados = JSON.parse(devSession);
+                inicializarInterfaceUsuario();
+            } else {
+                limparCachesESubscricoes();
+                alternarTelasVisiveis(false);
+            }
         }
         setTimeout(hideLoading, 400);
     });
 
+    function inicializarInterfaceUsuario() {
+        if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
+        if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
+
+        ouvirMuralAvisos();
+
+        if (usuarioLogadoDados.funcao === "Coordenador") {
+            if(painelCoroinha) painelCoroinha.classList.add('hidden');
+            if(menuAbasCoroinha) menuAbasCoroinha.classList.add('hidden');
+            if(painelCoordenador) painelCoordenador.classList.remove('hidden');
+            
+            try { ouvirEnqueteTempoRealCoordenador(); } catch(e) { console.error(e); }
+            try { ouvirUsuariosCadastrados(); } catch(e) { console.error(e); }
+            carregarAvisoNoInputCoordenador();
+            
+            switchCoordTab('coord-usuarios');
+            if(editorEscalaData) {
+                editorEscalaData.value = new Date().toISOString().split('T')[0];
+                carregarEditorEscalasPorData(editorEscalaData.value);
+            }
+        } else {
+            if(painelCoordenador) painelCoordenador.classList.add('hidden');
+            if(painelCoroinha) painelCoroinha.classList.remove('hidden');
+            if(menuAbasCoroinha) menuAbasCoroinha.classList.remove('hidden');
+            
+            const hoje = new Date().toISOString().split('T')[0];
+            if(buscaEscalaData) {
+                buscaEscalaData.value = hoje;
+                carregarEscalaPorData(hoje);
+            }
+            
+            ouvirEnqueteTempoRealCoroinha();
+            carregarLiturgiaAutomatica();
+            carregarMaterialEstudo();
+        }
+        alternarTelasVisiveis(true);
+    }
+
+    function limparCachesESubscricoes() {
+        if (unsubEnquete) { unsubEnquete(); unsubEnquete = null; }
+        if (unsubMural) { unsubMural(); unsubMural = null; }
+        if (unsubUsuarios) { unsubUsuarios(); unsubUsuarios = null; }
+        usuarioLogadoDados = null;
+    }
+
+    // FORMULÁRIO DE LOGIN COM SUPORTE AO LOGIN DO DEV (BYPASS)
     if(formLogin) {
         formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -529,6 +549,22 @@
             const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
             const senhaInput = document.getElementById('login-senha').value.trim();
 
+            // ─── LOGIN DO DEV (BYPASS LOCAL) ───
+            if (emailInput === "dev@altaris.com" && senhaInput === "dev1234") {
+                console.log("Acesso DEV Bypass ativado.");
+                usuarioLogadoDados = {
+                    uid: "dev_bypass_id",
+                    nome: "Desenvolvedor Altaris",
+                    email: "dev@altaris.com",
+                    funcao: "Coordenador"
+                };
+                sessionStorage.setItem("dev_user", JSON.stringify(usuarioLogadoDados));
+                inicializarInterfaceUsuario();
+                setTimeout(hideLoading, 400);
+                return;
+            }
+
+            // LOGIN NORMAL VIA FIREBASE AUTH
             try {
                 await signInWithEmailAndPassword(auth, emailInput, senhaInput);
                 if(erroLogin) erroLogin.classList.add('hidden');
@@ -550,7 +586,8 @@
     if(btnLogout) {
         btnLogout.addEventListener('click', () => {
             showLoading();
-            signOut(auth);
+            sessionStorage.removeItem("dev_user");
+            signOut(auth).window.location.reload();
         });
     }
 
@@ -577,15 +614,15 @@
     const btnGerarSenha = document.getElementById('btn-gerar-senha');
     if(btnGerarSenha) {
         btnGerarSenha.addEventListener('click', () => {
-            const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
+            const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
             let novaSenha = '';
-            for (let i = 0; i < 8; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            for (let i = 0; i < 6; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
             const cadSenhaInput = document.getElementById('cad-senha');
             if(cadSenhaInput) cadSenhaInput.value = novaSenha;
         });
     }
 
-    const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
+    // FORMULÁRIO DE CADASTRO COM LÓGICA DE IRMÃOS (MESMO E-MAIL)
     if(formCadastroUsuario) {
         formCadastroUsuario.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -601,6 +638,32 @@
                 return;
             }
 
+            // Verifica se o e-mail já existe na nossa lista cacheada (Indicação de Irmãos)
+            const emailJaExiste = cacheTodosUsuarios.some(user => user.email === email);
+
+            if (emailJaExiste) {
+                // ─── LÓGICA DE IRMÃOS (MESMO E-MAIL) ───
+                // Como o Firebase Auth bloqueia a criação de contas com o mesmo e-mail, salvamos este irmão 
+                // apenas no Firestore como "Não-Oficial/Pré-cadastrado" usando um ID manual customizado.
+                const idIrmaoManual = "pre_" + Date.now();
+                try {
+                    await setDoc(doc(db, "usuarios", idIrmaoManual), {
+                        nome: nome,
+                        email: email,
+                        senha_provisoria: senha,
+                        funcao: funcao,
+                        tipoConta: "IrmaoVinculado"
+                    });
+                    alert(`Cadastro de irmão detectado! ${nome} foi adicionado com sucesso ao banco vinculando o e-mail: ${email}. Ele usará as mesmas credenciais para acessar a própria escala.`);
+                    formCadastroUsuario.reset();
+                } catch(err) {
+                    alert("Erro ao cadastrar irmão vinculado: " + err.message);
+                }
+                hideLoading();
+                return;
+            }
+
+            // CADASTRO NORMAL DE NOVO MEMBRO OFICIAL (E-MAIL EXCLUSIVO)
             try {
                 const resultadoAuth = await createUserWithEmailAndPassword(authSecundario, email, senha);
                 const novoUidOficial = resultadoAuth.user.uid;
@@ -609,7 +672,8 @@
                     nome: nome,
                     email: email,
                     senha_provisoria: senha,
-                    funcao: funcao
+                    funcao: funcao,
+                    tipoConta: "Oficial"
                 });
 
                 await signOut(authSecundario);
@@ -620,16 +684,12 @@
                     await fetch('https://o-servi-o-do-altar-app-fechado.vercel.app/api/enviar-email', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            nome: nome,
-                            email: email,
-                            mensagem: textMessage
-                        })
+                        body: JSON.stringify({ nome: nome, email: email, mensagem: textMessage })
                     });
                     alert(`Conta oficial de ${nome} ativada no sistema e e-mail disparado!`);
                 } catch (emailErr) {
                     console.error("Falha no disparo do e-mail:", emailErr);
-                    alert(`Conta criada com sucesso no banco! A mensagem automática via Vercel falhou.`);
+                    alert(`Conta criada com sucesso no banco! A mensagem automática via API falhou.`);
                 }
 
                 formCadastroUsuario.reset();
@@ -669,12 +729,12 @@
 
         filtrados.forEach((usuario) => {
             const senhaExibida = usuario.senha_provisoria || "••••••••";
-            const identificadorExibido = usuario.idDoc.startsWith('pre_') ? "🚫 Não-Oficial" : "✓ Ativo";
+            const identificadorExibido = usuario.idDoc.startsWith('pre_') ? "🚫 Compartilhada (Irmão)" : "✓ Oficial";
             tabelaBody.innerHTML += `
                 <tr class="hover:bg-gray-50/80 transition-all border-b border-gray-100">
                     <td class="p-3 font-semibold text-gray-800">
                         ${usuario.nome}
-                        <span class="block text-[9px] font-bold ${usuario.idDoc.startsWith('pre_') ? 'text-rose-600' : 'text-emerald-600'}">${identificadorExibido}</span>
+                        <span class="block text-[9px] font-bold ${usuario.idDoc.startsWith('pre_') ? 'text-amber-600' : 'text-emerald-600'}">${identificadorExibido}</span>
                     </td>
                     <td class="p-3 text-gray-600 font-mono">${usuario.email}</td>
                     <td class="p-3 text-amber-900 bg-amber-50/40 font-mono font-bold select-all">${senhaExibida}</td>
@@ -943,10 +1003,7 @@
                 hideLoading();
                 alert("Escalas mensais processadas com sucesso!");
                 formEscalaAutomatica.reset();
-                
-                if (editorEscalaData) {
-                    carregarEditorEscalasPorData(editorEscalaData.value);
-                }
+                if (editorEscalaData) carregarEditorEscalasPorData(editorEscalaData.value);
             } catch (err) { 
                 hideLoading(); 
                 alert("Erro ao processar escala automática: " + err.message); 
@@ -1121,7 +1178,7 @@
                 Object.keys(respostas).forEach(nome => {
                     const r = respostas[nome];
                     const escolhas = r.escolhas || (Array.isArray(r) ? r : []);
-                    if (escolhas.includes(chaveEnqueteBuscada) && nome !== usuarioLogadoDados.nome) {
+                    if (choices.includes(chaveEnqueteBuscada) && nome !== usuarioLogadoDados.nome) {
                         listaCandidatosValidos.push({ nome, timestamp: r.respondidoEm || 0 });
                     }
                 });
@@ -1274,7 +1331,7 @@
                     titulo: document.getElementById('form-titulo-input').value, 
                     url: document.getElementById('form-url-input').value 
                 });
-                alert("Material de estudo updated!");
+                alert("Material de estudo atualizado!");
                 carregarMaterialEstudo();
             } catch(err) { alert(err.message); }
             hideLoading();
