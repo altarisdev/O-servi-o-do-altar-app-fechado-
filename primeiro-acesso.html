@@ -56,7 +56,8 @@
 
 <!-- LÓGICA DE INTEGRAÇÃO COM O FIREBASE -->
 <script type="module">
-    // IMPORTANTE: Mude o caminho abaixo para o local exato do seu arquivo de configuração do Firebase
+    // 1. ATENÇÃO: Garanta que o caminho para o seu arquivo de configuração está correto!
+    // Se o seu arquivo de configuração se chamar 'firebase.js' ou estiver em outra pasta, mude aqui.
     import { db, auth } from "./firebaseConfig.js"; 
     
     import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10/firebase-firestore.js";
@@ -64,61 +65,57 @@
 
     document.getElementById('formPrimeiroAcesso').addEventListener('submit', async (e) => {
         e.preventDefault();
+        console.log("Formulário enviado. Iniciando processo...");
 
-        // Resgata os valores dos inputs do HTML
         const codigoDigitado = document.getElementById('codigoAcesso').value.trim();
         const nome = document.getElementById('nomeCompleto').value.trim();
         const email = document.getElementById('emailCadastro').value.trim();
         const senha = document.getElementById('senhaCadastro').value;
 
         try {
-            // 1. Busca o código oficial que o coordenador salvou no Firestore
-            // Altere "configuracoes" e "sistema" se sua coleção tiver outro nome
+            alert("Passo 1: Conectando ao banco para verificar o código...");
+            
+            // Busca o documento dentro de configuracoes -> sistema
             const docRef = doc(db, "configuracoes", "sistema");
             const docSnap = await getDoc(docRef);
             
             if (!docSnap.exists()) {
-                alert("Erro interno: O código de acesso não foi configurado no banco de dados. Avise o coordenador.");
+                alert("Erro: O documento 'sistema' dentro da coleção 'configuracoes' não foi encontrado no seu Firestore.");
                 return;
             }
             
             const codigoCorreto = docSnap.data().codigoAcesso;
+            alert("Passo 2: Código encontrado no banco. Validando o que você digitou...");
 
-            // 2. Compara se o código digitado bate com o do banco
             if (codigoDigitado !== codigoCorreto) {
-                alert("Código de acesso incorreto! Solicite a chave atualizada ao seu coordenador.");
-                return; // Bloqueia e impede a criação da conta
+                alert("Erro: O código digitado está errado!");
+                return;
             }
 
-            // 3. Se passou na validação, cria a autenticação (Auth)
+            alert("Passo 3: Código correto! Criando usuário no Firebase Authentication...");
             const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
             const user = userCredential.user;
 
-            // 4. Cria o documento de perfil do usuário no Firestore (Coleção "usuarios")
+            alert("Passo 4: Usuário criado no Auth. Salvando dados na coleção 'usuarios'...");
+            
+            // IMPORTANTE: Alinhado com a estrutura do seu banco de dados
             await setDoc(doc(db, "usuarios", user.uid), {
                 nome: nome,
                 email: email,
-                role: "membro", // Cargo padrão seguro (não admin)
-                dataCadastro: new Date()
+                funcao: "Membro", // Modificado para "funcao" para seguir o padrão do seu banco
+                senha_provisoria: senha
             });
 
-            alert("Cadastro realizado com sucesso! Redirecionando...");
-            window.location.href = "index.html"; // Mude para a sua página interna pós-login
+            alert("Sucesso total! Usuário cadastrado. Redirecionando...");
+            window.location.href = "index.html"; // Mude para a página pós-login real do seu sistema
 
         } catch (error) {
-            console.error("Erro no processo de cadastro:", error);
-            
-            // Tratamento de erros comuns do Firebase Auth
-            if (error.code === 'auth/email-already-in-use') {
-                alert("Este e-mail já está cadastrado no sistema.");
-            } else if (error.code === 'auth/weak-shadow' || error.code === 'auth/weak-password') {
-                alert("A senha precisa ter pelo menos 6 caracteres.");
-            } else {
-                alert("Erro ao realizar cadastro: " + error.message);
-            }
+            console.error("Erro completo:", error);
+            alert("Ocorreu um erro no código: " + error.message);
         }
     });
 </script>
+
 
 </body>
 </html>
