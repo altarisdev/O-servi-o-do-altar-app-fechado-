@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altaris - Painel do Acólito</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .active-tab { border-bottom: 3px solid #b45309; color: #b45309; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+
+    <div id="tela-loading" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-amber-700 mb-4"></div>
+        <p class="text-xs font-semibold text-gray-500 tracking-wider uppercase">Sincronizando Presbitério...</p>
+    </div>
+
+    <header class="bg-amber-900 text-white px-4 py-4 shadow-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-church"></i></div>
+                <div>
+                    <h2 id="nome-usuario-header" class="text-sm font-bold leading-tight">Carregando...</h2>
+                    <span id="funcao-usuario-header" class="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-sm font-semibold uppercase tracking-wider block mt-0.5">...</span>
+                </div>
+            </div>
+            <button id="btn-logout" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all">
+                Sair <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </button>
+        </div>
+    </header>
+
+    <div id="menu-abas-coroinha" class="bg-white border-b border-gray-200 sticky top-[72px] z-30 flex md:hidden">
+        <button id="tab-escala" onclick="switchTab('escala')" class="active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1 cursor-pointer">
+            <i class="fa-solid fa-calendar-days text-base"></i><span>Escalas</span>
+        </button>
+        <button id="tab-avisos" onclick="switchTab('avisos')" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1 cursor-pointer">
+            <i class="fa-solid fa-bullhorn text-base"></i><span>Avisos</span>
+        </button>
+        <button id="tab-liturgia" onclick="switchTab('liturgia')" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1 cursor-pointer">
+            <i class="fa-solid fa-book-bible text-base"></i><span>Liturgia</span>
+        </button>
+    </div>
+
+    <main class="max-w-6xl w-full mx-auto p-4 flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div id="conteudo-escala" class="space-y-4 block md:col-span-2">
+            <div class="bg-white p-4 rounded-xl shadow-xs border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-800"><i class="fa-solid fa-magnifying-glass"></i> Consultar Outro Dia</h3>
+                    <p class="text-[11px] text-gray-400 font-medium">Selecione o dia para puxar quem está escalado</p>
+                </div>
+                <input type="date" id="busca-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-bold text-gray-700 focus:outline-none focus:border-amber-700">
+            </div>
+
+            <div id="card-enquete" class="hidden bg-gradient-to-br from-blue-700 to-indigo-900 text-white p-5 rounded-2xl shadow-md border border-blue-800 space-y-3">
+                <div class="flex items-start gap-3">
+                    <div class="bg-white/20 p-2 rounded-xl text-lg"><i class="fa-solid fa-clipboard-question"></i></div>
+                    <div>
+                        <h3 class="text-sm font-black tracking-wide">Pesquisa de Disponibilidade Aberta!</h3>
+                        <p class="text-[11px] text-blue-100">Marque todas as celebrações em que você poderá servir no próximo mês.</p>
+                    </div>
+                </div>
+                <div id="bloco-votacao-enquete" class="bg-white text-gray-800 rounded-xl p-3 max-h-48 overflow-y-auto space-y-1.5">
+                    <div id="container-opcoes-enquete" class="space-y-1"></div>
+                    <button id="btn-enquete-enviar" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-lg text-xs transition-all mt-2 cursor-pointer">Enviar Minha Disponibilidade</button>
+                </div>
+                <div id="txt-feedback-enquete" class="hidden bg-emerald-600/30 border border-emerald-500/40 text-emerald-200 text-center py-2 px-3 rounded-lg text-xs font-bold">
+                    <i class="fa-solid fa-circle-check"></i> Suas respostas foram salvas no painel da coordenação!
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xs border border-gray-200 overflow-hidden">
+                <div class="bg-amber-800 text-white p-4 flex justify-between items-center">
+                    <div>
+                        <span id="lbl-data-missa" class="text-[10px] bg-white/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">--/--/----</span>
+                        <h3 id="lbl-titulo-missa" class="text-sm font-black mt-1 leading-tight">Carregando cronograma...</h3>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[9px] block uppercase font-bold text-amber-200">Horário</span>
+                        <span id="lbl-horario-missa" class="text-base font-black">--:--h</span>
+                    </div>
+                </div>
+                <div id="lista-presbiterio" class="divide-y divide-gray-100"></div>
+                <div id="card-notificacao" class="hidden bg-amber-50 p-4 border-t-2 border-amber-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="flex gap-2.5 items-start">
+                        <i class="fa-solid fa-bell text-amber-700 text-sm mt-0.5 animate-bounce"></i>
+                        <div>
+                            <p class="text-xs font-bold text-amber-900">Você está escalado para esta celebração!</p>
+                            <p class="text-[10px] text-gray-500 font-medium">Confirme sua presença ou solicite um substituto imediatamente.</p>
+                        </div>
+                    </div>
+                    <div id="botoes-notificacao-container" class="flex gap-2 w-full sm:w-auto"></div>
+                </div>
+            </div>
+
+            <div id="card-convite-substituto" class="hidden bg-rose-50 border border-rose-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div class="flex gap-2"><i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
+                    <div>
+                        <p class="text-xs font-bold text-rose-900">Vaga aberta por falta justificada!</p>
+                        <p class="text-[10px] text-rose-700">Um irmão precisou de substituto. Deseja assumir este posto no altar?</p>
+                    </div>
+                </div>
+                <div id="botoes-cobertura-container" class="flex flex-wrap gap-2 w-full sm:w-auto"></div>
+            </div>
+        </div>
+
+        <div id="conteudo-avisos" class="hidden md:block space-y-4">
+            <div class="bg-white p-4 rounded-2xl shadow-xs border border-gray-100 space-y-3">
+                <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-bullhorn text-amber-700"></i> Mural de Avisos</h3>
+                <div id="corpo-mural-avisos" class="bg-amber-50/40 border border-amber-100 p-3 rounded-xl"></div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-xs border border-gray-100 space-y-3">
+                <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-graduation-cap text-amber-700"></i> Formação Continuada</h3>
+                <div class="flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+                    <div class="truncate mr-2">
+                        <p id="lbl-titulo-formacao" class="text-xs font-bold text-gray-700 truncate">Nenhum documento</p>
+                        <span class="text-[9px] text-gray-400 font-medium uppercase">Manual de Posições PDF</span>
+                    </div>
+                    <a id="btn-download-formacao" href="#" target="_blank" class="bg-amber-800 hover:bg-amber-900 text-white p-2 rounded-lg text-xs font-bold transition-all"><i class="fa-solid fa-cloud-arrow-down"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div id="conteudo-liturgia" class="hidden md:block space-y-4">
+            <div class="bg-white p-4 rounded-2xl shadow-xs border border-gray-100 space-y-3">
+                <div class="flex justify-between items-center border-b pb-1.5">
+                    <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-book-bible text-amber-700"></i> Liturgia Diária</h3>
+                    <span id="lbl-ref-liturgia" class="text-[10px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded-sm">...</span>
+                </div>
+                <div class="max-h-64 overflow-y-auto text-xs text-gray-600 font-medium leading-relaxed italic bg-gray-50 p-3 rounded-xl border border-gray-100 whitespace-pre-wrap" id="txt-evangelho-dia">Carregando Santo Evangelho...</div>
+            </div>
+        </div>
+    </main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
+        authDomain: "tarcisius-d03d7.firebaseapp.com",
+        projectId: "tarcisius-d03d7",
+        storageBucket: "tarcisius-d03d7.firebasestorage.app",
+        messagingSenderId: "186797936591",
+        appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const telaLoading = document.getElementById('tela-loading');
+    const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
+    const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
+    const buscaEscalaData = document.getElementById('busca-escala-data');
+    const cardConviteSubstituto = document.getElementById('card-convite-substituto');
+    const btnLogout = document.getElementById('btn-logout');
+
+    let usuarioLogadoDados = null;
+    let dataSelecionadaGlobal = "";
+    let unsubEnquete = null;
+    let unsubMural = null;
+
+    function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+            if (docSnap.exists() && docSnap.data().funcao !== "Coordenador") {
+                usuarioLogadoDados = docSnap.data();
+                usuarioLogadoDados.uid = user.uid;
+                inicializarPainel();
+            } else {
+                // Se for coordenador ou não existir, expulsa daqui
+                signOut(auth);
+                window.location.href = "index.html";
+            }
+        } else {
+            window.location.href = "index.html";
+        }
+        setTimeout(hideLoading, 400);
+    });
+
+    function inicializarPainel() {
+        if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
+        if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
+        
+        ouvirMuralAvisos();
+        ouvirEnqueteTempoRealCoroinha();
+        carregarLiturgiaAutomatica();
+        carregarMaterialEstudo();
+
+        const hoje = new Date().toISOString().split('T')[0];
+        if(buscaEscalaData) {
+            buscaEscalaData.value = hoje;
+            carregarEscalaPorData(hoje);
+        }
+    }
+
+    if(btnLogout) {
+        btnLogout.addEventListener('click', () => { signOut(auth).then(() => window.location.href = "index.html"); });
+    }
+
+    function ouvirMuralAvisos() {
+        unsubMural = onSnapshot(doc(db, "mural", "aviso_geral"), (docSnap) => {
+            const muralContainer = document.getElementById('corpo-mural-avisos');
+            if(!muralContainer) return;
+            if (docSnap.exists() && docSnap.data().texto) {
+                muralContainer.innerHTML = `<div class="text-gray-700 font-medium leading-relaxed whitespace-pre-wrap">${docSnap.data().texto}</div><div class="text-[10px] text-gray-400 font-bold text-right pt-2 border-t mt-2">Publicado em: ${docSnap.data().dataPublicacao}</div>`;
+            } else {
+                muralContainer.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-2">Nenhum comunicado urgente hoje.</p>`;
+            }
+        });
+    }
+
+    function ouvirEnqueteTempoRealCoroinha() {
+        unsubEnquete = onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
+            const cardEnquete = document.getElementById('card-enquete');
+            const blocoVotacao = document.getElementById('bloco-votacao-enquete');
+            const blocoFeedback = document.getElementById('txt-feedback-enquete');
+            const container = document.getElementById('container-opcoes-enquete');
+            if(!cardEnquete) return;
+
+            if (docSnap.exists() && docSnap.data().ativa === true) {
+                const dados = docSnap.data();
+                const respostas = dados.respostas || {};
+                if (usuarioLogadoDados && Object.prototype.hasOwnProperty.call(respostas, usuarioLogadoDados.nome)) {
+                    blocoVotacao?.classList.add('hidden');
+                    blocoFeedback?.classList.remove('hidden');
+                    cardEnquete.classList.remove('hidden');
+                } else {
+                    if(container) {
+                        container.innerHTML = "";
+                        dados.celebracoes.forEach(cel => {
+                            container.innerHTML += `<label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 text-xs cursor-pointer border-b"><input type="checkbox" value="${cel.idChave}" class="chk-dia-enquete w-4 h-4 text-amber-700 rounded sub-checkbox"><div><strong>${cel.data.split('-').reverse().join('/')}</strong> - ${cel.rotulo} às ${cel.horario}h</div></label>`;
+                        });
+                    }
+                    blocoFeedback?.classList.add('hidden');
+                    blocoVotacao?.classList.remove('hidden');
+                    cardEnquete.classList.remove('hidden');
+                }
+            } else { cardEnquete.classList.add('hidden'); }
+        });
+    }
+
+    document.addEventListener('click', async (e) => {
+        if(e.target && e.target.id === 'btn-enquete-enviar') {
+            const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
+            const chaves = Array.from(checkboxes).map(chk => chk.value);
+            try {
+                const campoAtualizacao = {};
+                campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = { escolhas: chaves, respondidoEm: Date.now() };
+                await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), campoAtualizacao);
+            } catch (err) { alert(err.message); }
+        }
+    });
+
+    async function carregarEscalaPorData(dataString) {
+        dataSelecionadaGlobal = dataString;
+        const lista = document.getElementById('lista-presbiterio');
+        const cardNotificacao = document.getElementById('card-notificacao');
+        const botoesContainer = document.getElementById('botoes-notificacao-container');
+        const botoesCoberturaContainer = document.getElementById('botoes-cobertura-container');
+
+        if(!lista) return;
+        lista.innerHTML = ""; if(botoesContainer) botoesContainer.innerHTML = ""; if(botoesCoberturaContainer) botoesCoberturaContainer.innerHTML = "";
+        cardNotificacao?.classList.add('hidden'); cardConviteSubstituto?.classList.add('hidden');
+
+        const horariosPossiveis = ["1900", "1700", "0900"];
+        let encontrouAlguma = false; let usuarioOcupado = false; let temVaga = false;
+
+        for(const hr of horariosPossiveis) {
+            const idDoc = `${dataString}_${hr}`;
+            const docSnap = await getDoc(doc(db, "escalas", idDoc));
+            if (docSnap.exists()) {
+                encontrouAlguma = true;
+                const dados = docSnap.data();
+                document.getElementById('lbl-data-missa').innerText = dataString.split('-').reverse().join('/');
+                document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
+                document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
+                
+                let htmlMissa = `<div class="p-4 bg-amber-50/20 border-b space-y-2"><p class="text-[11px] font-bold text-amber-900 uppercase">Celebração das ${dados.horario}h</p><div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">`;
+                const postos = [{ch:'altar1', lb:'Altar I'}, {ch:'altar2', lb:'Altar II'}, {ch:'altar3', lb:'Altar III'}, {ch:'altar4', lb:'Altar IV'}, {ch:'altar5', lb:'Altar V'}, {ch:'altar6', lb:'Altar VI'}];
+                if (dados.turibuloAtivo) postos.push({ch:'turiferario', lb:'Turiferário'});
+                if (dados.navetaAtiva) postos.push({ch:'naveteiro', lb:'Naveteiro'});
+
+                postos.forEach(p => {
+                    const obj = dados[p.ch] || { nome: 'A definir', status: 'Pendente' };
+                    const livre = (obj.nome === "A definir" || obj.nome === "");
+                    let badge = obj.status === "Confirmado" ? "bg-emerald-100 text-emerald-800 font-bold" : "bg-amber-100 text-amber-800";
+                    
+                    htmlMissa += `<div class="bg-white p-2 rounded-lg border flex justify-between items-center"><span><strong>${p.lb}:</strong> ${obj.nome}</span><span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${badge}">${obj.status}</span></div>`;
+
+                    if (usuarioLogadoDados && obj.nome === usuarioLogadoDados.nome) {
+                        usuarioOcupado = true; cardNotificacao?.classList.remove('hidden');
+                        botoesContainer.innerHTML += `<div class="flex gap-1"><button onclick="confirmarPresencaMissa('${idDoc}', '${p.ch}')" class="bg-emerald-700 text-white text-[10px] px-2 py-1 rounded">Confirmar</button><button onclick="pedirSubstituicaoMissa('${idDoc}', '${p.ch}')" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded">Pedir Troca</button></div>`;
+                    }
+                    if (livre && botoesCoberturaContainer) {
+                        temVaga = true;
+                        botoesCoberturaContainer.innerHTML += `<button onclick="cobrirVagaAberta('${idDoc}', '${p.ch}')" class="bg-indigo-700 text-white text-[10px] px-2 py-1 rounded">Assumir ${p.lb} às ${dados.horario}h</button>`;
+                    }
+                });
+                htmlMissa += `</div></div>`; lista.innerHTML += htmlMissa;
+            }
+        }
+        if (temVaga && !usuarioOcupado) cardConviteSubstituto?.classList.remove('hidden');
+        if(!encontrouAlguma) lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado para este dia.</p>`;
+    }
+
+    window.confirmarPresencaMissa = async function(idMissa, slot) {
+        const obj = {}; obj[`${slot}.status`] = "Confirmado";
+        await updateDoc(doc(db, "escalas", idMissa), obj); carregarEscalaPorData(dataSelecionadaGlobal);
+    }
+
+    window.pedirSubstituicaoMissa = async function(idMissa, slot) {
+        if(!confirm("Solicitar dispensa?")) return;
+        const docMissaSnap = await getDoc(doc(db, "escalas", idMissa));
+        const dadosMissa = docMissaSnap.data();
+        const docEnq = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
+        let sub = "A definir";
+
+        if (docEnq.exists()) {
+            const respostas = docEnq.data().respostas || {};
+            let candidatos = [];
+            Object.keys(respostas).forEach(n => {
+                if ((respostas[n].escolhas || []).includes(idMissa) && n !== usuarioLogadoDados.nome) candidatos.push({n, t: respostas[n].respondidoEm || 0});
+            });
+            const ocupados = [dadosMissa.altar1?.nome, dadosMissa.altar2?.nome, dadosMissa.altar3?.nome, dadosMissa.altar4?.nome, dadosMissa.altar5?.nome, dadosMissa.altar6?.nome, dadosMissa.turiferario?.nome, dadosMissa.naveteiro?.nome];
+            candidatos = candidatos.filter(c => !ocupados.includes(c.n)).sort((a,b) => a.t - b.t);
+            if (candidatos.length > 0) sub = candidatos[0].n;
+        }
+        const obj = {}; obj[slot] = { nome: sub, status: "Pendente" };
+        await updateDoc(doc(db, "escalas", idMissa), obj); carregarEscalaPorData(dataSelecionadaGlobal);
+    }
+
+    window.cobrirVagaAberta = async function(idMissa, slot) {
+        const obj = {}; obj[slot] = { nome: usuarioLogadoDados.nome, status: "Confirmado" };
+        await updateDoc(doc(db, "escalas", idMissa), obj); carregarEscalaPorData(dataSelecionadaGlobal);
+    }
+
+    if(buscaEscalaData) buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
+
+    async function carregarMaterialEstudo() {
+        const docSnap = await getDoc(doc(db, "formacao", "manual_atual"));
+        if (docSnap.exists()) {
+            document.getElementById('lbl-titulo-formacao').innerText = docSnap.data().titulo;
+            document.getElementById('btn-download-formacao').href = docSnap.data().url;
+        }
+    }
+
+    async function carregarLiturgiaAutomatica() {
+        try {
+            const res = await fetch('https://liturgia.up.railway.app/');
+            const data = await res.json();
+            document.getElementById('lbl-ref-liturgia').innerText = data.evangelho.referencia;
+            document.getElementById('txt-evangelho-dia').innerText = data.evangelho.texto;
+        } catch (e) { document.getElementById('txt-evangelho-dia').innerText = "Consulta disponível na sacristia."; }
+    }
+
+    window.switchTab = function(tabName) {
+        document.getElementById('conteudo-escala').className = tabName === 'escala' ? 'space-y-4 block md:col-span-2' : 'space-y-4 hidden md:col-span-2';
+        document.getElementById('conteudo-avisos').className = tabName === 'avisos' ? 'space-y-4 block' : 'space-y-4 hidden md:block';
+        document.getElementById('conteudo-liturgia').className = tabName === 'liturgia' ? 'space-y-4 block' : 'space-y-4 hidden md:block';
+        
+        document.getElementById('tab-escala').className = tabName === 'escala' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+        document.getElementById('tab-avisos').className = tabName === 'avisos' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+        document.getElementById('tab-liturgia').className = tabName === 'liturgia' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+    }
+</script>
+</body>
+</html>
