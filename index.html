@@ -422,6 +422,11 @@
     const cardConviteSubstituto = document.getElementById('card-convite-substituto');
     const buscaUsuarioLista = document.getElementById('busca-usuario-lista');
 
+    // Elementos do campo dinâmico de vínculo familiar (Irmão)
+    const cadFuncao = document.getElementById('cad-funcao');
+    const containerSelecionarIrmao = document.getElementById('container-selecionar-irmao'); // Certifique-se de que a div em volta do select de irmãos tenha este ID
+    const cadIrmaoSelect = document.getElementById('cad-irmao-select'); // Certifique-se de que o select de irmãos tenha este ID
+
     let usuarioLogadoDados = null;
     let dataSelecionadaGlobal = "";
     let mapaRespostasGerais = {}; 
@@ -429,7 +434,7 @@
     let unsubEnquete = null;
     let unsubMural = null;
     let unsubUsuarios = null;
-    let enqueteCarregada = false; // Trava de re-renderização para corrigir as checkboxes
+    let enqueteCarregada = false;
 
     const CRONOGRAMA_PAROQUIA = [
         { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" },
@@ -469,6 +474,7 @@
         }
     }
 
+    // CORREÇÃO: Tratamento do nível de acesso do Dev e Coordenador em conjunto
     onAuthStateChanged(auth, async (user) => {
         showLoading();
         if (user) {
@@ -482,11 +488,11 @@
 
                     ouvirMuralAvisos();
 
-                    if (usuarioLogadoDados.funcao === "Coordenador") {
+                    // Dev ganha as mesmas permissões estruturais de visualização do painel administrativo
+                    if (usuarioLogadoDados.funcao === "Coordenador" || usuarioLogadoDados.funcao === "Dev" || usuarioLogadoDados.funcao === "Developer") {
                         if(painelCoroinha) painelCoroinha.classList.add('hidden');
                         if(menuAbasCoroinha) menuAbasCoroinha.classList.add('hidden');
                         
-                        // Garante exibição em Grid compatível com Tailwind v4
                         if(painelCoordenador) {
                             painelCoordenador.classList.remove('hidden');
                             painelCoordenador.classList.add('grid');
@@ -502,6 +508,7 @@
                             carregarEditorEscalasPorData(editorEscalaData.value);
                         }
                     } else {
+                        // Fluxo normal para Coroinhas / Coroinha Irmão
                         if(painelCoordenador) {
                             painelCoordenador.classList.add('hidden');
                             painelCoordenador.classList.remove('grid');
@@ -518,7 +525,7 @@
                             carregarEscalaPorData(hoje);
                         }
                         
-                        enqueteCarregada = false; // Reseta estado para renderizar a enquete do coroinha
+                        enqueteCarregada = false; 
                         ouvirEnqueteTempoRealCoroinha();
                         carregarLiturgiaAutomatica();
                         carregarMaterialEstudo();
@@ -582,7 +589,6 @@
         return datasMapeadas;
     }
 
-    const btnGerarSenha = document.getElementById('btn-gerar-senha');
     if(btnGerarSenha) {
         btnGerarSenha.addEventListener('click', () => {
             const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%';
@@ -590,6 +596,34 @@
             for (let i = 0; i < 8; i++) novaSenha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
             const cadSenhaInput = document.getElementById('cad-senha');
             if(cadSenhaInput) cadSenhaInput.value = novaSenha;
+        });
+    }
+
+    // CORREÇÃO: Escuta a mudança de função para exibir a seleção de irmão e preenche os nomes disponíveis
+    if (cadFuncao) {
+        cadFuncao.addEventListener('change', (e) => {
+            const funcaoSelecionada = e.target.value;
+            // Altere para o valor exato correspondente ao option do seu HTML (ex: "Coroinha Irmão" ou "Irmao")
+            if (funcaoSelecionada === "Coroinha Irmão" || funcaoSelecionada === "irmao") {
+                if (containerSelecionarIrmao) {
+                    containerSelecionarIrmao.classList.remove('hidden');
+                    containerSelecionarIrmao.classList.add('block');
+                }
+                
+                // Preenche o select de irmãos com os usuários cadastrados no cache para referência
+                if (cadIrmaoSelect) {
+                    cadIrmaoSelect.innerHTML = '<option value="">Selecione o irmão/irmã...</option>';
+                    cacheTodosUsuarios.forEach(usr => {
+                        cadIrmaoSelect.innerHTML += `<option value="${usr.nome}">${usr.nome}</option>`;
+                    });
+                }
+            } else {
+                if (containerSelecionarIrmao) {
+                    containerSelecionarIrmao.classList.add('hidden');
+                    containerSelecionarIrmao.classList.remove('block');
+                }
+                if (cadIrmaoSelect) cadIrmaoSelect.innerHTML = '<option value="">Selecione o irmão/irmã...</option>';
+            }
         });
     }
 
@@ -602,6 +636,7 @@
             const email = document.getElementById('cad-email').value.trim().toLowerCase();
             const senha = document.getElementById('cad-senha').value.trim();
             const funcao = document.getElementById('cad-funcao').value;
+            const vinculadoAIrmao = cadIrmaoSelect ? cadIrmaoSelect.value : "";
 
             if (senha.length < 6) {
                 hideLoading();
@@ -613,13 +648,18 @@
                 const resultadoAuth = await createUserWithEmailAndPassword(authSecundario, email, senha);
                 const novoUidOficial = resultadoAuth.user.uid;
                 
-                await setDoc(doc(db, "usuarios", novoUidOficial), {
+                const objetoUsuario = {
                     nome: nome,
                     email: email,
                     senha_provisoria: senha,
                     funcao: funcao
-                });
+                };
 
+                if(vinculadoAIrmao) {
+                    objetoUsuario.vinculo_irmao = vinculadoAIrmao;
+                }
+                
+                await setDoc(doc(db, "usuarios", novoUidOficial), objetoUsuario);
                 await signOut(authSecundario);
                 
                 try {
@@ -628,11 +668,7 @@
                     await fetch('https://o-servi-o-do-altar-app-fechado.vercel.app/api/enviar-email', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            nome: nome,
-                            email: email,
-                            mensagem: mensagemTexto
-                        })
+                        body: JSON.stringify({ nome: nome, email: email, mensagem: mensagemTexto })
                     });
                     alert(`Conta oficial de ${nome} ativada no sistema e e-mail disparado!`);
                 } catch (emailErr) {
@@ -641,6 +677,7 @@
                 }
 
                 formCadastroUsuario.reset();
+                if(containerSelecionarIrmao) containerSelecionarIrmao.classList.add('hidden');
             } catch (err) {
                 console.error(err);
                 alert("Erro ao registrar conta oficial: " + err.message);
@@ -678,10 +715,13 @@
         filtrados.forEach((usuario) => {
             const senhaExibida = usuario.senha_provisoria || "••••••••";
             const identificadorExibido = usuario.idDoc.startsWith('pre_') ? "🚫 Não-Oficial" : "✓ Ativo";
+            const tagIrmao = usuario.vinculo_irmao ? `<span class="block text-[9px] text-indigo-600 font-medium">Irmão de: ${usuario.vinculo_irmao}</span>` : "";
+            
             tabelaBody.innerHTML += `
                 <tr class="hover:bg-gray-50/80 transition-all border-b border-gray-100">
                     <td class="p-3 font-semibold text-gray-800">
                         ${usuario.nome}
+                        ${tagIrmao}
                         <span class="block text-[9px] font-bold ${usuario.idDoc.startsWith('pre_') ? 'text-rose-600' : 'text-emerald-600'}">${identificadorExibido}</span>
                     </td>
                     <td class="p-3 text-gray-600 font-mono">${usuario.email}</td>
@@ -712,6 +752,16 @@
             });
             cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome));
             if(buscaUsuarioLista) renderizarTabelaUsuariosFiltrada(buscaUsuarioLista.value);
+            
+            // Atualiza dinamicamente o select de irmãos caso o coordenador esteja na aba de cadastro ativa
+            if (cadFuncao && (cadFuncao.value === "Coroinha Irmão" || cadFuncao.value === "irmao") && cadIrmaoSelect) {
+                const valorAtual = cadIrmaoSelect.value;
+                cadIrmaoSelect.innerHTML = '<option value="">Selecione o irmão/irmã...</option>';
+                cacheTodosUsuarios.forEach(usr => {
+                    cadIrmaoSelect.innerHTML += `<option value="${usr.nome}">${usr.nome}</option>`;
+                });
+                cadIrmaoSelect.value = valorAtual;
+            }
         });
     }
 
@@ -721,9 +771,7 @@
         });
     }
 
-    // CORREÇÃO: Alternância de abas do coordenador com compatibilidade Tailwind v4
     window.switchCoordTab = function(tabID) {
-        // Remove a exibição de todas as seções mapeadas
         ['sec-coord-usuarios', 'sec-coord-escalas', 'sec-coord-sorteio', 'sec-coord-material', 'sec-coord-avisos-tab'].forEach(id => {
             const el = document.getElementById(id);
             if(el) {
@@ -735,7 +783,6 @@
         const targetSec = document.getElementById('sec-' + tabID);
         if(targetSec) {
             targetSec.classList.remove('hidden');
-            // Mantém comportamento responsivo correto
             if(tabID === 'coord-usuarios' || tabID === 'coord-sorteio') {
                 targetSec.classList.add('grid');
             } else {
@@ -779,7 +826,7 @@
                 celebracoes: listaCelebracoes,
                 respostas: {} 
             });
-            enqueteCarregada = false; // Permite reconstruir para os usuários online
+            enqueteCarregada = false; 
             hideLoading();
             alert("Enquete de disponibilidade aberta com sucesso!");
         });
@@ -871,7 +918,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural de avisos updated!");
+                alert("Mural de avisos atualizado!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
@@ -1040,7 +1087,7 @@
                             "naveteiro.nome": document.getElementById(`edit-nave-${idDocumentoMissa}`).value
                         });
                         hideLoading();
-                        alert("Escala atualizada!");
+                        alert("Escala updated!");
                         if (buscaEscalaData && editorEscalaData && buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                         carregarEditorEscalasPorData(editorEscalaData.value);
                     } catch (err) { hideLoading(); alert(err.message); }
@@ -1053,7 +1100,6 @@
         editorEscalaData.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
     }
 
-    // CORREÇÃO: Evita que os inputs desmarquem sozinhos ao clicar
     function ouvirEnqueteTempoRealCoroinha() {
         if (unsubEnquete) unsubEnquete();
         unsubEnquete = onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
@@ -1072,7 +1118,6 @@
                     if(blocoFeedback) blocoFeedback.classList.remove('hidden');
                     cardEnquete.classList.remove('hidden');
                 } else {
-                    // SÓ CONSTRÓI O HTML SE FOR A PRIMEIRA VEZ (Evita perder a marcação do clique)
                     if(container && !enqueteCarregada) {
                         container.innerHTML = "";
                         dados.celebracoes.forEach(cel => {
@@ -1084,7 +1129,7 @@
                                 </label>
                             `;
                         });
-                        enqueteCarregada = true; // Trava o estado estrutural
+                        enqueteCarregada = true; 
                     }
                     if(blocoFeedback) blocoFeedback.classList.add('hidden');
                     if(blocoVotacao) blocoVotacao.classList.remove('hidden');
@@ -1102,7 +1147,7 @@
             checkboxes.forEach(chk => chavesSelecionadas.push(chk.value));
             
             if(chavesSelecionadas.length === 0) {
-                alert("Selecione ao menos um dia em que você está disponível!");
+                alert("Selecione ao menos um dia!");
                 return;
             }
             
@@ -1134,7 +1179,7 @@
     }
 
     window.pedirSubstituicaoMissa = async function(idMissa, slotChave) {
-        if(!confirm("Deseja solicitar dispensa desse horário?")) return;
+        if(!confirm("Deseja solicitar dispensa?")) return;
         showLoading();
         try {
             const docMissaRef = doc(db, "escalas", idMissa);
@@ -1288,7 +1333,7 @@
             }
 
             if(!encontrouAlguma) {
-                lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado para este dia.</p>`;
+                lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado.</p>`;
             }
         } catch(e) { console.error(e); }
     }
@@ -1337,29 +1382,20 @@
         }
     }
 
-    // CORREÇÃO: Alternância de abas do Coroinha sem destruir classes estruturais do Tailwind v4
     window.switchTab = function(tabName) {
-        if (usuarioLogadoDados?.funcao === "Coordenador") return;
+        if (usuarioLogadoDados?.funcao === "Coordenador" || usuarioLogadoDados?.funcao === "Dev" || usuarioLogadoDados?.funcao === "Developer") return;
         
         const contEscala = document.getElementById('conteudo-escala');
         const contAvisos = document.getElementById('conteudo-avisos');
         const contLiturgia = document.getElementById('conteudo-liturgia');
         
-        // Esconde todos primeiro
         [contEscala, contAvisos, contLiturgia].forEach(el => {
             if(el) el.classList.add('hidden');
         });
         
-        // Exibe a aba ativa baseado no breakpoint md
-        if(tabName === 'escala' && contEscala) {
-            contEscala.classList.remove('hidden');
-        }
-        if(tabName === 'avisos' && contAvisos) {
-            contAvisos.classList.remove('hidden');
-        }
-        if(tabName === 'liturgia' && contLiturgia) {
-            contLiturgia.classList.remove('hidden');
-        }
+        if(tabName === 'escala' && contEscala) contEscala.classList.remove('hidden');
+        if(tabName === 'avisos' && contAvisos) contAvisos.classList.remove('hidden');
+        if(tabName === 'liturgia' && contLiturgia) contLiturgia.classList.remove('hidden');
         
         const tEscala = document.getElementById('tab-escala');
         const tAvisos = document.getElementById('tab-avisos');
