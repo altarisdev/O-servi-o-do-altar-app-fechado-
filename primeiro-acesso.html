@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primeiro Acesso - Cadastro</title>
+    <!-- Se você usa Tailwind ou algum arquivo CSS, linke-o aqui -->
+    <style>
+        /* Estilização básica para visualização (ajuste com as suas classes se usar CSS/Tailwind) */
+        body { font-family: Arial, sans-serif; background-color: #f3f4f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .cadastro-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .grupo-input { margin-bottom: 15px; }
+        .grupo-input label { display: block; margin-bottom: 5px; font-weight: bold; color: #374151; }
+        .grupo-input input { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box; }
+        .btn-enviar { width: 100%; padding: 10px; background-color: #2563eb; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        .btn-enviar:hover { background-color: #1d4ed8; }
+        .link-voltar { display: block; text-align: center; margin-top: 15px; color: #4b5563; text-decoration: none; font-size: 14px; }
+        .link-voltar:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="cadastro-container">
+    <h2>Primeiro Acesso</h2>
+    <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">
+        Insira o código fornecido pelo seu coordenador para liberar o seu auto-cadastro.
+    </p>
+
+    <form id="formPrimeiroAcesso">
+        <!-- Campo para a Chave/Código Geral -->
+        <div class="grupo-input">
+            <label for="codigoAcesso">Código Geral de Acesso</label>
+            <input type="text" id="codigoAcesso" placeholder="Digite o código do coordenador" required>
+        </div>
+
+        <div class="grupo-input">
+            <label for="nomeCompleto">Nome Completo</label>
+            <input type="text" id="nomeCompleto" placeholder="Seu nome" required>
+        </div>
+
+        <div class="grupo-input">
+            <label for="emailCadastro">E-mail</label>
+            <input type="email" id="emailCadastro" placeholder="exemplo@email.com" required>
+        </div>
+
+        <div class="grupo-input">
+            <label for="senhaCadastro">Senha</label>
+            <input type="password" id="senhaCadastro" placeholder="Mínimo 6 caracteres" required>
+        </div>
+
+        <button type="submit" class="btn-enviar">Validar e Cadastrar</button>
+    </form>
+
+    <a href="login.html" class="link-voltar">Já tem uma conta? Voltar ao Login</a>
+</div>
+
+<!-- LÓGICA DE INTEGRAÇÃO COM O FIREBASE -->
+<script type="module">
+    // IMPORTANTE: Mude o caminho abaixo para o local exato do seu arquivo de configuração do Firebase
+    import { db, auth } from "./firebaseConfig.js"; 
+    
+    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10/firebase-firestore.js";
+    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10/firebase-auth.js";
+
+    document.getElementById('formPrimeiroAcesso').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Resgata os valores dos inputs do HTML
+        const codigoDigitado = document.getElementById('codigoAcesso').value.trim();
+        const nome = document.getElementById('nomeCompleto').value.trim();
+        const email = document.getElementById('emailCadastro').value.trim();
+        const senha = document.getElementById('senhaCadastro').value;
+
+        try {
+            // 1. Busca o código oficial que o coordenador salvou no Firestore
+            // Altere "configuracoes" e "sistema" se sua coleção tiver outro nome
+            const docRef = doc(db, "configuracoes", "sistema");
+            const docSnap = await getDoc(docRef);
+            
+            if (!docSnap.exists()) {
+                alert("Erro interno: O código de acesso não foi configurado no banco de dados. Avise o coordenador.");
+                return;
+            }
+            
+            const codigoCorreto = docSnap.data().codigoAcesso;
+
+            // 2. Compara se o código digitado bate com o do banco
+            if (codigoDigitado !== codigoCorreto) {
+                alert("Código de acesso incorreto! Solicite a chave atualizada ao seu coordenador.");
+                return; // Bloqueia e impede a criação da conta
+            }
+
+            // 3. Se passou na validação, cria a autenticação (Auth)
+            const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+            const user = userCredential.user;
+
+            // 4. Cria o documento de perfil do usuário no Firestore (Coleção "usuarios")
+            await setDoc(doc(db, "usuarios", user.uid), {
+                nome: nome,
+                email: email,
+                role: "membro", // Cargo padrão seguro (não admin)
+                dataCadastro: new Date()
+            });
+
+            alert("Cadastro realizado com sucesso! Redirecionando...");
+            window.location.href = "index.html"; // Mude para a sua página interna pós-login
+
+        } catch (error) {
+            console.error("Erro no processo de cadastro:", error);
+            
+            // Tratamento de erros comuns do Firebase Auth
+            if (error.code === 'auth/email-already-in-use') {
+                alert("Este e-mail já está cadastrado no sistema.");
+            } else if (error.code === 'auth/weak-shadow' || error.code === 'auth/weak-password') {
+                alert("A senha precisa ter pelo menos 6 caracteres.");
+            } else {
+                alert("Erro ao realizar cadastro: " + error.message);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
