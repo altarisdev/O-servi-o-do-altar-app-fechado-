@@ -3,119 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primeiro Acesso - Cadastro</title>
-    <!-- Se você usa Tailwind ou algum arquivo CSS, linke-o aqui -->
-    <style>
-        /* Estilização básica para visualização (ajuste com as suas classes se usar CSS/Tailwind) */
-        body { font-family: Arial, sans-serif; background-color: #f3f4f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .cadastro-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        .grupo-input { margin-bottom: 15px; }
-        .grupo-input label { display: block; margin-bottom: 5px; font-weight: bold; color: #374151; }
-        .grupo-input input { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box; }
-        .btn-enviar { width: 100%; padding: 10px; background-color: #2563eb; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
-        .btn-enviar:hover { background-color: #1d4ed8; }
-        .link-voltar { display: block; text-align: center; margin-top: 15px; color: #4b5563; text-decoration: none; font-size: 14px; }
-        .link-voltar:hover { text-decoration: underline; }
-    </style>
+    <title>Altaris - Sistema de Escala</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="bg-gray-900 text-white">
 
-<div class="cadastro-container">
-    <h2>Primeiro Acesso</h2>
-    <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">
-        Insira o código fornecido pelo seu coordenador para liberar o seu auto-cadastro.
-    </p>
-
-    <form id="formPrimeiroAcesso">
-        <!-- Campo para a Chave/Código Geral -->
-        <div class="grupo-input">
-            <label for="codigoAcesso">Código Geral de Acesso</label>
-            <input type="text" id="codigoAcesso" placeholder="Digite o código do coordenador" required>
-        </div>
-
-        <div class="grupo-input">
-            <label for="nomeCompleto">Nome Completo</label>
-            <input type="text" id="nomeCompleto" placeholder="Seu nome" required>
-        </div>
-
-        <div class="grupo-input">
-            <label for="emailCadastro">E-mail</label>
-            <input type="email" id="emailCadastro" placeholder="exemplo@email.com" required>
-        </div>
-
-        <div class="grupo-input">
-            <label for="senhaCadastro">Senha</label>
-            <input type="password" id="senhaCadastro" placeholder="Mínimo 6 caracteres" required>
-        </div>
-
-        <button type="submit" class="btn-enviar">Validar e Cadastrar</button>
-    </form>
-
-    <a href="index.html" class="link-voltar">Já tem uma conta? Voltar ao Login</a>
-</div>
-
-<!-- LÓGICA DE INTEGRAÇÃO COM O FIREBASE -->
-<script type="module">
-    // 1. ATENÇÃO: Garanta que o caminho para o seu arquivo de configuração está correto!
-    // Se o seu arquivo de configuração se chamar 'firebase.js' ou estiver em outra pasta, mude aqui.
-    import { db, auth } from "./firebaseConfig.js"; 
-    
-    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10/firebase-firestore.js";
-    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10/firebase-auth.js";
-
-    document.getElementById('formPrimeiroAcesso').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        console.log("Formulário enviado. Iniciando processo...");
-
-        const codigoDigitado = document.getElementById('codigoAcesso').value.trim();
-        const nome = document.getElementById('nomeCompleto').value.trim();
-        const email = document.getElementById('emailCadastro').value.trim();
-        const senha = document.getElementById('senhaCadastro').value;
-
-        try {
-            alert("Passo 1: Conectando ao banco para verificar o código...");
+    <!-- Tela de Login Padrão -->
+    <div id="tela-login" class="flex items-center justify-center h-screen">
+        <div class="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-center mb-6">Login de Membros</h2>
             
-            // Busca o documento dentro de configuracoes -> sistema
-            const docRef = doc(db, "configuracoes", "sistema");
-            const docSnap = await getDoc(docRef);
-            
-            if (!docSnap.exists()) {
-                alert("Erro: O documento 'sistema' dentro da coleção 'configuracoes' não foi encontrado no seu Firestore.");
-                return;
-            }
-            
-            const codigoCorreto = docSnap.data().codigoAcesso;
-            alert("Passo 2: Código encontrado no banco. Validando o que você digitou...");
+            <form id="form-login" class="space-y-4">
+                <div>
+                    <label for="login-email" class="block text-sm font-medium mb-1">E-mail:</label>
+                    <input type="email" id="login-email" required 
+                           class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:outline-none">
+                </div>
+                
+                <div>
+                    <label for="login-senha" class="block text-sm font-medium mb-1">Senha:</label>
+                    <input type="password" id="login-senha" required 
+                           class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:outline-none">
+                </div>
 
-            if (codigoDigitado !== codigoCorreto) {
-                alert("Erro: O código digitado está errado!");
-                return;
-            }
+                <!-- Elementos de erro alinhados ao JS principal -->
+                <div id="erro-login" class="hidden text-red-500 text-sm font-semibold mt-2 text-center">
+                    <span id="erro-login-texto">E-mail ou senha incorretos.</span>
+                </div>
 
-            alert("Passo 3: Código correto! Criando usuário no Firebase Authentication...");
-            const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
-            const user = userCredential.user;
+                <button type="submit" 
+                        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    Entrar
+                </button>
+            </form>
+        </div>
+    </div>
 
-            alert("Passo 4: Usuário criado no Auth. Salvando dados na coleção 'usuarios'...");
-            
-            // IMPORTANTE: Alinhado com a estrutura do seu banco de dados
-            await setDoc(doc(db, "usuarios", user.uid), {
-                nome: nome,
-                email: email,
-                funcao: "Membro", // Modificado para "funcao" para seguir o padrão do seu banco
-                senha_provisoria: senha
-            });
+    <!-- Container do Painel Principal (Inicia oculto/vazio até o login ser validado) -->
+    <div id="painel-principal" class="hidden container mx-auto p-4">
+        <!-- Sua interface de escalas, perfil do irmão logado, etc. vai aqui -->
+        <h1 class="text-3xl font-bold">Bem-vindo ao Altaris</h1>
+        <p class="text-gray-400 mt-2">Você está logado no sistema.</p>
+        <button id="btn-logout" class="mt-4 bg-red-600 px-4 py-2 rounded">Sair</button>
+    </div>
 
-            alert("Sucesso total! Usuário cadastrado. Redirecionando...");
-            window.location.href = "index.html"; // Mude para a página pós-login real do seu sistema
+    <!-- Elemento de Loading Global do Sistema -->
+    <div id="loading" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+        <div class="text-xl font-bold">Carregando dados...</div>
+    </div>
 
-        } catch (error) {
-            console.error("Erro completo:", error);
-            alert("Ocorreu um erro no código: " + error.message);
-        }
-    });
-</script>
-
-
+    <!-- Scripts de Inicialização do Firebase e Lógica de Negócio -->
+    <script type="module">
+        // Importações do Firebase e a lógica do app.js / script.js vão aqui ou no seu arquivo compilado externo.
+        // Certifique-se de que as funções originais (showLoading, hideLoading, inicializarInterfaceUsuario) estejam declaradas no escopo do seu script principal.
+    </script>
 </body>
 </html>
