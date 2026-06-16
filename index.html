@@ -155,7 +155,7 @@
                         </div>
                     </div>
 
-                    <div id="card-convite-substituto" class="hidden bg-rose-50 border border-rose-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div id="card-convite-substituto" class="hidden bg-rose-50 border border-rose-200 p-4 rounded-xl flex flex-col justify-between items-start sm:items-center gap-3">
                         <div class="flex gap-2">
                             <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
                             <div>
@@ -429,7 +429,7 @@
     const cardConviteSubstituto = document.getElementById('card-convite-substituto');
     const buscaUsuarioLista = document.getElementById('busca-usuario-lista');
     
-    // Novos seletores da funcionalidade de irmão
+    // Seletores da funcionalidade de irmão
     const chkTemIrmao = document.getElementById('chk-tem-irmao');
     const blocoSelecaoIrmao = document.getElementById('bloco-selecao-irmao');
     const cadIrmaoVinculo = document.getElementById('cad-irmao-vinculo');
@@ -565,7 +565,6 @@
             const senhaInput = document.getElementById('login-senha').value.trim();
 
             if (emailInput === "dev@altaris.com" && senhaInput === "dev1234") {
-                console.log("Acesso DEV Bypass ativado.");
                 usuarioLogadoDados = {
                     uid: "dev_bypass_id",
                     nome: "Desenvolvedor Altaris",
@@ -636,7 +635,6 @@
         });
     }
 
-    // LISTENER DA CHECKBOX DE IRMÃO (EXIBE/OCULTA A LISTBOX)
     if(chkTemIrmao) {
         chkTemIrmao.addEventListener('change', (e) => {
             if(e.target.checked) {
@@ -648,7 +646,6 @@
         });
     }
 
-    // ATUALIZA A LISTBOX DE IRMÃOS COM OS DADOS DO CACHE DO FIREBASE
     function atualizarListBoxIrmaos() {
         if(!cadIrmaoVinculo) return;
         const valorSelecionado = cadIrmaoVinculo.value;
@@ -661,7 +658,27 @@
         cadIrmaoVinculo.value = valorSelecionado;
     }
 
-    // FORMULÁRIO DE CADASTRO ATUALIZADO COM VÍNCULO DE IRMÃO
+    // DISPARO DE E-MAIL DO SISTEMA VIA RESEND (BACKEND VERCEL)
+    async function dispararEmailBoasVindasResend(nome, email, senha) {
+        try {
+            const textoMensagem = `Olá ${nome}! Sua conta no Serviço do Altar foi ativada com sucesso.\n\nSeu acesso:\nE-mail: ${email}\nSenha Provisória: ${senha}\n\nEntre no sistema para atualizar suas preferências e conferir o cronograma.`;
+            
+            await fetch('https://o-servi-o-do-altar-app-fechado.vercel.app/api/enviar-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    nome: nome, 
+                    email: email, 
+                    mensagem: textoMensagem 
+                })
+            });
+            alert(`Conta oficial de ${nome} ativada no sistema e e-mail disparado via Resend!`);
+        } catch (emailErr) {
+            console.error("Falha no disparo do e-mail:", emailErr);
+            alert(`Conta criada com sucesso no banco! A mensagem via Resend falhou.`);
+        }
+    }
+
     if(formCadastroUsuario) {
         formCadastroUsuario.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -671,7 +688,6 @@
             const senha = document.getElementById('cad-senha').value.trim();
             const funcao = document.getElementById('cad-funcao').value;
             
-            // Pega o irmão vinculado se a checkbox estiver ativa
             const temIrmaoMarcado = chkTemIrmao ? chkTemIrmao.checked : false;
             const irmaoNomeVinculado = (temIrmaoMarcado && cadIrmaoVinculo) ? cadIrmaoVinculo.value : "";
 
@@ -697,7 +713,6 @@
 
                     await setDoc(doc(db, "usuarios", idIrmaoManual), dadosCadastro);
                     
-                    // Se foi linkado um irmão invertido, atualiza o irmão existente também para criar o vínculo mútuo
                     if(irmaoNomeVinculado) {
                         const irmaoNoBanco = cacheTodosUsuarios.find(u => u.nome === irmaoNomeVinculado);
                         if(irmaoNoBanco) {
@@ -705,7 +720,7 @@
                         }
                     }
 
-                    alert(`Cadastro de irmão detectado! ${nome} foi adicionado com sucesso ao banco vinculando o e-mail: ${email}. Ele usará as mesmas credenciais para acessar a própria escala.`);
+                    alert(`Cadastro de irmão detectado! ${nome} foi adicionado compartilhando o e-mail: ${email}.`);
                     formCadastroUsuario.reset();
                     if(blocoSelecaoIrmao) blocoSelecaoIrmao.classList.add('hidden');
                 } catch(err) {
@@ -739,19 +754,8 @@
 
                 await signOut(authSecundario);
                 
-                try {
-                    const textMessage = `Olá ${nome}! Sua conta no Serviço do Altar foi ativada com sucesso.\n\nSeu acesso:\nE-mail: ${email}\nSenha Provisória: ${senha}\n\nEntre no sistema para atualizar suas preferências e conferir o cronograma.`;
-                    
-                    await fetch('https://o-servi-o-do-altar-app-fechado.vercel.app/api/enviar-email', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nome: nome, email: email, mensagem: textMessage })
-                    });
-                    alert(`Conta oficial de ${nome} ativada no sistema e e-mail disparado!`);
-                } catch (emailErr) {
-                    console.error("Falha no disparo do e-mail:", emailErr);
-                    alert(`Conta criada com sucesso no banco! A mensagem automática via API falhou.`);
-                }
+                // Dispara o e-mail usando o novo serviço Resend estruturado
+                await dispararEmailBoasVindasResend(nome, email, senha);
 
                 formCadastroUsuario.reset();
                 if(blocoSelecaoIrmao) blocoSelecaoIrmao.classList.add('hidden');
@@ -828,7 +832,7 @@
             });
             cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome));
             if(buscaUsuarioLista) renderizarTabelaUsuariosFiltrada(buscaUsuarioLista.value);
-            atualizarListBoxIrmaos(); // Atualiza dinamicamente as opções do formulário
+            atualizarListBoxIrmaos();
         }, (error) => {
             console.error("Erro na escuta de usuários ativos:", error);
         });
@@ -974,7 +978,7 @@
             try {
                 const dataHoje = new Date().toLocaleDateString('pt-BR');
                 await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAvisoInput.value, dataPublicacao: dataHoje });
-                alert("Mural de avisos atualizado!");
+                alert("Mural de avisos updated!");
             } catch (err) { alert(err.message); }
             hideLoading();
         });
@@ -1007,7 +1011,6 @@
         });
     }
 
-    // LÓGICA DO SORTEADOR AUTOMÁTICO ADAPTADA PARA CASAR IRMÃOS NO MESMO DIA/HORÁRIO
     if(formEscalaAutomatica) {
         formEscalaAutomatica.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1019,7 +1022,7 @@
 
                 if (!mesSelecionado) {
                     hideLoading();
-                    alert("Por favor, selecione o Mês de Referência no campo acima antes de gerar as escalas.");
+                    alert("Por favor, selecione o Mês de Referência antes de gerar.");
                     return;
                 }
 
@@ -1028,7 +1031,7 @@
 
                 if (cronogramaDoMes.length === 0) {
                     hideLoading();
-                    alert("Nenhuma data correspondente encontrada para este mês baseado no cronograma da paróquia.");
+                    alert("Nenhuma data correspondente encontrada para este mês.");
                     return;
                 }
 
@@ -1045,26 +1048,18 @@
                         }
                     });
                     
-                    // Embaralha a lista inicial para garantir o fator aleatório (randômico puro)
                     disponiveis.sort(() => Math.random() - 0.5);
-                    
-                    // VETOR DE RESULTADO FINAL DO PREBITÉRIO PARA ESTA MISSA
                     let escaladosFinais = [];
                     
-                    // Enquanto houver vagas no altar (6 postos tradicionais) e pessoas disponíveis
                     while(disponiveis.length > 0 && escaladosFinais.length < 6) {
-                        const corrente = disponiveis.shift(); // Tira o primeiro da fila aleatória
+                        const corrente = disponiveis.shift();
                         escaladosFinais.push(corrente);
                         
-                        // Busca se a pessoa possui um irmão cadastrado no sistema
                         const perfilUsuario = cacheTodosUsuarios.find(u => u.nome === corrente);
                         if(perfilUsuario && perfilUsuario.irmaoVinculado) {
                             const nomeIrmao = perfilUsuario.irmaoVinculado;
-                            
-                            // Verifica se o irmão também respondeu que pode ir nessa missa e ainda não foi puxado
                             const irmaoDisponivelIndex = disponiveis.indexOf(nomeIrmao);
                             if(irmaoDisponivelIndex !== -1 && escaladosFinais.length < 6) {
-                                // Remove o irmão da lista de disponíveis e joga imediatamente na vaga seguinte
                                 disponiveis.splice(irmaoDisponivelIndex, 1);
                                 escaladosFinais.push(nomeIrmao);
                             }
@@ -1091,7 +1086,7 @@
                 }
 
                 hideLoading();
-                alert("Escalas mensais processadas com sucesso! Irmãos mapeados foram agrupados no mesmo horário.");
+                alert("Escalas processadas! Irmãos agrupados com sucesso.");
                 formEscalaAutomatica.reset();
                 if (editorEscalaData) carregarEditorEscalasPorData(editorEscalaData.value);
             } catch (err) { 
@@ -1137,7 +1132,7 @@
                             <div><input type="text" id="edit-nave-${idDoc}" value="${dados.naveteiro?.nome || 'A definir'}" class="w-full border p-1 text-xs bg-white rounded-md"></div>
                         </div>
                     </div>
-                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md">
+                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao-manual w-full bg-amber-800 text-white text-[11px] font-bold py-1.5 rounded-md cursor-pointer">
                         Atualizar Cronograma Oficial
                     </button>
                 `;
@@ -1165,7 +1160,7 @@
                             "naveteiro.nome": document.getElementById(`edit-nave-${idDocumentoMissa}`).value
                         });
                         hideLoading();
-                        alert("Escala updated!");
+                        alert("Escala atualizada!");
                         if (buscaEscalaData && editorEscalaData && buscaEscalaData.value === editorEscalaData.value) carregarEscalaPorData(buscaEscalaData.value);
                         carregarEditorEscalasPorData(editorEscalaData.value);
                     } catch (err) { hideLoading(); alert(err.message); }
@@ -1191,7 +1186,7 @@
                 const dados = docSnap.data();
                 const respostas = dados.respostas || {};
                 if (usuarioLogadoDados && Object.prototype.hasOwnProperty.call(respostas, usuarioLogadoDados.nome)) {
-                    if(blocoVotacao) { blocoVotacao.classList.add('hidden'); blocoVotacao.innerHTML = ""; }
+                    if(blocoVotacao) { blocoVotacao.classList.add('hidden'); }
                     if(blocoFeedback) blocoFeedback.classList.remove('hidden');
                     cardEnquete.classList.remove('hidden');
                 } else {
@@ -1201,7 +1196,7 @@
                             const dataBR = cel.data.split('-').reverse().join('/');
                             container.innerHTML += `
                                 <label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 text-xs cursor-pointer border-b">
-                                    <input type="checkbox" value="${cel.idChave}" class="chk-dia-enquete w-4 h-4">
+                                    <input type="checkbox" value="${cel.idChave}" class="chk-dia-enquete w-4 h-4 text-amber-700 rounded focus:ring-amber-500">
                                     <div><strong>${dataBR}</strong> - ${cel.rotulo} às ${cel.horario}h</div>
                                 </label>
                             `;
@@ -1215,12 +1210,15 @@
         });
     }
 
+    // CORREÇÃO DA SUBMISSÃO DAS CHECKBOXES DA ENQUETE
     const btnEnqueteEnviar = document.getElementById('btn-enquete-enviar');
     if(btnEnqueteEnviar) {
         btnEnqueteEnviar.addEventListener('click', async () => {
+            // Seletor corrigido de forma precisa para mapear a classe gerada dinamicamente
             const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
             const chavesSelecionadas = [];
             checkboxes.forEach(chk => chavesSelecionadas.push(chk.value));
+            
             showLoading();
             try {
                 const docRef = doc(db, "enquetes", "disponibilidade_atual");
@@ -1230,6 +1228,7 @@
                     respondidoEm: Date.now()
                 };
                 await updateDoc(docRef, campoAtualizacao);
+                alert("Sua disponibilidade foi salva!");
             } catch (err) { alert("Erro ao salvar: " + err.message); }
             hideLoading();
         });
@@ -1293,13 +1292,19 @@
         hideLoading();
     }
 
+    // CORREÇÃO DE ASSUMIR VAGA / COBRIR ALTO (SINCRONIZAÇÃO DA DATA SELECIONADA)
     window.cobrirVagaAberta = async function(idMissa, slotChave) {
         showLoading();
         try {
             const updateObjeto = {};
             updateObjeto[slotChave] = { nome: usuarioLogadoDados.nome, status: "Confirmado" };
             await updateDoc(doc(db, "escalas", idMissa), updateObjeto);
-            alert("Você assumiu a escala!");
+            alert("Você assumiu a escala com sucesso!");
+            
+            // Força a sincronia caso a data selecionada global estivesse vazia na inicialização
+            if (!dataSelecionadaGlobal) {
+                dataSelecionadaGlobal = idMissa.split('_')[0];
+            }
             carregarEscalaPorData(dataSelecionadaGlobal);
         } catch(e) { alert(e.message); }
         hideLoading();
@@ -1372,10 +1377,11 @@
                             if(cardNotificacao) cardNotificacao.classList.remove('hidden');
                             if(botoesContainer) {
                                 botoesContainer.innerHTML += `
-                                    <div class="pb-1 mb-1 border-b">
+                                    <div class="pb-1 mb-1 border-b w-full">
+                                        <p class="text-[10px] text-gray-500 mb-1">Posto: ${p.label} (${dados.horario}h)</p>
                                         <div class="flex gap-1">
-                                            <button onclick="confirmarPresencaMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-emerald-700 text-white text-[10px] px-2 py-1 rounded cursor-pointer">Confirmar</button>
-                                            <button onclick="pedirSubstituicaoMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded cursor-pointer">Pedir Troca</button>
+                                            <button onclick="confirmarPresencaMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-emerald-700 text-white text-[10px] px-2 py-1 rounded cursor-pointer font-bold">Confirmar</button>
+                                            <button onclick="pedirSubstituicaoMissa('${idDocumentoMissa}', '${p.chave}')" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded cursor-pointer font-bold">Pedir Troca</button>
                                         </div>
                                     </div>
                                 `;
@@ -1385,7 +1391,7 @@
                         if (isVagaLivre && botoesCoberturaContainer) {
                             temVagaDisponivel = true;
                             botoesCoberturaContainer.innerHTML += `
-                                <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="bg-indigo-700 text-white text-[10px] px-2 py-1 rounded cursor-pointer">
+                                <button onclick="cobrirVagaAberta('${idDocumentoMissa}', '${p.chave}')" class="bg-indigo-700 hover:bg-indigo-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg cursor-pointer transition-all shadow-xs">
                                     Assumir ${p.label} às ${dados.horario}h
                                 </button>
                             `;
