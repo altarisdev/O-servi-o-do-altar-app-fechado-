@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altaris - Painel do Coordenador</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+
+    <div id="tela-loading" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-amber-700 mb-4"></div>
+        <p class="text-xs font-semibold text-gray-500 tracking-wider uppercase">Carregando Administração...</p>
+    </div>
+
+    <header class="bg-amber-900 text-white px-4 py-4 shadow-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-church"></i></div>
+                <div>
+                    <h2 id="nome-usuario-header" class="text-sm font-bold leading-tight">Carregando...</h2>
+                    <span id="funcao-usuario-header" class="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-sm font-semibold uppercase tracking-wider block mt-0.5">...</span>
+                </div>
+            </div>
+            <button id="btn-logout" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all">
+                Sair <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl w-full mx-auto p-4 flex-1 flex flex-col space-y-6">
+        <div class="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+            <button id="btn-c-usuarios" onclick="switchCoordTab('coord-usuarios')" class="flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold bg-amber-700 text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"><i class="fa-solid fa-users"></i> Controlar Usuários</button>
+            <button id="btn-c-escalas" onclick="switchCoordTab('coord-escalas')" class="flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-calendar-plus"></i> Painel de Escalas</button>
+            <button id="btn-c-sorteio" onclick="switchCoordTab('coord-sorteio')" class="flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-wand-magic-sparkles"></i> Sorteio Automático</button>
+            <button id="btn-c-material" onclick="switchCoordTab('coord-material')" class="flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Material</button>
+            <button id="btn-c-avisos" onclick="switchCoordTab('coord-avisos-tab')" class="flex-1 min-w-[150px] py-2.5 px-3 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-bullhorn"></i> Mudar Avisos</button>
+        </div>
+
+        <section id="sec-coord-usuarios" class="hidden-coord-tab grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 h-fit space-y-4">
+                <div>
+                    <h3 class="text-sm font-black text-gray-800">Cadastrar Novo Membro</h3>
+                    <p class="text-[11px] text-gray-400 font-medium">Suporta e-mails repetidos para irmãos.</p>
+                </div>
+                <form id="form-cadastro-usuario" class="space-y-3">
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nome Completo</label><input type="text" id="cad-nome" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">E-mail de Login</label><input type="email" id="cad-email" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Senha Provisória</label><div class="flex gap-2"><input type="text" id="cad-senha" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-mono font-bold"><button type="button" id="btn-gerar-senha" class="bg-gray-800 text-white px-2.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-key"></i></button></div></div>
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nível de Acesso</label><select id="cad-funcao" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-semibold text-gray-700"><option value="Coroinha">Coroinha / Acólito</option><option value="Coordenador">Coordenador</option></select></div>
+                    <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-xs cursor-pointer"><i class="fa-solid fa-user-plus mr-1"></i> Registrar Membro</button>
+                </form>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 overflow-hidden flex flex-col">
+                <div class="mb-3 flex justify-between items-center"><div><h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3></div><input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-xs font-medium"></div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-xs border-collapse"><thead><tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] border-b"><th class="p-3">Nome</th><th class="p-3">E-mail</th><th class="p-3">Senha Prov.</th><th class="p-3 text-center">Função</th><th class="p-3 text-center">Ações</th></tr></thead><tbody id="tabela-usuarios-recuperacao"></tbody></table></div>
+            </div>
+        </section>
+
+        <section id="sec-coord-escalas" class="hidden-coord-tab hidden space-y-4">
+            <div class="bg-white p-4 rounded-xl shadow-xs border border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div><h3 class="text-sm font-black text-gray-800">Editor Manual de Escalas Oficiais</h3></div><input type="date" id="editor-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold">
+            </div>
+            <div id="container-editores-missa" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <section id="sec-coord-sorteio" class="hidden-coord-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 h-fit">
+                <div><h3 class="text-sm font-black text-gray-800">Controles do Mapeador</h3></div>
+                <div class="space-y-3">
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Mês de Referência</label><input type="month" id="enq-mes-alvo" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700"></div>
+                    <div class="flex gap-2"><button id="btn-disparar-enquete" class="flex-1 bg-blue-700 text-white font-bold text-xs py-2 rounded-lg">Abrir Pesquisa</button><button id="btn-fechar-enquete" class="flex-1 bg-gray-800 text-white font-bold text-xs py-2 rounded-lg">Fechar</button></div>
+                </div>
+                <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-100"><h4 class="text-[11px] font-bold text-amber-900 uppercase">Fila de Prioridade</h4><div id="lista-fila-prioridade" class="space-y-1 max-h-24 overflow-y-auto"></div></div>
+                <form id="form-escala-automatica" class="space-y-3">
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Título Padrão</label><input type="text" id="auto-titulo" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
+                    <button type="submit" class="w-full bg-amber-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-xs"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gerar Escalas</button>
+                </form>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 space-y-3">
+                <div><h3 class="text-sm font-black text-gray-800">Lista de Respostas / Disponíveis</h3></div>
+                <div id="lista-nomes-enquete" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto bg-gray-50 p-3 rounded-xl border"></div>
+            </div>
+        </section>
+
+        <section id="sec-coord-material" class="hidden-coord-tab hidden max-w-md bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
+            <form id="form-upload-formacao" class="space-y-3">
+                <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Título do Material</label><input type="text" id="form-titulo-input" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
+                <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">URL Externa</label><input type="url" id="form-url-input" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
+                <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2.5 rounded-lg">Atualizar Manual</button>
+            </form>
+        </section>
+
+        <section id="sec-coord-avisos-tab" class="hidden-coord-tab hidden max-w-xl bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
+            <form id="form-publicar-aviso" class="space-y-3">
+                <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Texto do Comunicado</label><textarea id="txt-aviso-coordenador" required rows="6" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs"></textarea></div>
+                <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2.5 rounded-lg"><i class="fa-solid fa-bullhorn mr-1"></i> Publicar no Mural</button>
+            </form>
+        </section>
+    </main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
+        authDomain: "tarcisius-d03d7.firebaseapp.com",
+        projectId: "tarcisius-d03d7",
+        storageBucket: "tarcisius-d03d7.firebasestorage.app",
+        messagingSenderId: "186797936591",
+        appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
+    };
+
+    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+    const appSecundario = initializeApp(firebaseConfig, "SecondaryApp"); const authSecundario = getAuth(appSecundario);
+
+    const telaLoading = document.getElementById('tela-loading');
+    const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
+    const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
+    const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
+    const buscaUsuarioLista = document.getElementById('busca-usuario-lista');
+    const editorEscalaData = document.getElementById('editor-escala-data');
+    const containerEditoresMissa = document.getElementById('container-editores-missa');
+    const btnLogout = document.getElementById('btn-logout');
+
+    let usuarioLogadoDados = null; let mapaRespostasGerais = {}; let cacheTodosUsuarios = []; let unsubUsuarios = null;
+
+    const CRONOGRAMA_PAROQUIA = [
+        { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" }, { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
+        { diaSemana: 6, horario: "19:00", rotulo: "Sábado" }, { diaSemana: 0, horario: "09:00", rotulo: "Domingo de Manhã" }, { diaSemana: 0, horario: "19:00", rotulo: "Domingo de Noite" }
+    ];
+
+    function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
+
+    onAuthStateChanged(auth, async (user) => {
+        const devSession = sessionStorage.getItem("dev_user");
+        if (devSession) {
+            usuarioLogadoDados = JSON.parse(devSession);
+            inicializarPainel();
+        } else if (user) {
+            const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+            if (docSnap.exists() && docSnap.data().funcao === "Coordenador") {
+                usuarioLogadoDados = docSnap.data();
+                inicializarPainel();
+            } else {
+                signOut(auth); window.location.href = "index.html";
+            }
+        } else { window.location.href = "index.html"; }
+        setTimeout(hideLoading, 400);
+    });
+
+    function inicializarPainel() {
+        if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
+        if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
+
+        ouvirEnqueteTempoRealCoordenador();
+        ouvirUsuariosCadastrados();
+        carregarAvisoNoInputCoordenador();
+        switchCoordTab('coord-usuarios');
+        if(editorEscalaData) {
+            editorEscalaData.value = new Date().toISOString().split('T')[0];
+            carregarEditorEscalasPorData(editorEscalaData.value);
+        }
+    }
+
+    if(btnLogout) {
+        btnLogout.addEventListener('click', () => { sessionStorage.removeItem("dev_user"); signOut(auth).then(() => window.location.href = "index.html"); });
+    }
+
+    // Gerador automático de senha provisória
+    document.getElementById('btn-gerar-senha')?.addEventListener('click', () => {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; let s = '';
+        for (let i = 0; i < 6; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
+        document.getElementById('cad-senha').value = s;
+    });
+
+    if(formCadastroUsuario) {
+        formCadastroUsuario.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('cad-nome').value.trim();
+            const email = document.getElementById('cad-email').value.trim().toLowerCase();
+            const senha = document.getElementById('cad-senha').value.trim();
+            const funcao = document.getElementById('cad-funcao').value;
+
+            if (cacheTodosUsuarios.some(u => u.email === email)) {
+                await setDoc(doc(db, "usuarios", "pre_" + Date.now()), { nome, email, senha_provisoria: senha, funcao, tipoConta: "IrmaoVinculado" });
+                alert("Irmão vinculado cadastrado com sucesso!"); formCadastroUsuario.reset(); return;
+            }
+
+            try {
+                const res = await createUserWithEmailAndPassword(authSecundario, email, senha);
+                await setDoc(doc(db, "usuarios", res.user.uid), { nome, email, senha_provisoria: senha, funcao, tipoConta: "Oficial" });
+                await signOut(authSecundario);
+                alert("Conta oficial criada!"); formCadastroUsuario.reset();
+            } catch (err) { alert(err.message); }
+        });
+    }
+
+    window.deletarUsuarioDoSistema = async function(id, nome) {
+        if(confirm(`Remover permanentemente ${nome}?`)) { await deleteDoc(doc(db, "usuarios", id)); }
+    }
+
+    function ouvirUsuariosCadastrados() {
+        unsubUsuarios = onSnapshot(collection(db, "usuarios"), (snap) => {
+            cacheTodosUsuarios = [];
+            snap.forEach(d => { const u = d.data(); u.idDoc = d.id; cacheTodosUsuarios.push(u); });
+            cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome));
+            renderizarTabelaUsuarios();
+        });
+    }
+
+    function renderizarTabelaUsuarios() {
+        const b = document.getElementById('tabela-usuarios-recuperacao'); if(!b) return; b.innerHTML = "";
+        const termo = buscaUsuarioLista?.value.toLowerCase() || "";
+        cacheTodosUsuarios.filter(u => u.nome.toLowerCase().includes(termo)).forEach(u => {
+            b.innerHTML += `<tr class="border-b"><td class="p-3 font-semibold">${u.nome}</td><td class="p-3 font-mono">${u.email}</td><td class="p-3 text-amber-950 font-bold">${u.senha_provisoria||'••••'}</td><td class="p-3 text-center">${u.funcao}</td><td class="p-3 text-center"><button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2 py-1 rounded border border-rose-200">Excluir</button></td></tr>`;
+        });
+    }
+    buscaUsuarioLista?.addEventListener('input', renderizarTabelaUsuarios);
+
+    function ouvirEnqueteTempoRealCoordenador() {
+        onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
+            if (!docSnap.exists()) return;
+            const dados = docSnap.data(); mapaRespostasGerais = dados.respostas || {};
+            const fila = document.getElementById('lista-fila-prioridade');
+            if(fila) {
+                fila.innerHTML = "";
+                let arr = Object.keys(mapaRespostasGerais).map(n => ({nome: n, t: mapaRespostasGerais[n].respondidoEm || 0}));
+                arr.sort((a,b) => a.t - b.t);
+                if(arr.length===0) fila.innerHTML = `<p class="text-[10px] text-gray-400 italic">Ninguém respondeu.</p>`;
+                else arr.forEach((v, i) => fila.innerHTML += `<div class="flex justify-between bg-white px-2 py-0.5 rounded border text-[11px]"><span class="font-bold">${i+1}. ${v.nome}</span></div>`);
+            }
+            const container = document.getElementById('lista-nomes-enquete');
+            if(container && dados.celebracoes) {
+                container.innerHTML = "";
+                dados.celebracoes.forEach(cel => {
+                    let aptos = []; Object.keys(mapaRespostasGerais).forEach(n => { if((mapaRespostasGerais[n].escolhas||[]).includes(cel.idChave)) aptos.push(n); });
+                    container.innerHTML += `<div class="bg-white p-1 border rounded mb-1"><strong class="text-amber-900 text-[10px] block border-b">${cel.data.split('-').reverse().join('/')} - ${cel.rotulo}:</strong><p class="text-[10px] text-emerald-700 font-medium">${aptos.length>0?'✓ '+aptos.join(', '):'Ninguém'}</p></div>`;
+                });
+            }
+        });
+    }
+
+    document.getElementById('form-publicar-aviso')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await setDoc(doc(db, "mural", "aviso_geral"), { texto: document.getElementById('txt-aviso-coordenador').value, dataPublicacao: new Date().toLocaleDateString('pt-BR') });
+        alert("Mural atualizado!");
+    });
+
+    async function carregarAvisoNoInputCoordenador() {
+        const d = await getDoc(doc(db, "mural", "aviso_geral"));
+        if(d.exists()) document.getElementById('txt-aviso-coordenador').value = d.data().texto || "";
+    }
+
+    document.getElementById('btn-disparar-enquete')?.addEventListener('click', async () => {
+        const mes = document.getElementById('enq-mes-alvo').value; if(!mes) return;
+        const [a, m] = mes.split('-').map(Number);
+        const list = []; const curr = new Date(a, m - 1, 1);
+        while(curr.getMonth() === m - 1) {
+            CRONOGRAMA_PAROQUIA.filter(c => c.diaSemana === curr.getDay()).forEach(item => {
+                const dStr = curr.toISOString().split('T')[0];
+                list.push({ idChave: `${dStr}_${item.horario.replace(':','')}`, data: dStr, horario: item.horario, rotulo: item.rotulo });
+            });
+            curr.setDate(curr.setDate() + 1);
+        }
+        await setDoc(doc(db, "enquetes", "disponibilidade_atual"), { mesReferencia: mes, ativa: true, celebracoes: list, respostas: {} });
+        alert("Pesquisa aberta!");
+    });
+
+    document.getElementById('btn-fechar-enquete')?.addEventListener('click', async () => {
+        await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false }); alert("Pesquisa fechada.");
+    });
+
+    document.getElementById('form-escala-automatica')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const mes = document.getElementById('enq-mes-alvo').value; if(!mes) return;
+        const [a, m] = mes.split('-').map(Number);
+        const list = []; const curr = new Date(a, m - 1, 1);
+        while(curr.getMonth() === m - 1) {
+            CRONOGRAMA_PAROQUIA.filter(c => c.diaSemana === curr.getDay()).forEach(item => {
+                const dStr = curr.toISOString().split('T')[0];
+                list.push({ idChave: `${dStr}_${item.horario.replace(':','')}`, data: dStr, horario: item.horario, rotulo: item.rotulo });
+            });
+            curr.setDate(curr.setDate() + 1);
+        }
+        const tit = document.getElementById('auto-titulo').value.trim();
+        for(const cel of list) {
+            let disp = []; Object.keys(mapaRespostasGerais).forEach(n => { if((mapaRespostasGerais[n].escolhas||[]).includes(cel.idChave)) disp.push(n); });
+            disp.sort(() => Math.random() - 0.5);
+            await setDoc(doc(db, "escalas", `${cel.data}_${cel.horario.replace(':','')}`), {
+                titulo: `${tit} (${cel.rotulo})`, horario: cel.horario, data: cel.data,
+                altar1: { nome: disp[0] || "A definir", status: "Pendente" }, altar2: { nome: disp[1] || "A definir", status: "Pendente" },
+                altar3: { nome: disp[2] || "A definir", status: "Pendente" }, altar4: { nome: disp[3] || "A definir", status: "Pendente" },
+                altar5: { nome: disp[4] || "A definir", status: "Pendente" }, altar6: { nome: disp[5] || "A definir", status: "Pendente" },
+                turibuloAtivo: false, turiferario: { nome: "A definir", status: "Pendente" }, navetaAtiva: false, naveteiro: { nome: "A definir", status: "Pendente" }
+            });
+        }
+        alert("Escalas geradas!");
+    });
+
+    async function carregarEditorEscalasPorData(dataString) {
+        if(!containerEditoresMissa) return; containerEditoresMissa.innerHTML = "";
+        const hrs = ["1900", "1700", "0900"]; let fnd = false;
+        for (const hr of hrs) {
+            const idDoc = `${dataString}_${hr}`; const snap = await getDoc(doc(db, "escalas", idDoc));
+            if (snap.exists()) {
+                fnd = true; const d = snap.data(); const dv = document.createElement('div');
+                dv.className = "bg-gray-50 border p-4 rounded-xl space-y-3 text-xs";
+                dv.innerHTML = `
+                    <div class="flex justify-between font-bold"><span>Missa: ${d.horario}h</span><span class="bg-amber-200 p-0.5 rounded">${d.titulo}</span></div>
+                    <div class="grid grid-cols-2 gap-1">
+                        <input type="text" id="edit-a1-${idDoc}" value="${d.altar1?.nome||''}" class="border p-1 bg-white rounded"> <input type="text" id="edit-a2-${idDoc}" value="${d.altar2?.nome||''}" class="border p-1 bg-white rounded">
+                        <input type="text" id="edit-a3-${idDoc}" value="${d.altar3?.nome||''}" class="border p-1 bg-white rounded"> <input type="text" id="edit-a4-${idDoc}" value="${d.altar4?.nome||''}" class="border p-1 bg-white rounded">
+                        <input type="text" id="edit-a5-${idDoc}" value="${d.altar5?.nome||''}" class="border p-1 bg-white rounded"> <input type="text" id="edit-a6-${idDoc}" value="${d.altar6?.nome||''}" class="border p-1 bg-white rounded">
+                    </div>
+                    <div class="flex gap-4"><label><input type="checkbox" id="chk-turi-${idDoc}" ${d.turibuloAtivo?'checked':''}> Turíbulo</label><label><input type="checkbox" id="chk-nave-${idDoc}" ${d.navetaAtiva?'checked':''}> Naveta</label></div>
+                    <div class="grid grid-cols-2 gap-1"><input type="text" id="edit-turi-${idDoc}" value="${d.turiferario?.nome||''}" class="border p-1 bg-white rounded"><input type="text" id="edit-nave-${idDoc}" value="${d.naveteiro?.nome||''}" class="border p-1 bg-white rounded"></div>
+                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao w-full bg-amber-800 text-white py-1 rounded font-bold">Atualizar Escala</button>
+                `;
+                containerEditoresMissa.appendChild(dv);
+            }
+        }
+        if(!fnd) containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma escala cadastrada.</p>`;
+        else {
+            document.querySelectorAll('.btn-salvar-edicao').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    await updateDoc(doc(db, "escalas", id), {
+                        "altar1.nome": document.getElementById(`edit-a1-${id}`).value, "altar2.nome": document.getElementById(`edit-a2-${id}`).value,
+                        "altar3.nome": document.getElementById(`edit-a3-${id}`).value, "altar4.nome": document.getElementById(`edit-a4-${id}`).value,
+                        "altar5.nome": document.getElementById(`edit-a5-${id}`).value, "altar6.nome": document.getElementById(`edit-a6-${id}`).value,
+                        "turibuloAtivo": document.getElementById(`chk-turi-${id}`).checked, "turiferario.nome": document.getElementById(`edit-turi-${id}`).value,
+                        "navetaAtiva": document.getElementById(`chk-nave-${id}`).checked, "naveteiro.nome": document.getElementById(`edit-nave-${id}`).value
+                    }); alert("Escala salva!");
+                });
+            });
+        }
+    }
+    editorEscalaData?.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
+
+    document.getElementById('form-upload-formacao')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await setDoc(doc(db, "formacao", "manual_atual"), { titulo: document.getElementById('form-titulo-input').value, url: document.getElementById('form-url-input').value });
+        alert("Manual atualizado!");
+    });
+
+    window.switchCoordTab = function(tabID) {
+        document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
+        document.getElementById('sec-' + tabID)?.classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
