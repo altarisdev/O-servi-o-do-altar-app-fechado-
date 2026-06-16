@@ -42,19 +42,26 @@
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 h-fit space-y-4">
                 <div>
                     <h3 class="text-sm font-black text-gray-800">Cadastrar Novo Membro</h3>
-                    <p class="text-[11px] text-gray-400 font-medium">Suporta e-mails repetidos para irmãos.</p>
+                    <p class="text-[11px] text-gray-400 font-medium">Selecione se é uma conta oficial ou um irmão vinculado.</p>
                 </div>
                 <form id="form-cadastro-usuario" class="space-y-3">
                     <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nome Completo</label><input type="text" id="cad-nome" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
                     <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">E-mail de Login</label><input type="email" id="cad-email" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Senha Provisória</label><div class="flex gap-2"><input type="text" id="cad-senha" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-mono font-bold"><button type="button" id="btn-gerar-senha" class="bg-gray-800 text-white px-2.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-key"></i></button></div></div>
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nível de Acesso</label><select id="cad-funcao" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-semibold text-gray-700"><option value="Coroinha">Coroinha / Acólito</option><option value="Coordenador">Coordenador</option></select></div>
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Senha Provisória / Senha do Irmão</label><div class="flex gap-2"><input type="text" id="cad-senha" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-mono font-bold"><button type="button" id="btn-gerar-senha" class="bg-gray-800 text-white px-2.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-key"></i></button></div></div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nível / Tipo de Conta</label>
+                        <select id="cad-funcao" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-semibold text-gray-700">
+                            <option value="Coroinha">Coroinha / Acólito (Oficial)</option>
+                            <option value="Irmao">Coroinha (Irmão Vinculado)</option>
+                            <option value="Coordenador">Coordenador</option>
+                        </select>
+                    </div>
                     <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-xs cursor-pointer"><i class="fa-solid fa-user-plus mr-1"></i> Registrar Membro</button>
                 </form>
             </div>
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 overflow-hidden flex flex-col">
                 <div class="mb-3 flex justify-between items-center"><div><h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3></div><input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-xs font-medium"></div>
-                <div class="overflow-x-auto"><table class="w-full text-left text-xs border-collapse"><thead><tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] border-b"><th class="p-3">Nome</th><th class="p-3">E-mail</th><th class="p-3">Senha Prov.</th><th class="p-3 text-center">Função</th><th class="p-3 text-center">Ações</th></tr></thead><tbody id="tabela-usuarios-recuperacao"></tbody></table></div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-xs border-collapse"><thead><tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] border-b"><th class="p-3">Nome</th><th class="p-3">E-mail</th><th class="p-3">Senha Prov.</th><th class="p-3 text-center">Tipo</th><th class="p-3 text-center">Ações</th></tr></thead><tbody id="tabela-usuarios-recuperacao"></tbody></table></div>
             </div>
         </section>
 
@@ -170,7 +177,6 @@
         btnLogout.addEventListener('click', () => { sessionStorage.removeItem("dev_user"); signOut(auth).then(() => window.location.href = "index.html"); });
     }
 
-    // Gerador automático de senha provisória
     document.getElementById('btn-gerar-senha')?.addEventListener('click', () => {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; let s = '';
         for (let i = 0; i < 6; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -185,16 +191,25 @@
             const senha = document.getElementById('cad-senha').value.trim();
             const funcao = document.getElementById('cad-funcao').value;
 
-            if (cacheTodosUsuarios.some(u => u.email === email)) {
-                await setDoc(doc(db, "usuarios", "pre_" + Date.now()), { nome, email, senha_provisoria: senha, funcao, tipoConta: "IrmaoVinculado" });
-                alert("Irmão vinculado cadastrado com sucesso!"); formCadastroUsuario.reset(); return;
+            // Lógica antiga restaurada: se for marcado como "Irmao" ou se o e-mail já existir na base
+            if (funcao === "Irmao" || cacheTodosUsuarios.some(u => u.email === email)) {
+                await setDoc(doc(db, "usuarios", "pre_" + Date.now()), { 
+                    nome, 
+                    email, 
+                    senha_provisoria: senha, 
+                    funcao: "Coroinha", // Na hora de ler a escala, ele é um coroinha normal
+                    tipoConta: "IrmaoVinculado" 
+                });
+                alert("Coroinha Irmão (Vínculo por e-mail) cadastrado com sucesso!"); 
+                formCadastroUsuario.reset(); 
+                return;
             }
 
             try {
                 const res = await createUserWithEmailAndPassword(authSecundario, email, senha);
                 await setDoc(doc(db, "usuarios", res.user.uid), { nome, email, senha_provisoria: senha, funcao, tipoConta: "Oficial" });
                 await signOut(authSecundario);
-                alert("Conta oficial criada!"); formCadastroUsuario.reset();
+                alert("Conta oficial criada com sucesso!"); formCadastroUsuario.reset();
             } catch (err) { alert(err.message); }
         });
     }
@@ -215,8 +230,28 @@
     function renderizarTabelaUsuarios() {
         const b = document.getElementById('tabela-usuarios-recuperacao'); if(!b) return; b.innerHTML = "";
         const termo = buscaUsuarioLista?.value.toLowerCase() || "";
+        
         cacheTodosUsuarios.filter(u => u.nome.toLowerCase().includes(termo)).forEach(u => {
-            b.innerHTML += `<tr class="border-b"><td class="p-3 font-semibold">${u.nome}</td><td class="p-3 font-mono">${u.email}</td><td class="p-3 text-amber-950 font-bold">${u.senha_provisoria||'••••'}</td><td class="p-3 text-center">${u.funcao}</td><td class="p-3 text-center"><button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2 py-1 rounded border border-rose-200">Excluir</button></td></tr>`;
+            // Define o rótulo de tipo de conta
+            let badgeTipo = "";
+            if (u.funcao === "Coordenador") {
+                badgeTipo = `<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Coordenação</span>`;
+            } else if (u.tipoConta === "IrmaoVinculado") {
+                badgeTipo = `<span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-[10px]">Irmão Vinculado</span>`;
+            } else {
+                badgeTipo = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Oficial</span>`;
+            }
+
+            b.innerHTML += `
+                <tr class="border-b">
+                    <td class="p-3 font-semibold">${u.nome}</td>
+                    <td class="p-3 font-mono">${u.email}</td>
+                    <td class="p-3 text-amber-950 font-bold">${u.senha_provisoria||'••••'}</td>
+                    <td class="p-3 text-center">${badgeTipo}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2 py-1 rounded border border-rose-200 cursor-pointer">Excluir</button>
+                    </td>
+                </tr>`;
         });
     }
     buscaUsuarioLista?.addEventListener('input', renderizarTabelaUsuarios);
@@ -318,7 +353,7 @@
                     </div>
                     <div class="flex gap-4"><label><input type="checkbox" id="chk-turi-${idDoc}" ${d.turibuloAtivo?'checked':''}> Turíbulo</label><label><input type="checkbox" id="chk-nave-${idDoc}" ${d.navetaAtiva?'checked':''}> Naveta</label></div>
                     <div class="grid grid-cols-2 gap-1"><input type="text" id="edit-turi-${idDoc}" value="${d.turiferario?.nome||''}" class="border p-1 bg-white rounded"><input type="text" id="edit-nave-${idDoc}" value="${d.naveteiro?.nome||''}" class="border p-1 bg-white rounded"></div>
-                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao w-full bg-amber-800 text-white py-1 rounded font-bold">Atualizar Escala</button>
+                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao w-full bg-amber-800 text-white py-1 rounded font-bold cursor-pointer">Atualizar Escala</button>
                 `;
                 containerEditoresMissa.appendChild(dv);
             }
@@ -344,7 +379,7 @@
     document.getElementById('form-upload-formacao')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         await setDoc(doc(db, "formacao", "manual_atual"), { titulo: document.getElementById('form-titulo-input').value, url: document.getElementById('form-url-input').value });
-        alert("Manual atualizado!");
+        alert("Manual updated!");
     });
 
     window.switchCoordTab = function(tabID) {
