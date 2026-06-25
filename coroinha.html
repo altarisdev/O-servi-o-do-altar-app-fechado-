@@ -43,12 +43,12 @@
         
         <div id="conteudo-escala" class="space-y-4 block md:col-span-2">
             
-            <!-- CENTRAL UNIFICADA DE ESCALAS (CONSULTA GERAL + VOTAÇÃO INTEGRADA POR DIA) -->
+            <!-- CENTRAL UNIFICADA DE ESCALAS (POR DIA/HORÁRIO) -->
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-3 gap-2">
                     <div>
                         <h3 class="text-sm font-black text-gray-800">Painel Geral de Escalas</h3>
-                        <p class="text-[11px] text-gray-400 font-medium">Consulte as equipes completas e responda sua escala diretamente no dia escolhido.</p>
+                        <p class="text-[11px] text-gray-400 font-medium">Consulte as equipes completas e confirme presença por dia e horário.</p>
                     </div>
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <span class="text-[10px] font-bold text-gray-400 uppercase whitespace-nowrap">Data:</span>
@@ -56,17 +56,16 @@
                     </div>
                 </div>
 
-                <!-- Onde as celebrações do dia selecionado e os botões individuais de voto vão aparecer -->
                 <div id="resultado-escala-geral" class="space-y-4 text-xs">
                     <p class="text-gray-400 italic">Buscando informações do dia...</p>
                 </div>
             </div>
 
-            <!-- PESQUISA DE DISPONIBILIDADE (PERMANENTE) -->
+            <!-- PESQUISA DE DISPONIBILIDADE (OPÇÕES PERMANENTES) -->
             <div id="card-enquete-disponibilidade" class="hidden bg-amber-50/60 p-5 rounded-2xl border border-amber-200/70 space-y-3">
                 <div>
                     <h3 class="text-sm font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation text-amber-700"></i> Pesquisa de Disponibilidade</h3>
-                    <p class="text-[11px] text-amber-800/80">Indique abaixo quais dias você poderá servir. Suas opções não somem ao salvar.</p>
+                    <p class="text-[11px] text-amber-800/80">Marque todas as opções que você puder e clique em Salvar. As caixas permanecem visíveis.</p>
                 </div>
                 <form id="form-responder-enquete" class="space-y-3">
                     <div id="lista-celebracoes-checkboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-white p-3 rounded-xl border border-amber-200"></div>
@@ -110,7 +109,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -201,20 +200,22 @@
         });
     }
 
-    // LISTA DE DISPONIBILIDADE: Continua intacta e editável a qualquer momento
+    // CORREÇÃO DISPONIBILIDADE: Mantém as caixas ativas e marcadas puxando o histórico em tempo real
     function ouvirEnqueteDisponibilidade() {
         onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (snap) => {
             if(snap.exists() && snap.data().ativa === true) {
                 const dados = snap.data(); cardEnqueteDisponibilidade.classList.remove('hidden');
                 listaCelebracoesCheckboxes.innerHTML = "";
+                
+                // Pega com segurança a lista salva do usuário logado
                 const minhasEscolhasSalvas = dados.respostas?.[usuarioLogadoDados.nome]?.escolhas || [];
 
                 dados.celebracoes.forEach(cel => {
                     const formatData = cel.data.split('-').reverse().join('/');
                     const checks = minhasEscolhasSalvas.includes(cel.idChave) ? 'checked' : '';
                     listaCelebracoesCheckboxes.innerHTML += `
-                        <label class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-100 cursor-pointer text-[11px] font-medium text-gray-700">
-                            <input type="checkbox" name="celebracao_resp" value="${cel.idChave}" ${checks} class="w-4 h-4 text-amber-700 border-gray-300 rounded">
+                        <label class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-100 cursor-pointer text-[11px] font-medium text-gray-700 hover:bg-amber-50/50 transition-all">
+                            <input type="checkbox" name="celebracao_resp" value="${cel.idChave}" ${checks} class="w-4 h-4 text-amber-700 border-gray-300 rounded focus:ring-amber-500">
                             <div><span class="font-bold text-amber-900 block">${formatData} - ${cel.horario}</span>${cel.rotulo}</div>
                         </label>`;
                 });
@@ -222,16 +223,29 @@
         });
     }
 
+    // CORREÇÃO SALVAR: Atualiza usando notação de ponto para não apagar o resto do documento e nem ocultar as caixas
     formResponderEnquete?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const boxes = document.querySelectorAll('input[name="celebracao_resp"]:checked');
         const listIds = []; boxes.forEach(b => listIds.push(b.value));
+        
         const refDoc = doc(db, "enquetes", "disponibilidade_atual");
-        await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
-        alert("Sua agenda de disponibilidade foi salva!");
+        const atualizacao Estruturada = {};
+        atualizacaoEstruturada[`respostas.${usuarioLogadoDados.nome}`] = {
+            escolhas: listIds,
+            respondidoEm: Date.now()
+        };
+
+        try {
+            await updateDoc(refDoc, atualizacaoEstruturada);
+            alert("Sua agenda de disponibilidade foi salva com sucesso!");
+        } catch (error) {
+            // Caso o nó 'respostas' ainda não exista no doc, usa o set merge
+            await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
+            alert("Sua agenda de disponibilidade foi salva com sucesso!");
+        }
     });
 
-    // ESCALAS: Escuta em tempo real todas as escalas para alimentar o painel unificado por data
     function ouvirTodasAsEscalas() {
         onSnapshot(collection(db, "escalas"), (snap) => {
             todasEscalasCache = [];
@@ -244,7 +258,7 @@
         });
     }
 
-    // UNIFICAÇÃO: Gera a interface de visualização + confirmação individual por data
+    // INTERFACE INTEGRADA POR DIA/HORÁRIO COM BOTÕES SEMPRE ATIVOS
     function renderizarEscalaGeralPorData() {
         if(!resultadoEscalaGeral || !buscaEscalaData) return;
         const dataAlvo = buscaEscalaData.value;
@@ -273,7 +287,6 @@
                 { id: 'turiferario', label: 'Turiferário' }, { id: 'naveteiro', label: 'Naveteiro' }
             ];
 
-            // Mapeia quem está escalado na celebração atual
             funcoes.forEach(f => {
                 const item = esc[f.id];
                 if(item && item.nome) {
@@ -290,7 +303,7 @@
                     if(statusText === 'Substituição Solicitada') badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-rose-100 text-rose-800">Subst. Pedida</span>`;
 
                     listaMembrosHtml += `
-                        <div class="flex justify-between items-center p-2 rounded-lg border text-xs ${ehVoce ? 'bg-amber-100/60 border-amber-400 font-bold' : 'bg-white border-gray-100'}">
+                        <div class="flex justify-between items-center p-2 rounded-lg border text-xs ${ehVoce ? 'bg-amber-50 border-amber-400 font-bold ring-1 ring-amber-300' : 'bg-white border-gray-100'}">
                             <span class="text-gray-500 text-[11px]">${f.label}:</span>
                             <div class="flex items-center gap-2 truncate">
                                 <span class="truncate max-w-[130px] ${ehVoce ? 'text-amber-950 font-black' : 'text-gray-800'}">${item.nome} ${ehVoce ? '(Você)' : ''}</span>
@@ -300,7 +313,6 @@
                 }
             });
 
-            // Se o coroinha logado estiver escalado, monta a barra de ações permanentes específica desse dia/horário
             let painelAcaoUsuarioHtml = "";
             if(estouEscaladoNestaCeb) {
                 const btnConfirmarClass = meuStatusNestaCeb === 'Confirmado' ? 'bg-emerald-700 text-white font-bold ring-2 ring-emerald-300' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50';
@@ -310,7 +322,7 @@
                     <div class="bg-amber-900 text-white p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 shadow-xs mt-2">
                         <div>
                             <span class="text-[9px] text-amber-200 uppercase tracking-wider block font-bold">Sua Escala nesta Celebração</span>
-                            <span class="text-[10px] block text-amber-100">Status atual: <strong class="uppercase">${meuStatusNestaCeb}</strong></span>
+                            <span class="text-[10px] block text-amber-100">Status: <strong class="uppercase">${meuStatusNestaCeb}</strong></span>
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto justify-end">
                             <button onclick="window.votarPresencaItem('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Confirmado')" class="${btnConfirmarClass} px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all">
@@ -342,7 +354,7 @@
         });
     }
 
-    // ALTERAÇÃO: Atualiza estritamente a linha/função selecionada no documento específico da escala
+    // RESOLVIDO: Atualiza o status em tempo real sem sumir com os botões ou a escala da tela
     window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
         if(!idDocEscala || !campoFuncao) return;
         const refDoc = doc(db, "escalas", idDocEscala);
@@ -350,10 +362,11 @@
         dUp[`${campoFuncao}.status`] = novoStatus;
 
         try {
-            await setDoc(refDoc, dUp, { merge: true });
-            alert(novoStatus === "Confirmado" ? "Presença confirmada com sucesso para este horário!" : "Pedido de substituição enviado com sucesso!");
+            await updateDoc(refDoc, dUp);
+            alert(novoStatus === "Confirmado" ? "Presença confirmada!" : "Substituição solicitada!");
         } catch (error) {
-            alert("Erro ao salvar resposta. Tente novamente.");
+            await setDoc(refDoc, dUp, { merge: true });
+            alert(novoStatus === "Confirmado" ? "Presença confirmada!" : "Substituição solicitada!");
         }
     };
 
