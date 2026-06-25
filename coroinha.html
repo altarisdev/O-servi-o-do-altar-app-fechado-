@@ -32,112 +32,82 @@
         </div>
     </header>
 
-    <div id="menu-abas-coroinha" class="bg-white border-b border-gray-200 sticky top-[72px] z-30 flex md:hidden">
-        <button id="tab-escala" onclick="switchTab('escala')" class="active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1 cursor-pointer">
-            <i class="fa-solid fa-calendar-days text-base"></i><span>Escalas</span>
-        </button>
-        <button id="tab-avisos" onclick="switchTab('avisos')" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1 cursor-pointer">
-            <i class="fa-solid fa-bullhorn text-base"></i><span>Avisos</span>
-        </button>
-        <button id="tab-liturgia" onclick="switchTab('liturgia')" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1 cursor-pointer">
-            <i class="fa-solid fa-book-bible text-base"></i><span>Liturgia</span>
-        </button>
+    <div class="bg-white border-b border-gray-200 flex md:hidden sticky top-[72px] z-30">
+        <button id="tab-escala" onclick="switchTab('escala')" class="active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1"><i class="fa-solid fa-calendar-days"></i> Escalas</button>
+        <button id="tab-avisos" onclick="switchTab('avisos')" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1"><i class="fa-solid fa-bullhorn"></i> Avisos</button>
+        <button id="tab-conteudos" onclick="switchTab('conteudos')" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1"><i class="fa-solid fa-book-open"></i> Conteúdos</button>
+        <button id="tab-liturgia" onclick="switchTab('liturgia')" class="text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1"><i class="fa-solid fa-scroll"></i> Liturgia</button>
     </div>
 
     <main class="max-w-6xl w-full mx-auto p-4 flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
+        
         <div id="conteudo-escala" class="space-y-4 block md:col-span-2">
-            <div class="bg-white p-4 rounded-xl shadow-xs border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
+                <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-800">Sua Próxima Escala</h3>
+                        <p class="text-[11px] text-gray-400 font-medium">Verifique suas atribuições para a próxima celebração.</p>
+                    </div>
+                    <span id="badge-status-escala" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Nenhuma</span>
+                </div>
+                <div id="dados-proxima-escala" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <p class="text-gray-400 italic col-span-2">Buscando escalas publicadas para você...</p>
+                </div>
+            </div>
+
+            <div id="card-enquete-disponibilidade" class="hidden bg-amber-50/60 p-5 rounded-2xl border border-amber-200/70 space-y-3">
                 <div>
-                    <h3 class="text-sm font-bold text-gray-800"><i class="fa-solid fa-magnifying-glass"></i> Consultar Outro Dia</h3>
-                    <p class="text-[11px] text-gray-400 font-medium">Selecione o dia para puxar quem está escalado</p>
+                    <h3 class="text-sm font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation text-amber-700 animate-pulse"></i> Pesquisa de Disponibilidade</h3>
+                    <p class="text-[11px] text-amber-700/80 font-medium">Marque todas as celebrações do mês que você **PODE** servir.</p>
                 </div>
-                <input type="date" id="busca-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-bold text-gray-700 focus:outline-none focus:border-amber-700">
+                <form id="form-responder-enquete" class="space-y-3">
+                    <div id="lista-celebracoes-checkboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-white p-3 rounded-xl border border-amber-200">
+                        </div>
+                    <button type="submit" class="w-full bg-amber-800 text-white font-bold text-xs py-2 rounded-lg shadow-xs hover:bg-amber-900 transition-all cursor-pointer">Salvar Minha Disponibilidade</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="space-y-4 md:col-span-1 flex flex-col">
+            
+            <div id="conteudo-avisos" class="space-y-4 block md:block">
+                <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-3">
+                    <h3 class="text-sm font-black text-gray-800 flex items-center gap-1.5"><i class="fa-solid fa-bullhorn text-amber-700"></i> Mural de Avisos</h3>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <p id="txt-aviso-mural" class="text-xs font-medium text-gray-600 whitespace-pre-wrap leading-relaxed">Nenhum comunicado oficial recente.</p>
+                        <span id="data-aviso-mural" class="block text-[9px] font-bold text-gray-400 mt-2 text-right">--/--/----</span>
+                    </div>
+                </div>
             </div>
 
-            <div id="card-enquete" class="hidden bg-gradient-to-br from-blue-700 to-indigo-900 text-white p-5 rounded-2xl shadow-md border border-blue-800 space-y-3">
-                <div class="flex items-start gap-3">
-                    <div class="bg-white/20 p-2 rounded-xl text-lg"><i class="fa-solid fa-clipboard-question"></i></div>
-                    <div>
-                        <h3 class="text-sm font-black tracking-wide">Pesquisa de Disponibilidade Aberta!</h3>
-                        <p class="text-[11px] text-blue-100">Marque todas as celebrações em que você poderá servir no próximo mês.</p>
+            <div id="conteudo-conteudos" class="space-y-4 hidden md:block">
+                <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-3">
+                    <h3 class="text-sm font-black text-gray-800 flex items-center gap-1.5"><i class="fa-solid fa-book-open text-blue-700"></i> Materiais de Formação</h3>
+                    <div id="lista-materiais-formacao" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                        <p class="text-xs text-gray-400 italic">Nenhum material de estudo disponível no momento.</p>
                     </div>
-                </div>
-                <div id="bloco-votacao-enquete" class="bg-white text-gray-800 rounded-xl p-3 max-h-48 overflow-y-auto space-y-1.5">
-                    <div id="container-opcoes-enquete" class="space-y-1"></div>
-                    <button id="btn-enquete-enviar" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-lg text-xs transition-all mt-2 cursor-pointer">Enviar Minha Disponibilidade</button>
-                </div>
-                <div id="txt-feedback-enquete" class="hidden bg-emerald-600/30 border border-emerald-500/40 text-emerald-200 text-center py-2 px-3 rounded-lg text-xs font-bold">
-                    <i class="fa-solid fa-circle-check"></i> Suas respostas foram salvas no painel da coordenação!
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-xs border border-gray-200 overflow-hidden">
-                <div class="bg-amber-800 text-white p-4 flex justify-between items-center">
-                    <div>
-                        <span id="lbl-data-missa" class="text-[10px] bg-white/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">--/--/----</span>
-                        <h3 id="lbl-titulo-missa" class="text-sm font-black mt-1 leading-tight">Carregando cronograma...</h3>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[9px] block uppercase font-bold text-amber-200">Horário</span>
-                        <span id="lbl-horario-missa" class="text-base font-black">--:--h</span>
-                    </div>
-                </div>
-                <div id="lista-presbiterio" class="divide-y divide-gray-100"></div>
-                <div id="card-notificacao" class="hidden bg-amber-50 p-4 border-t-2 border-amber-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div class="flex gap-2.5 items-start">
-                        <i class="fa-solid fa-bell text-amber-700 text-sm mt-0.5 animate-bounce"></i>
-                        <div>
-                            <p class="text-xs font-bold text-amber-900">Você está escalado para esta celebração!</p>
-                            <p class="text-[10px] text-gray-500 font-medium">Confirme sua presença ou solicite um substituto imediatamente.</p>
+            <div id="conteudo-liturgia" class="space-y-4 hidden md:block">
+                <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-3">
+                    <h3 class="text-sm font-black text-gray-800 flex items-center gap-1.5"><i class="fa-solid fa-scroll text-amber-700"></i> Liturgia Diária</h3>
+                    <div class="space-y-2">
+                        <div class="bg-amber-50/30 p-3 rounded-xl border border-amber-100/50">
+                            <span id="ref-evangelho-dia" class="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Evangelho</span>
+                            <p id="txt-evangelho-dia" class="text-xs text-gray-600 font-medium leading-relaxed max-h-36 overflow-y-auto pr-1">Carregando palavra do dia...</p>
                         </div>
                     </div>
-                    <div id="botoes-notificacao-container" class="flex gap-2 w-full sm:w-auto"></div>
                 </div>
             </div>
 
-            <div id="card-convite-substituto" class="hidden bg-rose-50 border border-rose-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div class="flex gap-2"><i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm mt-0.5"></i>
-                    <div>
-                        <p class="text-xs font-bold text-rose-900">Vaga aberta por falta justificada!</p>
-                        <p class="text-[10px] text-rose-700">Um irmão precisou de substituto. Deseja assumir este posto no altar?</p>
-                    </div>
-                </div>
-                <div id="botoes-cobertura-container" class="flex flex-wrap gap-2 w-full sm:w-auto"></div>
-            </div>
-        </div>
-
-        <div id="conteudo-avisos" class="hidden md:block space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-xs border border-gray-100 space-y-3">
-                <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-bullhorn text-amber-700"></i> Mural de Avisos</h3>
-                <div id="corpo-mural-avisos" class="bg-amber-50/40 border border-amber-100 p-3 rounded-xl"></div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-xs border border-gray-100 space-y-3">
-                <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-graduation-cap text-amber-700"></i> Formação Continuada</h3>
-                <div class="flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border border-gray-200">
-                    <div class="truncate mr-2">
-                        <p id="lbl-titulo-formacao" class="text-xs font-bold text-gray-700 truncate">Nenhum documento</p>
-                        <span class="text-[9px] text-gray-400 font-medium uppercase">Manual de Posições PDF</span>
-                    </div>
-                    <a id="btn-download-formacao" href="#" target="_blank" class="bg-amber-800 hover:bg-amber-900 text-white p-2 rounded-lg text-xs font-bold transition-all"><i class="fa-solid fa-cloud-arrow-down"></i></a>
-                </div>
-            </div>
-        </div>
-
-        <div id="conteudo-liturgia" class="hidden md:block space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-xs border border-gray-100 space-y-3">
-                <div class="flex justify-between items-center border-b pb-1.5">
-                    <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-book-bible text-amber-700"></i> Liturgia Diária</h3>
-                    <span id="lbl-ref-liturgia" class="text-[10px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.5 rounded-sm">...</span>
-                </div>
-                <div class="max-h-64 overflow-y-auto text-xs text-gray-600 font-medium leading-relaxed italic bg-gray-50 p-3 rounded-xl border border-gray-100 whitespace-pre-wrap" id="txt-evangelho-dia">Carregando Santo Evangelho...</div>
-            </div>
         </div>
     </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -148,214 +118,171 @@
         appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
 
     const telaLoading = document.getElementById('tela-loading');
     const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
     const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
-    const buscaEscalaData = document.getElementById('busca-escala-data');
-    const cardConviteSubstituto = document.getElementById('card-convite-substituto');
+    const dadosProximaEscala = document.getElementById('dados-proxima-escala');
+    const cardEnqueteDisponibilidade = document.getElementById('card-enquete-disponibilidade');
+    const listaCelebracoesCheckboxes = document.getElementById('lista-celebracoes-checkboxes');
+    const formResponderEnquete = document.getElementById('form-responder-enquete');
     const btnLogout = document.getElementById('btn-logout');
 
-    let usuarioLogadoDados = null;
-    let dataSelecionadaGlobal = "";
-    let unsubEnquete = null;
-    let unsubMural = null;
+    let usuarioLogadoDados = null; let idEscalaAtivaGlobal = null;
 
     function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
 
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
+        const devSession = sessionStorage.getItem("dev_user");
+        if(devSession) {
+            usuarioLogadoDados = JSON.parse(devSession); inicializarPainelAcolito();
+        } else if(user) {
             const docSnap = await getDoc(doc(db, "usuarios", user.uid));
-            if (docSnap.exists() && docSnap.data().funcao !== "Coordenador") {
-                usuarioLogadoDados = docSnap.data();
-                usuarioLogadoDados.uid = user.uid;
-                inicializarPainel();
-            } else {
-                // Se for coordenador ou não existir, expulsa daqui
-                signOut(auth);
-                window.location.href = "index.html";
-            }
-        } else {
-            window.location.href = "index.html";
-        }
-        setTimeout(hideLoading, 400);
+            if(docSnap.exists()) { usuarioLogadoDados = docSnap.data(); inicializarPainelAcolito(); }
+            else { signOut(auth); window.location.href = "index.html"; }
+        } else { window.location.href = "index.html"; }
+        setTimeout(hideLoading, 500);
     });
 
-    function inicializarPainel() {
-        if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome;
-        if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = "Acesso: " + usuarioLogadoDados.funcao;
-        
-        ouvirMuralAvisos();
-        ouvirEnqueteTempoRealCoroinha();
-        carregarLiturgiaAutomatica();
-        carregarMaterialEstudo();
+    function inicializarPainelAcolito() {
+        if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = usuarioLogadoDados.nome;
+        if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = usuarioLogadoDados.funcao;
 
-        const hoje = new Date().toISOString().split('T')[0];
-        if(buscaEscalaData) {
-            buscaEscalaData.value = hoje;
-            carregarEscalaPorData(hoje);
-        }
+        ouvirMuralAvisos();
+        ouvirColecaoConteudos(); // Nova escuta múltipla
+        ouvirEnqueteDisponibilidade();
+        buscarMinhaProximaEscala();
+        carregarLiturgiaDoDia();
+        if(window.innerWidth < 768) { switchTab('escala'); }
     }
 
     if(btnLogout) {
-        btnLogout.addEventListener('click', () => { signOut(auth).then(() => window.location.href = "index.html"); });
+        btnLogout.addEventListener('click', () => { sessionStorage.removeItem("dev_user"); signOut(auth).then(() => window.location.href = "index.html"); });
     }
 
     function ouvirMuralAvisos() {
-        unsubMural = onSnapshot(doc(db, "mural", "aviso_geral"), (docSnap) => {
-            const muralContainer = document.getElementById('corpo-mural-avisos');
-            if(!muralContainer) return;
-            if (docSnap.exists() && docSnap.data().texto) {
-                muralContainer.innerHTML = `<div class="text-gray-700 font-medium leading-relaxed whitespace-pre-wrap">${docSnap.data().texto}</div><div class="text-[10px] text-gray-400 font-bold text-right pt-2 border-t mt-2">Publicado em: ${docSnap.data().dataPublicacao}</div>`;
-            } else {
-                muralContainer.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-2">Nenhum comunicado urgente hoje.</p>`;
+        onSnapshot(doc(db, "mural", "aviso_geral"), (snap) => {
+            if(snap.exists()) {
+                document.getElementById('txt-aviso-mural').innerText = snap.data().texto || "";
+                document.getElementById('data-aviso-mural').innerText = snap.data().dataPublicacao || "--/--/----";
             }
         });
     }
 
-    function ouvirEnqueteTempoRealCoroinha() {
-        unsubEnquete = onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
-            const cardEnquete = document.getElementById('card-enquete');
-            const blocoVotacao = document.getElementById('bloco-votacao-enquete');
-            const blocoFeedback = document.getElementById('txt-feedback-enquete');
-            const container = document.getElementById('container-opcoes-enquete');
-            if(!cardEnquete) return;
-
-            if (docSnap.exists() && docSnap.data().ativa === true) {
-                const dados = docSnap.data();
-                const respostas = dados.respostas || {};
-                if (usuarioLogadoDados && Object.prototype.hasOwnProperty.call(respostas, usuarioLogadoDados.nome)) {
-                    blocoVotacao?.classList.add('hidden');
-                    blocoFeedback?.classList.remove('hidden');
-                    cardEnquete.classList.remove('hidden');
-                } else {
-                    if(container) {
-                        container.innerHTML = "";
-                        dados.celebracoes.forEach(cel => {
-                            container.innerHTML += `<label class="flex items-center gap-2 p-1.5 hover:bg-gray-50 text-xs cursor-pointer border-b"><input type="checkbox" value="${cel.idChave}" class="chk-dia-enquete w-4 h-4 text-amber-700 rounded sub-checkbox"><div><strong>${cel.data.split('-').reverse().join('/')}</strong> - ${cel.rotulo} às ${cel.horario}h</div></label>`;
-                        });
-                    }
-                    blocoFeedback?.classList.add('hidden');
-                    blocoVotacao?.classList.remove('hidden');
-                    cardEnquete.classList.remove('hidden');
-                }
-            } else { cardEnquete.classList.add('hidden'); }
+    // Escuta a coleção inteira de conteúdos salvos, permitindo múltiplos enviados
+    function ouvirColecaoConteudos() {
+        const container = document.getElementById('lista-materials-formacao');
+        onSnapshot(collection(db, "formacao"), (snap) => {
+            if(snap.empty) {
+                container.innerHTML = `<p class="text-xs text-gray-400 italic">Nenhum material disponível no momento.</p>`;
+                return;
+            }
+            container.innerHTML = "";
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                container.innerHTML += `
+                    <a href="${data.url}" target="_blank" class="flex items-center gap-3 bg-blue-50/50 hover:bg-blue-50 p-2.5 rounded-xl border border-blue-100 transition-all block group">
+                        <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs shadow-xs"><i class="fa-solid fa-book"></i></div>
+                        <div class="flex-1 overflow-hidden">
+                            <h4 class="text-xs font-bold text-gray-800 truncate group-hover:text-blue-700">${data.titulo}</h4>
+                            <span class="text-[9px] text-gray-400 font-medium block truncate">Clique para acessar o link externo</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-300 text-[10px] pr-1"></i>
+                    </a>`;
+            });
         });
     }
 
-    document.addEventListener('click', async (e) => {
-        if(e.target && e.target.id === 'btn-enquete-enviar') {
-            const checkboxes = document.querySelectorAll('.chk-dia-enquete:checked');
-            const chaves = Array.from(checkboxes).map(chk => chk.value);
-            try {
-                const campoAtualizacao = {};
-                campoAtualizacao[`respostas.${usuarioLogadoDados.nome}`] = { escolhas: chaves, respondidoEm: Date.now() };
-                await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), campoAtualizacao);
-            } catch (err) { alert(err.message); }
-        }
+    function ouvirEnqueteDisponibilidade() {
+        onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (snap) => {
+            if(snap.exists() && snap.data().ativa === true) {
+                const dados = snap.data(); cardEnqueteDisponibilidade.classList.remove('hidden');
+                listaCelebracoesCheckboxes.innerHTML = "";
+                
+                const minhasEscolhasSalvas = dados.respostas?.[usuarioLogadoDados.nome]?.escolhas || [];
+
+                dados.celebracoes.forEach(cel => {
+                    const formatData = cel.data.split('-').reverse().join('/');
+                    const checks = minhasEscolhasSalvas.includes(cel.idChave) ? 'checked' : '';
+                    listaCelebracoesCheckboxes.innerHTML += `
+                        <label class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-100 shadow-3xs cursor-pointer select-none text-[11px] font-medium text-gray-700">
+                            <input type="checkbox" name="celebracao_resp" value="${cel.idChave}" ${checks} class="w-4 h-4 text-amber-700 border-gray-300 rounded focus:ring-amber-500">
+                            <div><span class="font-bold text-amber-900 block">${formatData} - ${cel.horario}</span>${cel.rotulo}</div>
+                        </label>`;
+                });
+            } else { cardEnqueteDisponibilidade.classList.add('hidden'); }
+        });
+    }
+
+    formResponderEnquete?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const boxes = document.querySelectorAll('input[name="celebracao_resp"]:checked');
+        const listIds = []; boxes.forEach(b => listIds.push(b.value));
+        
+        const refDoc = doc(db, "enquetes", "disponibilidade_atual");
+        const oKey = `respostas.${usuarioLogadoDados.nome}`;
+        await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
+        alert("Sua agenda de disponibilidade foi enviada com sucesso!");
     });
 
-    async function carregarEscalaPorData(dataString) {
-        dataSelecionadaGlobal = dataString;
-        const lista = document.getElementById('lista-presbiterio');
-        const cardNotificacao = document.getElementById('card-notificacao');
-        const botoesContainer = document.getElementById('botoes-notificacao-container');
-        const botoesCoberturaContainer = document.getElementById('botoes-cobertura-container');
+    function buscarMinhaProximaEscala() {
+        onSnapshot(collection(db, "escalas"), (snap) => {
+            let escalaEncontrada = null; let funcaoAlvo = "";
+            const hojeStr = new Date().toISOString().split('T')[0];
 
-        if(!lista) return;
-        lista.innerHTML = ""; if(botoesContainer) botoesContainer.innerHTML = ""; if(botoesCoberturaContainer) botoesCoberturaContainer.innerHTML = "";
-        cardNotificacao?.classList.add('hidden'); cardConviteSubstituto?.classList.add('hidden');
-
-        const horariosPossiveis = ["1900", "1700", "0900"];
-        let encontrouAlguma = false; let usuarioOcupado = false; let temVaga = false;
-
-        for(const hr of horariosPossiveis) {
-            const idDoc = `${dataString}_${hr}`;
-            const docSnap = await getDoc(doc(db, "escalas", idDoc));
-            if (docSnap.exists()) {
-                encontrouAlguma = true;
-                const dados = docSnap.data();
-                document.getElementById('lbl-data-missa').innerText = dataString.split('-').reverse().join('/');
-                document.getElementById('lbl-titulo-missa').innerText = dados.titulo;
-                document.getElementById('lbl-horario-missa').innerText = dados.horario + "h";
-                
-                let htmlMissa = `<div class="p-4 bg-amber-50/20 border-b space-y-2"><p class="text-[11px] font-bold text-amber-900 uppercase">Celebração das ${dados.horario}h</p><div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">`;
-                const postos = [{ch:'altar1', lb:'Altar I'}, {ch:'altar2', lb:'Altar II'}, {ch:'altar3', lb:'Altar III'}, {ch:'altar4', lb:'Altar IV'}, {ch:'altar5', lb:'Altar V'}, {ch:'altar6', lb:'Altar VI'}];
-                if (dados.turibuloAtivo) postos.push({ch:'turiferario', lb:'Turiferário'});
-                if (dados.navetaAtiva) postos.push({ch:'naveteiro', lb:'Naveteiro'});
-
-                postos.forEach(p => {
-                    const obj = dados[p.ch] || { nome: 'A definir', status: 'Pendente' };
-                    const livre = (obj.nome === "A definir" || obj.nome === "");
-                    let badge = obj.status === "Confirmado" ? "bg-emerald-100 text-emerald-800 font-bold" : "bg-amber-100 text-amber-800";
-                    
-                    htmlMissa += `<div class="bg-white p-2 rounded-lg border flex justify-between items-center"><span><strong>${p.lb}:</strong> ${obj.nome}</span><span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${badge}">${obj.status}</span></div>`;
-
-                    if (usuarioLogadoDados && obj.nome === usuarioLogadoDados.nome) {
-                        usuarioOcupado = true; cardNotificacao?.classList.remove('hidden');
-                        botoesContainer.innerHTML += `<div class="flex gap-1"><button onclick="confirmarPresencaMissa('${idDoc}', '${p.ch}')" class="bg-emerald-700 text-white text-[10px] px-2 py-1 rounded">Confirmar</button><button onclick="pedirSubstituicaoMissa('${idDoc}', '${p.ch}')" class="bg-rose-600 text-white text-[10px] px-2 py-1 rounded">Pedir Troca</button></div>`;
-                    }
-                    if (livre && botoesCoberturaContainer) {
-                        temVaga = true;
-                        botoesCoberturaContainer.innerHTML += `<button onclick="cobrirVagaAberta('${idDoc}', '${p.ch}')" class="bg-indigo-700 text-white text-[10px] px-2 py-1 rounded">Assumir ${p.lb} às ${dados.horario}h</button>`;
-                    }
-                });
-                htmlMissa += `</div></div>`; lista.innerHTML += htmlMissa;
-            }
-        }
-        if (temVaga && !usuarioOcupado) cardConviteSubstituto?.classList.remove('hidden');
-        if(!encontrouAlguma) lista.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">Nenhum acólito alocado para este dia.</p>`;
-    }
-
-    window.confirmarPresencaMissa = async function(idMissa, slot) {
-        const obj = {}; obj[`${slot}.status`] = "Confirmado";
-        await updateDoc(doc(db, "escalas", idMissa), obj); carregarEscalaPorData(dataSelecionadaGlobal);
-    }
-
-    window.pedirSubstituicaoMissa = async function(idMissa, slot) {
-        if(!confirm("Solicitar dispensa?")) return;
-        const docMissaSnap = await getDoc(doc(db, "escalas", idMissa));
-        const dadosMissa = docMissaSnap.data();
-        const docEnq = await getDoc(doc(db, "enquetes", "disponibilidade_atual"));
-        let sub = "A definir";
-
-        if (docEnq.exists()) {
-            const respostas = docEnq.data().respostas || {};
-            let candidatos = [];
-            Object.keys(respostas).forEach(n => {
-                if ((respostas[n].escolhas || []).includes(idMissa) && n !== usuarioLogadoDados.nome) candidatos.push({n, t: respostas[n].respondidoEm || 0});
+            snap.forEach(d => {
+                const esc = d.data(); if(esc.data < hojeStr) return;
+                for(let i=1; i<=6; i++) { if(esc[`altar${i}`]?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = `Altar ${i}`; idEscalaAtivaGlobal = d.id; } }
+                if(esc.turiferario?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = "Turiferário"; idEscalaAtivaGlobal = d.id; }
+                if(esc.naveteiro?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = "Naveteiro"; idEscalaAtivaGlobal = d.id; }
             });
-            const ocupados = [dadosMissa.altar1?.nome, dadosMissa.altar2?.nome, dadosMissa.altar3?.nome, dadosMissa.altar4?.nome, dadosMissa.altar5?.nome, dadosMissa.altar6?.nome, dadosMissa.turiferario?.nome, dadosMissa.naveteiro?.nome];
-            candidatos = candidatos.filter(c => !ocupados.includes(c.n)).sort((a,b) => a.t - b.t);
-            if (candidatos.length > 0) sub = candidatos[0].n;
-        }
-        const obj = {}; obj[slot] = { nome: sub, status: "Pendente" };
-        await updateDoc(doc(db, "escalas", idMissa), obj); carregarEscalaPorData(dataSelecionadaGlobal);
+
+            if(escalaEncontrada) {
+                let statusItem = escalaEncontrada[funcaoAlvo.toLowerCase().replace(' ', '')]?.status || "Pendente";
+                if(funcaoAlvo.startsWith("Altar")) {
+                    let num = funcaoAlvo.split(' ')[1]; statusItem = escalaEncontrada[`altar${num}`].status;
+                }
+                
+                const b = document.getElementById('badge-status-escala');
+                b.innerText = statusItem;
+                b.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${statusItem==='Confirmado'?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}`;
+
+                const dtFmt = escalaEncontrada.data.split('-').reverse().join('/');
+                dadosProximaEscala.innerHTML = `
+                    <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-100 col-span-2 flex justify-between items-center">
+                        <div><span class="text-[10px] font-bold uppercase block text-gray-400">Celebração</span><strong class="text-sm font-bold text-amber-950">${escalaEncontrada.titulo}</strong></div>
+                        <div class="text-right"><span class="text-[10px] font-bold uppercase block text-gray-400">Data e Horário</span><strong class="text-xs font-bold text-gray-700">${dtFmt} às ${escalaEncontrada.horario}h</strong></div>
+                    </div>
+                    <div class="bg-amber-900 text-white p-3 rounded-xl col-span-2 flex justify-between items-center shadow-xs">
+                        <div><span class="text-[9px] text-amber-200 uppercase tracking-wider block font-bold">Sua Função Designada</span><strong class="text-base font-black">${funcaoAlvo}</strong></div>
+                        ${statusItem === 'Pendente' ? `<button onclick="window.confirmarPresencaEscala()" class="bg-white text-amber-900 px-3 py-1.5 rounded-lg text-xs font-black shadow-xs cursor-pointer hover:bg-amber-50">Confirmar Presença</button>` : `<span class="text-xs font-bold text-amber-200"><i class="fa-solid fa-circle-check"></i> Escala Confirmada</span>`}
+                    </div>`;
+            } else {
+                dadosProximaEscala.innerHTML = `<p class="text-gray-400 italic col-span-2 py-2">Você não está escalado em nenhuma das próximas celebrações publicadas.</p>`;
+                document.getElementById('badge-status-escala').innerText = "Livre";
+                document.getElementById('badge-status-escala').className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800";
+            }
+        });
     }
 
-    window.cobrirVagaAberta = async function(idMissa, slot) {
-        const obj = {}; obj[slot] = { nome: usuarioLogadoDados.nome, status: "Confirmado" };
-        await updateDoc(doc(db, "escalas", idMissa), obj); carregarEscalaPorData(dataSelecionadaGlobal);
-    }
+    window.confirmarPresencaEscala = async function() {
+        if(!idEscalaAtivaGlobal) return;
+        const snap = await getDoc(doc(db, "escalas", idEscalaAtivaGlobal)); if(!snap.exists()) return;
+        const esc = snap.data(); const dUp = {};
 
-    if(buscaEscalaData) buscaEscalaData.addEventListener('change', (e) => carregarEscalaPorData(e.target.value));
+        for(let i=1; i<=6; i++) { if(esc[`altar${i}`]?.nome === usuarioLogadoDados.nome) dUp[`altar${i}.status`] = "Confirmado"; }
+        if(esc.turiferario?.nome === usuarioLogadoDados.nome) dUp["turiferario.status"] = "Confirmado";
+        if(esc.naveteiro?.nome === usuarioLogadoDados.nome) dUp["naveteiro.status"] = "Confirmado";
 
-    async function carregarMaterialEstudo() {
-        const docSnap = await getDoc(doc(db, "formacao", "manual_atual"));
-        if (docSnap.exists()) {
-            document.getElementById('lbl-titulo-formacao').innerText = docSnap.data().titulo;
-            document.getElementById('btn-download-formacao').href = docSnap.data().url;
-        }
-    }
+        await setDoc(doc(db, "escalas", idEscalaAtivaGlobal), dUp, { merge: true });
+        alert("Sua presença foi confirmada na escala oficial!");
+    };
 
-    async function carregarLiturgiaAutomatica() {
+    async function carregarLiturgiaDoDia() {
         try {
-            const res = await fetch('https://liturgia.up.railway.app/');
-            const data = await res.json();
-            document.getElementById('lbl-ref-liturgia').innerText = data.evangelho.referencia;
+            const r = await fetch('https://liturgia.up.railway.app/'); const data = await r.json();
+            document.getElementById('ref-evangelho-dia').innerText = data.evangelho.referencia;
             document.getElementById('txt-evangelho-dia').innerText = data.evangelho.texto;
         } catch (e) { document.getElementById('txt-evangelho-dia').innerText = "Consulta disponível na sacristia."; }
     }
@@ -363,10 +290,12 @@
     window.switchTab = function(tabName) {
         document.getElementById('conteudo-escala').className = tabName === 'escala' ? 'space-y-4 block md:col-span-2' : 'space-y-4 hidden md:col-span-2';
         document.getElementById('conteudo-avisos').className = tabName === 'avisos' ? 'space-y-4 block' : 'space-y-4 hidden md:block';
+        document.getElementById('conteudo-conteudos').className = tabName === 'conteudos' ? 'space-y-4 block' : 'space-y-4 hidden md:block';
         document.getElementById('conteudo-liturgia').className = tabName === 'liturgia' ? 'space-y-4 block' : 'space-y-4 hidden md:block';
         
         document.getElementById('tab-escala').className = tabName === 'escala' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
         document.getElementById('tab-avisos').className = tabName === 'avisos' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
+        document.getElementById('tab-conteudos').className = tabName === 'conteudos' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
         document.getElementById('tab-liturgia').className = tabName === 'liturgia' ? 'active-tab flex-1 py-3 text-center text-sm flex flex-col items-center gap-1' : 'text-gray-500 flex-1 py-3 text-center text-sm flex flex-col items-center gap-1';
     }
 </script>
