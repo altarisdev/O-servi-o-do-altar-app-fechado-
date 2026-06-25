@@ -316,7 +316,7 @@
     document.getElementById('form-publicar-aviso')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         await setDoc(doc(db, "mural", "aviso_geral"), { texto: document.getElementById('txt-aviso-coordenador').value, dataPublicacao: new Date().toLocaleDateString('pt-BR') });
-        alert("Mural atualizado!");
+        alert("Mural updated!");
     });
 
     async function carregarAvisoNoInputCoordenador() {
@@ -341,7 +341,6 @@
         await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false }); alert("Pesquisa fechada.");
     });
 
-    // CORREÇÃO CRÍTICA: GERAÇÃO DA NOVA ESCALA USANDO O CAMPO DO MÊS CORRETAMENTE
     document.getElementById('form-escala-automatica')?.addEventListener('submit', async (e) => {
         e.preventDefault(); 
         const mes = document.getElementById('enq-mes-alvo').value; 
@@ -370,7 +369,6 @@
         alert("Escalas oficiais lançadas e gravadas com sucesso!");
     });
 
-    // CORREÇÃO CRÍTICA: REMOÇÃO E EDIÇÃO DE ESCALA VIGENTE
     window.excluirEscalaInteira = async function(idDoc) {
         if(confirm("Tem certeza absoluta que deseja APAGAR esta celebração da escala oficial?")) {
             await deleteDoc(doc(db, "escalas", idDoc));
@@ -379,9 +377,10 @@
         }
     };
 
+    // CORREÇÃO EFETUADA AQUI: Ajustada a array de horários removendo strings duplicadas
     async function carregarEditorEscalasPorData(dataString) {
         if(!containerEditoresMissa) return; containerEditoresMissa.innerHTML = "";
-        const hrs = ["19:00", "17:00", "09:00", "1900", "1700", "0900"]; let fnd = false;
+        const hrs = ["19:00", "17:00", "09:00"]; let fnd = false;
         for (const hr of hrs) {
             const idDoc = `${dataString}_${hr.replace(':','')}`; const snap = await getDoc(doc(db, "escalas", idDoc));
             if (snap.exists()) {
