@@ -96,9 +96,12 @@
         }
     });
 
+    // Roteador dinâmico modificado para aceitar o painel Mestre
     function redirecionarPorFuncao(funcao) {
         if (funcao === "Coordenador") {
             window.location.href = "coordenador.html";
+        } else if (funcao === "Mestre") {
+            window.location.href = "mestre.html";
         } else {
             window.location.href = "coroinha.html";
         }
