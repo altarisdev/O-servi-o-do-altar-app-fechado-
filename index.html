@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="transition-colors duration-500">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,53 +7,72 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 font-sans min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-50 dark:bg-zinc-950 font-sans min-h-screen flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 selection:bg-red-200">
 
-    <!-- Tela de Carregamento Refinada -->
-    <div id="tela-loading" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-none opacity-0">
-        <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-red-700 mb-4"></div>
-        <p class="text-xs font-bold text-gray-500 tracking-wider uppercase">Validando Credenciais...</p>
+    <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-[40%] -left-[20%] w-[80%] h-[80%] rounded-full bg-red-600/10 dark:bg-red-900/10 blur-[120px] animate-pulse duration-[6000ms]"></div>
+        <div class="absolute -bottom-[40%] -right-[20%] w-[80%] h-[80%] rounded-full bg-amber-600/5 dark:bg-amber-900/5 blur-[120px] animate-pulse duration-[8000ms]"></div>
+        
+        <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] dark:bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:24px_24px]"></div>
     </div>
 
-    <!-- Card de Login -->
-    <div class="bg-white p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] w-full max-w-md border border-gray-100">
-        <div class="text-center mb-8">
-            <!-- Ícone nas Cores dos Coroinhas -->
-            <div class="w-16 h-16 bg-gradient-to-br from-red-700 to-red-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-md shadow-red-700/20 mb-4">
-                <i class="fa-solid fa-cross"></i>
+    <div class="absolute top-4 right-4 z-50">
+        <button id="btn-dark-mode" class="relative w-14 h-8 bg-slate-200 dark:bg-zinc-800 rounded-full p-1 cursor-pointer transition-all duration-500 shadow-inner group overflow-hidden border border-slate-300/30 dark:border-zinc-700/30">
+            <div id="dark-mode-thumb" class="w-6 h-6 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center shadow-md transform transition-all duration-500 ease-out translate-x-0 dark:translate-x-6">
+                <i class="fa-solid fa-sun text-amber-500 text-xs absolute transition-all duration-500 scale-100 rotate-0 dark:scale-0 dark:rotate-180"></i>
+                <i class="fa-solid fa-moon text-red-500 text-xs absolute transition-all duration-500 scale-0 -rotate-180 dark:scale-100 dark:dark:rotate-0"></i>
             </div>
-            <h1 class="text-2xl font-extrabold text-gray-800 tracking-tight">Serviço do Altar</h1>
-            <p class="text-xs text-gray-400 font-medium mt-1">Insira suas credenciais para acessar as escalas</p>
+        </button>
+    </div>
+
+    <div id="tela-loading" class="fixed inset-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-50 flex flex-col items-center justify-center transition-opacity duration-500 pointer-events-none opacity-0">
+        <div class="relative flex items-center justify-center mb-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-red-600 border-b-amber-500"></div>
+            <i class="fa-solid fa-cross text-red-600 absolute text-xs"></i>
+        </div>
+        <p class="text-[10px] font-black text-gray-400 dark:text-zinc-500 tracking-widest uppercase animate-pulse">Sincronizando Presbitério...</p>
+    </div>
+
+    <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-md border border-slate-100/80 dark:border-zinc-800/80 transition-all duration-500 z-10 hover:shadow-[0_24px_60px_rgba(220,38,38,0.06)] dark:hover:shadow-[0_24px_60px_rgba(220,38,38,0.15)] relative backdrop-blur-xs">
+        
+        <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-red-700 via-amber-500 to-red-600 rounded-t-3xl"></div>
+
+        <div class="text-center mb-8 mt-2">
+            <div class="w-16 h-16 bg-gradient-to-br from-red-700 to-red-600 dark:from-red-600 dark:to-red-700 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-lg shadow-red-600/20 dark:shadow-red-900/30 mb-4 transition-transform duration-300 hover:rotate-6 relative group">
+                <i class="fa-solid fa-cross drop-shadow-[0_2px_5px_rgba(0,0,0,0.2)]"></i>
+                <div class="absolute inset-0 border border-amber-400/20 rounded-2xl pointer-events-none"></div>
+            </div>
+            <h1 class="text-2xl font-extrabold text-slate-800 dark:text-zinc-100 tracking-tight transition-colors">Serviço do Altar</h1>
+            <p class="text-xs text-slate-400 dark:text-zinc-400 font-medium mt-1.5 transition-colors">Insira suas credenciais para acessar as escalas</p>
         </div>
 
-        <form id="form-login" class="space-y-4">
+        <form id="form-login" class="space-y-5">
             <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">E-mail Cadastrado</label>
-                <div class="relative">
-                    <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-gray-400 text-xs"></i>
-                    <input type="email" id="login-email" required placeholder="exemplo@igreja.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none transition-all duration-200 focus:border-red-600 focus:bg-white focus:ring-4 focus:ring-red-600/10 font-medium text-gray-700 placeholder-gray-400">
+                <label class="block text-[10px] font-bold text-slate-400 dark:text-zinc-400 uppercase tracking-widest mb-2 transition-colors">E-mail Cadastrado</label>
+                <div class="relative group">
+                    <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 group-focus-within:text-red-600 text-xs transition-colors"></i>
+                    <input type="email" id="login-email" required placeholder="exemplo@igreja.com" class="w-full bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700/50 rounded-xl py-3 pl-10 pr-4 text-sm outline-none transition-all duration-300 focus:border-red-600 dark:focus:border-red-500 focus:bg-white dark:focus:bg-zinc-800 focus:ring-4 focus:ring-red-600/10 dark:focus:ring-red-500/10 font-medium text-slate-700 dark:text-zinc-200 placeholder-slate-400 dark:placeholder-zinc-500 shadow-xs">
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Senha de Acesso</label>
-                <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-gray-400 text-xs"></i>
-                    <input type="password" id="login-senha" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none transition-all duration-200 focus:border-red-600 focus:bg-white focus:ring-4 focus:ring-red-600/10 font-medium text-gray-700 placeholder-gray-400">
+                <label class="block text-[10px] font-bold text-slate-400 dark:text-zinc-400 uppercase tracking-widest mb-2 transition-colors">Senha de Acesso</label>
+                <div class="relative group">
+                    <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 group-focus-within:text-red-600 text-xs transition-colors"></i>
+                    <input type="password" id="login-senha" required placeholder="••••••••" class="w-full bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700/50 rounded-xl py-3 pl-10 pr-4 text-sm outline-none transition-all duration-300 focus:border-red-600 dark:focus:border-red-500 focus:bg-white dark:focus:bg-zinc-800 focus:ring-4 focus:ring-red-600/10 dark:focus:ring-red-500/10 font-medium text-slate-700 dark:text-zinc-200 placeholder-slate-400 dark:placeholder-zinc-500 shadow-xs">
                 </div>
             </div>
 
-            <div id="erro-login" class="hidden text-xs bg-rose-50 border border-rose-100 text-rose-700 p-3 rounded-xl font-semibold flex items-center gap-2 transition-all">
-                <i class="fa-solid fa-triangle-exclamation"></i> <span id="erro-login-texto">Usuário ou senha incorretos.</span>
+            <div id="erro-login" class="hidden text-xs bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50 text-rose-700 dark:text-rose-400 p-3.5 rounded-xl font-medium flex items-center gap-2.5 transition-all">
+                <i class="fa-solid fa-circle-exclamation text-sm shrink-0"></i> <span id="erro-login-texto">E-mail ou senha inválidos.</span>
             </div>
 
-            <!-- Botão com Micro-interações Fluidas -->
-            <button type="submit" class="w-full bg-gradient-to-r from-red-700 to-red-600 hover:from-red-800 hover:to-red-700 text-white font-bold py-3 rounded-xl shadow-md shadow-red-700/10 transition-all duration-200 ease-in-out hover:scale-[1.01] active:scale-[0.99] cursor-pointer text-sm tracking-wide">
-                Entrar no Sistema <i class="fa-solid fa-arrow-right-to-bracket ml-1.5 text-xs"></i>
+            <button type="submit" class="w-full bg-gradient-to-r from-red-700 to-red-600 hover:from-red-800 hover:to-red-700 dark:from-red-600 dark:to-red-700 text-white font-bold py-3.5 rounded-xl shadow-md shadow-red-700/10 dark:shadow-red-900/20 transition-all duration-300 ease-in-out hover:scale-[1.01] active:scale-[0.99] cursor-pointer text-sm tracking-wide flex items-center justify-center gap-2 border-b border-red-800/50">
+                Entrar no Sistema <i class="fa-solid fa-arrow-right-to-bracket text-xs opacity-90 transition-transform duration-300 group-hover:translate-x-1"></i>
             </button>
         </form>
         
-        <div class="text-center mt-5">
-            <a href="primeiro-acesso.html" class="text-xs font-bold text-red-700 hover:text-red-800 transition-colors">
+        <div class="text-center mt-6 pt-4 border-t border-slate-50 dark:border-zinc-800/60 transition-colors">
+            <a href="primeiro-acesso.html" class="text-xs font-bold text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors inline-block relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-600 dark:after:bg-red-500 after:transition-all after:duration-300 hover:after:w-full">
                 É seu primeiro acesso? Use o código do coordenador aqui
             </a>
         </div>
@@ -81,11 +100,29 @@
     const formLogin = document.getElementById('form-login');
     const erroLogin = document.getElementById('erro-login');
     const erroLoginTexto = document.getElementById('erro-login-texto');
+    const btnDarkMode = document.getElementById('btn-dark-mode');
+
+    // Lógica e Controle Animado do Modo Escuro (Persistente no Navegador)
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+
+    btnDarkMode?.addEventListener('click', () => {
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
 
     function showLoading() { if(telaLoading) telaLoading.classList.replace('opacity-0', 'opacity-100'); }
     function hideLoading() { if(telaLoading) telaLoading.classList.replace('opacity-100', 'opacity-0'); }
 
-    // Verifica se já está logado e redireciona automaticamente
+    // Roteamento automático baseado no estado da autenticação
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             showLoading();
@@ -105,7 +142,6 @@
         }
     });
 
-    // Roteador Inteligente
     function redirecionarPorFuncao(funcao, email = "") {
         if (funcao === "Coordenador") {
             window.location.href = "coordenador.html";
