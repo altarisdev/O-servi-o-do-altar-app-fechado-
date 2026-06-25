@@ -43,7 +43,6 @@
         
         <div id="conteudo-escala" class="space-y-4 block md:col-span-2">
             
-            <!-- CENTRAL UNIFICADA DE ESCALAS (POR DIA/HORÁRIO) -->
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-3 gap-2">
                     <div>
@@ -61,7 +60,6 @@
                 </div>
             </div>
 
-            <!-- PESQUISA DE DISPONIBILIDADE (OPÇÕES PERMANENTES) -->
             <div id="card-enquete-disponibilidade" class="hidden bg-amber-50/60 p-5 rounded-2xl border border-amber-200/70 space-y-3">
                 <div>
                     <h3 class="text-sm font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation text-amber-700"></i> Pesquisa de Disponibilidade</h3>
@@ -200,14 +198,12 @@
         });
     }
 
-    // CORREÇÃO DISPONIBILIDADE: Mantém as caixas ativas e marcadas puxando o histórico em tempo real
     function ouvirEnqueteDisponibilidade() {
         onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (snap) => {
             if(snap.exists() && snap.data().ativa === true) {
                 const dados = snap.data(); cardEnqueteDisponibilidade.classList.remove('hidden');
                 listaCelebracoesCheckboxes.innerHTML = "";
                 
-                // Pega com segurança a lista salva do usuário logado
                 const minhasEscolhasSalvas = dados.respostas?.[usuarioLogadoDados.nome]?.escolhas || [];
 
                 dados.celebracoes.forEach(cel => {
@@ -223,14 +219,13 @@
         });
     }
 
-    // CORREÇÃO SALVAR: Atualiza usando notação de ponto para não apagar o resto do documento e nem ocultar as caixas
     formResponderEnquete?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const boxes = document.querySelectorAll('input[name="celebracao_resp"]:checked');
         const listIds = []; boxes.forEach(b => listIds.push(b.value));
         
         const refDoc = doc(db, "enquetes", "disponibilidade_atual");
-        const atualizacao Estruturada = {};
+        const atualizacaoEstruturada = {};
         atualizacaoEstruturada[`respostas.${usuarioLogadoDados.nome}`] = {
             escolhas: listIds,
             respondidoEm: Date.now()
@@ -240,7 +235,6 @@
             await updateDoc(refDoc, atualizacaoEstruturada);
             alert("Sua agenda de disponibilidade foi salva com sucesso!");
         } catch (error) {
-            // Caso o nó 'respostas' ainda não exista no doc, usa o set merge
             await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
             alert("Sua agenda de disponibilidade foi salva com sucesso!");
         }
@@ -258,7 +252,6 @@
         });
     }
 
-    // INTERFACE INTEGRADA POR DIA/HORÁRIO COM BOTÕES SEMPRE ATIVOS
     function renderizarEscalaGeralPorData() {
         if(!resultadoEscalaGeral || !buscaEscalaData) return;
         const dataAlvo = buscaEscalaData.value;
@@ -354,7 +347,6 @@
         });
     }
 
-    // RESOLVIDO: Atualiza o status em tempo real sem sumir com os botões ou a escala da tela
     window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
         if(!idDocEscala || !campoFuncao) return;
         const refDoc = doc(db, "escalas", idDocEscala);
