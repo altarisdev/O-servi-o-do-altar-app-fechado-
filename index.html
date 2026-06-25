@@ -6,20 +6,27 @@
     <title>Altaris - Login</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Correção Crucial para o Tailwind v4 reconhecer a classe .dark manualmente -->
+    <style type="text/tailwindcss">
+        @theme {
+            --animate-pulse: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @custom-variant dark (&:where(.dark, .dark *));
+    </style>
 </head>
 <body class="bg-slate-50 dark:bg-zinc-950 font-sans min-h-screen flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 selection:bg-red-200">
 
     <!-- Fundo Premium Litúrgico Dinâmico -->
     <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div class="absolute -top-[40%] -left-[20%] w-[80%] h-[80%] rounded-full bg-red-600/10 dark:bg-red-900/10 blur-[120px] animate-pulse duration-[6000ms]"></div>
-        <div class="absolute -bottom-[40%] -right-[20%] w-[80%] h-[80%] rounded-full bg-amber-600/5 dark:bg-amber-900/5 blur-[120px] animate-pulse duration-[8000ms]"></div>
+        <div class="absolute -top-[40%] -left-[20%] w-[80%] h-[80%] rounded-full bg-red-600/10 dark:bg-red-900/10 blur-[120px] animate-pulse"></div>
+        <div class="absolute -bottom-[40%] -right-[20%] w-[80%] h-[80%] rounded-full bg-amber-600/5 dark:bg-amber-900/5 blur-[120px] animate-pulse"></div>
         <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] dark:bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:24px_24px]"></div>
     </div>
 
     <!-- Botão de Alternar Modo Claro/Escuro Animado -->
     <div class="absolute top-4 right-4 z-50">
         <button id="btn-dark-mode" class="relative w-14 h-8 bg-slate-200 dark:bg-zinc-800 rounded-full p-1 cursor-pointer transition-all duration-500 shadow-inner group overflow-hidden border border-slate-300/30 dark:border-zinc-700/30">
-            <!-- Nota: Removida a classe fixa 'dark:translate-x-6' para evitar conflito com o controle do script -->
             <div id="dark-mode-thumb" class="w-6 h-6 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center shadow-md transform transition-all duration-500 ease-out translate-x-0">
                 <i class="fa-solid fa-sun text-amber-500 text-xs absolute transition-all duration-500 scale-100 rotate-0 dark:scale-0 dark:rotate-180"></i>
                 <i class="fa-solid fa-moon text-red-500 text-xs absolute transition-all duration-500 scale-0 -rotate-180 dark:scale-100 dark:rotate-0"></i>
