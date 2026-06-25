@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altaris - Painel do Diretor / Casal Coordenador</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col md:flex-row">
+
+    <!-- Tela de Carregamento -->
+    <div id="tela-loading" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-amber-900 mb-4"></div>
+        <p class="text-xs font-semibold text-gray-500 tracking-wider uppercase">Carregando Painel Superior...</p>
+    </div>
+
+    <!-- Barra Lateral -->
+    <aside class="bg-stone-900 text-white w-full md:w-64 shrink-0 flex flex-col shadow-xl z-40">
+        <div class="p-5 border-b border-white/10 flex items-center gap-3">
+            <div class="w-9 h-9 bg-amber-600/20 rounded-xl flex items-center justify-center text-amber-500 text-base">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <div>
+                <h2 id="nome-usuario-header" class="text-xs font-black leading-tight truncate max-w-[140px]">Padre / Casal</h2>
+                <span class="text-[9px] bg-amber-600 px-1.5 py-0.5 rounded-sm font-bold uppercase tracking-wider block mt-0.5 w-fit">Direção Geral</span>
+            </div>
+        </div>
+
+        <nav class="p-4 flex-1 flex flex-col gap-1.5 overflow-y-auto">
+            <button id="btn-m-missas" onclick="switchMestreTab('m-missas')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-amber-700 text-white shadow-xs">
+                <i class="fa-solid fa-church text-sm w-5 text-center"></i> Relatório de Missas
+            </button>
+            <button id="btn-m-reunioes" onclick="switchMestreTab('m-reunioes')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-stone-300/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <i class="fa-solid fa-users-rectangle text-sm w-5 text-center"></i> Relatório de Reuniões
+            </button>
+            <button id="btn-m-material" onclick="switchMestreTab('m-material')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-stone-300/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <i class="fa-solid fa-cloud-arrow-up text-sm w-5 text-center"></i> Enviar Materiais
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-white/10 bg-stone-950/50">
+            <button id="btn-logout" class="w-full bg-white/10 hover:bg-rose-900/40 hover:text-rose-200 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all border border-white/5">
+                <span>Sair do Sistema</span> <i class="fa-solid fa-arrow-right-from-bracket text-[11px]"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 p-4 md:p-6 overflow-y-auto max-w-7xl w-full mx-auto space-y-6">
+
+        <!-- SEÇÃO: RELATÓRIO DE MISSAS (Falta, Presença, Substituição) -->
+        <section id="sec-m-missas" class="hidden-mestre-tab space-y-4">
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-100 pb-4">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-800">Frequência e Substituições em Missas</h3>
+                        <p class="text-[11px] text-gray-400">Auditoria de assiduidade dos coroinhas no altar por mês.</p>
+                    </div>
+                    <input type="month" id="filtro-mes-missas" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700">
+                </div>
+
+                <div class="overflow-x-auto mt-4">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 font-bold uppercase text-[10px] border-b">
+                                <th class="p-3">Coroinha / Acólito</th>
+                                <th class="p-3 text-center text-emerald-700">✓ Confirmadas</th>
+                                <th class="p-3 text-center text-rose-700">X Faltas</th>
+                                <th class="p-3 text-center text-blue-700">🔄 Substituições Solicitadas</th>
+                                <th class="p-3 text-center text-amber-700">⚡ Atendeu Substituição</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-frequencia-missas" class="divide-y divide-gray-100">
+                            <!-- Injetado dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: RELATÓRIO DE REUNIÕES (Falta, Presença, Justificada) -->
+        <section id="sec-m-reunioes" class="hidden-mestre-tab hidden space-y-4">
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-100 pb-4">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-800">Frequência Geral em Reuniões / Formações</h3>
+                        <p class="text-[11px] text-gray-400">Histórico completo de presença nos encontros mensais obrigatórios.</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto mt-4">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 font-bold uppercase text-[10px] border-b">
+                                <th class="p-3">Membro do Presbitério</th>
+                                <th class="p-3 text-center text-emerald-700">✓ Presente</th>
+                                <th class="p-3 text-center text-rose-700">X Falta</th>
+                                <th class="p-3 text-center text-blue-700">FJ Justificada</th>
+                                <th class="p-3 text-center">Aproveitamento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-frequencia-reunioes" class="divide-y divide-gray-100">
+                            <!-- Injetado dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: ENVIO DE MATERIAIS -->
+        <section id="sec-m-material" class="hidden-mestre-tab hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 h-fit">
+                <div>
+                    <h3 class="text-sm font-black text-gray-800">Adicionar Material Didático</h3>
+                    <p class="text-[11px] text-gray-400">Envie pautas de missas, formações e arquivos litúrgicos.</p>
+                </div>
+                <form id="form-mestre-material" class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Título do Material</label>
+                        <input type="text" id="mat-titulo" required placeholder="Ex: Manual do Turiferário PDF" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs focus:outline-amber-600">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Link do Conteúdo (Google Drive / URL)</label>
+                        <input type="url" id="mat-url" required placeholder="https://drive.google.com/..." class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs focus:outline-amber-600">
+                    </div>
+                    <button type="submit" class="w-full bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold py-2.5 rounded-lg shadow-xs cursor-pointer transition-all">
+                        <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Publicar para os Coroinhas
+                    </button>
+                </form>
+            </div>
+            
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 md:col-span-2 space-y-3">
+                <h3 class="text-sm font-black text-gray-800">Acervo Histórico de Materiais</h3>
+                <div id="lista-mestre-materiais" class="space-y-2 divide-y divide-gray-50">
+                    <!-- Injetado dinamicamente -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Mantendo estritamente as suas chaves e projeto originais
+    const firebaseConfig = {
+        apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
+        authDomain: "tarcisius-d03d7.firebaseapp.com",
+        projectId: "tarcisius-d03d7",
+        storageBucket: "tarcisius-d03d7.firebasestorage.app",
+        messagingSenderId: "186797936591",
+        appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const telaLoading = document.getElementById('tela-loading');
+    const filtroMesMissas = document.getElementById('filtro-mes-missas');
+    const tabelaFrequenciaMissas = document.getElementById('tabela-frequencia-missas');
+    const tabelaFrequenciaReunioes = document.getElementById('tabela-frequencia-reunioes');
+    const listaMestreMateriais = document.getElementById('lista-mestre-materiais');
+
+    let cacheUsuarios = [];
+
+    function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
+
+    // Estado da autenticação
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+            // O usuário mestre pode ser identificado como Coordenador, Padre ou perfil Mestre específico
+            if (docSnap.exists() && (docSnap.data().funcao === "Coordenador" || docSnap.data().funcao === "Mestre")) {
+                inicializarPainelMestre();
+            } else { window.location.href = "index.html"; }
+        } else { window.location.href = "index.html"; }
+        setTimeout(hideLoading, 500);
+    });
+
+    document.getElementById('btn-logout')?.addEventListener('click', () => {
+        signOut(auth).then(() => window.location.href = "index.html");
+    });
+
+    function inicializarPainelMestre() {
+        const dataHoje = new Date();
+        if(filtroMesMissas) {
+            filtroMesMissas.value = dataHoje.toISOString().substring(0, 7);
+            filtroMesMissas.addEventListener('change', carregarRelatorioMissas);
+        }
+        
+        // Puxar lista inicial de usuários do presbitério para base de cálculos
+        onSnapshot(collection(db, "usuarios"), (snap) => {
+            cacheUsuarios = [];
+            snap.forEach(d => {
+                if(d.data().funcao !== "Coordenador") cacheUsuarios.push(d.data().nome);
+            });
+            cacheUsuarios.sort();
+            
+            carregarRelatorioMissas();
+            carregarRelatorioReunioes();
+        });
+
+        ouvirMateriaisMestre();
+    }
+
+    // ==========================================
+    // 1. PROCESSAMENTO DE FREQUÊNCIA DAS MISSAS
+    // ==========================================
+    async function carregarRelatorioMissas() {
+        if(!tabelaFrequenciaMissas) return;
+        tabelaFrequenciaMissas.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400 italic">Processando métricas...</td></tr>`;
+        
+        const mesSelecionado = filtroMesMissas.value; // Formato YYYY-MM
+        
+        try {
+            // Puxa escalas cuja data começa com o mês selecionado
+            const snapEscalas = await getDocs(collection(db, "escalas"));
+            
+            // Dicionário de contagem estruturado
+            let relatorio = {};
+            cacheUsuarios.forEach(nome => {
+                relatorio[nome] = { presencas: 0, faltas: 0, solicitouSub: 0, atendeuSub: 0 };
+            });
+
+            snapEscalas.forEach(docSnap => {
+                const escala = docSnap.data();
+                if(escala.data && escala.data.startsWith(mesSelecionado)) {
+                    
+                    // Avalia todas as 6 vagas tradicionais do altar
+                    for(let i = 1; i <= 6; i++) {
+                        const vaga = escala[`altar${i}`];
+                        if(vaga && vaga.nome && relatorio[vaga.nome]) {
+                            if(vaga.status === "Confirmado" || vaga.status === "Presente") relatorio[vaga.nome].presencas++;
+                            if(vaga.status === "Falta") relatorio[vaga.nome].faltas++;
+                            if(vaga.status === "Substituido") relatorio[vaga.nome].solicitouSub++;
+                        }
+                    }
+
+                    // Avalia Turiferário e Naveteiro se ativos
+                    if(escala.turibuloAtivo && escala.turiferario && relatorio[escala.turiferario.nome]) {
+                        if(escala.turiferario.status === "Confirmado") relatorio[escala.turiferario.nome].presencas++;
+                        if(escala.turiferario.status === "Falta") relatorio[escala.turiferario.nome].faltas++;
+                        if(escala.turiferario.status === "Substituido") relatorio[escala.turiferario.nome].solicitouSub++;
+                    }
+                    if(escala.navetaAtiva && escala.naveteiro && relatorio[escala.naveteiro.nome]) {
+                        if(escala.naveteiro.status === "Confirmado") relatorio[escala.naveteiro.nome].presencas++;
+                        if(escala.naveteiro.status === "Falta") relatorio[escala.naveteiro.nome].faltas++;
+                        if(escala.naveteiro.status === "Substituido") relatorio[escala.naveteiro.nome].solicitouSub++;
+                    }
+
+                    // Contagem de quem assumiu a vaga (Substituto voluntário registrado)
+                    // Verifica campo histórico se seu sistema registrar o nome de quem cobriu
+                    if(escala.substitutoNome && relatorio[escala.substitutoNome]) {
+                        relatorio[escala.substitutoNome].atendeuSub++;
+                    }
+                }
+            });
+
+            tabelaFrequenciaMissas.innerHTML = "";
+            Object.keys(relatorio).forEach(nome => {
+                const dados = relatorio[nome];
+                tabelaFrequenciaMissas.innerHTML += `
+                    <tr class="hover:bg-gray-50/50">
+                        <td class="p-3 font-bold text-gray-800">${nome}</td>
+                        <td class="p-3 text-center text-emerald-700 font-bold">${dados.presencas}</td>
+                        <td class="p-3 text-center text-rose-700 font-bold">${dados.faltas}</td>
+                        <td class="p-3 text-center text-blue-700 font-medium">${dados.solicitouSub}</td>
+                        <td class="p-3 text-center text-amber-700 font-medium">${dados.atendeuSub}</td>
+                    </tr>
+                `;
+            });
+
+        } catch (err) { console.error(err); }
+    }
+
+    // ==========================================
+    // 2. PROCESSAMENTO DE FREQUÊNCIA DE REUNIÕES
+    // ==========================================
+    async function carregarRelatorioReunioes() {
+        if(!tabelaFrequenciaReunioes) return;
+        tabelaFrequenciaReunioes.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400 italic">Processando chamada histórica...</td></tr>`;
+
+        try {
+            const snapReunioes = await getDocs(collection(db, "reunioes"));
+            let contagemReunioes = {};
+            
+            cacheUsuarios.forEach(nome => {
+                contagemReunioes[nome] = { presentes: 0, faltas: 0, justificadas: 0, totalEncontros: 0 };
+            });
+
+            snapReunioes.forEach(docSnap => {
+                const dadosReuniao = docSnap.data();
+                const presencas = dadosReuniao.presencas || {};
+
+                Object.keys(contagemReunioes).forEach(nome => {
+                    if(presencas[nome]) {
+                        contagemReunioes[nome].totalEncontros++;
+                        if(presencas[nome] === "presente") contagemReunioes[nome].presentes++;
+                        if(presencas[nome] === "falta") contagemReunioes[nome].faltas++;
+                        if(presencas[nome] === "justificada") contagemReunioes[nome].justificadas++;
+                    }
+                });
+            });
+
+            tabelaFrequenciaReunioes.innerHTML = "";
+            Object.keys(contagemReunioes).forEach(nome => {
+                const c = contagemReunioes[nome];
+                let aproveitamento = 100;
+                if (c.totalEncontros > 0) {
+                    aproveitamento = Math.round(((c.presentes + c.justificadas) / c.totalEncontros) * 100);
+                }
+
+                let badgeAproveitamento = `<span class="bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded">${aproveitamento}%</span>`;
+                if(aproveitamento < 75) badgeAproveitamento = `<span class="bg-rose-100 text-rose-800 font-black px-2 py-0.5 rounded">${aproveitamento}%</span>`;
+
+                tabelaFrequenciaReunioes.innerHTML += `
+                    <tr class="hover:bg-gray-50/50">
+                        <td class="p-3 font-bold text-gray-800">${nome}</td>
+                        <td class="p-3 text-center text-emerald-600 font-semibold">${c.presentes}</td>
+                        <td class="p-3 text-center text-rose-600 font-semibold">${c.faltas}</td>
+                        <td class="p-3 text-center text-blue-600 font-semibold">${c.justificadas}</td>
+                        <td class="p-3 text-center">${badgeAproveitamento}</td>
+                    </tr>
+                `;
+            });
+        } catch (err) { console.error(err); }
+    }
+
+    // ==========================================
+    // 3. ENVIO E CONTROLE DE MATERIAIS DIDÁTICOS
+    // ==========================================
+    document.getElementById('form-mestre-material')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const titulo = document.getElementById('mat-titulo').value.trim();
+        const url = document.getElementById('mat-url').value.trim();
+        const idMaterial = "mat_" + Date.now();
+
+        try {
+            await setDoc(doc(db, "formacao", idMaterial), {
+                id: idMaterial,
+                titulo: titulo,
+                url: url,
+                enviadoPor: "Direção Geral",
+                dataEnvio: new Date().toLocaleDateString('pt-BR')
+            });
+            alert("Material publicado com sucesso para todo o grupo!");
+            document.getElementById('form-mestre-material').reset();
+        } catch(err) { alert("Erro ao salvar documento: " + err.message); }
+    });
+
+    function ouvirMateriaisMestre() {
+        if(!listaMestreMateriais) return;
+        onSnapshot(collection(db, "formacao"), (snap) => {
+            if(snap.empty) {
+                listaMestreMateriais.innerHTML = `<p class="text-xs text-gray-400 italic p-2">Nenhum material cadastrado.</p>`;
+                return;
+            }
+            listaMestreMateriais.innerHTML = "";
+            snap.forEach(d => {
+                const mat = d.data();
+                listaMestreMateriais.innerHTML += `
+                    <div class="flex justify-between items-center py-3 text-xs">
+                        <div>
+                            <strong class="text-stone-800 text-xs block">${mat.titulo}</strong>
+                            <a href="${mat.url}" target="_blank" class="text-[11px] text-amber-700 hover:underline font-mono truncate max-w-sm block">${mat.url}</a>
+                        </div>
+                        <button onclick="window.removerMaterialMestre('${d.id}')" class="text-rose-600 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded-lg font-bold border border-rose-200 text-[10px] cursor-pointer transition-all">Excluir</button>
+                    </div>
+                `;
+            });
+        });
+    }
+
+    window.removerMaterialMestre = async function(id) {
+        if(confirm("Deseja deletar permanentemente este material de formação?")) {
+            await deleteDoc(doc(db, "formacao", id));
+        }
+    }
+
+    // Alternador de Abas do Painel
+    window.switchMestreTab = function(tabID) {
+        document.querySelectorAll('.hidden-mestre-tab').forEach(el => el.classList.add('hidden'));
+        document.getElementById('sec-' + tabID)?.classList.remove('hidden');
+        
+        const ids = ['missas', 'reunioes', 'material'];
+        ids.forEach(id => {
+            const btn = document.getElementById(`btn-m-${id}`);
+            if(btn) {
+                if(tabID === `m-${id}`) {
+                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-amber-700 text-white shadow-xs";
+                } else {
+                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-stone-300/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>
