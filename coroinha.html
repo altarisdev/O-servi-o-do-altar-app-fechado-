@@ -55,6 +55,19 @@
                 </div>
             </div>
 
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-3 gap-2">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-800">Ver Escala Geral</h3>
+                        <p class="text-[11px] text-gray-400 font-medium">Consulte as equipes escaladas para qualquer data.</p>
+                    </div>
+                    <input type="date" id="busca-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700">
+                </div>
+                <div id="resultado-escala-geral" class="space-y-3 text-xs">
+                    <p class="text-gray-400 italic">Selecione uma data acima para consultar.</p>
+                </div>
+            </div>
+
             <div id="card-enquete-disponibilidade" class="hidden bg-amber-50/60 p-5 rounded-2xl border border-amber-200/70 space-y-3">
                 <div>
                     <h3 class="text-sm font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation text-amber-700"></i> Pesquisa de Disponibilidade</h3>
@@ -122,8 +135,10 @@
     const listaCelebracoesCheckboxes = document.getElementById('lista-celebracoes-checkboxes');
     const formResponderEnquete = document.getElementById('form-responder-enquete');
     const btnLogout = document.getElementById('btn-logout');
+    const buscaEscalaData = document.getElementById('busca-escala-data');
+    const resultadoEscalaGeral = document.getElementById('resultado-escala-geral');
 
-    let usuarioLogadoDados = null; let idEscalaAtivaGlobal = null;
+    let usuarioLogadoDados = null; let idEscalaAtivaGlobal = null; let todasEscalasCache = [];
 
     function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
 
@@ -141,6 +156,11 @@
     function inicializarPainelAcolito() {
         if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = usuarioLogadoDados.nome;
         if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = usuarioLogadoDados.funcao;
+
+        // Inicia a data padrão de busca para o dia atual
+        if(buscaEscalaData) {
+            buscaEscalaData.value = new Date().toISOString().split('T')[0];
+        }
 
         ouvirMuralAvisos();
         ouvirColecaoConteudos();
@@ -163,7 +183,6 @@
         });
     }
 
-    // CORREÇÃO DA RENDERIZAÇÃO DE CONTEÚDOS NO COROINHA
     function ouvirColecaoConteudos() {
         const container = document.getElementById('lista-materials-formacao');
         if(!container) return;
@@ -188,6 +207,7 @@
         });
     }
 
+    // ALTERAÇÃO: Enquete permanente (não some após o envio, mantendo as marcações salvas)
     function ouvirEnqueteDisponibilidade() {
         onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (snap) => {
             if(snap.exists() && snap.data().ativa === true) {
@@ -214,19 +234,29 @@
         const listIds = []; boxes.forEach(b => listIds.push(b.value));
         const refDoc = doc(db, "enquetes", "disponibilidade_atual");
         await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
-        alert("Sua agenda de disponibilidade foi enviada!");
+        alert("Sua agenda de disponibilidade foi enviada e atualizada com sucesso!");
     });
 
     function buscarMinhaProximaEscala() {
         onSnapshot(collection(db, "escalas"), (snap) => {
+            todasEscalasCache = [];
+            snap.forEach(d => { 
+                const esc = d.data(); 
+                esc.idDoc = d.id; 
+                todasEscalasCache.push(esc); 
+            });
+
+            // Atualiza o painel de ver escalas gerais por data
+            renderizarEscalaGeralPorData();
+
             let escalaEncontrada = null; let funcaoAlvo = "";
             const hojeStr = new Date().toISOString().split('T')[0];
 
-            snap.forEach(d => {
-                const esc = d.data(); if(esc.data < hojeStr) return;
-                for(let i=1; i<=6; i++) { if(esc[`altar${i}`]?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = `Altar ${i}`; idEscalaAtivaGlobal = d.id; } }
-                if(esc.turiferario?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = "Turiferário"; idEscalaAtivaGlobal = d.id; }
-                if(esc.naveteiro?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = "Naveteiro"; idEscalaAtivaGlobal = d.id; }
+            todasEscalasCache.forEach(esc => {
+                if(esc.data < hojeStr) return;
+                for(let i=1; i<=6; i++) { if(esc[`altar${i}`]?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = `Altar ${i}`; idEscalaAtivaGlobal = esc.idDoc; } }
+                if(esc.turiferario?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = "Turiferário"; idEscalaAtivaGlobal = esc.idDoc; }
+                if(esc.naveteiro?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = "Naveteiro"; idEscalaAtivaGlobal = esc.idDoc; }
             });
 
             if(escalaEncontrada) {
@@ -237,16 +267,33 @@
 
                 const b = document.getElementById('badge-status-escala');
                 b.innerText = statusItem;
-                b.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${statusItem==='Confirmado'?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}`;
+                
+                if (statusItem === 'Confirmado') b.className = `text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800`;
+                else if (statusItem === 'Substituição Solicitada') b.className = `text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800`;
+                else b.className = `text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800`;
+
+                let acoesHtml = "";
+                // ALTERAÇÃO: Esconde os botões/ações se já houver Confirmação ou Pedido de Substituição
+                if(statusItem === 'Pendente') {
+                    acoesHtml = `
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button onclick="window.atualizarPresencaEscala('Confirmado')" class="bg-white text-amber-950 px-3 py-1.5 rounded-lg text-xs font-black shadow-xs cursor-pointer hover:bg-amber-50">Confirmar Presença</button>
+                            <button onclick="window.atualizarPresencaEscala('Substituição Solicitada')" class="bg-rose-800 text-white border border-rose-700 px-3 py-1.5 rounded-lg text-xs font-black shadow-xs cursor-pointer hover:bg-rose-900">Pedir Substituição</button>
+                        </div>`;
+                } else if(statusItem === 'Confirmado') {
+                    acoesHtml = `<span class="text-xs font-bold text-amber-200"><i class="fa-solid fa-circle-check"></i> Presença Confirmada</span>`;
+                } else {
+                    acoesHtml = `<span class="text-xs font-bold text-rose-200"><i class="fa-solid fa-handshake-angle"></i> Substituição Solicitada</span>`;
+                }
 
                 dadosProximaEscala.innerHTML = `
                     <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-100 col-span-2 flex justify-between items-center">
                         <div><span class="text-[10px] font-bold uppercase block text-gray-400">Celebração</span><strong class="text-sm font-bold text-amber-950">${escalaEncontrada.titulo}</strong></div>
                         <div class="text-right"><span class="text-[10px] font-bold uppercase block text-gray-400">Data e Horário</span><strong class="text-xs font-bold text-gray-700">${escalaEncontrada.data.split('-').reverse().join('/')} às ${escalaEncontrada.horario}h</strong></div>
                     </div>
-                    <div class="bg-amber-900 text-white p-3 rounded-xl col-span-2 flex justify-between items-center shadow-xs">
+                    <div class="bg-amber-900 text-white p-3 rounded-xl col-span-2 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-xs">
                         <div><span class="text-[9px] text-amber-200 uppercase tracking-wider block font-bold">Sua Função Designada</span><strong class="text-base font-black">${funcaoAlvo}</strong></div>
-                        ${statusItem === 'Pendente' ? `<button onclick="window.confirmarPresencaEscala()" class="bg-white text-amber-900 px-3 py-1.5 rounded-lg text-xs font-black shadow-xs cursor-pointer hover:bg-amber-50">Confirmar Presença</button>` : `<span class="text-xs font-bold text-amber-200"><i class="fa-solid fa-circle-check"></i> Escala Confirmada</span>`}
+                        ${acoesHtml}
                     </div>`;
             } else {
                 dadosProximaEscala.innerHTML = `<p class="text-gray-400 italic col-span-2 py-2">Você não está escalado em nenhuma das próximas celebrações publicadas.</p>`;
@@ -256,18 +303,79 @@
         });
     }
 
-    window.confirmarPresencaEscala = async function() {
+    // ALTERAÇÃO: Função genérica para responder Indo ou Pedindo Substituição
+    window.atualizarPresencaEscala = async function(novoStatus) {
         if(!idEscalaAtivaGlobal) return;
         const snap = await getDoc(doc(db, "escalas", idEscalaAtivaGlobal)); if(!snap.exists()) return;
         const esc = snap.data(); const dUp = {};
 
-        for(let i=1; i<=6; i++) { if(esc[`altar${i}`]?.nome === usuarioLogadoDados.nome) dUp[`altar${i}.status`] = "Confirmado"; }
-        if(esc.turiferario?.nome === usuarioLogadoDados.nome) dUp["turiferario.status"] = "Confirmado";
-        if(esc.naveteiro?.nome === usuarioLogadoDados.nome) dUp["naveteiro.status"] = "Confirmado";
+        for(let i=1; i<=6; i++) { if(esc[`altar${i}`]?.nome === usuarioLogadoDados.nome) dUp[`altar${i}.status`] = novoStatus; }
+        if(esc.turiferario?.nome === usuarioLogadoDados.nome) dUp["turiferario.status"] = novoStatus;
+        if(esc.naveteiro?.nome === usuarioLogadoDados.nome) dUp["naveteiro.status"] = novoStatus;
 
         await setDoc(doc(db, "escalas", idEscalaAtivaGlobal), dUp, { merge: true });
-        alert("Sua presença foi confirmada!");
+        alert(novoStatus === "Confirmado" ? "Sua presença foi confirmada!" : "Pedido de substituição enviado à coordenação!");
     };
+
+    // ALTERAÇÃO: Renderizador da lista de quem está escalado por data
+    function renderizarEscalaGeralPorData() {
+        if(!resultadoEscalaGeral || !buscaEscalaData) return;
+        const dataAlvo = buscaEscalaData.value;
+        if(!dataAlvo) {
+            resultadoEscalaGeral.innerHTML = `<p class="text-gray-400 italic">Selecione uma data acima para consultar.</p>`;
+            return;
+        }
+
+        const escalasDoDia = todasEscalasCache.filter(e => e.data === dataAlvo);
+        if(escalasDoDia.length === 0) {
+            resultadoEscalaGeral.innerHTML = `<p class="text-gray-400 italic py-2 text-center bg-gray-50 rounded-xl border border-dashed">Nenhuma escala oficial publicada para este dia.</p>`;
+            return;
+        }
+
+        resultadoEscalaGeral.innerHTML = "";
+        escalasDoDia.forEach(esc => {
+            let listaMembrosHtml = "";
+            const funcoes = [
+                { id: 'altar1', label: 'Altar 1' }, { id: 'altar2', label: 'Altar 2' },
+                { id: 'altar3', label: 'Altar 3' }, { id: 'altar4', label: 'Altar 4' },
+                { id: 'altar5', label: 'Altar 5' }, { id: 'altar6', label: 'Altar 6' },
+                { id: 'turiferario', label: 'Turiferário' }, { id: 'naveteiro', label: 'Naveteiro' }
+            ];
+
+            funcoes.forEach(f => {
+                const item = esc[f.id];
+                if(item && item.nome) {
+                    const ehVoce = item.nome === usuarioLogadoDados.nome;
+                    const statusText = item.status || "Pendente";
+                    let badgeStatus = `<span class="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-100 text-amber-800">Pendente</span>`;
+                    if(statusText === 'Confirmado') badgeStatus = `<span class="text-[9px] px-1 py-0.2 rounded font-bold bg-emerald-100 text-emerald-800">✓</span>`;
+                    if(statusText === 'Substituição Solicitada') badgeStatus = `<span class="text-[9px] px-1 py-0.2 rounded font-bold bg-rose-100 text-rose-800">Subst.</span>`;
+
+                    listaMembrosHtml += `
+                        <div class="flex justify-between items-center p-1.5 rounded-lg border text-xs ${ehVoce ? 'bg-amber-100/50 border-amber-400 font-bold' : 'bg-white border-gray-100'}">
+                            <span class="text-gray-500 text-[11px]">${f.label}:</span>
+                            <div class="flex items-center gap-1.5 truncate">
+                                <span class="truncate max-w-[120px] ${ehVoce ? 'text-amber-950 font-black' : 'text-gray-800'}">${item.nome} ${ehVoce ? '(Você)' : ''}</span>
+                                ${badgeStatus}
+                            </div>
+                        </div>`;
+                }
+            });
+
+            resultadoEscalaGeral.innerHTML += `
+                <div class="border border-gray-200 rounded-xl p-3 bg-gray-50/50 space-y-2">
+                    <div class="flex justify-between border-b pb-1.5 font-bold text-amber-950 text-[13px]">
+                        <span>${esc.titulo}</span>
+                        <span>${esc.horario}h</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                        ${listaMembrosHtml}
+                    </div>
+                </div>`;
+        });
+    }
+
+    buscaEscalaData?.addEventListener('change', renderizarEscalaGeralPorData);
 
     async function carregarLiturgiaDoDia() {
         try {
