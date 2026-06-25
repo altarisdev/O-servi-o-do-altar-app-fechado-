@@ -35,6 +35,9 @@
             <button id="btn-c-sorteio" onclick="switchCoordTab('coord-sorteio')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                 <i class="fa-solid fa-wand-magic-sparkles text-sm w-5 text-center"></i> Sorteio Automático
             </button>
+            <button id="btn-c-reunioes" onclick="switchCoordTab('coord-reunioes')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <i class="fa-solid fa-clipboard-user text-sm w-5 text-center"></i> Chamada / Reuniões
+            </button>
             <button id="btn-c-material" onclick="switchCoordTab('coord-material')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                 <i class="fa-solid fa-cloud-arrow-up text-sm w-5 text-center"></i> Postar Conteúdos
             </button>
@@ -134,6 +137,40 @@
             </div>
         </section>
 
+        <section id="sec-coord-reunioes" class="hidden-coord-tab hidden max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-xs border border-gray-200 space-y-5">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-100 pb-4">
+                <div>
+                    <h3 class="text-sm font-black text-gray-800">Chamada e Presença de Reuniões</h3>
+                    <p class="text-[11px] text-gray-400">Selecione uma data para realizar ou revisar a lista de chamada do presbitério.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">Data da Reunião:</label>
+                    <input type="date" id="chamada-reuniao-data" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700 focus:outline-amber-700">
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-amber-50/40 border border-amber-200/60 rounded-xl p-3 flex flex-wrap justify-between items-center text-xs gap-3">
+                    <span class="font-semibold text-amber-900"><i class="fa-solid fa-list-check"></i> Painel de Presenças Ativo</span>
+                    <div class="flex gap-3 text-[10px] font-bold uppercase tracking-wider">
+                        <span class="text-emerald-700">✓ Presente</span>
+                        <span class="text-rose-700">X Falta</span>
+                        <span class="text-blue-700">FJ Justificada</span>
+                    </div>
+                </div>
+
+                <div id="lista-chamada-coroinhas" class="divide-y divide-gray-100 max-h-[450px] overflow-y-auto pr-1">
+                    <p class="text-xs text-gray-400 italic py-4 text-center">Selecione uma data válida para iniciar a chamada.</p>
+                </div>
+
+                <div class="pt-2 flex justify-end">
+                    <button type="button" id="btn-salvar-chamada" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-xs transition-all cursor-pointer">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> Gravar Lista de Chamada
+                    </button>
+                </div>
+            </div>
+        </section>
+
         <section id="sec-coord-material" class="hidden-coord-tab hidden grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 h-fit">
                 <div><h3 class="text-sm font-black text-gray-800">Adicionar Material Didático</h3></div>
@@ -185,8 +222,14 @@
     const chkPossuiIrmao = document.getElementById('chk-possui-irmao');
     const divListaIrmaos = document.getElementById('div-lista-irmaos');
     const selectIrmaoTitular = document.getElementById('cad-irmao-titular-select');
+    
+    // Elementos da Chamada
+    const chamadaReuniaoData = document.getElementById('chamada-reuniao-data');
+    const listaChamadaCoroinhas = document.getElementById('lista-chamada-coroinhas');
+    const btnSalvarChamada = document.getElementById('btn-salvar-chamada');
 
     let usuarioLogadoDados = null; let mapaRespostasGerais = {}; let cacheTodosUsuarios = [];
+    let mapaPresencaAtual = {}; // Guarda temporariamente a chamada da data selecionada
 
     const CRONOGRAMA_PAROQUIA = [
         { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" }, { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
@@ -228,8 +271,13 @@
         ouvirMateriaisComoAdmin();
         carregarAvisoNoInputCoordenador();
         switchCoordTab('coord-usuarios');
+        
         if(editorEscalaData) {
             editorEscalaData.value = new Date().toISOString().split('T')[0]; carregarEditorEscalasPorData(editorEscalaData.value);
+        }
+        if(chamadaReuniaoData) {
+            chamadaReuniaoData.value = new Date().toISOString().split('T')[0];
+            carregarListaDeChamada(chamadaReuniaoData.value);
         }
     }
 
@@ -274,6 +322,7 @@
             cacheTodosUsuarios = []; snap.forEach(d => { const u = d.data(); u.idDoc = d.id; cacheTodosUsuarios.push(u); });
             cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome)); renderizarTabelaUsuarios();
             if(chkPossuiIrmao && chkPossuiIrmao.checked) { atualizarListboxMembros(); }
+            if(chamadaReuniaoData && chamadaReuniaoData.value) { renderizarInterfaceChamada(); }
         });
     }
 
@@ -289,6 +338,94 @@
     }
     buscaUsuarioLista?.addEventListener('input', renderizarTabelaUsuarios);
 
+    // LOGICA DO SISTEMA DE CONTROLE DE REUNIÕES (CHAMADAS)
+    async function carregarListaDeChamada(dataString) {
+        if(!dataString) return;
+        mapaPresencaAtual = {};
+        try {
+            const docSnap = await getDoc(doc(db, "reunioes", dataString));
+            if(docSnap.exists()) {
+                mapaPresencaAtual = docSnap.data().presencas || {};
+            }
+            renderizarInterfaceChamada();
+        } catch(err) { console.error("Erro ao carregar chamada: ", err); }
+    }
+
+    function renderizarInterfaceChamada() {
+        if(!listaChamadaCoroinhas) return;
+        
+        // Filtra apenas membros que são coroinhas/acolitos
+        const listaCoroinhas = cacheTodosUsuarios.filter(u => u.funcao !== "Coordenador");
+        
+        if(listaCoroinhas.length === 0) {
+            listaChamadaCoroinhas.innerHTML = `<p class="text-xs text-gray-400 italic py-4 text-center">Nenhum coroinha cadastrado no sistema.</p>`;
+            return;
+        }
+
+        listaChamadaCoroinhas.innerHTML = "";
+        listaCoroinhas.forEach(c => {
+            // Se ainda não tiver status definido para a data, inicia como presente por padrão
+            const statusAtual = mapaPresencaAtual[c.nome] || "presente";
+            
+            listaChamadaCoroinhas.innerHTML += `
+                <div class="flex justify-between items-center py-2.5 px-1 hover:bg-gray-50/60 transition-all">
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-gray-800">${c.nome}</span>
+                        <span class="text-[10px] text-gray-400 font-mono">${c.email}</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200/60">
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'presente')" id="btn-p-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'presente' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">
+                            ✓ P
+                        </button>
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'falta')" id="btn-f-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'falta' ? 'bg-rose-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">
+                            X F
+                        </button>
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'justificada')" id="btn-j-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'justificada' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">
+                            FJ
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    window.alterarStatusPresencaLocal = function(nomeCoroinha, novoStatus) {
+        mapaPresencaAtual[nomeCoroinha] = novoStatus;
+        
+        // Remove classes ativas de todos os botões do coroinha específico
+        const idLimpo = nomeCoroinha.replace(/\s+/g, '');
+        const btnP = document.getElementById(`btn-p-${idLimpo}`);
+        const btnF = document.getElementById(`btn-f-${idLimpo}`);
+        const btnJ = document.getElementById(`btn-j-${idLimpo}`);
+
+        if(btnP) btnP.className = `px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'presente' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}`;
+        if(btnF) btnF.className = `px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'falta' ? 'bg-rose-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}`;
+        if(btnJ) btnJ.className = `px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'justificada' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}`;
+    };
+
+    btnSalvarChamada?.addEventListener('click', async () => {
+        const dataReuniao = chamadaReuniaoData.value;
+        if(!dataReuniao) return alert("Por favor, selecione uma data válida!");
+
+        // Garante que todos que estão listados e não foram clicados fiquem salvos como presente nativo
+        cacheTodosUsuarios.filter(u => u.funcao !== "Coordenador").forEach(c => {
+            if(!mapaPresencaAtual[c.nome]) mapaPresencaAtual[c.nome] = "presente";
+        });
+
+        try {
+            await setDoc(doc(db, "reunioes", dataReuniao), {
+                data: dataReuniao,
+                presencas: mapaPresencaAtual,
+                atualizadoEm: Date.now()
+            });
+            alert("Lista de chamada e presença salva com sucesso!");
+        } catch(err) { alert("Erro ao salvar lista de chamada: " + err.message); }
+    });
+
+    chamadaReuniaoData?.addEventListener('change', (e) => carregarListaDeChamada(e.target.value));
+
+    // DEMAIS FUNÇÕES DO BOTÃO E UPLOADS
     document.getElementById('form-upload-formacao')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const titulo = document.getElementById('form-titulo-input').value.trim();
@@ -363,7 +500,6 @@
         await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false }); alert("Pesquisa fechada.");
     });
 
-    // AÇÃO DE LIMPAR TODAS AS ESCALAS DO MÊS SELECIONADO
     document.getElementById('btn-limpar-escalas-mes')?.addEventListener('click', async () => {
         const mes = document.getElementById('enq-mes-alvo').value;
         if(!mes) return alert("Por favor, selecione o Mês de Referência primeiro!");
@@ -418,7 +554,6 @@
         alert("Escalas oficiais lançadas e gravadas com sucesso!");
     });
 
-    // AÇÃO DE ADICIONAR UMA CELEBRAÇÃO EXTRA / SOLENIDADE MANUALMENTE
     document.getElementById('form-criar-escala-manual')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const dataAlvo = editorEscalaData.value;
@@ -456,7 +591,6 @@
         }
     };
 
-    // MOTOR ATUALIZADO: Busca de forma dinâmica qualquer horário direto do banco de dados (Suporta Solenidades)
     async function carregarEditorEscalasPorData(dataString) {
         if(!containerEditoresMissa) return; containerEditoresMissa.innerHTML = "";
         let fnd = false;
@@ -472,7 +606,6 @@
                 listaDeEscalas.push(dadosMissa);
             });
 
-            // Ordena as missas pelo horário de início de forma crescente
             listaDeEscalas.sort((a, b) => a.horario.localeCompare(b.horario));
 
             listaDeEscalas.forEach(d => {
@@ -527,7 +660,7 @@
     window.switchCoordTab = function(tabID) {
         document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
         document.getElementById('sec-' + tabID)?.classList.remove('hidden');
-        const ids = ['usuarios', 'escalas', 'sorteio', 'material', 'avisos'];
+        const ids = ['usuarios', 'escalas', 'sorteio', 'reunioes', 'material', 'avisos'];
         ids.forEach(id => {
             const btn = document.getElementById(`btn-c-${id}`);
             if(btn) {
