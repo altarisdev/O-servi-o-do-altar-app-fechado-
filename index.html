@@ -85,8 +85,13 @@
         if (user) {
             showLoading();
             const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+            const emailAtual = user.email ? user.email.toLowerCase() : "";
+            
             if (docSnap.exists()) {
-                redirecionarPorFuncao(docSnap.data().funcao);
+                redirecionarPorFuncao(docSnap.data().funcao, emailAtual);
+            } else {
+                // Caso o Auth esteja logado mas o documento ainda não exista (Garante o Padre/Casal)
+                redirecionarPorFuncao("", emailAtual);
             }
         } else {
             const devSession = sessionStorage.getItem("dev_user");
@@ -96,11 +101,11 @@
         }
     });
 
-    // Roteador dinâmico modificado para aceitar o painel Mestre
-    function redirecionarPorFuncao(funcao) {
+    // Roteador Inteligente: Valida por função do banco ou por e-mail direto dos mestres
+    function redirecionarPorFuncao(funcao, email = "") {
         if (funcao === "Coordenador") {
             window.location.href = "coordenador.html";
-        } else if (funcao === "Mestre") {
+        } else if (funcao === "Mestre" || email === "padre@altaris.com" || email === "casalcoordenador@altaris.com") {
             window.location.href = "mestre.html";
         } else {
             window.location.href = "coroinha.html";
@@ -124,8 +129,12 @@
             try {
                 const cred = await signInWithEmailAndPassword(auth, emailInput, senhaInput);
                 const docSnap = await getDoc(doc(db, "usuarios", cred.user.uid));
+                
                 if (docSnap.exists()) {
-                    redirecionarPorFuncao(docSnap.data().funcao);
+                    redirecionarPorFuncao(docSnap.data().funcao, emailInput);
+                } else {
+                    // Segurança secundária: Permite a entrada mesmo se o documento no Firestore falhar
+                    redirecionarPorFuncao("", emailInput);
                 }
             } catch (err) { 
                 if(erroLoginTexto) erroLoginTexto.innerText = "E-mail ou senha incorretos.";
