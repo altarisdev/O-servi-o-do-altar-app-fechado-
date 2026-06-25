@@ -12,22 +12,22 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row antialiased">
 
-    <!-- Tela de Loading (Corrigida para o padrão funcional) -->
-    <div id="tela-loading" class="fixed inset-0 bg-white bg-opacity-95 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+    <!-- Tela de Loading (Estilo Padrão Coroinha/Index) -->
+    <div id="tela-loading" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="animate-spin rounded-full h-10 w-10 border-4 border-amber-700 border-t-transparent mb-4"></div>
         <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Carregando Administração...</p>
     </div>
 
     <!-- Sidebar / Aside -->
-    <aside class="bg-amber-950 text-white w-full md:w-64 shrink-0 flex flex-col shadow-xl z-40 border-b md:border-b-0 md:border-r border-amber-900/40">
-        <div class="p-5 border-b border-white/5 flex items-center justify-between">
+    <aside class="bg-amber-950 text-white w-full md:w-64 shrink-0 flex flex-col shadow-xl z-40 border-b md:border-b-0 md:border-r border-amber-900">
+        <div class="p-5 border-b border-amber-900 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-white bg-opacity-10 rounded-xl flex items-center justify-center text-amber-400 shadow-inner">
+                <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center text-amber-400 shadow-inner">
                     <i class="fa-solid fa-church"></i>
                 </div>
                 <div>
                     <h2 id="nome-usuario-header" class="text-xs font-black leading-tight truncate max-w-[140px] tracking-wide">Carregando...</h2>
-                    <span id="funcao-usuario-header" class="text-[9px] bg-amber-700 bg-opacity-80 text-amber-100 px-2 py-0.5 rounded font-bold uppercase tracking-widest block mt-1 w-fit">...</span>
+                    <span id="funcao-usuario-header" class="text-[9px] bg-amber-700 text-amber-100 px-2 py-0.5 rounded font-bold uppercase tracking-widest block mt-1 w-fit">...</span>
                 </div>
             </div>
         </div>
@@ -36,25 +36,25 @@
             <button id="btn-c-usuarios" onclick="switchCoordTab('coord-usuarios')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-amber-800 text-white shadow-md">
                 <i class="fa-solid fa-users text-sm w-5 text-center opacity-90"></i> Controlar Usuários
             </button>
-            <button id="btn-c-escalas" onclick="switchCoordTab('coord-escalas')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white hover:bg-opacity-5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+            <button id="btn-c-escalas" onclick="switchCoordTab('coord-escalas')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                 <i class="fa-solid fa-calendar-plus text-sm w-5 text-center opacity-70"></i> Painel de Escalas
             </button>
-            <button id="btn-c-sorteio" onclick="switchCoordTab('coord-sorteio')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white hover:bg-opacity-5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+            <button id="btn-c-sorteio" onclick="switchCoordTab('coord-sorteio')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                 <i class="fa-solid fa-wand-magic-sparkles text-sm w-5 text-center opacity-70"></i> Sorteio Automático
             </button>
-            <button id="btn-c-reunioes" onclick="switchCoordTab('coord-reunioes')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white hover:bg-opacity-5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+            <button id="btn-c-reunioes" onclick="switchCoordTab('coord-reunioes')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                 <i class="fa-solid fa-clipboard-user text-sm w-5 text-center opacity-70"></i> Chamada / Reuniões
             </button>
-            <button id="btn-c-material" onclick="switchCoordTab('coord-material')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white hover:bg-opacity-5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+            <button id="btn-c-material" onclick="switchCoordTab('coord-material')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                 <i class="fa-solid fa-cloud-arrow-up text-sm w-5 text-center opacity-70"></i> Postar Conteúdos
             </button>
-            <button id="btn-c-avisos" onclick="switchCoordTab('coord-avisos-tab')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white hover:bg-opacity-5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+            <button id="btn-c-avisos" onclick="switchCoordTab('coord-avisos-tab')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                 <i class="fa-solid fa-bullhorn text-sm w-5 text-center opacity-70"></i> Mudar Avisos
             </button>
         </nav>
 
-        <div class="p-4 border-t border-white/5 bg-amber-950 bg-opacity-40">
-            <button id="btn-logout" class="w-full bg-white bg-opacity-5 hover:bg-rose-950 hover:bg-opacity-40 hover:text-rose-300 hover:border-rose-900/50 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all border border-white/5 shadow-sm">
+        <div class="p-4 border-t border-amber-900 bg-amber-950/40">
+            <button id="btn-logout" class="w-full bg-white/5 hover:bg-rose-950/40 hover:text-rose-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
                 <span>Encerrar Sessão</span> <i class="fa-solid fa-arrow-right-from-bracket text-[10px] opacity-80"></i>
             </button>
         </div>
@@ -81,7 +81,7 @@
                         <input type="checkbox" id="chk-possui-irmao" class="w-4 h-4 text-amber-700 border-slate-300 rounded focus:ring-amber-500 cursor-pointer">
                         <label for="chk-possui-irmao" class="text-xs font-bold text-slate-700 cursor-pointer select-none">Possui irmão já cadastrado?</label>
                     </div>
-                    <div id="div-lista-irmaos" class="hidden bg-sky-50 bg-opacity-60 p-3.5 rounded-xl border border-sky-100 space-y-2">
+                    <div id="div-lista-irmaos" class="hidden bg-sky-50/60 p-3.5 rounded-xl border border-sky-100 space-y-2">
                         <label class="block text-[10px] font-bold text-sky-800 uppercase tracking-wider">Selecione o Irmão Cadastrado</label>
                         <select id="cad-irmao-titular-select" class="w-full bg-white border border-sky-200 focus:border-sky-500 rounded-xl p-2.5 text-xs font-medium text-slate-800 outline-none"></select>
                     </div>
@@ -102,7 +102,7 @@
                             </button>
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-all active:scale-[0.99] mt-2">Registrar Membro</button>
+                    <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-all mt-2">Registrar Membro</button>
                 </form>
             </div>
             
@@ -143,7 +143,7 @@
                 <input type="date" id="editor-escala-data" class="bg-slate-50 border border-slate-200 focus:border-amber-600 rounded-xl p-2 text-xs font-bold text-slate-700 cursor-pointer outline-none transition-colors">
             </div>
             
-            <div class="bg-amber-50 bg-opacity-60 p-4 rounded-2xl border border-amber-200 space-y-3">
+            <div class="bg-amber-50/60 p-4 rounded-2xl border border-amber-200 space-y-3">
                 <h4 class="text-xs font-black text-amber-900 flex items-center gap-2"><i class="fa-solid fa-circle-plus text-amber-700"></i> Adicionar Celebração Extra / Solenidade nesta Data</h4>
                 <form id="form-criar-escala-manual" class="flex flex-col sm:flex-row gap-3 items-end">
                     <div class="flex-1 w-full">
@@ -154,7 +154,7 @@
                         <label class="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Horário</label>
                         <input type="time" id="add-manual-horario" required class="w-full bg-white border border-amber-200 focus:border-amber-700 rounded-xl p-2.5 text-xs font-bold outline-none transition-colors">
                     </div>
-                    <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs px-5 py-2.5 rounded-xl whitespace-nowrap cursor-pointer w-full sm:w-auto shadow-sm hover:shadow-md transition-all active:scale-[0.98]">Criar Escala</button>
+                    <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs px-5 py-2.5 rounded-xl whitespace-nowrap cursor-pointer w-full sm:w-auto shadow-sm hover:shadow-md transition-all">Criar Escala</button>
                 </form>
             </div>
             
@@ -176,10 +176,10 @@
                         <button id="btn-disparar-enquete" class="flex-1 bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs py-2 rounded-xl transition-colors cursor-pointer shadow-sm">Abrir Pesquisa</button>
                         <button id="btn-fechar-enquete" class="flex-1 bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs py-2 rounded-xl transition-colors cursor-pointer shadow-sm">Fechar</button>
                     </div>
-                    <button type="button" id="btn-limpar-escalas-mes" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs py-2 rounded-xl cursor-pointer mt-1 shadow-sm transition-all active:scale-[0.99]"><i class="fa-solid fa-trash-can mr-1.5 text-[11px]"></i> Apagar Todas as Escalas do Mês</button>
+                    <button type="button" id="btn-limpar-escalas-mes" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs py-2 rounded-xl cursor-pointer mt-1 shadow-sm transition-all"><i class="fa-solid fa-trash-can mr-1.5 text-[11px]"></i> Apagar Todas as Escalas do Mês</button>
                 </div>
                 
-                <div class="bg-amber-50 bg-opacity-60 p-3.5 rounded-2xl border border-amber-100">
+                <div class="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100">
                     <h4 class="text-[10px] font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i class="fa-solid fa-arrow-down-short-wide"></i> Fila de Respostas</h4>
                     <div id="lista-fila-prioridade" class="space-y-1 max-h-32 overflow-y-auto pr-1"></div>
                 </div>
@@ -224,7 +224,7 @@
             </div>
 
             <div class="space-y-4">
-                <div class="bg-amber-50 bg-opacity-50 border border-amber-200 rounded-xl p-3 flex flex-wrap justify-between items-center text-xs gap-3">
+                <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-3 flex flex-wrap justify-between items-center text-xs gap-3">
                     <span class="font-bold text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-list-check text-amber-700"></i> Painel de Presenças Ativo</span>
                     <div class="flex gap-3 text-[10px] font-black uppercase tracking-wider">
                         <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">✓ Presente</span>
@@ -238,7 +238,7 @@
                 </div>
 
                 <div class="pt-2 flex justify-end">
-                    <button type="button" id="btn-salvar-chamada" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-[0.98]">
+                    <button type="button" id="btn-salvar-chamada" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer">
                         <i class="fa-solid fa-floppy-disk mr-1.5 text-[11px]"></i> Gravar Reunião e Chamada
                     </button>
                 </div>
@@ -318,7 +318,7 @@
     const divListaIrmaos = document.getElementById('div-lista-irmaos');
     const selectIrmaoTitular = document.getElementById('cad-irmao-titular-select');
     
-    const chamadaReuniaoData = document.getElementById('chamada-reuniao-data');
+    const llamadaReuniaoData = document.getElementById('chamada-reuniao-data');
     const chamadaReuniaoHorario = document.getElementById('chamada-reuniao-horario');
     const chamadaReuniaoTitulo = document.getElementById('chamada-reuniao-titulo');
     const listaChamadaCoroinhas = document.getElementById('lista-chamada-coroinhas');
@@ -376,11 +376,11 @@
         if(editorEscalaData) {
             editorEscalaData.value = new Date().toISOString().split('T')[0]; carregarEditorEscalasPorData(editorEscalaData.value);
         }
-        if(chamadaReuniaoData) {
-            chamadaReuniaoData.value = new Date().toISOString().split('T')[0];
+        if(llamadaReuniaoData) {
+            llamadaReuniaoData.value = new Date().toISOString().split('T')[0];
             chamadaReuniaoHorario.value = "15:00"; 
             chamadaReuniaoTitulo.value = "Reunião de Formação"; 
-            carregarListaDeChamada(chamadaReuniaoData.value);
+            carregarListaDeChamada(llamadaReuniaoData.value);
         }
     }
 
@@ -425,7 +425,7 @@
             cacheTodosUsuarios = []; snap.forEach(d => { const u = d.data(); u.idDoc = d.id; cacheTodosUsuarios.push(u); });
             cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome)); renderizarTabelaUsuarios();
             if(chkPossuiIrmao && chkPossuiIrmao.checked) { atualizarListboxMembros(); }
-            if(chamadaReuniaoData && chamadaReuniaoData.value) { renderizarInterfaceChamada(); }
+            if(llamadaReuniaoData && llamadaReuniaoData.value) { renderizarInterfaceChamada(); }
         });
     }
 
@@ -436,7 +436,7 @@
             let badgeTipo = u.funcao === "Coordenador" ? `<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Coordenação</span>` : `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Oficial</span>`;
             let colunaConexao = u.email_conexao ? `<span class="text-blue-700 font-bold text-[11px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">Irmão de: ${u.email_conexao}</span>` : `<span class="text-slate-400 italic text-[11px]">Nenhum</span>`;
             let senhaExibicao = u.senha_provisoria || `<span class="text-slate-400 italic">Alterada</span>`;
-            b.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors"><td class="p-3 font-semibold text-slate-800">${u.nome}</td><td class="p-3 font-mono text-slate-500">${u.email}</td><td class="p-3 font-mono font-bold text-amber-800">${senhaExibicao}</td><td class="p-3">${colunaConexao}</td><td class="p-3 text-center">${badgeTipo}</td><td class="p-3 text-center"><button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 text-[11px] hover:bg-rose-100 transition-colors cursor-pointer shadow-sm">Excluir</button></td></tr>`;
+            b.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors"><td class="p-3 font-semibold text-slate-800">${u.nome}</td><td class="p-3 font-mono text-slate-500">${u.email}</td><td class="p-3 font-mono font-bold text-amber-800">${senhaExibicao}</td><td class="p-3">${colunaConexao}</td><td class="p-3 text-center">${badgeTipo}</td><td class="p-3 text-center"><button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 text-[11px] hover:bg-rose-100 transition-colors shadow-sm">Excluir</button></td></tr>`;
         });
     }
     buscaUsuarioLista?.addEventListener('input', renderizarTabelaUsuarios);
@@ -500,7 +500,7 @@
     };
 
     btnSalvarChamada?.addEventListener('click', async () => {
-        const dataReuniao = chamadaReuniaoData.value;
+        const dataReuniao = llamadaReuniaoData.value;
         const horarioReuniao = chamadaReuniaoHorario.value;
         const tituloReuniao = chamadaReuniaoTitulo.value.trim();
 
@@ -523,7 +523,7 @@
         } catch(err) { alert("Erro ao salvar dados da reunião: " + err.message); }
     });
 
-    chamadaReuniaoData?.addEventListener('change', (e) => carregarListaDeChamada(e.target.value));
+    llamadaReuniaoData?.addEventListener('change', (e) => carregarListaDeChamada(e.target.value));
 
     document.getElementById('form-upload-formacao')?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -574,7 +574,7 @@
     document.getElementById('form-publicar-aviso')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         await setDoc(doc(db, "mural", "aviso_geral"), { texto: document.getElementById('txt-aviso-coordenador').value, dataPublicacao: new Date().toLocaleDateString('pt-BR') });
-        alert("Mural atualizado!");
+        alert("Mural updated!");
     });
 
     async function carregarAvisoNoInputCoordenador() {
@@ -769,7 +769,7 @@
                 if(tabID === `coord-${id}` || (id === 'avisos' && tabID === 'coord-avisos-tab')) {
                     btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-amber-800 text-white shadow-md";
                 } else {
-                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white hover:bg-opacity-5 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
+                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
                 }
             }
         });
