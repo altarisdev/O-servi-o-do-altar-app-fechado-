@@ -55,11 +55,10 @@
 
     <main class="flex-1 p-4 md:p-6 overflow-y-auto max-w-7xl w-full mx-auto space-y-6">
 
+        <!-- SEÇÃO USUÁRIOS -->
         <section id="sec-coord-usuarios" class="hidden-coord-tab grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 h-fit space-y-4">
-                <div>
-                    <h3 class="text-sm font-black text-gray-800">Cadastrar Novo Membro</h3>
-                </div>
+                <div><h3 class="text-sm font-black text-gray-800">Cadastrar Novo Membro</h3></div>
                 <form id="form-cadastro-usuario" class="space-y-3">
                     <div>
                         <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nível / Tipo de Conta</label>
@@ -88,12 +87,12 @@
             </div>
         </section>
 
+        <!-- SEÇÃO ESCALAS -->
         <section id="sec-coord-escalas" class="hidden-coord-tab hidden space-y-4">
             <div class="bg-white p-4 rounded-xl shadow-xs border border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div><h3 class="text-sm font-black text-gray-800">Visualizar / Editar / Apagar Escalas Vigentes</h3></div>
                 <input type="date" id="editor-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold">
             </div>
-
             <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200 space-y-3">
                 <h4 class="text-xs font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-plus"></i> Adicionar Celebração Extra / Solenidade nesta Data</h4>
                 <form id="form-criar-escala-manual" class="flex flex-col sm:flex-row gap-2 items-end">
@@ -105,25 +104,20 @@
                         <label class="block text-[10px] font-bold text-amber-800 uppercase mb-0.5">Horário</label>
                         <input type="time" id="add-manual-horario" required class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs font-bold focus:outline-amber-700">
                     </div>
-                    <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs px-4 py-2.5 rounded-lg whitespace-nowrap cursor-pointer w-full sm:w-auto shadow-xs transition-all">
-                        Criar Escala
-                    </button>
+                    <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs px-4 py-2.5 rounded-lg whitespace-nowrap cursor-pointer w-full sm:w-auto shadow-xs transition-all">Criar Escala</button>
                 </form>
             </div>
-
             <div id="container-editores-missa" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
+        <!-- SEÇÃO SORTEIO -->
         <section id="sec-coord-sorteio" class="hidden-coord-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 h-fit">
                 <div><h3 class="text-sm font-black text-gray-800">Gerador Automático</h3></div>
                 <div class="space-y-3">
                     <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Mês de Referência</label><input type="month" id="enq-mes-alvo" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700"></div>
                     <div class="flex gap-2"><button id="btn-disparar-enquete" class="flex-1 bg-blue-700 text-white font-bold text-xs py-2 rounded-lg cursor-pointer">Abrir Pesquisa</button><button id="btn-fechar-enquete" class="flex-1 bg-gray-800 text-white font-bold text-xs py-2 rounded-lg cursor-pointer">Fechar</button></div>
-                    
-                    <button type="button" id="btn-limpar-escalas-mes" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs py-2 rounded-lg cursor-pointer mt-1 shadow-2xs transition-all">
-                        <i class="fa-solid fa-trash-can mr-1"></i> Apagar Todas as Escalas do Mês
-                    </button>
+                    <button type="button" id="btn-limpar-escalas-mes" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs py-2 rounded-lg cursor-pointer mt-1 shadow-2xs transition-all"><i class="fa-solid fa-trash-can mr-1"></i> Apagar Todas as Escalas do Mês</button>
                 </div>
                 <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-100"><h4 class="text-[11px] font-bold text-amber-900 uppercase">Fila de Respostas</h4><div id="lista-fila-prioridade" class="space-y-1 max-h-24 overflow-y-auto"></div></div>
                 <form id="form-escala-automatica" class="space-y-3">
@@ -137,15 +131,26 @@
             </div>
         </section>
 
+        <!-- SEÇÃO REUNIÕES (ATUALIZADA) -->
         <section id="sec-coord-reunioes" class="hidden-coord-tab hidden max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-xs border border-gray-200 space-y-5">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-100 pb-4">
+            <div class="border-b border-gray-100 pb-4">
+                <h3 class="text-sm font-black text-gray-800">Chamada e Configuração de Reuniões</h3>
+                <p class="text-[11px] text-gray-400">Gerencie a data, horário, pauta e execute o controle de presenças.</p>
+            </div>
+
+            <!-- Painel de Seleção de Detalhes da Reunião -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
                 <div>
-                    <h3 class="text-sm font-black text-gray-800">Chamada e Presença de Reuniões</h3>
-                    <p class="text-[11px] text-gray-400">Selecione uma data para realizar ou revisar a lista de chamada do presbitério.</p>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Data da Reunião:</label>
+                    <input type="date" id="chamada-reuniao-data" class="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700 focus:outline-amber-700">
                 </div>
-                <div class="flex items-center gap-2">
-                    <label class="text-[10px] font-bold text-gray-500 uppercase">Data da Reunião:</label>
-                    <input type="date" id="chamada-reuniao-data" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700 focus:outline-amber-700">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Horário:</label>
+                    <input type="time" id="chamada-reuniao-horario" class="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700 focus:outline-amber-700">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Título / Pauta:</label>
+                    <input type="text" id="chamada-reuniao-titulo" placeholder="Ex: Encontro Mensal / Formação" class="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-medium text-gray-700 focus:outline-amber-700">
                 </div>
             </div>
 
@@ -165,12 +170,13 @@
 
                 <div class="pt-2 flex justify-end">
                     <button type="button" id="btn-salvar-chamada" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-xs transition-all cursor-pointer">
-                        <i class="fa-solid fa-floppy-disk mr-1"></i> Gravar Lista de Chamada
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> Gravar Reunião e Chamada
                     </button>
                 </div>
             </div>
         </section>
 
+        <!-- SEÇÃO MATERIAL -->
         <section id="sec-coord-material" class="hidden-coord-tab hidden grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 h-fit">
                 <div><h3 class="text-sm font-black text-gray-800">Adicionar Material Didático</h3></div>
@@ -186,6 +192,7 @@
             </div>
         </section>
 
+        <!-- SEÇÃO AVISOS -->
         <section id="sec-coord-avisos-tab" class="hidden-coord-tab hidden max-w-xl bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
             <form id="form-publicar-aviso" class="space-y-3">
                 <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Texto do Comunicado Geral</label><textarea id="txt-aviso-coordenador" required rows="6" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs"></textarea></div>
@@ -223,13 +230,15 @@
     const divListaIrmaos = document.getElementById('div-lista-irmaos');
     const selectIrmaoTitular = document.getElementById('cad-irmao-titular-select');
     
-    // Elementos da Chamada
+    // Elementos da Chamada (Atualizados)
     const chamadaReuniaoData = document.getElementById('chamada-reuniao-data');
+    const chamadaReuniaoHorario = document.getElementById('chamada-reuniao-horario');
+    const chamadaReuniaoTitulo = document.getElementById('chamada-reuniao-titulo');
     const listaChamadaCoroinhas = document.getElementById('lista-chamada-coroinhas');
     const btnSalvarChamada = document.getElementById('btn-salvar-chamada');
 
     let usuarioLogadoDados = null; let mapaRespostasGerais = {}; let cacheTodosUsuarios = [];
-    let mapaPresencaAtual = {}; // Guarda temporariamente a chamada da data selecionada
+    let mapaPresencaAtual = {};
 
     const CRONOGRAMA_PAROQUIA = [
         { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" }, { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
@@ -277,6 +286,8 @@
         }
         if(chamadaReuniaoData) {
             chamadaReuniaoData.value = new Date().toISOString().split('T')[0];
+            chamadaReuniaoHorario.value = "15:00"; // Padrão inicial
+            chamadaReuniaoTitulo.value = "Reunião de Formação"; // Padrão inicial
             carregarListaDeChamada(chamadaReuniaoData.value);
         }
     }
@@ -338,14 +349,20 @@
     }
     buscaUsuarioLista?.addEventListener('input', renderizarTabelaUsuarios);
 
-    // LOGICA DO SISTEMA DE CONTROLE DE REUNIÕES (CHAMADAS)
+    // LÓGICA DO SISTEMA DE REUNIÕES (ATUALIZADA)
     async function carregarListaDeChamada(dataString) {
         if(!dataString) return;
         mapaPresencaAtual = {};
         try {
             const docSnap = await getDoc(doc(db, "reunioes", dataString));
             if(docSnap.exists()) {
-                mapaPresencaAtual = docSnap.data().presencas || {};
+                const dados = docSnap.data();
+                mapaPresencaAtual = dados.presencas || {};
+                if(dados.horario) chamadaReuniaoHorario.value = dados.horario;
+                if(dados.titulo) chamadaReuniaoTitulo.value = dados.titulo;
+            } else {
+                chamadaReuniaoHorario.value = "15:00";
+                chamadaReuniaoTitulo.value = "Reunião de Formação";
             }
             renderizarInterfaceChamada();
         } catch(err) { console.error("Erro ao carregar chamada: ", err); }
@@ -353,8 +370,6 @@
 
     function renderizarInterfaceChamada() {
         if(!listaChamadaCoroinhas) return;
-        
-        // Filtra apenas membros que são coroinhas/acolitos
         const listaCoroinhas = cacheTodosUsuarios.filter(u => u.funcao !== "Coordenador");
         
         if(listaCoroinhas.length === 0) {
@@ -364,26 +379,17 @@
 
         listaChamadaCoroinhas.innerHTML = "";
         listaCoroinhas.forEach(c => {
-            // Se ainda não tiver status definido para a data, inicia como presente por padrão
             const statusAtual = mapaPresencaAtual[c.nome] || "presente";
-            
             listaChamadaCoroinhas.innerHTML += `
                 <div class="flex justify-between items-center py-2.5 px-1 hover:bg-gray-50/60 transition-all">
                     <div class="flex flex-col">
                         <span class="text-xs font-bold text-gray-800">${c.nome}</span>
                         <span class="text-[10px] text-gray-400 font-mono">${c.email}</span>
                     </div>
-                    
                     <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200/60">
-                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'presente')" id="btn-p-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'presente' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">
-                            ✓ P
-                        </button>
-                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'falta')" id="btn-f-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'falta' ? 'bg-rose-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">
-                            X F
-                        </button>
-                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'justificada')" id="btn-j-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'justificada' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">
-                            FJ
-                        </button>
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'presente')" id="btn-p-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'presente' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">✓ P</button>
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'falta')" id="btn-f-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'falta' ? 'bg-rose-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">X F</button>
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'justificada')" id="btn-j-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'justificada' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">FJ</button>
                     </div>
                 </div>
             `;
@@ -392,8 +398,6 @@
 
     window.alterarStatusPresencaLocal = function(nomeCoroinha, novoStatus) {
         mapaPresencaAtual[nomeCoroinha] = novoStatus;
-        
-        // Remove classes ativas de todos os botões do coroinha específico
         const idLimpo = nomeCoroinha.replace(/\s+/g, '');
         const btnP = document.getElementById(`btn-p-${idLimpo}`);
         const btnF = document.getElementById(`btn-f-${idLimpo}`);
@@ -406,9 +410,12 @@
 
     btnSalvarChamada?.addEventListener('click', async () => {
         const dataReuniao = chamadaReuniaoData.value;
-        if(!dataReuniao) return alert("Por favor, selecione uma data válida!");
+        const horarioReuniao = chamadaReuniaoHorario.value;
+        const tituloReuniao = chamadaReuniaoTitulo.value.trim();
 
-        // Garante que todos que estão listados e não foram clicados fiquem salvos como presente nativo
+        if(!dataReuniao) return alert("Por favor, selecione uma data válida!");
+        if(!horarioReuniao) return alert("Por favor, selecione um horário válido!");
+
         cacheTodosUsuarios.filter(u => u.funcao !== "Coordenador").forEach(c => {
             if(!mapaPresencaAtual[c.nome]) mapaPresencaAtual[c.nome] = "presente";
         });
@@ -416,16 +423,18 @@
         try {
             await setDoc(doc(db, "reunioes", dataReuniao), {
                 data: dataReuniao,
+                horario: horarioReuniao,
+                titulo: tituloReuniao || "Reunião Geral",
                 presencas: mapaPresencaAtual,
                 atualizadoEm: Date.now()
             });
-            alert("Lista de chamada e presença salva com sucesso!");
-        } catch(err) { alert("Erro ao salvar lista de chamada: " + err.message); }
+            alert("Dados da reunião e lista de chamada salvos com sucesso!");
+        } catch(err) { alert("Erro ao salvar dados da reunião: " + err.message); }
     });
 
     chamadaReuniaoData?.addEventListener('change', (e) => carregarListaDeChamada(e.target.value));
 
-    // DEMAIS FUNÇÕES DO BOTÃO E UPLOADS
+    // ADICIONAR MATERIAL DIDÁTICO
     document.getElementById('form-upload-formacao')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const titulo = document.getElementById('form-titulo-input').value.trim();
@@ -475,7 +484,7 @@
     document.getElementById('form-publicar-aviso')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         await setDoc(doc(db, "mural", "aviso_geral"), { texto: document.getElementById('txt-aviso-coordenador').value, dataPublicacao: new Date().toLocaleDateString('pt-BR') });
-        alert("Mural updated!");
+        alert("Mural atualizado!");
     });
 
     async function carregarAvisoNoInputCoordenador() {
@@ -503,7 +512,7 @@
     document.getElementById('btn-limpar-escalas-mes')?.addEventListener('click', async () => {
         const mes = document.getElementById('enq-mes-alvo').value;
         if(!mes) return alert("Por favor, selecione o Mês de Referência primeiro!");
-        if(!confirm(`ATENÇÃO: Deseja REALMENTE apagar TODAS as escalas oficiais registradas no mês ${mes}? Isso evitará duplicidades de horários, mas a ação é irreversível.`)) return;
+        if(!confirm(`ATENÇÃO: Deseja REALMENTE apagar TODAS as escalas oficiais registradas no mês ${mes}?`)) return;
 
         try {
             const snap = await getDocs(collection(db, "escalas"));
@@ -551,7 +560,7 @@
                 turibuloAtivo: false, turiferario: { nome: "A definir", status: "Pendente" }, navetaAtiva: false, naveteiro: { nome: "A definir", status: "Pendente" }
             });
         }
-        alert("Escalas oficiais lançadas e gravadas com sucesso!");
+        alert("Escalas oficiais lançadas com sucesso!");
     });
 
     document.getElementById('form-criar-escala-manual')?.addEventListener('submit', async (e) => {
@@ -577,16 +586,16 @@
                 turibuloAtivo: false, turiferario: { nome: "A definir", status: "Pendente" }, navetaAtiva: false, naveteiro: { nome: "A definir", status: "Pendente" }
             });
 
-            alert("Solenidade/Escala manual adicionada com sucesso!");
+            alert("Solenidade adicionada com sucesso!");
             document.getElementById('form-criar-escala-manual').reset();
             carregarEditorEscalasPorData(dataAlvo);
         } catch(err) { alert("Erro ao criar escala manual: " + err.message); }
     });
 
     window.excluirEscalaInteira = async function(idDoc) {
-        if(confirm("Tem certeza absoluta que deseja APAGAR esta celebração da escala oficial?")) {
+        if(confirm("Tem certeza absoluta que deseja APAGAR esta celebração?")) {
             await deleteDoc(doc(db, "escalas", idDoc));
-            alert("Escala excluída!");
+            alert("Escala de celebração excluída!");
             carregarEditorEscalasPorData(editorEscalaData.value);
         }
     };
@@ -633,13 +642,13 @@
                     </div>
                     <div class="flex gap-2 pt-2">
                         <button type="button" data-id="${idDoc}" class="btn-salvar-edicao flex-1 bg-emerald-700 text-white py-2 rounded-xl font-bold cursor-pointer hover:bg-emerald-800">Salvar Alterações</button>
-                        <button type="button" onclick="excluirEscalaInteira('${idDoc}')" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-2 rounded-xl font-bold cursor-pointer hover:bg-rose-100">Apagar Escala</button>
+                        <button type="button" onclick="excluirEscalaInteira('${idDoc}')" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-2 rounded-xl font-bold cursor-pointer hover:bg-rose-100">Apagar</button>
                     </div>
                 `; containerEditoresMissa.appendChild(dv);
             });
         } catch(erro) { console.error("Erro ao resgatar escalas vigentes: ", erro); }
 
-        if(!fnd) containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic text-center col-span-2 py-4">Nenhuma escala cadastrada ou ativa para esta data.</p>`;
+        if(!fnd) containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic text-center col-span-2 py-4">Nenhuma escala ativa para esta data.</p>`;
         else {
             document.querySelectorAll('.btn-salvar-edicao').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
