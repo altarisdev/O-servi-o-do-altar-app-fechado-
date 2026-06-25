@@ -7,24 +7,33 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Correção Crucial para o Tailwind v4 reconhecer a classe .dark manualmente -->
     <style type="text/tailwindcss">
         @theme {
             --animate-pulse: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @custom-variant dark (&:where(.dark, .dark *));
+
+        /* Fundo Litúrgico Cruz de São Bento e Arabescos Dourados */
+        .bg-sacro-dourado {
+            background-color: #f8fafc; /* bg-slate-50 */
+            /* Padrão geométrico de cruzes e linhas finas em dourado/âmbar sutil */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23b45309' fill-opacity='0.04'%3E%3Cpath d='M39 0h2v15h-2zM39 25h2v15h-2zM39 40h2v15h-2zM39 65h2v15h-2zM0 39h15v2H0zM25 39h15v2H25zM40 39h15v2H40zM65 39h15v2H65z'/%3E%3Ccircle cx='40' cy='20' r='1'/%3E%3Ccircle cx='40' cy='60' r='1'/%3E%3Ccircle cx='20' cy='40' r='1'/%3E%3Ccircle cx='60' cy='40' r='1'/%3E%3Cpath d='M36 18h8v2h-8zM36 58h8v2h-8zM18 36h2v8h-2zM58 36h2v8h-2z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .dark .bg-sacro-dourado {
+            background-color: #09090b; /* bg-zinc-950 */
+            /* No modo escuro, aumentamos ligeiramente o contraste do dourado para destacar nos paramentos escuros */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23d97706' fill-opacity='0.06'%3E%3Cpath d='M39 0h2v15h-2zM39 25h2v15h-2zM39 40h2v15h-2zM39 65h2v15h-2zM0 39h15v2H0zM25 39h15v2H25zM40 39h15v2H40zM65 39h15v2H65z'/%3E%3Ccircle cx='40' cy='20' r='1'/%3E%3Ccircle cx='40' cy='60' r='1'/%3E%3Ccircle cx='20' cy='40' r='1'/%3E%3Ccircle cx='60' cy='40' r='1'/%3E%3Cpath d='M36 18h8v2h-8zM36 58h8v2h-8zM18 36h2v8h-2zM58 36h2v8h-2z'/%3E%3C/g%3E%3C/svg%3E");
+        }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-zinc-950 font-sans min-h-screen flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 selection:bg-red-200">
+<body class="bg-sacro-dourado font-sans min-h-screen flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 selection:bg-red-200">
 
-    <!-- Fundo Premium Litúrgico Dinâmico -->
     <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div class="absolute -top-[40%] -left-[20%] w-[80%] h-[80%] rounded-full bg-red-600/10 dark:bg-red-900/10 blur-[120px] animate-pulse"></div>
-        <div class="absolute -bottom-[40%] -right-[20%] w-[80%] h-[80%] rounded-full bg-amber-600/5 dark:bg-amber-900/5 blur-[120px] animate-pulse"></div>
-        <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] dark:bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div class="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-red-600/8 dark:bg-red-900/10 blur-[130px] animate-pulse"></div>
+        <div class="absolute -bottom-[30%] -right-[10%] w-[70%] h-[70%] rounded-full bg-amber-500/5 dark:bg-amber-600/5 blur-[130px] animate-pulse"></div>
     </div>
 
-    <!-- Botão de Alternar Modo Claro/Escuro Animado -->
     <div class="absolute top-4 right-4 z-50">
         <button id="btn-dark-mode" class="relative w-14 h-8 bg-slate-200 dark:bg-zinc-800 rounded-full p-1 cursor-pointer transition-all duration-500 shadow-inner group overflow-hidden border border-slate-300/30 dark:border-zinc-700/30">
             <div id="dark-mode-thumb" class="w-6 h-6 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center shadow-md transform transition-all duration-500 ease-out translate-x-0">
@@ -34,7 +43,6 @@
         </button>
     </div>
 
-    <!-- Tela de Carregamento Refinada -->
     <div id="tela-loading" class="fixed inset-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-50 flex flex-col items-center justify-center transition-opacity duration-500 pointer-events-none opacity-0">
         <div class="relative flex items-center justify-center mb-4">
             <div class="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-red-600 border-b-amber-500"></div>
@@ -43,8 +51,7 @@
         <p class="text-[10px] font-black text-gray-400 dark:text-zinc-500 tracking-widest uppercase animate-pulse">Sincronizando Presbitério...</p>
     </div>
 
-    <!-- Card Principal de Login -->
-    <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-md border border-slate-100/80 dark:border-zinc-800/80 transition-all duration-500 z-10 hover:shadow-[0_24px_60px_rgba(220,38,38,0.06)] dark:hover:shadow-[0_24px_60px_rgba(220,38,38,0.15)] relative backdrop-blur-xs">
+    <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.06)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.4)] w-full max-w-md border border-slate-100/80 dark:border-zinc-800/80 transition-all duration-500 z-10 hover:shadow-[0_30px_70px_rgba(220,38,38,0.08)] dark:hover:shadow-[0_30px_70px_rgba(220,38,38,0.18)] relative backdrop-blur-xs">
         
         <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-red-700 via-amber-500 to-red-600 rounded-t-3xl"></div>
 
@@ -114,7 +121,6 @@
     const btnDarkMode = document.getElementById('btn-dark-mode');
     const darkModeThumb = document.getElementById('dark-mode-thumb');
 
-    // Função interna para gerenciar o deslizamento físico do botão
     function sincronizarVisualBotao(isDark) {
         if (isDark) {
             darkModeThumb.classList.remove('translate-x-0');
@@ -125,7 +131,6 @@
         }
     }
 
-    // Lógica e Controle do Modo Escuro (Estado Inicial Fixo)
     const temaSalvo = localStorage.getItem('theme');
     const prefereSistemaEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const deveAtivarDark = temaSalvo === 'dark' || (!temaSalvo && prefereSistemaEscuro);
@@ -138,7 +143,6 @@
         sincronizarVisualBotao(false);
     }
 
-    // Evento do clique com tratamento dinâmico de classes de movimentação
     btnDarkMode?.addEventListener('click', () => {
         const modificadoParaDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('theme', modificadoParaDark ? 'dark' : 'light');
@@ -148,7 +152,6 @@
     function showLoading() { if(telaLoading) telaLoading.classList.replace('opacity-0', 'opacity-100'); }
     function hideLoading() { if(telaLoading) telaLoading.classList.replace('opacity-100', 'opacity-0'); }
 
-    // Roteamento automático baseado no estado da autenticação
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             showLoading();
