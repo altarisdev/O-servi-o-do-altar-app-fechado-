@@ -51,25 +51,22 @@
                     <span id="badge-status-escala" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Nenhuma</span>
                 </div>
                 <div id="dados-proxima-escala" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <p class="text-gray-400 italic col-span-2">Buscando escalas publicadas para você...</p>
+                    <p class="text-gray-400 italic col-span-2">Buscando escalas...</p>
                 </div>
             </div>
 
             <div id="card-enquete-disponibilidade" class="hidden bg-amber-50/60 p-5 rounded-2xl border border-amber-200/70 space-y-3">
                 <div>
-                    <h3 class="text-sm font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation text-amber-700 animate-pulse"></i> Pesquisa de Disponibilidade</h3>
-                    <p class="text-[11px] text-amber-700/80 font-medium">Marque todas as celebrações do mês que você **PODE** servir.</p>
+                    <h3 class="text-sm font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation text-amber-700"></i> Pesquisa de Disponibilidade</h3>
                 </div>
                 <form id="form-responder-enquete" class="space-y-3">
-                    <div id="lista-celebracoes-checkboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-white p-3 rounded-xl border border-amber-200">
-                        </div>
-                    <button type="submit" class="w-full bg-amber-800 text-white font-bold text-xs py-2 rounded-lg shadow-xs hover:bg-amber-900 transition-all cursor-pointer">Salvar Minha Disponibilidade</button>
+                    <div id="lista-celebracoes-checkboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-white p-3 rounded-xl border border-amber-200"></div>
+                    <button type="submit" class="w-full bg-amber-800 text-white font-bold text-xs py-2 rounded-lg hover:bg-amber-900 transition-all cursor-pointer">Salvar Minha Disponibilidade</button>
                 </form>
             </div>
         </div>
 
         <div class="space-y-4 md:col-span-1 flex flex-col">
-            
             <div id="conteudo-avisos" class="space-y-4 block md:block">
                 <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-3">
                     <h3 class="text-sm font-black text-gray-800 flex items-center gap-1.5"><i class="fa-solid fa-bullhorn text-amber-700"></i> Mural de Avisos</h3>
@@ -83,8 +80,8 @@
             <div id="conteudo-conteudos" class="space-y-4 hidden md:block">
                 <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-3">
                     <h3 class="text-sm font-black text-gray-800 flex items-center gap-1.5"><i class="fa-solid fa-book-open text-blue-700"></i> Materiais de Formação</h3>
-                    <div id="lista-materiais-formacao" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-                        <p class="text-xs text-gray-400 italic">Nenhum material de estudo disponível no momento.</p>
+                    <div id="lista-materials-formacao" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                        <p class="text-xs text-gray-400 italic">Buscando conteúdos ativos...</p>
                     </div>
                 </div>
             </div>
@@ -92,22 +89,19 @@
             <div id="conteudo-liturgia" class="space-y-4 hidden md:block">
                 <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-3">
                     <h3 class="text-sm font-black text-gray-800 flex items-center gap-1.5"><i class="fa-solid fa-scroll text-amber-700"></i> Liturgia Diária</h3>
-                    <div class="space-y-2">
-                        <div class="bg-amber-50/30 p-3 rounded-xl border border-amber-100/50">
-                            <span id="ref-evangelho-dia" class="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Evangelho</span>
-                            <p id="txt-evangelho-dia" class="text-xs text-gray-600 font-medium leading-relaxed max-h-36 overflow-y-auto pr-1">Carregando palavra do dia...</p>
-                        </div>
+                    <div class="bg-amber-50/30 p-3 rounded-xl border border-amber-100/50">
+                        <span id="ref-evangelho-dia" class="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Evangelho</span>
+                        <p id="txt-evangelho-dia" class="text-xs text-gray-600 font-medium leading-relaxed max-h-36 overflow-y-auto pr-1">Carregando palavra do dia...</p>
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -135,9 +129,8 @@
 
     onAuthStateChanged(auth, async (user) => {
         const devSession = sessionStorage.getItem("dev_user");
-        if(devSession) {
-            usuarioLogadoDados = JSON.parse(devSession); inicializarPainelAcolito();
-        } else if(user) {
+        if(devSession) { usuarioLogadoDados = JSON.parse(devSession); inicializarPainelAcolito(); } 
+        else if(user) {
             const docSnap = await getDoc(doc(db, "usuarios", user.uid));
             if(docSnap.exists()) { usuarioLogadoDados = docSnap.data(); inicializarPainelAcolito(); }
             else { signOut(auth); window.location.href = "index.html"; }
@@ -150,7 +143,7 @@
         if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = usuarioLogadoDados.funcao;
 
         ouvirMuralAvisos();
-        ouvirColecaoConteudos(); // Nova escuta múltipla
+        ouvirColecaoConteudos();
         ouvirEnqueteDisponibilidade();
         buscarMinhaProximaEscala();
         carregarLiturgiaDoDia();
@@ -170,9 +163,10 @@
         });
     }
 
-    // Escuta a coleção inteira de conteúdos salvos, permitindo múltiplos enviados
+    // CORREÇÃO DA RENDERIZAÇÃO DE CONTEÚDOS NO COROINHA
     function ouvirColecaoConteudos() {
         const container = document.getElementById('lista-materials-formacao');
+        if(!container) return;
         onSnapshot(collection(db, "formacao"), (snap) => {
             if(snap.empty) {
                 container.innerHTML = `<p class="text-xs text-gray-400 italic">Nenhum material disponível no momento.</p>`;
@@ -186,7 +180,7 @@
                         <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs shadow-xs"><i class="fa-solid fa-book"></i></div>
                         <div class="flex-1 overflow-hidden">
                             <h4 class="text-xs font-bold text-gray-800 truncate group-hover:text-blue-700">${data.titulo}</h4>
-                            <span class="text-[9px] text-gray-400 font-medium block truncate">Clique para acessar o link externo</span>
+                            <span class="text-[9px] text-gray-400 font-medium block truncate">Acessar link externo</span>
                         </div>
                         <i class="fa-solid fa-chevron-right text-gray-300 text-[10px] pr-1"></i>
                     </a>`;
@@ -199,15 +193,14 @@
             if(snap.exists() && snap.data().ativa === true) {
                 const dados = snap.data(); cardEnqueteDisponibilidade.classList.remove('hidden');
                 listaCelebracoesCheckboxes.innerHTML = "";
-                
                 const minhasEscolhasSalvas = dados.respostas?.[usuarioLogadoDados.nome]?.escolhas || [];
 
                 dados.celebracoes.forEach(cel => {
                     const formatData = cel.data.split('-').reverse().join('/');
                     const checks = minhasEscolhasSalvas.includes(cel.idChave) ? 'checked' : '';
                     listaCelebracoesCheckboxes.innerHTML += `
-                        <label class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-100 shadow-3xs cursor-pointer select-none text-[11px] font-medium text-gray-700">
-                            <input type="checkbox" name="celebracao_resp" value="${cel.idChave}" ${checks} class="w-4 h-4 text-amber-700 border-gray-300 rounded focus:ring-amber-500">
+                        <label class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-100 cursor-pointer text-[11px] font-medium text-gray-700">
+                            <input type="checkbox" name="celebracao_resp" value="${cel.idChave}" ${checks} class="w-4 h-4 text-amber-700 border-gray-300 rounded">
                             <div><span class="font-bold text-amber-900 block">${formatData} - ${cel.horario}</span>${cel.rotulo}</div>
                         </label>`;
                 });
@@ -219,11 +212,9 @@
         e.preventDefault();
         const boxes = document.querySelectorAll('input[name="celebracao_resp"]:checked');
         const listIds = []; boxes.forEach(b => listIds.push(b.value));
-        
         const refDoc = doc(db, "enquetes", "disponibilidade_atual");
-        const oKey = `respostas.${usuarioLogadoDados.nome}`;
         await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
-        alert("Sua agenda de disponibilidade foi enviada com sucesso!");
+        alert("Sua agenda de disponibilidade foi enviada!");
     });
 
     function buscarMinhaProximaEscala() {
@@ -239,20 +230,19 @@
             });
 
             if(escalaEncontrada) {
-                let statusItem = escalaEncontrada[funcaoAlvo.toLowerCase().replace(' ', '')]?.status || "Pendente";
-                if(funcaoAlvo.startsWith("Altar")) {
-                    let num = funcaoAlvo.split(' ')[1]; statusItem = escalaEncontrada[`altar${num}`].status;
-                }
-                
+                let statusItem = "Pendente";
+                if(funcaoAlvo.startsWith("Altar")) { statusItem = escalaEncontrada[`altar${funcaoAlvo.split(' ')[1]}`].status; }
+                else if(funcaoAlvo === "Turiferário") statusItem = escalaEncontrada.turiferario.status;
+                else if(funcaoAlvo === "Naveteiro") statusItem = escalaEncontrada.naveteiro.status;
+
                 const b = document.getElementById('badge-status-escala');
                 b.innerText = statusItem;
                 b.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${statusItem==='Confirmado'?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}`;
 
-                const dtFmt = escalaEncontrada.data.split('-').reverse().join('/');
                 dadosProximaEscala.innerHTML = `
                     <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-100 col-span-2 flex justify-between items-center">
                         <div><span class="text-[10px] font-bold uppercase block text-gray-400">Celebração</span><strong class="text-sm font-bold text-amber-950">${escalaEncontrada.titulo}</strong></div>
-                        <div class="text-right"><span class="text-[10px] font-bold uppercase block text-gray-400">Data e Horário</span><strong class="text-xs font-bold text-gray-700">${dtFmt} às ${escalaEncontrada.horario}h</strong></div>
+                        <div class="text-right"><span class="text-[10px] font-bold uppercase block text-gray-400">Data e Horário</span><strong class="text-xs font-bold text-gray-700">${escalaEncontrada.data.split('-').reverse().join('/')} às ${escalaEncontrada.horario}h</strong></div>
                     </div>
                     <div class="bg-amber-900 text-white p-3 rounded-xl col-span-2 flex justify-between items-center shadow-xs">
                         <div><span class="text-[9px] text-amber-200 uppercase tracking-wider block font-bold">Sua Função Designada</span><strong class="text-base font-black">${funcaoAlvo}</strong></div>
@@ -276,7 +266,7 @@
         if(esc.naveteiro?.nome === usuarioLogadoDados.nome) dUp["naveteiro.status"] = "Confirmado";
 
         await setDoc(doc(db, "escalas", idEscalaAtivaGlobal), dUp, { merge: true });
-        alert("Sua presença foi confirmada na escala oficial!");
+        alert("Sua presença foi confirmada!");
     };
 
     async function carregarLiturgiaDoDia() {
