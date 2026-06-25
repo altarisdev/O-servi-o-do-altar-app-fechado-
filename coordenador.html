@@ -1,298 +1,245 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="transition-colors duration-500">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Altaris - Painel do Coordenador</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .hidden-coord-tab { display: none; }
+    
+    <style type="text/tailwindcss">
+        @theme {
+            --animate-pulse: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @custom-variant dark (&:where(.dark, .dark *));
+
+        /* Fundo Litúrgico - Padrão Sacro */
+        .bg-sacro-dourado {
+            background-color: #f8fafc;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
+        }
+
+        .dark .bg-sacro-dourado {
+            background-color: #09090b;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjZDk3NzA2IiBmaWxsLW9wYWNpdHk9IjAuMDciPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
+        }
+
+        .active-tab {
+            border-bottom: 3px solid #dc2626;
+            color: #dc2626;
+            font-weight: 800;
+        }
+        .dark .active-tab {
+            border-bottom: 3px solid #ef4444;
+            color: #ef4444;
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row antialiased">
+<body class="bg-sacro-dourado font-sans min-h-screen flex flex-col transition-colors duration-500 selection:bg-red-200">
 
-    <!-- Tela de Loading (Estilo Padrão Coroinha/Index) -->
-    <div id="tela-loading" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300">
-        <div class="animate-spin rounded-full h-10 w-10 border-4 border-amber-700 border-t-transparent mb-4"></div>
-        <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Carregando Administração...</p>
+    <!-- Tela Loading -->
+    <div id="tela-loading" class="fixed inset-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative flex items-center justify-center mb-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-red-600 border-b-amber-500"></div>
+            <i class="fa-solid fa-cross text-red-600 absolute text-xs"></i>
+        </div>
+        <p class="text-[10px] font-black text-gray-400 dark:text-zinc-500 tracking-widest uppercase animate-pulse">Sincronizando Presbitério (Coordenador)...</p>
     </div>
 
-    <!-- Sidebar / Aside -->
-    <aside class="bg-amber-950 text-white w-full md:w-64 shrink-0 flex flex-col shadow-xl z-40 border-b md:border-b-0 md:border-r border-amber-900">
-        <div class="p-5 border-b border-amber-900 flex items-center justify-between">
+    <!-- Header Litúrgico -->
+    <header class="bg-gradient-to-r from-red-800 to-red-900 dark:from-zinc-900 dark:to-zinc-900 text-white px-4 py-4 shadow-md sticky top-0 z-40 border-b border-red-900/40 dark:border-zinc-800/80 transition-colors">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center text-amber-400 shadow-inner">
-                    <i class="fa-solid fa-church"></i>
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/10 shadow-inner">
+                    <i class="fa-solid fa-user-gear text-amber-400 text-base"></i>
                 </div>
                 <div>
-                    <h2 id="nome-usuario-header" class="text-xs font-black leading-tight truncate max-w-[140px] tracking-wide">Carregando...</h2>
-                    <span id="funcao-usuario-header" class="text-[9px] bg-amber-700 text-amber-100 px-2 py-0.5 rounded font-bold uppercase tracking-widest block mt-1 w-fit">...</span>
+                    <h2 id="nome-usuario-header" class="text-sm font-black tracking-wide uppercase">Carregando...</h2>
+                    <span id="funcao-usuario-header" class="text-[9px] bg-white/20 dark:bg-zinc-800 px-2 py-0.5 rounded-sm font-bold uppercase tracking-wider block mt-0.5">Coordenador</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button id="btn-dark-mode" class="relative w-12 h-7 bg-red-950/40 dark:bg-zinc-800 rounded-full p-1 cursor-pointer transition-all duration-500 border border-white/5 dark:border-zinc-700/30">
+                    <div id="dark-mode-thumb" class="w-5 h-5 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center shadow-md transform transition-all duration-500 ease-out translate-x-0 dark:translate-x-5">
+                        <i class="fa-solid fa-sun text-amber-500 text-[10px] absolute transition-all duration-500 scale-100 rotate-0 dark:scale-0 dark:rotate-180"></i>
+                        <i class="fa-solid fa-moon text-red-500 text-[10px] absolute transition-all duration-500 scale-0 -rotate-180 dark:scale-100 dark:rotate-0"></i>
+                    </div>
+                </button>
+
+                <button id="btn-logout" class="bg-red-950/40 dark:bg-zinc-800/50 hover:bg-red-900 dark:hover:bg-zinc-800 p-2.5 rounded-xl transition-all text-white/90 cursor-pointer border border-white/5 dark:border-zinc-700/20 text-xs flex items-center gap-2 font-bold">
+                    Sair <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação Responsiva Mobile para Gerenciamento -->
+    <nav class="bg-white dark:bg-zinc-900 border-b border-slate-200/60 dark:border-zinc-800 shadow-xs sticky top-[73px] z-30 flex md:hidden transition-colors">
+        <button id="tab-escalas" onclick="switchTab('escalas')" class="active-tab flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400">
+            <i class="fa-solid fa-calendar-check text-sm"></i> <span>Escalas</span>
+        </button>
+        <button id="tab-mural" onclick="switchTab('mural')" class="flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400">
+            <i class="fa-solid fa-bullhorn text-sm"></i> <span>Mural & Enquetes</span>
+        </button>
+        <button id="tab-usuarios" onclick="switchTab('usuarios')" class="flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400">
+            <i class="fa-solid fa-users text-sm"></i> <span>Membros</span>
+        </button>
+        <button id="tab-materiais" onclick="switchTab('materiais')" class="flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400">
+            <i class="fa-solid fa-book-open text-sm"></i> <span>Materiais</span>
+        </button>
+    </nav>
+
+    <!-- Layout Grid Principal do Coordenador -->
+    <main class="max-w-6xl w-full mx-auto p-4 md:p-6 flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 z-10 relative items-start">
+        
+        <!-- Coluna da Esquerda (Mais larga no Desktop): Gestão de Escalas -->
+        <div id="conteudo-escalas" class="space-y-6 block md:col-span-2">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-700 via-amber-500 to-red-600"></div>
+                
+                <div class="p-6 border-b border-slate-100 dark:border-zinc-800/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-base font-black text-slate-800 dark:text-zinc-100 tracking-tight">Painel de Controle de Escalas</h3>
+                        <p class="text-[11px] text-slate-400 dark:text-zinc-400 font-medium mt-0.5">Crie novas celebrações ou gerencie as equipes escaladas para cada liturgia.</p>
+                    </div>
+                    <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                        <span class="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider whitespace-nowrap">Data Geral:</span>
+                        <input type="date" id="busca-escala-data" class="w-full sm:w-auto bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700/50 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-zinc-200 outline-none focus:border-red-600 transition-all shadow-xs">
+                    </div>
+                </div>
+
+                <!-- Formulário Ocultável / Botão para Nova Escala -->
+                <div class="p-6 bg-slate-50/50 dark:bg-zinc-800/20 border-b border-slate-100 dark:border-zinc-800/40">
+                    <details class="group">
+                        <summary class="list-none flex items-center justify-between font-bold text-xs text-red-800 dark:text-red-400 cursor-pointer uppercase tracking-wider select-none">
+                            <span><i class="fa-solid fa-plus-circle mr-1.5"></i> Criar Nova Celebração</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+                        </summary>
+                        <form id="form-criar-escala" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs">
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold text-slate-500 dark:text-zinc-400">Título / Solenidade:</label>
+                                <input type="text" id="nova-escala-titulo" placeholder="Ex: Missa Dominical" required class="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl p-2.5 text-slate-700 dark:text-zinc-200 outline-none focus:border-red-600 shadow-xs">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold text-slate-500 dark:text-zinc-400">Data:</label>
+                                <input type="date" id="nova-escala-data" required class="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl p-2.5 text-slate-700 dark:text-zinc-200 outline-none focus:border-red-600 shadow-xs">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold text-slate-500 dark:text-zinc-400">Horário:</label>
+                                <input type="text" id="nova-escala-horario" placeholder="Ex: 19:00" required class="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl p-2.5 text-slate-700 dark:text-zinc-200 outline-none focus:border-red-600 shadow-xs">
+                            </div>
+                            <div class="sm:col-span-3 flex items-center gap-6 py-1 bg-white dark:bg-zinc-900 px-4 rounded-xl border border-slate-100 dark:border-zinc-800">
+                                <label class="flex items-center gap-2 font-semibold text-slate-600 dark:text-zinc-300 cursor-pointer">
+                                    <input type="checkbox" id="nova-escala-turibulo" checked class="w-4 h-4 accent-red-700 rounded"> Turiferário Ativo
+                                </label>
+                                <label class="flex items-center gap-2 font-semibold text-slate-600 dark:text-zinc-300 cursor-pointer">
+                                    <input type="checkbox" id="nova-escala-naveta" checked class="w-4 h-4 accent-red-700 rounded"> Naveteiro Ativo
+                                </label>
+                            </div>
+                            <button type="submit" class="sm:col-span-3 bg-red-700 hover:bg-red-800 text-white font-bold py-2.5 rounded-xl transition-all shadow-xs uppercase tracking-wider cursor-pointer">Publicar Escala</button>
+                        </form>
+                    </details>
+                </div>
+
+                <div class="p-6">
+                    <div id="resultado-escala-geral" class="space-y-5 text-xs">
+                        <p class="text-slate-400 dark:text-zinc-500 italic flex items-center gap-2"><i class="fa-solid fa-circle-notch animate-spin"></i> Sincronizando escalas...</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <nav class="p-4 flex-1 flex flex-col gap-1 overflow-y-auto">
-            <button id="btn-c-usuarios" onclick="switchCoordTab('coord-usuarios')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-amber-800 text-white shadow-md">
-                <i class="fa-solid fa-users text-sm w-5 text-center opacity-90"></i> Controlar Usuários
-            </button>
-            <button id="btn-c-escalas" onclick="switchCoordTab('coord-escalas')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
-                <i class="fa-solid fa-calendar-plus text-sm w-5 text-center opacity-70"></i> Painel de Escalas
-            </button>
-            <button id="btn-c-sorteio" onclick="switchCoordTab('coord-sorteio')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
-                <i class="fa-solid fa-wand-magic-sparkles text-sm w-5 text-center opacity-70"></i> Sorteio Automático
-            </button>
-            <button id="btn-c-reunioes" onclick="switchCoordTab('coord-reunioes')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
-                <i class="fa-solid fa-clipboard-user text-sm w-5 text-center opacity-70"></i> Chamada / Reuniões
-            </button>
-            <button id="btn-c-material" onclick="switchCoordTab('coord-material')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
-                <i class="fa-solid fa-cloud-arrow-up text-sm w-5 text-center opacity-70"></i> Postar Conteúdos
-            </button>
-            <button id="btn-c-avisos" onclick="switchCoordTab('coord-avisos-tab')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
-                <i class="fa-solid fa-bullhorn text-sm w-5 text-center opacity-70"></i> Mudar Avisos
-            </button>
-        </nav>
+        <!-- Coluna da Direita (Responsiva no Mobile): Gestão de Avisos, Enquetes, Usuários e Materiais -->
+        <div class="space-y-6 md:col-span-1 flex flex-col w-full">
+            
+            <!-- Bloco Mural & Enquetes -->
+            <div id="conteudo-mural" class="space-y-4 block md:block w-full">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
+                    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 to-red-600"></div>
+                    <div class="p-5 border-b border-slate-100 dark:border-zinc-800/60 flex items-center gap-2.5">
+                        <i class="fa-solid fa-bullhorn text-amber-600 dark:text-amber-500 text-base"></i>
+                        <h3 class="text-sm font-black text-slate-800 dark:text-zinc-100 tracking-tight">Gerenciar Comunicação</h3>
+                    </div>
+                    
+                    <div class="p-5 space-y-5 text-xs">
+                        <!-- Mural -->
+                        <form id="form-atualizar-mural" class="space-y-2">
+                            <label class="font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block text-[10px]">Texto do Mural de Avisos:</label>
+                            <textarea id="txt-aviso-mural" rows="3" required class="w-full bg-slate-50/70 dark:bg-zinc-800/30 p-3 rounded-xl border border-slate-100 dark:border-zinc-800/60 text-slate-700 dark:text-zinc-300 outline-none focus:border-amber-500 transition-all font-medium" placeholder="Digite o aviso geral aqui..."></textarea>
+                            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded-xl transition-all cursor-pointer uppercase tracking-wider text-[10px]">Atualizar Mural</button>
+                        </form>
+                        
+                        <hr class="border-slate-100 dark:border-zinc-800/60">
 
-        <div class="p-4 border-t border-amber-900 bg-amber-950/40">
-            <button id="btn-logout" class="w-full bg-white/5 hover:bg-rose-950/40 hover:text-rose-300 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
-                <span>Encerrar Sessão</span> <i class="fa-solid fa-arrow-right-from-bracket text-[10px] opacity-80"></i>
-            </button>
-        </div>
-    </aside>
-
-    <!-- Conteúdo Principal -->
-    <main class="flex-1 p-4 md:p-6 overflow-y-auto max-w-7xl w-full mx-auto space-y-6">
-
-        <!-- SEÇÃO USUÁRIOS -->
-        <section id="sec-coord-usuarios" class="hidden-coord-tab grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit space-y-4">
-                <div class="border-b border-slate-100 pb-2">
-                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Cadastrar Novo Membro</h3>
-                </div>
-                <form id="form-cadastro-usuario" class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nível / Tipo de Conta</label>
-                        <select id="cad-funcao" class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-none transition-all">
-                            <option value="Coroinha">Coroinha / Acólito</option>
-                            <option value="Coordenador">Coordenador</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2.5 py-1">
-                        <input type="checkbox" id="chk-possui-irmao" class="w-4 h-4 text-amber-700 border-slate-300 rounded focus:ring-amber-500 cursor-pointer">
-                        <label for="chk-possui-irmao" class="text-xs font-bold text-slate-700 cursor-pointer select-none">Possui irmão já cadastrado?</label>
-                    </div>
-                    <div id="div-lista-irmaos" class="hidden bg-sky-50/60 p-3.5 rounded-xl border border-sky-100 space-y-2">
-                        <label class="block text-[10px] font-bold text-sky-800 uppercase tracking-wider">Selecione o Irmão Cadastrado</label>
-                        <select id="cad-irmao-titular-select" class="w-full bg-white border border-sky-200 focus:border-sky-500 rounded-xl p-2.5 text-xs font-medium text-slate-800 outline-none"></select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nome Completo</label>
-                        <input type="text" id="cad-nome" required class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl p-2.5 text-xs font-medium outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">E-mail de Login Único</label>
-                        <input type="email" id="cad-email" required class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl p-2.5 text-xs font-medium outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Senha de Acesso</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="cad-senha" required class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl p-2.5 text-xs font-mono font-bold tracking-wide outline-none transition-all">
-                            <button type="button" id="btn-gerar-senha" class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 rounded-xl text-xs font-bold cursor-pointer transition-colors shadow-sm" title="Gerar Senha">
-                                <i class="fa-solid fa-key text-[11px]"></i>
-                            </button>
+                        <!-- Enquete de Disponibilidade -->
+                        <div class="space-y-2">
+                            <label class="font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block text-[10px]">Enquete de Disponibilidade Mensal:</label>
+                            <div id="status-enquete-area" class="p-3 rounded-xl bg-slate-50 dark:bg-zinc-800/40 border border-slate-100 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 font-medium">
+                                Carregando status da enquete...
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button id="btn-ativar-enquete" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl transition-all cursor-pointer uppercase tracking-wider text-[10px]">Abrir Nova</button>
+                                <button id="btn-fechar-enquete" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 rounded-xl transition-all cursor-pointer uppercase tracking-wider text-[10px]">Encerrar Atual</button>
+                            </div>
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-all mt-2">Registrar Membro</button>
-                </form>
+                </div>
+            </div>
+
+            <!-- Bloco Controle de Membros -->
+            <div id="conteudo-usuarios" class="space-y-4 hidden md:block w-full">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
+                    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-700 to-amber-500"></div>
+                    <div class="p-5 border-b border-slate-100 dark:border-zinc-800/60 flex items-center gap-2.5">
+                        <i class="fa-solid fa-users text-red-600 dark:text-red-500 text-base"></i>
+                        <h3 class="text-sm font-black text-slate-800 dark:text-zinc-100 tracking-tight">Cadastro de Acólitos</h3>
+                    </div>
+                    <div class="p-5 space-y-4 text-xs">
+                        <form id="form-criar-usuario" class="space-y-2.5">
+                            <input type="text" id="novo-usuario-nome" placeholder="Nome Completo do Acólito" required class="w-full bg-slate-50 dark:bg-zinc-800/30 border border-slate-200 dark:border-zinc-700 rounded-xl p-2.5 text-slate-700 dark:text-zinc-200 outline-none focus:border-red-600 shadow-xs">
+                            <select id="novo-usuario-funcao" class="w-full bg-slate-50 dark:bg-zinc-800/30 border border-slate-200 dark:border-zinc-700 rounded-xl p-2.5 text-slate-700 dark:text-zinc-200 outline-none focus:border-red-600 shadow-xs">
+                                <option value="Acólito">Acólito</option>
+                                <option value="Coroinha">Coroinha</option>
+                                <option value="Coordenador">Coordenador</option>
+                            </select>
+                            <button type="submit" class="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-2.5 rounded-xl transition-all cursor-pointer uppercase tracking-wider text-[10px]">Registrar Membro</button>
+                        </form>
+                        <div id="lista-membros-sistema" class="space-y-2 max-h-48 overflow-y-auto pt-2 border-t border-slate-100 dark:border-zinc-800">
+                            <p class="text-slate-400 dark:text-zinc-500 italic">Buscando equipe...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bloco Materiais de Formação -->
+            <div id="conteudo-materiais" class="space-y-4 hidden md:block w-full">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
+                    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-600 via-red-600 to-amber-500"></div>
+                    <div class="p-5 border-b border-slate-100 dark:border-zinc-800/60 flex items-center gap-2.5">
+                        <i class="fa-solid fa-book-open text-amber-600 dark:text-amber-500 text-base"></i>
+                        <h3 class="text-sm font-black text-slate-800 dark:text-zinc-100 tracking-tight">Materiais & Links</h3>
+                    </div>
+                    <div class="p-5 space-y-4 text-xs">
+                        <form id="form-adicionar-formacao" class="space-y-2.5">
+                            <input type="text" id="novo-material-titulo" placeholder="Título do Material" required class="w-full bg-slate-50 dark:bg-zinc-800/30 border border-slate-200 dark:border-zinc-700 rounded-xl p-2.5 text-slate-700 dark:text-zinc-200 outline-none focus:border-amber-600 shadow-xs">
+                            <input type="url" id="novo-material-url" placeholder="URL do Link (Drive, PDF, etc.)" required class="w-full bg-slate-50 dark:bg-zinc-800/30 border border-slate-200 dark:border-zinc-700 rounded-xl p-2.5 text-slate-700 dark:text-zinc-200 outline-none focus:border-amber-600 shadow-xs">
+                            <button type="submit" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2.5 rounded-xl transition-all cursor-pointer uppercase tracking-wider text-[10px]">Adicionar Link</button>
+                        </form>
+                        <div id="lista-materials-formacao" class="space-y-2 max-h-44 overflow-y-auto pt-2 border-t border-slate-100 dark:border-zinc-800">
+                            <p class="text-slate-400 dark:text-zinc-500 italic">Buscando materiais cadastrados...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col h-fit">
-                <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3">
-                    <div>
-                        <h3 class="text-sm font-black text-slate-800 tracking-wide">Lista Geral do Presbitério</h3>
-                    </div>
-                    <div class="relative w-full sm:w-64">
-                        <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none"><i class="fa-solid fa-magnifying-glass text-[11px]"></i></span>
-                        <input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl pl-8 pr-3 py-1.5 text-xs font-medium outline-none transition-all">
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-500 font-bold uppercase text-[9px] tracking-wider border-b border-slate-100">
-                                <th class="p-3">Nome</th>
-                                <th class="p-3">E-mail</th>
-                                <th class="p-3">Senha Provisória</th>
-                                <th class="p-3">Vínculo</th>
-                                <th class="p-3 text-center">Tipo</th>
-                                <th class="p-3 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-usuarios-recuperacao" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- SEÇÃO ESCALAS -->
-        <section id="sec-coord-escalas" class="hidden-coord-tab hidden space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div>
-                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Visualizar / Editar / Apagar Escalas Vigentes</h3>
-                </div>
-                <input type="date" id="editor-escala-data" class="bg-slate-50 border border-slate-200 focus:border-amber-600 rounded-xl p-2 text-xs font-bold text-slate-700 cursor-pointer outline-none transition-colors">
-            </div>
-            
-            <div class="bg-amber-50/60 p-4 rounded-2xl border border-amber-200 space-y-3">
-                <h4 class="text-xs font-black text-amber-900 flex items-center gap-2"><i class="fa-solid fa-circle-plus text-amber-700"></i> Adicionar Celebração Extra / Solenidade nesta Data</h4>
-                <form id="form-criar-escala-manual" class="flex flex-col sm:flex-row gap-3 items-end">
-                    <div class="flex-1 w-full">
-                        <label class="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Título da Celebração</label>
-                        <input type="text" id="add-manual-titulo" required placeholder="Ex: Missa de Solenidade de Corpus Christi" class="w-full bg-white border border-amber-200 focus:border-amber-700 rounded-xl p-2.5 text-xs font-medium outline-none transition-colors">
-                    </div>
-                    <div class="w-full sm:w-36">
-                        <label class="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Horário</label>
-                        <input type="time" id="add-manual-horario" required class="w-full bg-white border border-amber-200 focus:border-amber-700 rounded-xl p-2.5 text-xs font-bold outline-none transition-colors">
-                    </div>
-                    <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs px-5 py-2.5 rounded-xl whitespace-nowrap cursor-pointer w-full sm:w-auto shadow-sm hover:shadow-md transition-all">Criar Escala</button>
-                </form>
-            </div>
-            
-            <div id="container-editores-missa" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </section>
-
-        <!-- SEÇÃO SORTEIO -->
-        <section id="sec-coord-sorteio" class="hidden-coord-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4 h-fit">
-                <div class="border-b border-slate-100 pb-2">
-                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Gerador Automático</h3>
-                </div>
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mês de Referência</label>
-                        <input type="month" id="enq-mes-alvo" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 cursor-pointer outline-none">
-                    </div>
-                    <div class="flex gap-2">
-                        <button id="btn-disparar-enquete" class="flex-1 bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs py-2 rounded-xl transition-colors cursor-pointer shadow-sm">Abrir Pesquisa</button>
-                        <button id="btn-fechar-enquete" class="flex-1 bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs py-2 rounded-xl transition-colors cursor-pointer shadow-sm">Fechar</button>
-                    </div>
-                    <button type="button" id="btn-limpar-escalas-mes" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs py-2 rounded-xl cursor-pointer mt-1 shadow-sm transition-all"><i class="fa-solid fa-trash-can mr-1.5 text-[11px]"></i> Apagar Todas as Escalas do Mês</button>
-                </div>
-                
-                <div class="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100">
-                    <h4 class="text-[10px] font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i class="fa-solid fa-arrow-down-short-wide"></i> Fila de Respostas</h4>
-                    <div id="lista-fila-prioridade" class="space-y-1 max-h-32 overflow-y-auto pr-1"></div>
-                </div>
-                
-                <form id="form-escala-automatica" class="space-y-3 pt-2 border-t border-slate-100">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Título Padrão das Missas</label>
-                        <input type="text" id="auto-titulo" required placeholder="Ex: Santa Missa" class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 rounded-xl p-2.5 text-xs font-medium outline-none">
-                    </div>
-                    <button type="submit" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm hover:shadow-md transition-all cursor-pointer"><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> Lançar Escalas do Mês</button>
-                </form>
-            </div>
-            
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2 space-y-4">
-                <div class="border-b border-slate-100 pb-2">
-                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Lista de Disponibilidade Recebida</h3>
-                </div>
-                <div id="lista-nomes-enquete" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[480px] overflow-y-auto bg-slate-50 p-3.5 rounded-2xl border border-slate-200"></div>
-            </div>
-        </section>
-
-        <!-- SEÇÃO REUNIÕES -->
-        <section id="sec-coord-reunioes" class="hidden-coord-tab hidden max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
-            <div class="border-b border-slate-100 pb-4">
-                <h3 class="text-sm font-black text-slate-800 tracking-wide">Chamada e Configuração de Reuniões</h3>
-                <p class="text-[11px] text-slate-400 mt-0.5">Gerencie a data, horário, pauta e execute o controle de presenças com salvamento em nuvem.</p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Data da Reunião:</label>
-                    <input type="date" id="chamada-reuniao-data" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-amber-700">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Horário:</label>
-                    <input type="time" id="chamada-reuniao-horario" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-amber-700">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Título / Pauta:</label>
-                    <input type="text" id="chamada-reuniao-titulo" placeholder="Ex: Encontro Mensal / Formação" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-amber-700">
-                </div>
-            </div>
-
-            <div class="space-y-4">
-                <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-3 flex flex-wrap justify-between items-center text-xs gap-3">
-                    <span class="font-bold text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-list-check text-amber-700"></i> Painel de Presenças Ativo</span>
-                    <div class="flex gap-3 text-[10px] font-black uppercase tracking-wider">
-                        <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">✓ Presente</span>
-                        <span class="text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 font-bold">X Falta</span>
-                        <span class="text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 font-bold">FJ Justificada</span>
-                    </div>
-                </div>
-
-                <div id="lista-chamada-coroinhas" class="divide-y divide-slate-100 max-h-[450px] overflow-y-auto pr-1">
-                    <p class="text-xs text-slate-400 italic py-6 text-center">Selecione uma data válida para iniciar a chamada.</p>
-                </div>
-
-                <div class="pt-2 flex justify-end">
-                    <button type="button" id="btn-salvar-chamada" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer">
-                        <i class="fa-solid fa-floppy-disk mr-1.5 text-[11px]"></i> Gravar Reunião e Chamada
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- SEÇÃO MATERIAL -->
-        <section id="sec-coord-material" class="hidden-coord-tab hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4 h-fit">
-                <div class="border-b border-slate-100 pb-2">
-                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Adicionar Material Didático</h3>
-                </div>
-                <form id="form-upload-formacao" class="space-y-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Título do Material</label>
-                        <input type="text" id="form-titulo-input" required placeholder="Ex: Manual Litúrgico 2026" class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 rounded-xl p-2.5 text-xs font-medium outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">URL do Conteúdo (Drive/Link)</label>
-                        <input type="url" id="form-url-input" required placeholder="https://drive.google.com/..." class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 rounded-xl p-2.5 text-xs font-medium outline-none">
-                    </div>
-                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm cursor-pointer transition-colors mt-2">Publicar Conteúdo</button>
-                </form>
-            </div>
-            
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 md:col-span-2 space-y-4">
-                <div class="border-b border-slate-100 pb-2">
-                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Materiais Visíveis para os Coroinhas</h3>
-                </div>
-                <div id="lista-adm-materiais" class="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-                    <p class="text-xs text-slate-400 italic">Buscando lista...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- SEÇÃO AVISOS -->
-        <section id="sec-coord-avisos-tab" class="hidden-coord-tab hidden max-w-xl bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-            <div class="border-b border-slate-100 pb-2">
-                <h3 class="text-sm font-black text-slate-800 tracking-wide">Mural de Comunicados</h3>
-            </div>
-            <form id="form-publicar-aviso" class="space-y-3">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Texto do Comunicado Geral</label>
-                    <textarea id="txt-aviso-coordenador" required rows="6" placeholder="Escreva o aviso geral que será exibido no topo da tela inicial de todos os coroinhas..." class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl p-3.5 text-xs font-medium outline-none transition-all resize-none"></textarea>
-                </div>
-                <button type="submit" class="w-full bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer transition-colors shadow-sm">Publicar no Mural</button>
-            </form>
-        </section>
+        </div>
     </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot, addDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -303,474 +250,377 @@
         appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
     };
 
-    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
-    const appSecundario = initializeApp(firebaseConfig, "SecondaryApp"); const authSecundario = getAuth(appSecundario);
+    const app = initializeApp(firebaseConfig); 
+    const auth = getAuth(app); 
+    const db = getFirestore(app);
 
     const telaLoading = document.getElementById('tela-loading');
     const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
     const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
-    const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
-    const buscaUsuarioLista = document.getElementById('busca-usuario-lista');
-    const editorEscalaData = document.getElementById('editor-escala-data');
-    const containerEditoresMissa = document.getElementById('container-editores-missa');
     const btnLogout = document.getElementById('btn-logout');
-    const chkPossuiIrmao = document.getElementById('chk-possui-irmao');
-    const divListaIrmaos = document.getElementById('div-lista-irmaos');
-    const selectIrmaoTitular = document.getElementById('cad-irmao-titular-select');
-    
-    const llamadaReuniaoData = document.getElementById('chamada-reuniao-data');
-    const chamadaReuniaoHorario = document.getElementById('chamada-reuniao-horario');
-    const chamadaReuniaoTitulo = document.getElementById('chamada-reuniao-titulo');
-    const listaChamadaCoroinhas = document.getElementById('lista-chamada-coroinhas');
-    const btnSalvarChamada = document.getElementById('btn-salvar-chamada');
+    const buscaEscalaData = document.getElementById('busca-escala-data');
+    const resultadoEscalaGeral = document.getElementById('resultado-escala-geral');
+    const btnDarkMode = document.getElementById('btn-dark-mode');
+    const darkModeThumb = document.getElementById('dark-mode-thumb');
 
-    let usuarioLogadoDados = null; let mapaRespostasGerais = {}; let cacheTodosUsuarios = [];
-    let mapaPresencaAtual = {};
+    let usuarioLogadoDados = null; 
+    let todasEscalasCache = [];
+    let listaTodosUsuariosGlobal = [];
 
-    const CRONOGRAMA_PAROQUIA = [
-        { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" }, { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
-        { diaSemana: 6, horario: "19:00", rotulo: "Sábado" }, { diaSemana: 0, horario: "09:00", rotulo: "Domingo de Manhã" }, { diaSemana: 0, horario: "19:00", rotulo: "Domingo de Noite" }
-    ];
-
-    function hideLoading() { 
-        if(telaLoading) {
-            telaLoading.classList.add('opacity-0');
-            setTimeout(() => { telaLoading.style.display = 'none'; }, 300);
+    // Sincronização do Dark Mode
+    function sincronizarVisualBotao(isDark) {
+        if (darkModeThumb) {
+            if (isDark) {
+                darkModeThumb.classList.remove('translate-x-0');
+                darkModeThumb.classList.add('translate-x-5');
+            } else {
+                darkModeThumb.classList.remove('translate-x-5');
+                darkModeThumb.classList.add('translate-x-0');
+            }
         }
     }
 
-    chkPossuiIrmao?.addEventListener('change', (e) => {
-        if(e.target.checked) {
-            divListaIrmaos.classList.remove('hidden'); selectIrmaoTitular.setAttribute('required', 'true'); atualizarListboxMembros();
-        } else { divListaIrmaos.classList.add('hidden'); selectIrmaoTitular.removeAttribute('required'); }
+    const temaSalvo = localStorage.getItem('theme');
+    const prefereSistemaEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (temaSalvo === 'dark' || (!temaSalvo && prefereSistemaEscuro)) {
+        document.documentElement.classList.add('dark');
+        sincronizarVisualBotao(true);
+    } else {
+        document.documentElement.classList.remove('dark');
+        sincronizarVisualBotao(false);
+    }
+
+    btnDarkMode?.addEventListener('click', () => {
+        const modificadoParaDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', modificadoParaDark ? 'dark' : 'light');
+        sincronizarVisualBotao(modificadoParaDark);
     });
 
-    function atualizarListboxMembros() {
-        if(!selectIrmaoTitular) return; selectIrmaoTitular.innerHTML = '<option value="">Selecione um membro...</option>';
-        cacheTodosUsuarios.filter(u => u.funcao !== "Coordenador").forEach(u => {
-            const opt = document.createElement('option'); opt.value = u.email; opt.textContent = `${u.nome} (${u.email})`; selectIrmaoTitular.appendChild(opt);
-        });
-    }
+    function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
 
     onAuthStateChanged(auth, async (user) => {
         const devSession = sessionStorage.getItem("dev_user");
-        if (devSession) { usuarioLogadoDados = JSON.parse(devSession); inicializarPainel(); }
-        else if (user) {
+        if(devSession) { 
+            usuarioLogadoDados = JSON.parse(devSession); 
+            inicializarPainelCoordenador(); 
+        } else if(user) {
             const docSnap = await getDoc(doc(db, "usuarios", user.uid));
-            if (docSnap.exists() && docSnap.data().funcao === "Coordenador") { usuarioLogadoDados = docSnap.data(); inicializarPainel(); }
-            else { signOut(auth); window.location.href = "index.html"; }
-        } else { window.location.href = "index.html"; }
+            if(docSnap.exists()) { 
+                usuarioLogadoDados = docSnap.data();
+                if(usuarioLogadoDados.funcao !== 'Coordenador') {
+                    window.location.href = "acolito.html";
+                    return;
+                }
+                inicializarPainelCoordenador(); 
+            } else { 
+                signOut(auth); 
+                window.location.href = "index.html"; 
+            }
+        } else { 
+            window.location.href = "index.html"; 
+        }
         setTimeout(hideLoading, 500);
     });
 
-    function inicializarPainel() {
-        if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome.split(' ')[0];
+    function inicializarPainelCoordenador() {
+        if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = usuarioLogadoDados.nome;
         if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = usuarioLogadoDados.funcao;
 
-        ouvirEnqueteTempoRealCoordenador();
-        ouvirUsuariosCadastrados();
-        ouvirMateriaisComoAdmin();
-        carregarAvisoNoInputCoordenador();
-        switchCoordTab('coord-usuarios');
-        
-        if(editorEscalaData) {
-            editorEscalaData.value = new Date().toISOString().split('T')[0]; carregarEditorEscalasPorData(editorEscalaData.value);
+        if(buscaEscalaData && !buscaEscalaData.value) {
+            buscaEscalaData.value = new Date().toISOString().split('T')[0];
         }
-        if(llamadaReuniaoData) {
-            llamadaReuniaoData.value = new Date().toISOString().split('T')[0];
-            chamadaReuniaoHorario.value = "15:00"; 
-            chamadaReuniaoTitulo.value = "Reunião de Formação"; 
-            carregarListaDeChamada(llamadaReuniaoData.value);
-        }
+
+        ouvirMuralAvisos();
+        ouvirColecaoConteudos();
+        ouvirListaMembros();
+        ouvirEnqueteStatus();
+        ouvirTodasAsEscalas();
+
+        if(window.innerWidth < 768) { switchTab('escalas'); }
     }
 
     if(btnLogout) {
         btnLogout.addEventListener('click', () => { sessionStorage.removeItem("dev_user"); signOut(auth).then(() => window.location.href = "index.html"); });
     }
 
-    document.getElementById('btn-gerar-senha')?.addEventListener('click', () => {
-        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; let s = '';
-        for (let i = 0; i < 6; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
-        document.getElementById('cad-senha').value = s;
+    // Funcionalidade: Mural de Avisos
+    function ouvirMuralAvisos() {
+        onSnapshot(doc(db, "mural", "aviso_geral"), (snap) => {
+            if(snap.exists()) {
+                document.getElementById('txt-aviso-mural').value = snap.data().texto || "";
+            }
+        });
+    }
+
+    document.getElementById('form-atualizar-mural')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const textoIn = document.getElementById('txt-aviso-mural').value;
+        const formatData = new Date().toLocaleDateString('pt-BR');
+        try {
+            await setDoc(doc(db, "mural", "aviso_geral"), { texto: textoIn, dataPublicacao: formatData }, { merge: true });
+            alert("Mural de avisos atualizado!");
+        } catch (err) { alert("Erro ao atualizar."); }
     });
 
-    if(formCadastroUsuario) {
-        formCadastroUsuario.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nome = document.getElementById('cad-nome').value.trim();
-            const funcao = document.getElementById('cad-funcao').value;
-            const email = document.getElementById('cad-email').value.trim().toLowerCase();
-            const senha = document.getElementById('cad-senha').value.trim();
-            const ehIrmao = chkPossuiIrmao ? chkPossuiIrmao.checked : false;
-
-            try {
-                const res = await createUserWithEmailAndPassword(authSecundario, email, senha);
-                const novoUsuario = { nome, email, senha_provisoria: senha, funcao, tipoConta: "Oficial" };
-                if (ehIrmao && selectIrmaoTitular.value) {
-                    novoUsuario.email_conexao = selectIrmaoTitular.value.toLowerCase(); novoUsuario.tipoConta = "ComVinculo";
-                }
-                await setDoc(doc(db, "usuarios", res.user.uid), novoUsuario);
-                await signOut(authSecundario);
-                alert("Membro cadastrado com sucesso!"); formCadastroUsuario.reset(); divListaIrmaos.classList.add('hidden');
-            } catch (err) { alert(err.message); }
-        });
-    }
-
-    window.deletarUsuarioDoSistema = async function(id, nome) {
-        if(confirm(`Remover permanentemente ${nome}?`)) { await deleteDoc(doc(db, "usuarios", id)); }
-    }
-
-    function ouvirUsuariosCadastrados() {
-        onSnapshot(collection(db, "usuarios"), (snap) => {
-            cacheTodosUsuarios = []; snap.forEach(d => { const u = d.data(); u.idDoc = d.id; cacheTodosUsuarios.push(u); });
-            cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome)); renderizarTabelaUsuarios();
-            if(chkPossuiIrmao && chkPossuiIrmao.checked) { atualizarListboxMembros(); }
-            if(llamadaReuniaoData && llamadaReuniaoData.value) { renderizarInterfaceChamada(); }
-        });
-    }
-
-    function renderizarTabelaUsuarios() {
-        const b = document.getElementById('tabela-usuarios-recuperacao'); if(!b) return; b.innerHTML = "";
-        const termo = buscaUsuarioLista?.value.toLowerCase() || "";
-        cacheTodosUsuarios.filter(u => u.nome.toLowerCase().includes(termo)).forEach(u => {
-            let badgeTipo = u.funcao === "Coordenador" ? `<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Coordenação</span>` : `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Oficial</span>`;
-            let colunaConexao = u.email_conexao ? `<span class="text-blue-700 font-bold text-[11px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">Irmão de: ${u.email_conexao}</span>` : `<span class="text-slate-400 italic text-[11px]">Nenhum</span>`;
-            let senhaExibicao = u.senha_provisoria || `<span class="text-slate-400 italic">Alterada</span>`;
-            b.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors"><td class="p-3 font-semibold text-slate-800">${u.nome}</td><td class="p-3 font-mono text-slate-500">${u.email}</td><td class="p-3 font-mono font-bold text-amber-800">${senhaExibicao}</td><td class="p-3">${colunaConexao}</td><td class="p-3 text-center">${badgeTipo}</td><td class="p-3 text-center"><button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 text-[11px] hover:bg-rose-100 transition-colors shadow-sm">Excluir</button></td></tr>`;
-        });
-    }
-    buscaUsuarioLista?.addEventListener('input', renderizarTabelaUsuarios);
-
-    async function carregarListaDeChamada(dataString) {
-        if(!dataString) return;
-        mapaPresencaAtual = {};
-        try {
-            const docSnap = await getDoc(doc(db, "reunioes", dataString));
-            if(docSnap.exists()) {
-                const dados = docSnap.data();
-                mapaPresencaAtual = dados.presencas || {};
-                if(dados.horario) chamadaReuniaoHorario.value = dados.horario;
-                if(dados.titulo) chamadaReuniaoTitulo.value = dados.titulo;
-            } else {
-                chamadaReuniaoHorario.value = "15:00";
-                chamadaReuniaoTitulo.value = "Reunião de Formação";
+    // Funcionalidade: Materiais de Formação
+    function ouvirColecaoConteudos() {
+        const container = document.getElementById('lista-materials-formacao');
+        if(!container) return;
+        onSnapshot(collection(db, "formacao"), (snap) => {
+            if(snap.empty) {
+                container.innerHTML = `<p class="text-xs text-slate-400 dark:text-zinc-500 italic">Nenhum material cadastrado.</p>`;
+                return;
             }
-            renderizarInterfaceChamada();
-        } catch(err) { console.error("Erro ao carregar chamada: ", err); }
-    }
-
-    function renderizarInterfaceChamada() {
-        if(!listaChamadaCoroinhas) return;
-        const listaCoroinhas = cacheTodosUsuarios.filter(u => u.funcao !== "Coordenador");
-        
-        if(listaCoroinhas.length === 0) {
-            listaChamadaCoroinhas.innerHTML = `<p class="text-xs text-slate-400 italic py-6 text-center">Nenhum coroinha cadastrado no sistema.</p>`;
-            return;
-        }
-
-        listaChamadaCoroinhas.innerHTML = "";
-        listaCoroinhas.forEach(c => {
-            const statusAtual = mapaPresencaAtual[c.nome] || "presente";
-            listaChamadaCoroinhas.innerHTML += `
-                <div class="flex justify-between items-center py-3 px-2 hover:bg-slate-50 transition-all rounded-xl my-0.5">
-                    <div class="flex flex-col">
-                        <span class="text-xs font-bold text-slate-800">${c.nome}</span>
-                        <span class="text-[10px] text-slate-400 font-mono mt-0.5">${c.email}</span>
-                    </div>
-                    <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'presente')" id="btn-p-${c.nome.replace(/\s+/g, '')}" class="px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'presente' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}">✓ P</button>
-                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'falta')" id="btn-f-${c.nome.replace(/\s+/g, '')}" class="px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'falta' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}">X F</button>
-                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'justificada')" id="btn-j-${c.nome.replace(/\s+/g, '')}" class="px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'justificada' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}">FJ</button>
-                    </div>
-                </div>
-            `;
+            container.innerHTML = "";
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                container.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-50/70 dark:bg-zinc-800/30 p-2 rounded-xl border border-slate-100 dark:border-zinc-800/60">
+                        <span class="font-bold text-slate-700 dark:text-zinc-300 truncate max-w-[70%]">${data.titulo}</span>
+                        <button onclick="window.deletarFormacaoItem('${docSnap.id}')" class="text-rose-600 hover:text-rose-800 text-[11px] font-bold cursor-pointer px-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+            });
         });
     }
 
-    window.alterarStatusPresencaLocal = function(nomeCoroinha, novoStatus) {
-        mapaPresencaAtual[nomeCoroinha] = novoStatus;
-        const idLimpo = nomeCoroinha.replace(/\s+/g, '');
-        const btnP = document.getElementById(`btn-p-${idLimpo}`);
-        const btnF = document.getElementById(`btn-f-${idLimpo}`);
-        const btnJ = document.getElementById(`btn-j-${idLimpo}`);
+    document.getElementById('form-adicionar-formacao')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const tit = document.getElementById('novo-material-titulo').value;
+        const urlLink = document.getElementById('novo-material-url').value;
+        try {
+            await addDoc(collection(db, "formacao"), { titulo: tit, url: urlLink, criadoEm: Date.now() });
+            document.getElementById('form-adicionar-formacao').reset();
+            alert("Material adicionado!");
+        } catch(e) { alert("Erro ao salvar."); }
+    });
 
-        if(btnP) btnP.className = `px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'presente' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}`;
-        if(btnF) btnF.className = `px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'falta' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}`;
-        if(btnJ) btnJ.className = `px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'justificada' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}`;
+    window.deletarFormacaoItem = async function(id) {
+        if(confirm("Deseja remover este material?")) {
+            await deleteDoc(doc(db, "formacao", id));
+        }
     };
 
-    btnSalvarChamada?.addEventListener('click', async () => {
-        const dataReuniao = llamadaReuniaoData.value;
-        const horarioReuniao = chamadaReuniaoHorario.value;
-        const tituloReuniao = chamadaReuniaoTitulo.value.trim();
-
-        if(!dataReuniao) return alert("Por favor, selecione uma data válida!");
-        if(!horarioReuniao) return alert("Por favor, selecione um horário válido!");
-
-        cacheTodosUsuarios.filter(u => u.funcao !== "Coordenador").forEach(c => {
-            if(!mapaPresencaAtual[c.nome]) mapaPresencaAtual[c.nome] = "presente";
-        });
-
-        try {
-            await setDoc(doc(db, "reunioes", dataReuniao), {
-                data: dataReuniao,
-                horario: horarioReuniao,
-                titulo: tituloReuniao || "Reunião Geral",
-                presencas: mapaPresencaAtual,
-                atualizadoEm: Date.now()
-            });
-            alert("Dados da reunião e lista de chamada salvos com sucesso!");
-        } catch(err) { alert("Erro ao salvar dados da reunião: " + err.message); }
-    });
-
-    llamadaReuniaoData?.addEventListener('change', (e) => carregarListaDeChamada(e.target.value));
-
-    document.getElementById('form-upload-formacao')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const titulo = document.getElementById('form-titulo-input').value.trim();
-        const url = document.getElementById('form-url-input').value.trim();
-        const idConteudo = "mat_" + Date.now();
-        await setDoc(doc(db, "formacao", idConteudo), { id: idConteudo, titulo: titulo, url: url });
-        alert("Novo material adicionado com sucesso!");
-        document.getElementById('form-upload-formacao').reset();
-    });
-
-    function ouvirMateriaisComoAdmin() {
-        const container = document.getElementById('lista-adm-materiais');
-        onSnapshot(collection(db, "formacao"), (snap) => {
-            if(snap.empty) { container.innerHTML = `<p class="text-xs text-slate-400 italic py-2">Nenhum arquivo ativo.</p>`; return; }
+    // Funcionalidade: Cadastro e Listagem de Membros
+    function ouvirListaMembros() {
+        onSnapshot(collection(db, "usuarios"), (snap) => {
+            const container = document.getElementById('lista-membros-sistema');
+            if(!container) return;
+            listaTodosUsuariosGlobal = [];
             container.innerHTML = "";
             snap.forEach(d => {
-                const mat = d.data();
-                container.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs transition-colors hover:bg-slate-100"><div><strong class="text-slate-800 block font-bold">${mat.titulo}</strong><span class="text-[10px] text-slate-400 font-mono block mt-0.5 truncate max-w-xs sm:max-w-md">${mat.url}</span></div><button onclick="window.removerConteudoDidatico('${d.id}')" class="bg-rose-50 border border-rose-200 text-rose-700 px-3 py-1 rounded-xl text-[10px] font-extrabold hover:bg-rose-100 transition-colors cursor-pointer shadow-sm">Excluir</button></div>`;
+                const u = d.data();
+                u.uid = d.id;
+                listaTodosUsuariosGlobal.push(u);
+                container.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-50/50 dark:bg-zinc-800/20 p-2 rounded-xl border border-slate-100 dark:border-zinc-800/40">
+                        <div>
+                            <span class="font-bold text-slate-700 dark:text-zinc-200 block">${u.nome}</span>
+                            <span class="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500">${u.funcao}</span>
+                        </div>
+                        <button onclick="window.removerMembroItem('${d.id}')" class="text-rose-600 hover:text-rose-700 font-bold text-[10px] cursor-pointer"><i class="fa-solid fa-user-minus"></i></button>
+                    </div>`;
             });
+            renderizarEscalaGeralPorData();
         });
     }
 
-    window.removerConteudoDidatico = async function(id) {
-        if(confirm("Deseja apagar esse material didático?")) { await deleteDoc(doc(db, "formacao", id)); }
-    };
-
-    function ouvirEnqueteTempoRealCoordenador() {
-        onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
-            if (!docSnap.exists()) return; const dados = docSnap.data(); mapaRespostasGerais = dados.respostas || {};
-            const fila = document.getElementById('lista-fila-prioridade');
-            if(fila) {
-                fila.innerHTML = ""; let arr = Object.keys(mapaRespostasGerais).map(n => ({nome: n, t: mapaRespostasGerais[n].respondidoEm || 0}));
-                arr.sort((a,b) => a.t - b.t);
-                if(arr.length===0) fila.innerHTML = `<p class="text-[10px] text-slate-400 italic py-1">Ninguém respondeu ainda.</p>`;
-                else arr.forEach((v, i) => fila.innerHTML += `<div class="flex justify-between bg-white px-2.5 py-1 rounded-lg border border-slate-100 text-[11px] font-medium shadow-sm"><span class="font-bold text-slate-700">${i+1}. ${v.nome}</span></div>`);
-            }
-            const container = document.getElementById('lista-nomes-enquete');
-            if(container && dados.celebracoes) {
-                container.innerHTML = ""; dados.celebracoes.forEach(cel => {
-                    let aptos = []; Object.keys(mapaRespostasGerais).forEach(n => { if((mapaRespostasGerais[n].escolhas||[]).includes(cel.idChave)) aptos.push(n); });
-                    container.innerHTML += `<div class="bg-white p-2.5 border border-slate-200 rounded-xl mb-1.5 shadow-sm"><strong class="text-amber-950 text-[10px] block border-b border-slate-100 pb-1">${cel.data.split('-').reverse().join('/')} — ${cel.rotulo} (${cel.horario}h):</strong><p class="text-[10px] text-emerald-700 font-bold mt-1 flex items-center gap-1">${aptos.length>0?'✓ '+aptos.join(', '):'<span class="text-slate-400 font-normal italic">Nenhum irmão disponível</span>'}</p></div>`;
-                });
-            }
-        });
-    }
-
-    document.getElementById('form-publicar-aviso')?.addEventListener('submit', async (e) => {
+    document.getElementById('form-criar-usuario')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        await setDoc(doc(db, "mural", "aviso_geral"), { texto: document.getElementById('txt-aviso-coordenador').value, dataPublicacao: new Date().toLocaleDateString('pt-BR') });
-        alert("Mural updated!");
+        const nomeIn = document.getElementById('novo-usuario-nome').value;
+        const funcaoIn = document.getElementById('novo-usuario-funcao').value;
+        const fakeUid = "user_" + Date.now();
+        try {
+            await setDoc(doc(db, "usuarios", fakeUid), { nome: nomeIn, funcao: funcaoIn });
+            document.getElementById('form-criar-usuario').reset();
+            alert("Membro cadastrado com sucesso!");
+        } catch(e) { alert("Erro ao cadastrar."); }
     });
 
-    async function carregarAvisoNoInputCoordenador() {
-        const d = await getDoc(doc(db, "mural", "aviso_geral")); if(d.exists()) document.getElementById('txt-aviso-coordenador').value = d.data().texto || "";
+    window.removerMembroItem = async function(uid) {
+        if(confirm("Excluir este membro do sistema?")) {
+            await deleteDoc(doc(db, "usuarios", uid));
+        }
+    };
+
+    // Funcionalidade: Gestão da Enquete Mensal
+    function ouvirEnqueteStatus() {
+        onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (snap) => {
+            const area = document.getElementById('status-enquete-area');
+            if(!area) return;
+            if(snap.exists() && snap.data().ativa === true) {
+                const totalResp = Object.keys(snap.data().respostas || {}).length;
+                area.innerHTML = `<span class="text-emerald-700 dark:text-emerald-500 font-bold block">● Ativa e Aberta</span> ${totalResp} acólitos enviaram resposta.`;
+            } else {
+                area.innerHTML = `<span class="text-slate-400 font-bold block">○ Fechada / Inativa</span> Escalas livres dependem de atribuição manual direta.`;
+            }
+        });
     }
 
-    document.getElementById('btn-disparar-enquete')?.addEventListener('click', async () => {
-        const mes = document.getElementById('enq-mes-alvo').value; if(!mes) return alert("Selecione o mês!");
-        const [a, m] = mes.split('-').map(Number); const list = []; const curr = new Date(a, m - 1, 1);
-        while(curr.getMonth() === m - 1) {
-            CRONOGRAMA_PAROQUIA.filter(c => c.diaSemana === curr.getDay()).forEach(item => {
-                const dStr = curr.toISOString().split('T')[0];
-                list.push({ idChave: `${dStr}_${item.horario.replace(':','')}`, data: dStr, horario: item.horario, rotulo: item.rotulo });
-            });
-            curr.setDate(curr.getDate() + 1);
-        }
-        await setDoc(doc(db, "enquetes", "disponibilidade_atual"), { mesReferencia: mes, ativa: true, celebracoes: list, respostas: {} });
-        alert("Pesquisa de disponibilidade aberta!");
+    document.getElementById('btn-ativar-enquete')?.addEventListener('click', async () => {
+        if(!confirm("Deseja abrir uma nova enquete baseada nas escalas futuras publicadas?")) return;
+        const celulasParaEnquete = [];
+        todasEscalasCache.forEach(e => {
+            celulasParaEnquete.push({ idChave: `${e.idDoc}_base`, data: e.data, horario: e.horario, rotulo: e.titulo });
+        });
+        await setDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: true, celebracoes: celulasParaEnquete, respostas: {} });
+        alert("Nova enquete mensal disponível aos acólitos!");
     });
 
     document.getElementById('btn-fechar-enquete')?.addEventListener('click', async () => {
-        await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false }); alert("Pesquisa fechada.");
+        await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false });
+        alert("Enquete encerrada!");
     });
 
-    document.getElementById('btn-limpar-escalas-mes')?.addEventListener('click', async () => {
-        const mes = document.getElementById('enq-mes-alvo').value;
-        if(!mes) return alert("Por favor, selecione o Mês de Referência primeiro!");
-        if(!confirm(`ATENÇÃO: Deseja REALMENTE apagar TODAS as escalas oficiais registradas no mês ${mes}?`)) return;
-
-        try {
-            const snap = await getDocs(collection(db, "escalas"));
-            const promessasDeRemocao = [];
-            let contadorRemovidos = 0;
-
-            snap.forEach(documento => {
-                const dataEscala = documento.data().data;
-                if(dataEscala && dataEscala.startsWith(mes)) {
-                    promessasDeRemocao.push(deleteDoc(doc(db, "escalas", documento.id)));
-                    contadorRemovidos++;
-                }
-            });
-
-            await Promise.all(promessasDeRemocao);
-            alert(`Sucesso! Foram excluídas ${contadorRemovidos} escalas vinculadas ao mês ${mes}.`);
-            if(editorEscalaData && editorEscalaData.value.startsWith(mes)) {
-                carregarEditorEscalasPorData(editorEscalaData.value);
-            }
-        } catch(err) { alert("Erro ao limpar o banco: " + err.message); }
-    });
-
-    document.getElementById('form-escala-automatica')?.addEventListener('submit', async (e) => {
-        e.preventDefault(); 
-        const mes = document.getElementById('enq-mes-alvo').value; 
-        if(!mes) return alert("Por favor, selecione o mês alvo no campo acima antes de gerar!");
-        
-        const [a, m] = mes.split('-').map(Number); const list = []; const curr = new Date(a, m - 1, 1);
-        while(curr.getMonth() === m - 1) {
-            CRONOGRAMA_PAROQUIA.filter(c => c.diaSemana === curr.getDay()).forEach(item => {
-                const dStr = curr.toISOString().split('T')[0];
-                list.push({ idChave: `${dStr}_${item.horario.replace(':','')}`, data: dStr, horario: item.horario, rotulo: item.rotulo });
-            });
-            curr.setDate(curr.getDate() + 1);
-        }
-        const tit = document.getElementById('auto-titulo').value.trim();
-        for(const cel of list) {
-            let disp = []; Object.keys(mapaRespostasGerais).forEach(n => { if((mapaRespostasGerais[n].escolhas||[]).includes(cel.idChave)) disp.push(n); });
-            disp.sort(() => Math.random() - 0.5);
-            await setDoc(doc(db, "escalas", `${cel.data}_${cel.horario.replace(':','')}`), {
-                titulo: `${tit} (${cel.rotulo})`, horario: cel.horario, data: cel.data,
-                altar1: { nome: disp[0] || "A definir", status: "Pendente" }, altar2: { nome: disp[1] || "A definir", status: "Pendente" },
-                altar3: { nome: disp[2] || "A definir", status: "Pendente" }, altar4: { nome: disp[3] || "A definir", status: "Pendente" },
-                altar5: { nome: disp[4] || "A definir", status: "Pendente" }, altar6: { nome: disp[5] || "A definir", status: "Pendente" },
-                turibuloAtivo: false, turiferario: { nome: "A definir", status: "Pendente" }, navetaAtiva: false, naveteiro: { nome: "A definir", status: "Pendente" }
-            });
-        }
-        alert("Escalas oficiais lançadas com sucesso!");
-    });
-
-    document.getElementById('form-criar-escala-manual')?.addEventListener('submit', async (e) => {
+    // Funcionalidade: Gestão Estruturada de Escalas (Firebase)
+    document.getElementById('form-criar-escala')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const dataAlvo = editorEscalaData.value;
-        if(!dataAlvo) return alert("Selecione um dia no calendário primeiro!");
+        const t = document.getElementById('nova-escala-titulo').value;
+        const d = document.getElementById('nova-escala-data').value;
+        const h = document.getElementById('nova-escala-horario').value;
+        const tAtivo = document.getElementById('nova-escala-turibulo').checked;
+        const nAtivo = document.getElementById('nova-escala-naveta').checked;
 
-        const titulo = document.getElementById('add-manual-titulo').value.trim();
-        const horario = document.getElementById('add-manual-horario').value;
-        const idDoc = `${dataAlvo}_${horario.replace(':', '')}`;
+        const novaEstrutura = {
+            titulo: t, data: d, horario: h,
+            turibuloAtivo: tAtivo, navetaAtiva: nAtivo,
+            altar1: { nome: "", status: "Pendente" }, altar2: { nome: "", status: "Pendente" },
+            altar3: { nome: "", status: "Pendente" }, altar4: { nome: "", status: "Pendente" },
+            altar5: { nome: "", status: "Pendente" }, altar6: { nome: "", status: "Pendente" },
+            turiferario: { nome: "", status: "Pendente" }, naveteiro: { nome: "", status: "Pendente" }
+        };
 
-        const checarSeExiste = await getDoc(doc(db, "escalas", idDoc));
-        if(checarSeExiste.exists()) {
-            if(!confirm("Já existe uma escala para este exato horário. Deseja sobrescrever os dados?")) return;
-        }
-
-        try {
-            await setDoc(doc(db, "escalas", idDoc), {
-                titulo: titulo, horario: horario, data: dataAlvo,
-                altar1: { nome: "A definir", status: "Pendente" }, altar2: { nome: "A definir", status: "Pendente" },
-                altar3: { nome: "A definir", status: "Pendente" }, altar4: { nome: "A definir", status: "Pendente" },
-                altar5: { nome: "A definir", status: "Pendente" }, altar6: { nome: "A definir", status: "Pendente" },
-                turibuloAtivo: false, turiferario: { nome: "A definir", status: "Pendente" }, navetaAtiva: false, naveteiro: { nome: "A definir", status: "Pendente" }
-            });
-
-            alert("Solenidade adicionada com sucesso!");
-            document.getElementById('form-criar-escala-manual').reset();
-            carregarEditorEscalasPorData(dataAlvo);
-        } catch(err) { alert("Erro ao criar escala manual: " + err.message); }
+        await addDoc(collection(db, "escalas"), novaEstrutura);
+        document.getElementById('form-criar-escala').reset();
+        alert("Celebração publicada com sucesso no painel geral!");
     });
 
-    window.excluirEscalaInteira = async function(idDoc) {
-        if(confirm("Tem certeza absoluta que deseja APAGAR esta celebração?")) {
-            await deleteDoc(doc(db, "escalas", idDoc));
-            alert("Escala de celebração excluída!");
-            carregarEditorEscalasPorData(editorEscalaData.value);
+    function ouvirTodasAsEscalas() {
+        onSnapshot(collection(db, "escalas"), (snap) => {
+            todasEscalasCache = [];
+            snap.forEach(d => { 
+                const esc = d.data(); 
+                esc.idDoc = d.id; 
+                todasEscalasCache.push(esc); 
+            });
+            renderizarEscalaGeralPorData();
+        });
+    }
+
+    function renderizarEscalaGeralPorData() {
+        if(!resultadoEscalaGeral || !buscaEscalaData) return;
+        const dataAlvo = buscaEscalaData.value;
+        if(!dataAlvo) {
+            resultadoEscalaGeral.innerHTML = `<p class="text-slate-400 dark:text-zinc-500 italic">Selecione uma data para gerenciar.</p>`;
+            return;
+        }
+
+        const escalasDoDia = todasEscalasCache.filter(e => e.data === dataAlvo);
+        if(escalasDoDia.length === 0) {
+            resultadoEscalaGeral.innerHTML = `<p class="text-slate-400 dark:text-zinc-500 italic py-6 text-center bg-slate-50/50 dark:bg-zinc-800/10 rounded-2xl border border-dashed border-slate-200 dark:border-zinc-800">Nenhuma celebração criada para este dia.</p>`;
+            return;
+        }
+
+        resultadoEscalaGeral.innerHTML = "";
+        escalasDoDia.forEach(esc => {
+            let listaCamposHtml = "";
+            const funcoes = [
+                { id: 'altar1', label: 'Altar 1', icone: 'fa-candle-holder' }, { id: 'altar2', label: 'Altar 2', icone: 'fa-candle-holder' },
+                { id: 'altar3', label: 'Altar 3', icone: 'fa-candle-holder' }, { id: 'altar4', label: 'Altar 4', icone: 'fa-candle-holder' },
+                { id: 'altar5', label: 'Altar 5', icone: 'fa-wine-glass' }, { id: 'altar6', label: 'Altar 6', icone: 'fa-wine-glass' },
+                { id: 'turiferario', label: 'Turiferário', icone: 'fa-smudge' }, { id: 'naveteiro', label: 'Naveteiro', icone: 'fa-box-tissue' }
+            ];
+
+            // Geração das opções de seleção (Acólitos e Coroinhas da lista global)
+            let opcoesMembrosSelect = `<option value="">A definir / Vaga Livre</option>`;
+            listaTodosUsuariosGlobal.forEach(u => {
+                opcoesMembrosSelect += `<option value="${u.nome}">${u.nome} (${u.funcao})</option>`;
+            });
+
+            funcoes.forEach(f => {
+                const campoAtivo = f.id.startsWith('altar') ? true : (f.id === 'turiferario' ? esc.turibuloAtivo : esc.navetaAtiva);
+                if (campoAtivo === false) return; 
+
+                const item = esc[f.id];
+                const nomeEscalado = item?.nome || "";
+                const statusText = item?.status || "Pendente";
+
+                let badgeCor = "bg-amber-50 text-amber-800 border-amber-100 dark:bg-amber-950/40 dark:text-amber-400";
+                if(statusText === 'Confirmado') badgeCor = "bg-emerald-50 text-emerald-800 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400";
+                if(statusText === 'Substituição Solicitada') badgeCor = "bg-rose-50 text-rose-800 border-rose-100 dark:bg-rose-950/40 dark:text-rose-400";
+                if(!nomeEscalado) badgeCor = "bg-slate-100 text-slate-400 dark:bg-zinc-800 dark:text-zinc-500 italic";
+
+                listaCamposHtml += `
+                    <div class="bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800/60 p-3 rounded-xl flex flex-col gap-2 shadow-xs">
+                        <div class="flex justify-between items-center text-[11px] font-bold text-slate-500 dark:text-zinc-400">
+                            <span><i class="fa-solid ${f.icone} mr-1 text-[10px]"></i> ${f.label}:</span>
+                            <span class="px-1.5 py-0.5 rounded-sm text-[9px] border ${badgeCor}">${nomeEscalado ? statusText : 'Livre'}</span>
+                        </div>
+                        <select onchange="window.atualizarEscalaMembroDireto('${esc.idDoc}', '${f.id}', this.value)" class="w-full bg-slate-50 dark:bg-zinc-800/40 border border-slate-200 dark:border-zinc-700/60 rounded-lg p-1.5 font-semibold text-slate-700 dark:text-zinc-300 outline-none text-xs focus:border-red-600">
+                            ${opcoesMembrosSelect}
+                        </select>
+                    </div>`;
+            });
+
+            resultadoEscalaGeral.innerHTML += `
+                <div class="border border-slate-100 dark:border-zinc-800/80 rounded-2xl p-4 bg-slate-50/40 dark:bg-zinc-800/20 space-y-3 shadow-xs">
+                    <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-zinc-800 pb-2.5 font-black text-slate-800 dark:text-zinc-100 text-xs sm:text-sm">
+                        <span class="tracking-tight"><i class="fa-solid fa-church text-red-700 dark:text-red-500 mr-1.5 text-xs"></i> ${esc.titulo}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 px-2.5 py-0.5 rounded-lg border border-red-100/60 dark:border-red-900/20 text-xs">${esc.horario}h</span>
+                            <button onclick="window.removerEscalaCompleta('${esc.idDoc}')" class="text-rose-600 hover:text-rose-800 font-bold p-1 cursor-pointer" title="Remover Celebração"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        ${listaCamposHtml}
+                    </div>
+                </div>`;
+            
+            // Forçar sincronização dos selects com os valores atuais salvos no banco
+            setTimeout(() => {
+                escalasDoDia.forEach(e => {
+                    funcoes.forEach(f => {
+                        const sel = document.querySelector(`select[onchange*="'${e.idDoc}'"][onchange*="'${f.id}'"]`);
+                        if(sel) sel.value = e[f.id]?.nome || "";
+                    });
+                });
+            }, 50);
+        });
+    }
+
+    window.atualizarEscalaMembroDireto = async function(idDoc, campoFuncao, novoNome) {
+        const refDoc = doc(db, "escalas", idDoc);
+        const dUp = {};
+        dUp[`${campoFuncao}.nome`] = novoNome;
+        dUp[`${campoFuncao}.status`] = novoNome ? "Confirmado" : "Pendente";
+        
+        try {
+            await updateDoc(refDoc, dUp);
+        } catch(e) {
+            await setDoc(refDoc, dUp, { merge: true });
         }
     };
 
-    async function carregarEditorEscalasPorData(dataString) {
-        if(!containerEditoresMissa) return; containerEditoresMissa.innerHTML = "";
-        let fnd = false;
-
-        try {
-            const consulta = query(collection(db, "escalas"), where("data", "==", dataString));
-            const snapshot = await getDocs(consulta);
-            let listaDeEscalas = [];
-
-            snapshot.forEach(docSnap => {
-                const dadosMissa = docSnap.data();
-                dadosMissa.idDocumentoFirebase = docSnap.id;
-                listaDeEscalas.push(dadosMissa);
-            });
-
-            listaDeEscalas.sort((a, b) => a.horario.localeCompare(b.horario));
-
-            listaDeEscalas.forEach(d => {
-                fnd = true; 
-                const idDoc = d.idDocumentoFirebase;
-                const dv = document.createElement('div');
-                dv.className = "bg-white border border-slate-200 p-5 rounded-2xl space-y-4 text-xs shadow-sm hover:shadow-md transition-all";
-                dv.innerHTML = `
-                    <div class="flex justify-between items-center font-bold border-b border-slate-100 pb-2.5">
-                        <span class="text-amber-950 font-black text-xs">Horário: ${d.horario}h</span>
-                        <span class="bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wide truncate max-w-[180px]">${d.titulo}</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 1</label><input type="text" id="edit-a1-${idDoc}" value="${d.altar1?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-none font-medium"></div>
-                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 2</label><input type="text" id="edit-a2-${idDoc}" value="${d.altar2?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-none font-medium"></div>
-                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 3</label><input type="text" id="edit-a3-${idDoc}" value="${d.altar3?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-none font-medium"></div>
-                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 4</label><input type="text" id="edit-a4-${idDoc}" value="${d.altar4?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-none font-medium"></div>
-                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 5</label><input type="text" id="edit-a5-${idDoc}" value="${d.altar5?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-none font-medium"></div>
-                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 6</label><input type="text" id="edit-a6-${idDoc}" value="${d.altar6?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-none font-medium"></div>
-                    </div>
-                    <div class="flex gap-4 border-t border-slate-100 pt-2.5 font-bold text-slate-700">
-                        <label class="flex items-center gap-1.5 cursor-pointer select-none"><input type="checkbox" id="chk-turi-${idDoc}" ${d.turibuloAtivo?'checked':''} class="w-4 h-4 text-amber-700 border-slate-300 rounded"> Turíbulo Ativo</label>
-                        <label class="flex items-center gap-1.5 cursor-pointer select-none"><input type="checkbox" id="chk-nave-${idDoc}" ${d.navetaAtiva?'checked':''} class="w-4 h-4 text-amber-700 border-slate-300 rounded"> Naveta Ativa</label>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Turiferário</label><input type="text" id="edit-turi-${idDoc}" value="${d.turiferario?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-none font-medium"></div>
-                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Naveteiro</label><input type="text" id="edit-nave-${idDoc}" value="${d.naveteiro?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-none font-medium"></div>
-                    </div>
-                    <div class="flex gap-2 pt-2 border-t border-slate-50">
-                        <button type="button" data-id="${idDoc}" class="btn-salvar-edicao flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-2 rounded-xl font-bold cursor-pointer transition-colors shadow-sm">Salvar Alterações</button>
-                        <button type="button" onclick="excluirEscalaInteira('${idDoc}')" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-2 rounded-xl font-bold cursor-pointer hover:bg-rose-100 transition-colors shadow-sm">Apagar</button>
-                    </div>
-                `; containerEditoresMissa.appendChild(dv);
-            });
-        } catch(erro) { console.error("Erro ao resgatar escalas vigentes: ", erro); }
-
-        if(!fnd) containerEditoresMissa.innerHTML = `<p class="text-xs text-slate-400 italic text-center col-span-2 py-6">Nenhuma escala ativa para esta data.</p>`;
-        else {
-            document.querySelectorAll('.btn-salvar-edicao').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const id = e.currentTarget.getAttribute('data-id');
-                    await updateDoc(doc(db, "escalas", id), {
-                        "altar1.nome": document.getElementById(`edit-a1-${id}`).value, "altar2.nome": document.getElementById(`edit-a2-${id}`).value,
-                        "altar3.nome": document.getElementById(`edit-a3-${id}`).value, "altar4.nome": document.getElementById(`edit-a4-${id}`).value,
-                        "altar5.nome": document.getElementById(`edit-a5-${id}`).value, "altar6.nome": document.getElementById(`edit-a6-${id}`).value,
-                        "turibuloAtivo": document.getElementById(`chk-turi-${id}`).checked, "turiferario.nome": document.getElementById(`edit-turi-${id}`).value,
-                        "navetaAtiva": document.getElementById(`chk-nave-${id}`).checked, "naveteiro.nome": document.getElementById(`edit-nave-${id}`).value
-                    }); alert("Modificações salvas!");
-                });
-            });
+    window.removerEscalaCompleta = async function(idDoc) {
+        if(confirm("Excluir definitivamente esta escala/liturgia completa?")) {
+            await deleteDoc(doc(db, "escalas", idDoc));
         }
-    }
-    editorEscalaData?.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
+    };
 
-    window.switchCoordTab = function(tabID) {
-        document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
-        document.getElementById('sec-' + tabID)?.classList.remove('hidden');
-        const ids = ['usuarios', 'escalas', 'sorteio', 'reunioes', 'material', 'avisos'];
-        ids.forEach(id => {
-            const btn = document.getElementById(`btn-c-${id}`);
-            if(btn) {
-                if(tabID === `coord-${id}` || (id === 'avisos' && tabID === 'coord-avisos-tab')) {
-                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-amber-800 text-white shadow-md";
-                } else {
-                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
-                }
+    buscaEscalaData?.addEventListener('change', renderizarEscalaGeralPorData);
+
+    // Sistema de abas mobile sincronizado
+    window.switchTab = function(tabName) {
+        document.getElementById('conteudo-escalas').className = tabName === 'escalas' ? 'space-y-6 block md:col-span-2' : 'space-y-6 hidden md:col-span-2';
+        document.getElementById('conteudo-mural').className = tabName === 'mural' ? 'space-y-4 block' : 'space-y-4 hidden md:block w-full';
+        document.getElementById('conteudo-usuarios').className = tabName === 'usuarios' ? 'space-y-4 block' : 'space-y-4 hidden md:block w-full';
+        document.getElementById('conteudo-materiais').className = tabName === 'materiais' ? 'space-y-4 block' : 'space-y-4 hidden md:block w-full';
+        
+        const tabs = ['escalas', 'mural', 'usuarios', 'materiais'];
+        tabs.forEach(t => {
+            const el = document.getElementById(`tab-${t}`);
+            if(el) {
+                if(t === tabName) el.className = 'active-tab flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400';
+                else el.className = 'text-gray-500 flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer dark:text-zinc-500';
             }
         });
     }
