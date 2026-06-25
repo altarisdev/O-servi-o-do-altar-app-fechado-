@@ -7,170 +7,237 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 font-sans min-h-screen flex flex-col md:flex-row">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row antialiased">
 
-    <div id="tela-loading" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-amber-700 mb-4"></div>
-        <p class="text-xs font-semibold text-gray-500 tracking-wider uppercase">Carregando Administração...</p>
+    <!-- Tela de Loading -->
+    <div id="tela-loading" class="fixed inset-0 bg-white/95 backdrop-blur-xs z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="animate-spin rounded-full h-10 w-10 border-3 border-amber-700 border-t-transparent mb-4"></div>
+        <p class="text-[11px] font-bold text-slate-400 tracking-wider uppercase">Carregando Administração...</p>
     </div>
 
-    <aside class="bg-amber-950 text-white w-full md:w-64 shrink-0 flex flex-col shadow-xl z-40">
-        <div class="p-5 border-b border-white/10 flex items-center justify-between">
+    <!-- Sidebar / Aside -->
+    <aside class="bg-amber-950 text-white w-full md:w-64 shrink-0 flex flex-col shadow-xl z-40 border-b md:border-b-0 md:border-r border-amber-900/40">
+        <div class="p-5 border-b border-white/5 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center text-base"><i class="fa-solid fa-church"></i></div>
+                <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center text-amber-400 shadow-inner">
+                    <i class="fa-solid fa-church"></i>
+                </div>
                 <div>
-                    <h2 id="nome-usuario-header" class="text-xs font-black leading-tight truncate max-w-[140px]">Carregando...</h2>
-                    <span id="funcao-usuario-header" class="text-[9px] bg-amber-700 px-1.5 py-0.5 rounded-sm font-bold uppercase tracking-wider block mt-0.5 w-fit">...</span>
+                    <h2 id="nome-usuario-header" class="text-xs font-black leading-tight truncate max-w-[140px] tracking-wide">Carregando...</h2>
+                    <span id="funcao-usuario-header" class="text-[9px] bg-amber-700/80 text-amber-100 px-2 py-0.5 rounded font-bold uppercase tracking-widest block mt-1 w-fit">...</span>
                 </div>
             </div>
         </div>
 
-        <nav class="p-4 flex-1 flex flex-col gap-1.5 overflow-y-auto">
-            <button id="btn-c-usuarios" onclick="switchCoordTab('coord-usuarios')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-amber-800 text-white shadow-xs">
-                <i class="fa-solid fa-users text-sm w-5 text-center"></i> Controlar Usuários
+        <nav class="p-4 flex-1 flex flex-col gap-1 overflow-y-auto">
+            <button id="btn-c-usuarios" onclick="switchCoordTab('coord-usuarios')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-amber-800 text-white shadow-md">
+                <i class="fa-solid fa-users text-sm w-5 text-center opacity-90"></i> Controlar Usuários
             </button>
-            <button id="btn-c-escalas" onclick="switchCoordTab('coord-escalas')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
-                <i class="fa-solid fa-calendar-plus text-sm w-5 text-center"></i> Painel de Escalas
+            <button id="btn-c-escalas" onclick="switchCoordTab('coord-escalas')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <i class="fa-solid fa-calendar-plus text-sm w-5 text-center opacity-70"></i> Painel de Escalas
             </button>
-            <button id="btn-c-sorteio" onclick="switchCoordTab('coord-sorteio')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
-                <i class="fa-solid fa-wand-magic-sparkles text-sm w-5 text-center"></i> Sorteio Automático
+            <button id="btn-c-sorteio" onclick="switchCoordTab('coord-sorteio')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <i class="fa-solid fa-wand-magic-sparkles text-sm w-5 text-center opacity-70"></i> Sorteio Automático
             </button>
-            <button id="btn-c-reunioes" onclick="switchCoordTab('coord-reunioes')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
-                <i class="fa-solid fa-clipboard-user text-sm w-5 text-center"></i> Chamada / Reuniões
+            <button id="btn-c-reunioes" onclick="switchCoordTab('coord-reunioes')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <i class="fa-solid fa-clipboard-user text-sm w-5 text-center opacity-70"></i> Chamada / Reuniões
             </button>
-            <button id="btn-c-material" onclick="switchCoordTab('coord-material')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
-                <i class="fa-solid fa-cloud-arrow-up text-sm w-5 text-center"></i> Postar Conteúdos
+            <button id="btn-c-material" onclick="switchCoordTab('coord-material')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <i class="fa-solid fa-cloud-arrow-up text-sm w-5 text-center opacity-70"></i> Postar Conteúdos
             </button>
-            <button id="btn-c-avisos" onclick="switchCoordTab('coord-avisos-tab')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
-                <i class="fa-solid fa-bullhorn text-sm w-5 text-center"></i> Mudar Avisos
+            <button id="btn-c-avisos" onclick="switchCoordTab('coord-avisos-tab')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <i class="fa-solid fa-bullhorn text-sm w-5 text-center opacity-70"></i> Mudar Avisos
             </button>
         </nav>
 
-        <div class="p-4 border-t border-white/10 bg-amber-950/50">
-            <button id="btn-logout" class="w-full bg-white/10 hover:bg-rose-900/40 hover:text-rose-200 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all border border-white/5">
-                <span>Encerrar Sessão</span> <i class="fa-solid fa-arrow-right-from-bracket text-[11px]"></i>
+        <div class="p-4 border-t border-white/5 bg-amber-950/40">
+            <button id="btn-logout" class="w-full bg-white/5 hover:bg-rose-950/40 hover:text-rose-300 hover:border-rose-900/50 p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all border border-white/5 shadow-xs">
+                <span>Encerrar Sessão</span> <i class="fa-solid fa-arrow-right-from-bracket text-[10px] opacity-80"></i>
             </button>
         </div>
     </aside>
 
+    <!-- Conteúdo Principal -->
     <main class="flex-1 p-4 md:p-6 overflow-y-auto max-w-7xl w-full mx-auto space-y-6">
 
         <!-- SEÇÃO USUÁRIOS -->
         <section id="sec-coord-usuarios" class="hidden-coord-tab grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 h-fit space-y-4">
-                <div><h3 class="text-sm font-black text-gray-800">Cadastrar Novo Membro</h3></div>
-                <form id="form-cadastro-usuario" class="space-y-3">
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 h-fit space-y-4">
+                <div class="border-b border-slate-100 pb-2">
+                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Cadastrar Novo Membro</h3>
+                </div>
+                <form id="form-cadastro-usuario" class="space-y-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nível / Tipo de Conta</label>
-                        <select id="cad-funcao" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-semibold text-gray-700">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nível / Tipo de Conta</label>
+                        <select id="cad-funcao" class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl p-2.5 text-xs font-semibold text-slate-700 outline-hidden transition-all">
                             <option value="Coroinha">Coroinha / Acólito</option>
                             <option value="Coordenador">Coordenador</option>
                         </select>
                     </div>
-                    <div class="flex items-center gap-2 pt-1 pb-1">
-                        <input type="checkbox" id="chk-possui-irmao" class="w-4 h-4 text-amber-700 border-gray-300 rounded focus:ring-amber-500 cursor-pointer">
-                        <label for="chk-possui-irmao" class="text-xs font-bold text-gray-700 cursor-pointer select-none">Possui irmão já cadastrado?</label>
+                    <div class="flex items-center gap-2.5 py-1">
+                        <input type="checkbox" id="chk-possui-irmao" class="w-4 h-4 text-amber-700 border-slate-300 rounded-sm focus:ring-amber-500 cursor-pointer">
+                        <label for="chk-possui-irmao" class="text-xs font-bold text-slate-700 cursor-pointer select-none">Possui irmão já cadastrado?</label>
                     </div>
-                    <div id="div-lista-irmaos" class="hidden bg-blue-50/50 p-3 rounded-xl border border-blue-100 space-y-1.5">
-                        <label class="block text-[10px] font-bold text-blue-800 uppercase">Selecione o Irmão Cadastrado</label>
-                        <select id="cad-irmao-titular-select" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs font-medium text-gray-800"></select>
+                    <div id="div-lista-irmaos" class="hidden bg-sky-50/60 p-3.5 rounded-xl border border-sky-100 space-y-2 animate-fadeIn">
+                        <label class="block text-[10px] font-bold text-sky-800 uppercase tracking-wider">Selecione o Irmão Cadastrado</label>
+                        <select id="cad-irmao-titular-select" class="w-full bg-white border border-sky-200 focus:border-sky-500 rounded-xl p-2.5 text-xs font-medium text-slate-800 outline-hidden"></select>
                     </div>
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nome Completo</label><input type="text" id="cad-nome" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">E-mail de Login Único</label><input type="email" id="cad-email" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Senha de Acesso</label><div class="flex gap-2"><input type="text" id="cad-senha" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-mono font-bold"><button type="button" id="btn-gerar-senha" class="bg-gray-800 text-white px-2.5 rounded-lg text-xs font-bold cursor-pointer"><i class="fa-solid fa-key"></i></button></div></div>
-                    <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-xs cursor-pointer">Registrar Membro</button>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nome Completo</label>
+                        <input type="text" id="cad-nome" required class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl p-2.5 text-xs font-medium outline-hidden transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">E-mail de Login Único</label>
+                        <input type="email" id="cad-email" required class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl p-2.5 text-xs font-medium outline-hidden transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Senha de Acesso</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="cad-senha" required class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl p-2.5 text-xs font-mono font-bold tracking-wide outline-hidden transition-all">
+                            <button type="button" id="btn-gerar-senha" class="bg-slate-800 hover:bg-slate-900 text-white px-3.5 rounded-xl text-xs font-bold cursor-pointer transition-colors shadow-xs" title="Gerar Senha">
+                                <i class="fa-solid fa-key text-[11px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold py-2.5 rounded-xl shadow-xs hover:shadow-md cursor-pointer transition-all active:scale-[0.99] mt-2">Registrar Membro</button>
                 </form>
             </div>
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 flex flex-col">
-                <div class="mb-3 flex justify-between items-center"><div><h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3></div><input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-xs font-medium"></div>
-                <div class="overflow-x-auto"><table class="w-full text-left text-xs border-collapse"><thead><tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] border-b"><th class="p-3">Nome</th><th class="p-3">E-mail</th><th class="p-3">Senha</th><th class="p-3">Vínculo</th><th class="p-3 text-center">Tipo</th><th class="p-3 text-center">Ações</th></tr></thead><tbody id="tabela-usuarios-recuperacao"></tbody></table></div>
+            
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 lg:col-span-2 flex flex-col h-fit">
+                <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3">
+                    <div>
+                        <h3 class="text-sm font-black text-slate-800 tracking-wide">Lista Geral do Presbitério</h3>
+                    </div>
+                    <div class="relative w-full sm:w-64">
+                        <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none"><i class="fa-solid fa-magnifying-glass text-[11px]"></i></span>
+                        <input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl pl-8 pr-3 py-1.5 text-xs font-medium outline-hidden transition-all">
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 font-bold uppercase text-[9px] tracking-wider border-b border-slate-100">
+                                <th class="p-3">Nome</th>
+                                <th class="p-3">E-mail</th>
+                                <th class="p-3">Senha Provisória</th>
+                                <th class="p-3">Vínculo</th>
+                                <th class="p-3 text-center">Tipo</th>
+                                <th class="p-3 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-usuarios-recuperacao" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
         <!-- SEÇÃO ESCALAS -->
         <section id="sec-coord-escalas" class="hidden-coord-tab hidden space-y-4">
-            <div class="bg-white p-4 rounded-xl shadow-xs border border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <div><h3 class="text-sm font-black text-gray-800">Visualizar / Editar / Apagar Escalas Vigentes</h3></div>
-                <input type="date" id="editor-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold">
+            <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Visualizar / Editar / Apagar Escalas Vigentes</h3>
+                </div>
+                <input type="date" id="editor-escala-data" class="bg-slate-50 border border-slate-200 focus:border-amber-600 rounded-xl p-2 text-xs font-bold text-slate-700 cursor-pointer outline-hidden transition-colors">
             </div>
-            <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200 space-y-3">
-                <h4 class="text-xs font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-plus"></i> Adicionar Celebração Extra / Solenidade nesta Data</h4>
-                <form id="form-criar-escala-manual" class="flex flex-col sm:flex-row gap-2 items-end">
+            
+            <div class="bg-amber-50/60 p-4 rounded-2xl border border-amber-200/70 space-y-3">
+                <h4 class="text-xs font-black text-amber-900 flex items-center gap-2"><i class="fa-solid fa-circle-plus text-amber-700"></i> Adicionar Celebração Extra / Solenidade nesta Data</h4>
+                <form id="form-criar-escala-manual" class="flex flex-col sm:flex-row gap-3 items-end">
                     <div class="flex-1 w-full">
-                        <label class="block text-[10px] font-bold text-amber-800 uppercase mb-0.5">Título da Celebração</label>
-                        <input type="text" id="add-manual-titulo" required placeholder="Ex: Missa de Solenidade de Corpus Christi" class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs font-medium focus:outline-amber-700">
+                        <label class="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Título da Celebração</label>
+                        <input type="text" id="add-manual-titulo" required placeholder="Ex: Missa de Solenidade de Corpus Christi" class="w-full bg-white border border-amber-200 focus:border-amber-700 rounded-xl p-2.5 text-xs font-medium outline-hidden transition-colors">
                     </div>
-                    <div class="w-full sm:w-32">
-                        <label class="block text-[10px] font-bold text-amber-800 uppercase mb-0.5">Horário</label>
-                        <input type="time" id="add-manual-horario" required class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs font-bold focus:outline-amber-700">
+                    <div class="w-full sm:w-36">
+                        <label class="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Horário</label>
+                        <input type="time" id="add-manual-horario" required class="w-full bg-white border border-amber-200 focus:border-amber-700 rounded-xl p-2.5 text-xs font-bold outline-hidden transition-colors">
                     </div>
-                    <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs px-4 py-2.5 rounded-lg whitespace-nowrap cursor-pointer w-full sm:w-auto shadow-xs transition-all">Criar Escala</button>
+                    <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs px-5 py-2.5 rounded-xl whitespace-nowrap cursor-pointer w-full sm:w-auto shadow-xs hover:shadow-md transition-all active:scale-[0.98]">Criar Escala</button>
                 </form>
             </div>
+            
             <div id="container-editores-missa" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
         <!-- SEÇÃO SORTEIO -->
         <section id="sec-coord-sorteio" class="hidden-coord-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 h-fit">
-                <div><h3 class="text-sm font-black text-gray-800">Gerador Automático</h3></div>
-                <div class="space-y-3">
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Mês de Referência</label><input type="month" id="enq-mes-alvo" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700"></div>
-                    <div class="flex gap-2"><button id="btn-disparar-enquete" class="flex-1 bg-blue-700 text-white font-bold text-xs py-2 rounded-lg cursor-pointer">Abrir Pesquisa</button><button id="btn-fechar-enquete" class="flex-1 bg-gray-800 text-white font-bold text-xs py-2 rounded-lg cursor-pointer">Fechar</button></div>
-                    <button type="button" id="btn-limpar-escalas-mes" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs py-2 rounded-lg cursor-pointer mt-1 shadow-2xs transition-all"><i class="fa-solid fa-trash-can mr-1"></i> Apagar Todas as Escalas do Mês</button>
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 space-y-4 h-fit">
+                <div class="border-b border-slate-100 pb-2">
+                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Gerador Automático</h3>
                 </div>
-                <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-100"><h4 class="text-[11px] font-bold text-amber-900 uppercase">Fila de Respostas</h4><div id="lista-fila-prioridade" class="space-y-1 max-h-24 overflow-y-auto"></div></div>
-                <form id="form-escala-automatica" class="space-y-3">
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Título Padrão das Missas</label><input type="text" id="auto-titulo" required placeholder="Ex: Santa Missa" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
-                    <button type="submit" class="w-full bg-amber-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-xs cursor-pointer"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Lançar Escalas do Mês</button>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mês de Referência</label>
+                        <input type="month" id="enq-mes-alvo" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 cursor-pointer outline-hidden">
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="btn-disparar-enquete" class="flex-1 bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs py-2 rounded-xl transition-colors cursor-pointer shadow-2xs">Abrir Pesquisa</button>
+                        <button id="btn-fechar-enquete" class="flex-1 bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs py-2 rounded-xl transition-colors cursor-pointer shadow-2xs">Fechar</button>
+                    </div>
+                    <button type="button" id="btn-limpar-escalas-mes" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs py-2 rounded-xl cursor-pointer mt-1 shadow-2xs transition-all active:scale-[0.99]"><i class="fa-solid fa-trash-can mr-1.5 text-[11px]"></i> Apagar Todas as Escalas do Mês</button>
+                </div>
+                
+                <div class="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100/70">
+                    <h4 class="text-[10px] font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i class="fa-solid fa-arrow-down-short-wide"></i> Fila de Respostas</h4>
+                    <div id="lista-fila-prioridade" class="space-y-1 max-h-32 overflow-y-auto pr-1"></div>
+                </div>
+                
+                <form id="form-escala-automatica" class="space-y-3 pt-2 border-t border-slate-100">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Título Padrão das Missas</label>
+                        <input type="text" id="auto-titulo" required placeholder="Ex: Santa Missa" class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 rounded-xl p-2.5 text-xs font-medium outline-hidden">
+                    </div>
+                    <button type="submit" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2.5 rounded-xl text-xs shadow-xs hover:shadow-md transition-all cursor-pointer"><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> Lançar Escalas do Mês</button>
                 </form>
             </div>
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 space-y-3">
-                <div><h3 class="text-sm font-black text-gray-800">Lista de Disponibilidade Recebida</h3></div>
-                <div id="lista-nomes-enquete" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto bg-gray-50 p-3 rounded-xl border"></div>
+            
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 lg:col-span-2 space-y-4">
+                <div class="border-b border-slate-100 pb-2">
+                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Lista de Disponibilidade Recebida</h3>
+                </div>
+                <div id="lista-nomes-enquete" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[480px] overflow-y-auto bg-slate-50 p-3.5 rounded-2xl border border-slate-200/60"></div>
             </div>
         </section>
 
-        <!-- SEÇÃO REUNIÕES (ATUALIZADA) -->
-        <section id="sec-coord-reunioes" class="hidden-coord-tab hidden max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-xs border border-gray-200 space-y-5">
-            <div class="border-b border-gray-100 pb-4">
-                <h3 class="text-sm font-black text-gray-800">Chamada e Configuração de Reuniões</h3>
-                <p class="text-[11px] text-gray-400">Gerencie a data, horário, pauta e execute o controle de presenças.</p>
+        <!-- SEÇÃO REUNIÕES -->
+        <section id="sec-coord-reunioes" class="hidden-coord-tab hidden max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 space-y-5">
+            <div class="border-b border-slate-100 pb-4">
+                <h3 class="text-sm font-black text-slate-800 tracking-wide">Chamada e Configuração de Reuniões</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">Gerencie a data, horário, pauta e execute o controle de presenças com salvamento em nuvem.</p>
             </div>
 
             <!-- Painel de Seleção de Detalhes da Reunião -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200/60">
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Data da Reunião:</label>
-                    <input type="date" id="chamada-reuniao-data" class="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700 focus:outline-amber-700">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Data da Reunião:</label>
+                    <input type="date" id="chamada-reuniao-data" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-amber-700">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Horário:</label>
-                    <input type="time" id="chamada-reuniao-horario" class="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700 focus:outline-amber-700">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Horário:</label>
+                    <input type="time" id="chamada-reuniao-horario" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-amber-700">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Título / Pauta:</label>
-                    <input type="text" id="chamada-reuniao-titulo" placeholder="Ex: Encontro Mensal / Formação" class="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-medium text-gray-700 focus:outline-amber-700">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Título / Pauta:</label>
+                    <input type="text" id="chamada-reuniao-titulo" placeholder="Ex: Encontro Mensal / Formação" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-amber-700">
                 </div>
             </div>
 
             <div class="space-y-4">
-                <div class="bg-amber-50/40 border border-amber-200/60 rounded-xl p-3 flex flex-wrap justify-between items-center text-xs gap-3">
-                    <span class="font-semibold text-amber-900"><i class="fa-solid fa-list-check"></i> Painel de Presenças Ativo</span>
-                    <div class="flex gap-3 text-[10px] font-bold uppercase tracking-wider">
-                        <span class="text-emerald-700">✓ Presente</span>
-                        <span class="text-rose-700">X Falta</span>
-                        <span class="text-blue-700">FJ Justificada</span>
+                <div class="bg-amber-50/50 border border-amber-200/60 rounded-xl p-3 flex flex-wrap justify-between items-center text-xs gap-3">
+                    <span class="font-bold text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-list-check text-amber-700"></i> Painel de Presenças Ativo</span>
+                    <div class="flex gap-3 text-[10px] font-black uppercase tracking-wider">
+                        <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/40">✓ Presente</span>
+                        <span class="text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200/40 font-bold">X Falta</span>
+                        <span class="text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/40 font-bold">FJ Justificada</span>
                     </div>
                 </div>
 
-                <div id="lista-chamada-coroinhas" class="divide-y divide-gray-100 max-h-[450px] overflow-y-auto pr-1">
-                    <p class="text-xs text-gray-400 italic py-4 text-center">Selecione uma data válida para iniciar a chamada.</p>
+                <div id="lista-chamada-coroinhas" class="divide-y divide-slate-100 max-h-[450px] overflow-y-auto pr-1">
+                    <p class="text-xs text-slate-400 italic py-6 text-center">Selecione uma data válida para iniciar a chamada.</p>
                 </div>
 
                 <div class="pt-2 flex justify-end">
-                    <button type="button" id="btn-salvar-chamada" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-xs transition-all cursor-pointer">
-                        <i class="fa-solid fa-floppy-disk mr-1"></i> Gravar Reunião e Chamada
+                    <button type="button" id="btn-salvar-chamada" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-[0.98]">
+                        <i class="fa-solid fa-floppy-disk mr-1.5 text-[11px]"></i> Gravar Reunião e Chamada
                     </button>
                 </div>
             </div>
@@ -178,25 +245,44 @@
 
         <!-- SEÇÃO MATERIAL -->
         <section id="sec-coord-material" class="hidden-coord-tab hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 h-fit">
-                <div><h3 class="text-sm font-black text-gray-800">Adicionar Material Didático</h3></div>
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 space-y-4 h-fit">
+                <div class="border-b border-slate-100 pb-2">
+                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Adicionar Material Didático</h3>
+                </div>
                 <form id="form-upload-formacao" class="space-y-3">
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Título do Material</label><input type="text" id="form-titulo-input" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">URL do Conteúdo (Drive/Link)</label><input type="url" id="form-url-input" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
-                    <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2.5 rounded-lg shadow-xs cursor-pointer">Publicar Conteúdo</button>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Título do Material</label>
+                        <input type="text" id="form-titulo-input" required placeholder="Ex: Manual Litúrgico 2026" class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 rounded-xl p-2.5 text-xs font-medium outline-hidden">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">URL do Conteúdo (Drive/Link)</label>
+                        <input type="url" id="form-url-input" required placeholder="https://drive.google.com/..." class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 rounded-xl p-2.5 text-xs font-medium outline-hidden">
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold py-2.5 rounded-xl shadow-xs cursor-pointer transition-colors mt-2">Publicar Conteúdo</button>
                 </form>
             </div>
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 md:col-span-2">
-                <h3 class="text-sm font-black text-gray-800 mb-3">Materiais Visíveis para os Coroinhas</h3>
-                <div id="lista-adm-materiais" class="space-y-2"><p class="text-xs text-gray-400 italic">Buscando lista...</p></div>
+            
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 md:col-span-2 space-y-4">
+                <div class="border-b border-slate-100 pb-2">
+                    <h3 class="text-sm font-black text-slate-800 tracking-wide">Materiais Visíveis para os Coroinhas</h3>
+                </div>
+                <div id="lista-adm-materiais" class="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                    <p class="text-xs text-slate-400 italic">Buscando lista...</p>
+                </div>
             </div>
         </section>
 
         <!-- SEÇÃO AVISOS -->
-        <section id="sec-coord-avisos-tab" class="hidden-coord-tab hidden max-w-xl bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
+        <section id="sec-coord-avisos-tab" class="hidden-coord-tab hidden max-w-xl bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 space-y-4">
+            <div class="border-b border-slate-100 pb-2">
+                <h3 class="text-sm font-black text-slate-800 tracking-wide">Mural de Comunicados</h3>
+            </div>
             <form id="form-publicar-aviso" class="space-y-3">
-                <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Texto do Comunicado Geral</label><textarea id="txt-aviso-coordenador" required rows="6" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs"></textarea></div>
-                <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2.5 rounded-lg cursor-pointer">Publicar no Mural</button>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Texto do Comunicado Geral</label>
+                    <textarea id="txt-aviso-coordenador" required rows="6" placeholder="Escreva o aviso geral que será exibido no topo da tela inicial de todos os coroinhas..." class="w-full bg-slate-50 border border-slate-200 focus:border-amber-600 focus:bg-white rounded-xl p-3.5 text-xs font-medium outline-hidden transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer transition-colors shadow-xs">Publicar no Mural</button>
             </form>
         </section>
     </main>
@@ -230,9 +316,9 @@
     const divListaIrmaos = document.getElementById('div-lista-irmaos');
     const selectIrmaoTitular = document.getElementById('cad-irmao-titular-select');
     
-    // Elementos da Chamada (Atualizados)
+    // Elementos da Chamada
     const chamadaReuniaoData = document.getElementById('chamada-reuniao-data');
-    const chamadaReuniaoHorario = document.getElementById('chamada-reuniao-horario');
+    const llamadaReuniaoHorario = document.getElementById('chamada-reuniao-horario');
     const chamadaReuniaoTitulo = document.getElementById('chamada-reuniao-titulo');
     const listaChamadaCoroinhas = document.getElementById('lista-chamada-coroinhas');
     const btnSalvarChamada = document.getElementById('btn-salvar-chamada');
@@ -286,8 +372,8 @@
         }
         if(chamadaReuniaoData) {
             chamadaReuniaoData.value = new Date().toISOString().split('T')[0];
-            chamadaReuniaoHorario.value = "15:00"; // Padrão inicial
-            chamadaReuniaoTitulo.value = "Reunião de Formação"; // Padrão inicial
+            chamadaReuniaoHorario.value = "15:00"; 
+            chamadaReuniaoTitulo.value = "Reunião de Formação"; 
             carregarListaDeChamada(chamadaReuniaoData.value);
         }
     }
@@ -342,14 +428,14 @@
         const termo = buscaUsuarioLista?.value.toLowerCase() || "";
         cacheTodosUsuarios.filter(u => u.nome.toLowerCase().includes(termo)).forEach(u => {
             let badgeTipo = u.funcao === "Coordenador" ? `<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Coordenação</span>` : `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Oficial</span>`;
-            let colunaConexao = u.email_conexao ? `<span class="text-blue-700 font-bold text-[11px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">Irmão de: ${u.email_conexao}</span>` : `<span class="text-gray-400 italic text-[11px]">Nenhum</span>`;
-            let senhaExibicao = u.senha_provisoria || `<span class="text-gray-400 italic">Alterada</span>`;
-            b.innerHTML += `<tr class="border-b hover:bg-gray-50/50"><td class="p-3 font-semibold">${u.nome}</td><td class="p-3 font-mono text-gray-600">${u.email}</td><td class="p-3 font-mono font-bold text-amber-800">${senhaExibicao}</td><td class="p-3">${colunaConexao}</td><td class="p-3 text-center">${badgeTipo}</td><td class="p-3 text-center"><button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2 py-1 rounded border border-rose-200 text-[11px] hover:bg-rose-100 cursor-pointer">Excluir</button></td></tr>`;
+            let colunaConexao = u.email_conexao ? `<span class="text-blue-700 font-bold text-[11px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">Irmão de: ${u.email_conexao}</span>` : `<span class="text-slate-400 italic text-[11px]">Nenhum</span>`;
+            let senhaExibicao = u.senha_provisoria || `<span class="text-slate-400 italic">Alterada</span>`;
+            b.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50/70 transition-colors"><td class="p-3 font-semibold text-slate-800">${u.nome}</td><td class="p-3 font-mono text-slate-500">${u.email}</td><td class="p-3 font-mono font-bold text-amber-800">${senhaExibicao}</td><td class="p-3">${colunaConexao}</td><td class="p-3 text-center">${badgeTipo}</td><td class="p-3 text-center"><button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200/50 text-[11px] hover:bg-rose-100 transition-colors cursor-pointer shadow-3xs">Excluir</button></td></tr>`;
         });
     }
     buscaUsuarioLista?.addEventListener('input', renderizarTabelaUsuarios);
 
-    // LÓGICA DO SISTEMA DE REUNIÕES (ATUALIZADA)
+    // LÓGICA DO SISTEMA DE REUNIÕES
     async function carregarListaDeChamada(dataString) {
         if(!dataString) return;
         mapaPresencaAtual = {};
@@ -373,7 +459,7 @@
         const listaCoroinhas = cacheTodosUsuarios.filter(u => u.funcao !== "Coordenador");
         
         if(listaCoroinhas.length === 0) {
-            listaChamadaCoroinhas.innerHTML = `<p class="text-xs text-gray-400 italic py-4 text-center">Nenhum coroinha cadastrado no sistema.</p>`;
+            listaChamadaCoroinhas.innerHTML = `<p class="text-xs text-slate-400 italic py-6 text-center">Nenhum coroinha cadastrado no sistema.</p>`;
             return;
         }
 
@@ -381,15 +467,15 @@
         listaCoroinhas.forEach(c => {
             const statusAtual = mapaPresencaAtual[c.nome] || "presente";
             listaChamadaCoroinhas.innerHTML += `
-                <div class="flex justify-between items-center py-2.5 px-1 hover:bg-gray-50/60 transition-all">
+                <div class="flex justify-between items-center py-3 px-2 hover:bg-slate-50/80 transition-all rounded-xl my-0.5">
                     <div class="flex flex-col">
-                        <span class="text-xs font-bold text-gray-800">${c.nome}</span>
-                        <span class="text-[10px] text-gray-400 font-mono">${c.email}</span>
+                        <span class="text-xs font-bold text-slate-800">${c.nome}</span>
+                        <span class="text-[10px] text-slate-400 font-mono mt-0.5">${c.email}</span>
                     </div>
-                    <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200/60">
-                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'presente')" id="btn-p-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'presente' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">✓ P</button>
-                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'falta')" id="btn-f-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'falta' ? 'bg-rose-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">X F</button>
-                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'justificada')" id="btn-j-${c.nome.replace(/\s+/g, '')}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'justificada' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">FJ</button>
+                    <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/60">
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'presente')" id="btn-p-${c.nome.replace(/\s+/g, '')}" class="px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'presente' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'}">✓ P</button>
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'falta')" id="btn-f-${c.nome.replace(/\s+/g, '')}" class="px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'falta' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'}">X F</button>
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'justificada')" id="btn-j-${c.nome.replace(/\s+/g, '')}" class="px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'justificada' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'}">FJ</button>
                     </div>
                 </div>
             `;
@@ -403,9 +489,9 @@
         const btnF = document.getElementById(`btn-f-${idLimpo}`);
         const btnJ = document.getElementById(`btn-j-${idLimpo}`);
 
-        if(btnP) btnP.className = `px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'presente' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}`;
-        if(btnF) btnF.className = `px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'falta' ? 'bg-rose-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}`;
-        if(btnJ) btnJ.className = `px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'justificada' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}`;
+        if(btnP) btnP.className = `px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'presente' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'}`;
+        if(btnF) btnF.className = `px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'falta' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'}`;
+        if(btnJ) btnJ.className = `px-3 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'justificada' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'}`;
     };
 
     btnSalvarChamada?.addEventListener('click', async () => {
@@ -448,11 +534,11 @@
     function ouvirMateriaisComoAdmin() {
         const container = document.getElementById('lista-adm-materiais');
         onSnapshot(collection(db, "formacao"), (snap) => {
-            if(snap.empty) { container.innerHTML = `<p class="text-xs text-gray-400 italic">Nenhum arquivo ativo.</p>`; return; }
+            if(snap.empty) { container.innerHTML = `<p class="text-xs text-slate-400 italic py-2">Nenhum arquivo ativo.</p>`; return; }
             container.innerHTML = "";
             snap.forEach(d => {
                 const mat = d.data();
-                container.innerHTML += `<div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-xs"><div><strong class="text-gray-800 block">${mat.titulo}</strong><span class="text-[10px] text-gray-400 font-mono">${mat.url}</span></div><button onclick="window.removerConteudoDidatico('${d.id}')" class="bg-rose-50 border border-rose-200 text-rose-700 px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-rose-100 cursor-pointer">Excluir</button></div>`;
+                container.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-200/60 text-xs transition-colors hover:bg-slate-100/50"><div><strong class="text-slate-800 block font-bold">${mat.titulo}</strong><span class="text-[10px] text-slate-400 font-mono block mt-0.5 truncate max-w-xs sm:max-w-md">${mat.url}</span></div><button onclick="window.removerConteudoDidatico('${d.id}')" class="bg-rose-50 border border-rose-200 text-rose-700 px-3 py-1 rounded-xl text-[10px] font-extrabold hover:bg-rose-100 transition-colors cursor-pointer shadow-3xs">Excluir</button></div>`;
             });
         });
     }
@@ -468,14 +554,14 @@
             if(fila) {
                 fila.innerHTML = ""; let arr = Object.keys(mapaRespostasGerais).map(n => ({nome: n, t: mapaRespostasGerais[n].respondidoEm || 0}));
                 arr.sort((a,b) => a.t - b.t);
-                if(arr.length===0) fila.innerHTML = `<p class="text-[10px] text-gray-400 italic">Ninguém respondeu ainda.</p>`;
-                else arr.forEach((v, i) => fila.innerHTML += `<div class="flex justify-between bg-white px-2 py-0.5 rounded border text-[11px]"><span class="font-bold">${i+1}. ${v.nome}</span></div>`);
+                if(arr.length===0) fila.innerHTML = `<p class="text-[10px] text-slate-400 italic py-1">Ninguém respondeu ainda.</p>`;
+                else arr.forEach((v, i) => fila.innerHTML += `<div class="flex justify-between bg-white px-2.5 py-1 rounded-lg border border-slate-100 text-[11px] font-medium shadow-3xs"><span class="font-bold text-slate-700">${i+1}. ${v.nome}</span></div>`);
             }
             const container = document.getElementById('lista-nomes-enquete');
             if(container && dados.celebracoes) {
                 container.innerHTML = ""; dados.celebracoes.forEach(cel => {
                     let aptos = []; Object.keys(mapaRespostasGerais).forEach(n => { if((mapaRespostasGerais[n].escolhas||[]).includes(cel.idChave)) aptos.push(n); });
-                    container.innerHTML += `<div class="bg-white p-1 border rounded mb-1"><strong class="text-amber-900 text-[10px] block border-b">${cel.data.split('-').reverse().join('/')} - ${cel.rotulo}:</strong><p class="text-[10px] text-emerald-700 font-medium">${aptos.length>0?'✓ '+aptos.join(', '):'Ninguém'}</p></div>`;
+                    container.innerHTML += `<div class="bg-white p-2.5 border border-slate-200/80 rounded-xl mb-1.5 shadow-3xs"><strong class="text-amber-950 text-[10px] block border-b border-slate-100 pb-1">${cel.data.split('-').reverse().join('/')} — ${cel.rotulo} (${cel.horario}h):</strong><p class="text-[10px] text-emerald-700 font-bold mt-1 flex items-center gap-1">${aptos.length>0?'✓ '+aptos.join(', '):'<span class="text-slate-400 font-normal italic">Nenhum irmão disponível</span>'}</p></div>`;
                 });
             }
         });
@@ -484,7 +570,7 @@
     document.getElementById('form-publicar-aviso')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         await setDoc(doc(db, "mural", "aviso_geral"), { texto: document.getElementById('txt-aviso-coordenador').value, dataPublicacao: new Date().toLocaleDateString('pt-BR') });
-        alert("Mural atualizado!");
+        alert("Mural updated!");
     });
 
     async function carregarAvisoNoInputCoordenador() {
@@ -621,34 +707,37 @@
                 fnd = true; 
                 const idDoc = d.idDocumentoFirebase;
                 const dv = document.createElement('div');
-                dv.className = "bg-white border p-5 rounded-2xl space-y-3 text-xs shadow-xs border-gray-200";
+                dv.className = "bg-white border border-slate-200/80 p-5 rounded-2xl space-y-4 text-xs shadow-xs hover:shadow-sm transition-all";
                 dv.innerHTML = `
-                    <div class="flex justify-between items-center font-bold border-b pb-2">
-                        <span class="text-amber-950">Horário: ${d.horario}h</span>
-                        <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[10px]">${d.titulo}</span>
+                    <div class="flex justify-between items-center font-bold border-b border-slate-100 pb-2.5">
+                        <span class="text-amber-950 font-black text-xs">Horário: ${d.horario}h</span>
+                        <span class="bg-amber-100/70 text-amber-900 px-2.5 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wide truncate max-w-[180px]">${d.titulo}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 1</label><input type="text" id="edit-a1-${idDoc}" value="${d.altar1?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
-                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 2</label><input type="text" id="edit-a2-${idDoc}" value="${d.altar2?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
-                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 3</label><input type="text" id="edit-a3-${idDoc}" value="${d.altar3?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
-                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 4</label><input type="text" id="edit-a4-${idDoc}" value="${d.altar4?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
-                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 5</label><input type="text" id="edit-a5-${idDoc}" value="${d.altar5?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
-                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 6</label><input type="text" id="edit-a6-${idDoc}" value="${d.altar6?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 1</label><input type="text" id="edit-a1-${idDoc}" value="${d.altar1?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-hidden font-medium"></div>
+                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 2</label><input type="text" id="edit-a2-${idDoc}" value="${d.altar2?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-hidden font-medium"></div>
+                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 3</label><input type="text" id="edit-a3-${idDoc}" value="${d.altar3?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-hidden font-medium"></div>
+                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 4</label><input type="text" id="edit-a4-${idDoc}" value="${d.altar4?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-hidden font-medium"></div>
+                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 5</label><input type="text" id="edit-a5-${idDoc}" value="${d.altar5?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-hidden font-medium"></div>
+                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Altar 6</label><input type="text" id="edit-a6-${idDoc}" value="${d.altar6?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-hidden font-medium"></div>
                     </div>
-                    <div class="flex gap-4 border-t pt-2"><label class="flex items-center gap-1"><input type="checkbox" id="chk-turi-${idDoc}" ${d.turibuloAtivo?'checked':''}> Turíbulo</label><label class="flex items-center gap-1"><input type="checkbox" id="chk-nave-${idDoc}" ${d.navetaAtiva?'checked':''}> Naveta</label></div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Turiferário</label><input type="text" id="edit-turi-${idDoc}" value="${d.turiferario?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
-                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Naveteiro</label><input type="text" id="edit-nave-${idDoc}" value="${d.naveteiro?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                    <div class="flex gap-4 border-t border-slate-100 pt-2.5 font-bold text-slate-700">
+                        <label class="flex items-center gap-1.5 cursor-pointer select-none"><input type="checkbox" id="chk-turi-${idDoc}" ${d.turibuloAtivo?'checked':''} class="w-4 h-4 text-amber-700 border-slate-300 rounded-sm"> Turíbulo Ativo</label>
+                        <label class="flex items-center gap-1.5 cursor-pointer select-none"><input type="checkbox" id="chk-nave-${idDoc}" ${d.navetaAtiva?'checked':''} class="w-4 h-4 text-amber-700 border-slate-300 rounded-sm"> Naveta Ativa</label>
                     </div>
-                    <div class="flex gap-2 pt-2">
-                        <button type="button" data-id="${idDoc}" class="btn-salvar-edicao flex-1 bg-emerald-700 text-white py-2 rounded-xl font-bold cursor-pointer hover:bg-emerald-800">Salvar Alterações</button>
-                        <button type="button" onclick="excluirEscalaInteira('${idDoc}')" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-2 rounded-xl font-bold cursor-pointer hover:bg-rose-100">Apagar</button>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Turiferário</label><input type="text" id="edit-turi-${idDoc}" value="${d.turiferario?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-hidden font-medium"></div>
+                        <div><label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Naveteiro</label><input type="text" id="edit-nave-${idDoc}" value="${d.naveteiro?.nome||''}" class="w-full border border-slate-200 p-2 bg-slate-50 rounded-xl focus:bg-white focus:border-amber-600 outline-hidden font-medium"></div>
+                    </div>
+                    <div class="flex gap-2 pt-2 border-t border-slate-50">
+                        <button type="button" data-id="${idDoc}" class="btn-salvar-edicao flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-2 rounded-xl font-bold cursor-pointer transition-colors shadow-2xs">Salvar Alterações</button>
+                        <button type="button" onclick="excluirEscalaInteira('${idDoc}')" class="bg-rose-50 text-rose-700 border border-rose-200/50 px-3 py-2 rounded-xl font-bold cursor-pointer hover:bg-rose-100 transition-colors shadow-3xs">Apagar</button>
                     </div>
                 `; containerEditoresMissa.appendChild(dv);
             });
         } catch(erro) { console.error("Erro ao resgatar escalas vigentes: ", erro); }
 
-        if(!fnd) containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic text-center col-span-2 py-4">Nenhuma escala ativa para esta data.</p>`;
+        if(!fnd) containerEditoresMissa.innerHTML = `<p class="text-xs text-slate-400 italic text-center col-span-2 py-6">Nenhuma escala ativa para esta data.</p>`;
         else {
             document.querySelectorAll('.btn-salvar-edicao').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
@@ -674,9 +763,9 @@
             const btn = document.getElementById(`btn-c-${id}`);
             if(btn) {
                 if(tabID === `coord-${id}` || (id === 'avisos' && tabID === 'coord-avisos-tab')) {
-                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-amber-800 text-white shadow-xs";
+                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-amber-800 text-white shadow-md";
                 } else {
-                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
+                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-amber-200/60 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
                 }
             }
         });
