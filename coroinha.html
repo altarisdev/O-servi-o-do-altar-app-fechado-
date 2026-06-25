@@ -47,7 +47,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-3 gap-2">
                     <div>
                         <h3 class="text-sm font-black text-gray-800">Painel Geral de Escalas</h3>
-                        <p class="text-[11px] text-gray-400 font-medium">Consulte as equipes completas e confirme presença por dia e horário.</p>
+                        <p class="text-[11px] text-gray-400 font-medium">Confirme sua vaga ou assuma uma escala livre/substituição disponível.</p>
                     </div>
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <span class="text-[10px] font-bold text-gray-400 uppercase whitespace-nowrap">Data:</span>
@@ -62,12 +62,12 @@
 
             <div id="card-enquete-disponibilidade" class="hidden bg-amber-50/60 p-5 rounded-2xl border border-amber-200/70 space-y-3">
                 <div>
-                    <h3 class="text-sm font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation text-amber-700"></i> Pesquisa de Disponibilidade</h3>
-                    <p class="text-[11px] text-amber-800/80">Marque todas as opções que você puder e clique em Salvar. As caixas permanecem visíveis.</p>
+                    <h3 class="text-sm font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation text-amber-700"></i> Enquete de Disponibilidade Mensal</h3>
+                    <p class="text-[11px] text-amber-800/80">Marque os dias que você pode servir. As opções somem desta lista assim que enviadas.</p>
                 </div>
                 <form id="form-responder-enquete" class="space-y-3">
                     <div id="lista-celebracoes-checkboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-white p-3 rounded-xl border border-amber-200"></div>
-                    <button type="submit" class="w-full bg-amber-800 text-white font-bold text-xs py-2 rounded-lg hover:bg-amber-900 transition-all cursor-pointer">Salvar Minha Disponibilidade</button>
+                    <button type="submit" class="w-full bg-amber-800 text-white font-bold text-xs py-2 rounded-lg hover:bg-amber-900 transition-all cursor-pointer">Salvar Disponibilidade</button>
                 </form>
             </div>
         </div>
@@ -198,23 +198,34 @@
         });
     }
 
+    // REGRA DE NEGÓCIO: Opções marcadas e respondidas agora SOMEM da tela de Enquete
     function ouvirEnqueteDisponibilidade() {
         onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (snap) => {
             if(snap.exists() && snap.data().ativa === true) {
-                const dados = snap.data(); cardEnqueteDisponibilidade.classList.remove('hidden');
+                const dados = snap.data(); 
                 listaCelebracoesCheckboxes.innerHTML = "";
                 
                 const minhasEscolhasSalvas = dados.respostas?.[usuarioLogadoDados.nome]?.escolhas || [];
+                let opçõesVisíveisCount = 0;
 
                 dados.celebracoes.forEach(cel => {
+                    // Se o usuário já selecionou e confirmou essa opção no passado, ela SUMIRÁ da lista
+                    if(minhasEscolhasSalvas.includes(cel.idChave)) return;
+
+                    opçõesVisíveisCount++;
                     const formatData = cel.data.split('-').reverse().join('/');
-                    const checks = minhasEscolhasSalvas.includes(cel.idChave) ? 'checked' : '';
                     listaCelebracoesCheckboxes.innerHTML += `
                         <label class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-100 cursor-pointer text-[11px] font-medium text-gray-700 hover:bg-amber-50/50 transition-all">
-                            <input type="checkbox" name="celebracao_resp" value="${cel.idChave}" ${checks} class="w-4 h-4 text-amber-700 border-gray-300 rounded focus:ring-amber-500">
+                            <input type="checkbox" name="celebracao_resp" value="${cel.idChave}" class="w-4 h-4 text-amber-700 border-gray-300 rounded focus:ring-amber-500">
                             <div><span class="font-bold text-amber-900 block">${formatData} - ${cel.horario}</span>${cel.rotulo}</div>
                         </label>`;
                 });
+
+                if(opçõesVisíveisCount > 0) {
+                    cardEnqueteDisponibilidade.classList.remove('hidden');
+                } else {
+                    cardEnqueteDisponibilidade.classList.add('hidden'); // Oculta o card se já respondeu tudo
+                }
             } else { cardEnqueteDisponibilidade.classList.add('hidden'); }
         });
     }
@@ -222,21 +233,26 @@
     formResponderEnquete?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const boxes = document.querySelectorAll('input[name="celebracao_resp"]:checked');
-        const listIds = []; boxes.forEach(b => listIds.push(b.value));
+        if(boxes.length === 0) { alert("Selecione ao menos uma opção antes de salvar!"); return; }
         
+        const listIds = []; boxes.forEach(b => listIds.push(b.value));
         const refDoc = doc(db, "enquetes", "disponibilidade_atual");
-        const atualizacaoEstruturada = {};
-        atualizacaoEstruturada[`respostas.${usuarioLogadoDados.nome}`] = {
-            escolhas: listIds,
-            respondidoEm: Date.now()
-        };
-
+        
         try {
+            const docSnap = await getDoc(refDoc);
+            let escolhasExistentes = docSnap.exists() ? (docSnap.data().respostas?.[usuarioLogadoDados.nome]?.escolhas || []) : [];
+            const novasEscolhasUnificadas = [...new Set([...escolhasExistentes, ...listIds])];
+
+            const atualizacaoEstruturada = {};
+            atualizacaoEstruturada[`respostas.${usuarioLogadoDados.nome}`] = {
+                escolhas: novasEscolhasUnificadas,
+                respondidoEm: Date.now()
+            };
             await updateDoc(refDoc, atualizacaoEstruturada);
-            alert("Sua agenda de disponibilidade foi salva com sucesso!");
+            alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
         } catch (error) {
             await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
-            alert("Sua agenda de disponibilidade foi salva com sucesso!");
+            alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
         }
     });
 
@@ -252,6 +268,7 @@
         });
     }
 
+    // REGRA DE NEGÓCIO: Opções de confirmação somem após clicar, e vagas abertas/substituições podem ser assumidas
     function renderizarEscalaGeralPorData() {
         if(!resultadoEscalaGeral || !buscaEscalaData) return;
         const dataAlvo = buscaEscalaData.value;
@@ -272,6 +289,7 @@
             let estouEscaladoNestaCeb = false;
             let minhaFuncaoNestaCeb = "";
             let meuStatusNestaCeb = "Pendente";
+            let vagasLivresOuSubstituicoes = []; // Guarda onde há espaço ou alguém pedindo substituição
 
             const funcoes = [
                 { id: 'altar1', label: 'Altar 1' }, { id: 'altar2', label: 'Altar 2' },
@@ -281,56 +299,103 @@
             ];
 
             funcoes.forEach(f => {
+                // Checa se a função está configurada/ativa nesta escala específica
+                const campoAtivo = f.id.startsWith('altar') ? true : (f.id === 'turiferario' ? esc.turiAtivo : esc.navetaAtiva);
+                if (campoAtivo === false) return; 
+
                 const item = esc[f.id];
-                if(item && item.nome) {
-                    const ehVoce = item.nome === usuarioLogadoDados.nome;
-                    if(ehVoce) {
-                        estouEscaladoNestaCeb = true;
-                        minhaFuncaoNestaCeb = f.id;
-                        meuStatusNestaCeb = item.status || "Pendente";
-                    }
+                const nomeEscalado = item?.nome || "";
+                const statusText = item?.status || "Pendente";
 
-                    const statusText = item.status || "Pendente";
-                    let badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-amber-100 text-amber-800">Pendente</span>`;
-                    if(statusText === 'Confirmado') badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">✓ Confirmado</span>`;
-                    if(statusText === 'Substituição Solicitada') badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-rose-100 text-rose-800">Subst. Pedida</span>`;
-
-                    listaMembrosHtml += `
-                        <div class="flex justify-between items-center p-2 rounded-lg border text-xs ${ehVoce ? 'bg-amber-50 border-amber-400 font-bold ring-1 ring-amber-300' : 'bg-white border-gray-100'}">
-                            <span class="text-gray-500 text-[11px]">${f.label}:</span>
-                            <div class="flex items-center gap-2 truncate">
-                                <span class="truncate max-w-[130px] ${ehVoce ? 'text-amber-950 font-black' : 'text-gray-800'}">${item.nome} ${ehVoce ? '(Você)' : ''}</span>
-                                ${badgeStatus}
-                            </div>
-                        </div>`;
+                const ehVoce = nomeEscalado === usuarioLogadoDados.nome;
+                if(ehVoce) {
+                    estouEscaladoNestaCeb = true;
+                    minhaFuncaoNestaCeb = f.id;
+                    meuStatusNestaCeb = statusText;
                 }
+
+                // Identifica se a vaga está livre de verdade ou se alguém pediu substituição
+                if(!nomeEscalado || nomeEscalado.trim() === "") {
+                    vagasLivresOuSubstituicoes.push({ funcaoId: f.id, label: f.label, tipo: 'vazia' });
+                } else if(statusText === 'Substituição Solicitada' && !ehVoce) {
+                    vagasLivresOuSubstituicoes.push({ funcaoId: f.id, label: f.label, tipo: 'subst', quem: nomeEscalado });
+                }
+
+                let badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-amber-100 text-amber-800">Pendente</span>`;
+                if(!nomeEscalado) badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-gray-150 text-gray-400 italic">Vaga Disponível</span>`;
+                else if(statusText === 'Confirmado') badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">✓ Confirmado</span>`;
+                else if(statusText === 'Substituição Solicitada') badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-rose-100 text-rose-800">Subst. Pedida</span>`;
+
+                listaMembrosHtml += `
+                    <div class="flex justify-between items-center p-2 rounded-lg border text-xs ${ehVoce ? 'bg-amber-50 border-amber-400 font-bold ring-1 ring-amber-300' : 'bg-white border-gray-100'}">
+                        <span class="text-gray-500 text-[11px]">${f.label}:</span>
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="truncate max-w-[130px] ${ehVoce ? 'text-amber-950 font-black' : (nomeEscalado ? 'text-gray-800' : 'text-gray-300 italic')}">
+                                ${nomeEscalado || 'Ninguém escalado'} ${ehVoce ? '(Você)' : ''}
+                            </span>
+                            ${badgeStatus}
+                        </div>
+                    </div>`;
             });
 
             let painelAcaoUsuarioHtml = "";
-            if(estouEscaladoNestaCeb) {
-                const btnConfirmarClass = meuStatusNestaCeb === 'Confirmado' ? 'bg-emerald-700 text-white font-bold ring-2 ring-emerald-300' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50';
-                const btnSubstClass = meuStatusNestaCeb === 'Substituição Solicitada' ? 'bg-rose-700 text-white font-bold ring-2 ring-rose-300' : 'bg-white text-rose-700 border border-rose-200 hover:bg-rose-50';
 
-                painelAcaoUsuarioHtml = `
-                    <div class="bg-amber-900 text-white p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 shadow-xs mt-2">
-                        <div>
-                            <span class="text-[9px] text-amber-200 uppercase tracking-wider block font-bold">Sua Escala nesta Celebração</span>
-                            <span class="text-[10px] block text-amber-100">Status: <strong class="uppercase">${meuStatusNestaCeb}</strong></span>
-                        </div>
-                        <div class="flex gap-2 w-full sm:w-auto justify-end">
-                            <button onclick="window.votarPresencaItem('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Confirmado')" class="${btnConfirmarClass} px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all">
-                                ${meuStatusNestaCeb === 'Confirmado' ? '<i class="fa-solid fa-circle-check"></i> Presença Confirmada' : 'Confirmar Presença'}
+            if(estouEscaladoNestaCeb) {
+                // REGRA DE NEGÓCIO: Se já confirmou ou pediu substituição, os botões SOMEM e vira texto fixo irreversível
+                if(meuStatusNestaCeb === 'Confirmado') {
+                    painelAcaoUsuarioHtml = `
+                        <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3 rounded-xl flex items-center justify-center gap-2 text-xs font-bold mt-2">
+                            <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i> Sua presença está confirmada nesta celebração. Bom serviço!
+                        </div>`;
+                } else if(meuStatusNestaCeb === 'Substituição Solicitada') {
+                    painelAcaoUsuarioHtml = `
+                        <div class="bg-rose-50 border border-rose-100 text-rose-900 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-2 mt-2">
+                            <span class="text-xs font-semibold"><i class="fa-solid fa-handshake-angle text-rose-600"></i> Você solicitou um substituto para este dia.</span>
+                            <button onclick="window.assumirVagaEscala('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Voltar')" class="bg-amber-800 hover:bg-amber-900 text-white font-bold text-[11px] px-2.5 py-1 rounded-md cursor-pointer transition-all">
+                                Voltar a Servir aqui
                             </button>
-                            <button onclick="window.votarPresencaItem('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Substituição Solicitada')" class="${btnSubstClass} px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all">
-                                ${meuStatusNestaCeb === 'Substituição Solicitada' ? '<i class="fa-solid fa-handshake-angle"></i> Substituição Solicitada' : 'Pedir Substituição'}
-                            </button>
-                        </div>
-                    </div>`;
+                        </div>`;
+                } else {
+                    // Exibe os botões se o status for estritamente 'Pendente'
+                    painelAcaoUsuarioHtml = `
+                        <div class="bg-amber-900 text-white p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 shadow-xs mt-2">
+                            <div>
+                                <span class="text-[9px] text-amber-200 uppercase tracking-wider block font-bold">Sua Escala nesta Celebração</span>
+                                <span class="text-[10px] block text-amber-100">Responda sua escalação por dia/horário:</span>
+                            </div>
+                            <div class="flex gap-2 w-full sm:w-auto justify-end">
+                                <button onclick="window.votarPresencaItem('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Confirmado')" class="bg-white text-emerald-800 border border-gray-200 hover:bg-emerald-50 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all">
+                                    Confirmar Presença
+                                </button>
+                                <button onclick="window.votarPresencaItem('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Substituição Solicitada')" class="bg-white text-rose-700 border border-rose-200 hover:bg-rose-50 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all">
+                                    Pedir Substituição
+                                </button>
+                            </div>
+                        </div>`;
+                }
             } else {
-                painelAcaoUsuarioHtml = `
-                    <div class="bg-blue-50 border border-blue-100 text-blue-900 p-2.5 rounded-xl text-center text-[11px] font-medium mt-2">
-                        <i class="fa-solid fa-info-circle"></i> Você não está escalado para este horário.
-                    </div>`;
+                // SE VOCÊ NÃO ESTÁ ESCALADO: O sistema varre se existem vagas abertas ou pedidos de auxílio de irmãos
+                if(vagasLivresOuSubstituicoes.length > 0) {
+                    let botoesVagasHtml = "";
+                    vagasLivresOuSubstituicoes.forEach(v => {
+                        const txtBotao = v.tipo === 'vazia' ? `Assumir ${v.label} (Vaga Livre)` : `Substituir ${v.quem} em ${v.label}`;
+                        botoesVagasHtml += `
+                            <button onclick="window.assumirVagaEscala('${esc.idDoc}', '${v.funcaoId}', 'Assumir')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded font-bold tracking-wide transition-all cursor-pointer text-[10px]">
+                                <i class="fa-solid fa-plus-circle"></i> ${txtBotao}
+                            </button>`;
+                    });
+
+                    painelAcaoUsuarioHtml = `
+                        <div class="bg-blue-50 border border-blue-100 p-3 rounded-xl mt-2 space-y-2">
+                            <span class="text-blue-900 font-bold block text-[11px]"><i class="fa-solid fa-hands-helping"></i> Oportunidades neste Horário:</span>
+                            <div class="flex flex-wrap gap-2">${botoesVagasHtml}</div>
+                        </div>`;
+                } else {
+                    painelAcaoUsuarioHtml = `
+                        <div class="bg-gray-100 text-gray-500 p-2 rounded-xl text-center text-[11px] font-medium mt-2">
+                            <i class="fa-solid fa-info-circle"></i> Equipe completa. Você não está escalado neste horário.
+                        </div>`;
+                }
             }
 
             resultadoEscalaGeral.innerHTML += `
@@ -347,6 +412,7 @@
         });
     }
 
+    // AÇÃO DE CONFIRMAÇÃO: Altera status e faz o botão sumir virando texto fixo
     window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
         if(!idDocEscala || !campoFuncao) return;
         const refDoc = doc(db, "escalas", idDocEscala);
@@ -355,10 +421,32 @@
 
         try {
             await updateDoc(refDoc, dUp);
-            alert(novoStatus === "Confirmado" ? "Presença confirmada!" : "Substituição solicitada!");
+            alert(novoStatus === "Confirmado" ? "Presença confirmada! As opções de alteração sumiram." : "Substituição solicitada com sucesso!");
         } catch (error) {
             await setDoc(refDoc, dUp, { merge: true });
-            alert(novoStatus === "Confirmado" ? "Presença confirmada!" : "Substituição solicitada!");
+        }
+    };
+
+    // AÇÃO DE ASSUMIR VAGAS LIVRES OU AJUDAR IRMÃO
+    window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
+        if(!idDocEscala || !campoFuncao) return;
+        const refDoc = doc(db, "escalas", idDocEscala);
+        const dUp = {};
+
+        if (operacao === 'Voltar') {
+            // Cancela o pedido de substituição e volta a ficar pendente/confirmado
+            dUp[`${campoFuncao}.status`] = "Pendente";
+        } else {
+            // Coloca o nome do coroinha logado diretamente na vaga livre ou na substituição
+            dUp[`${campoFuncao}.nome`] = usuarioLogadoDados.nome;
+            dUp[`${campoFuncao}.status`] = "Confirmado"; // Já entra confirmado na vaga livre
+        }
+
+        try {
+            await updateDoc(refDoc, dUp);
+            alert(operacao === 'Voltar' ? "Você assumiu novamente o seu posto!" : "Você foi incluído na escala deste horário com sucesso!");
+        } catch (error) {
+            await setDoc(refDoc, dUp, { merge: true });
         }
     };
 
