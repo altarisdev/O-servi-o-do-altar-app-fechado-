@@ -42,40 +42,31 @@
     <main class="max-w-6xl w-full mx-auto p-4 flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
         
         <div id="conteudo-escala" class="space-y-4 block md:col-span-2">
-            <!-- PAINEL INTEGRADO DE ESCALAS (SUA PRÓXIMA + CONSULTA GERAL) -->
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-5">
-                <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+            
+            <!-- CENTRAL UNIFICADA DE ESCALAS (CONSULTA GERAL + VOTAÇÃO INTEGRADA POR DIA) -->
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-3 gap-2">
                     <div>
-                        <h3 class="text-sm font-black text-gray-800">Sua Próxima Escala</h3>
-                        <p class="text-[11px] text-gray-400 font-medium">Verifique suas atribuições para a próxima celebração.</p>
+                        <h3 class="text-sm font-black text-gray-800">Painel Geral de Escalas</h3>
+                        <p class="text-[11px] text-gray-400 font-medium">Consulte as equipes completas e responda sua escala diretamente no dia escolhido.</p>
                     </div>
-                    <span id="badge-status-escala" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Nenhuma</span>
-                </div>
-                
-                <div id="dados-proxima-escala" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <p class="text-gray-400 italic col-span-2">Buscando escalas...</p>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase whitespace-nowrap">Data:</span>
+                        <input type="date" id="busca-escala-data" class="w-full sm:w-auto bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700 focus:outline-amber-700">
+                    </div>
                 </div>
 
-                <!-- SEÇÃO INTEGRADA: CONSULTAR OUTROS DIAS -->
-                <div class="border-t border-gray-100 pt-4 space-y-3">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        <div>
-                            <h4 class="text-xs font-black text-amber-900">Ver Escala Geral por Dia</h4>
-                            <p class="text-[10px] text-gray-400 font-medium">Selecione uma data para ver quem está escalado e se você participa.</p>
-                        </div>
-                        <input type="date" id="busca-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg p-1.5 text-xs font-bold text-gray-700 focus:outline-amber-700">
-                    </div>
-                    
-                    <div id="resultado-escala-geral" class="space-y-3 text-xs">
-                        <p class="text-gray-400 italic">Selecione uma data acima para consultar.</p>
-                    </div>
+                <!-- Onde as celebrações do dia selecionado e os botões individuais de voto vão aparecer -->
+                <div id="resultado-escala-geral" class="space-y-4 text-xs">
+                    <p class="text-gray-400 italic">Buscando informações do dia...</p>
                 </div>
             </div>
 
-            <!-- PESQUISA DE DISPONIBILIDADE -->
+            <!-- PESQUISA DE DISPONIBILIDADE (PERMANENTE) -->
             <div id="card-enquete-disponibilidade" class="hidden bg-amber-50/60 p-5 rounded-2xl border border-amber-200/70 space-y-3">
                 <div>
                     <h3 class="text-sm font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation text-amber-700"></i> Pesquisa de Disponibilidade</h3>
+                    <p class="text-[11px] text-amber-800/80">Indique abaixo quais dias você poderá servir. Suas opções não somem ao salvar.</p>
                 </div>
                 <form id="form-responder-enquete" class="space-y-3">
                     <div id="lista-celebracoes-checkboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-white p-3 rounded-xl border border-amber-200"></div>
@@ -135,7 +126,6 @@
     const telaLoading = document.getElementById('tela-loading');
     const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
     const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
-    const dadosProximaEscala = document.getElementById('dados-proxima-escala');
     const cardEnqueteDisponibilidade = document.getElementById('card-enquete-disponibilidade');
     const listaCelebracoesCheckboxes = document.getElementById('lista-celebracoes-checkboxes');
     const formResponderEnquete = document.getElementById('form-responder-enquete');
@@ -143,7 +133,7 @@
     const buscaEscalaData = document.getElementById('busca-escala-data');
     const resultadoEscalaGeral = document.getElementById('resultado-escala-geral');
 
-    let usuarioLogadoDados = null; let idEscalaAtivaGlobal = null; let todasEscalasCache = [];
+    let usuarioLogadoDados = null; let todasEscalasCache = [];
 
     function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
 
@@ -162,14 +152,14 @@
         if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = usuarioLogadoDados.nome;
         if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = usuarioLogadoDados.funcao;
 
-        if(buscaEscalaData) {
+        if(buscaEscalaData && !buscaEscalaData.value) {
             buscaEscalaData.value = new Date().toISOString().split('T')[0];
         }
 
         ouvirMuralAvisos();
         ouvirColecaoConteudos();
         ouvirEnqueteDisponibilidade();
-        buscarMinhaProximaEscala();
+        ouvirTodasAsEscalas();
         carregarLiturgiaDoDia();
         if(window.innerWidth < 768) { switchTab('escala'); }
     }
@@ -211,6 +201,7 @@
         });
     }
 
+    // LISTA DE DISPONIBILIDADE: Continua intacta e editável a qualquer momento
     function ouvirEnqueteDisponibilidade() {
         onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (snap) => {
             if(snap.exists() && snap.data().ativa === true) {
@@ -240,7 +231,8 @@
         alert("Sua agenda de disponibilidade foi salva!");
     });
 
-    function buscarMinhaProximaEscala() {
+    // ESCALAS: Escuta em tempo real todas as escalas para alimentar o painel unificado por data
+    function ouvirTodasAsEscalas() {
         onSnapshot(collection(db, "escalas"), (snap) => {
             todasEscalasCache = [];
             snap.forEach(d => { 
@@ -248,77 +240,11 @@
                 esc.idDoc = d.id; 
                 todasEscalasCache.push(esc); 
             });
-
             renderizarEscalaGeralPorData();
-
-            let escalaEncontrada = null; let funcaoAlvo = "";
-            const hojeStr = new Date().toISOString().split('T')[0];
-
-            todasEscalasCache.forEach(esc => {
-                if(esc.data < hojeStr) return;
-                for(let i=1; i<=6; i++) { if(esc[`altar${i}`]?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = `Altar ${i}`; idEscalaAtivaGlobal = esc.idDoc; } }
-                if(esc.turiferario?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = "Turiferário"; idEscalaAtivaGlobal = esc.idDoc; }
-                if(esc.naveteiro?.nome === usuarioLogadoDados.nome) { escalaEncontrada = esc; funcaoAlvo = "Naveteiro"; idEscalaAtivaGlobal = esc.idDoc; }
-            });
-
-            if(escalaEncontrada) {
-                let statusItem = "Pendente";
-                if(funcaoAlvo.startsWith("Altar")) { statusItem = escalaEncontrada[`altar${funcaoAlvo.split(' ')[1]}`].status; }
-                else if(funcaoAlvo === "Turiferário") statusItem = escalaEncontrada.turiferario.status;
-                else if(funcaoAlvo === "Naveteiro") statusItem = escalaEncontrada.naveteiro.status;
-
-                const b = document.getElementById('badge-status-escala');
-                b.innerText = statusItem;
-                
-                if (statusItem === 'Confirmado') b.className = `text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800`;
-                else if (statusItem === 'Substituição Solicitada') b.className = `text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800`;
-                else b.className = `text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800`;
-
-                // ALTERAÇÃO: Mantém os botões sempre ativos e destaca com bordas e ícones a escolha feita
-                const btnConfirmarClass = statusItem === 'Confirmado' ? 'bg-emerald-700 text-white ring-2 ring-emerald-400' : 'bg-white text-amber-950 hover:bg-gray-50';
-                const btnSubstClass = statusItem === 'Substituição Solicitada' ? 'bg-rose-700 text-white ring-2 ring-rose-400' : 'bg-white text-rose-800 border border-rose-200 hover:bg-rose-50';
-
-                dadosProximaEscala.innerHTML = `
-                    <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-100 col-span-2 flex justify-between items-center">
-                        <div><span class="text-[10px] font-bold uppercase block text-gray-400">Celebração</span><strong class="text-sm font-bold text-amber-950">${escalaEncontrada.titulo}</strong></div>
-                        <div class="text-right"><span class="text-[10px] font-bold uppercase block text-gray-400">Data e Horário</span><strong class="text-xs font-bold text-gray-700">${escalaEncontrada.data.split('-').reverse().join('/')} às ${escalaEncontrada.horario}h</strong></div>
-                    </div>
-                    <div class="bg-amber-900 text-white p-3 rounded-xl col-span-2 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-xs">
-                        <div>
-                            <span class="text-[9px] text-amber-200 uppercase tracking-wider block font-bold">Sua Função Designada</span>
-                            <strong class="text-base font-black">${funcaoAlvo}</strong>
-                            <span class="text-[10px] block text-amber-200/90 font-medium mt-0.5">Status: ${statusItem}</span>
-                        </div>
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <button onclick="window.atualizarPresencaEscala('Confirmado')" class="${btnConfirmarClass} px-3 py-1.5 rounded-lg text-xs font-black shadow-xs cursor-pointer transition-all">
-                                ${statusItem === 'Confirmado' ? '<i class="fa-solid fa-circle-check"></i> Vou' : 'Confirmar Presença'}
-                            </button>
-                            <button onclick="window.atualizarPresencaEscala('Substituição Solicitada')" class="${btnSubstClass} px-3 py-1.5 rounded-lg text-xs font-black shadow-xs cursor-pointer transition-all">
-                                ${statusItem === 'Substituição Solicitada' ? '<i class="fa-solid fa-handshake-angle"></i> Substituição Pedida' : 'Pedir Substituição'}
-                            </button>
-                        </div>
-                    </div>`;
-            } else {
-                dadosProximaEscala.innerHTML = `<p class="text-gray-400 italic col-span-2 py-2">Você não está escalado em nenhuma das próximas celebrações publicadas.</p>`;
-                document.getElementById('badge-status-escala').innerText = "Livre";
-                document.getElementById('badge-status-escala').className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800";
-            }
         });
     }
 
-    window.atualizarPresencaEscala = async function(novoStatus) {
-        if(!idEscalaAtivaGlobal) return;
-        const snap = await getDoc(doc(db, "escalas", idEscalaAtivaGlobal)); if(!snap.exists()) return;
-        const esc = snap.data(); const dUp = {};
-
-        for(let i=1; i<=6; i++) { if(esc[`altar${i}`]?.nome === usuarioLogadoDados.nome) dUp[`altar${i}.status`] = novoStatus; }
-        if(esc.turiferario?.nome === usuarioLogadoDados.nome) dUp["turiferario.status"] = novoStatus;
-        if(esc.naveteiro?.nome === usuarioLogadoDados.nome) dUp["naveteiro.status"] = novoStatus;
-
-        await setDoc(doc(db, "escalas", idEscalaAtivaGlobal), dUp, { merge: true });
-        alert(novoStatus === "Confirmado" ? "Presença confirmada!" : "Pedido de substituição enviado!");
-    };
-
+    // UNIFICAÇÃO: Gera a interface de visualização + confirmação individual por data
     function renderizarEscalaGeralPorData() {
         if(!resultadoEscalaGeral || !buscaEscalaData) return;
         const dataAlvo = buscaEscalaData.value;
@@ -329,13 +255,17 @@
 
         const escalasDoDia = todasEscalasCache.filter(e => e.data === dataAlvo);
         if(escalasDoDia.length === 0) {
-            resultadoEscalaGeral.innerHTML = `<p class="text-gray-400 italic py-3 text-center bg-gray-50 rounded-xl border border-dashed text-[11px]">Nenhuma escala oficial publicada para este dia.</p>`;
+            resultadoEscalaGeral.innerHTML = `<p class="text-gray-400 italic py-4 text-center bg-gray-50 rounded-xl border border-dashed">Nenhuma celebração ou escala publicada para este dia.</p>`;
             return;
         }
 
         resultadoEscalaGeral.innerHTML = "";
         escalasDoDia.forEach(esc => {
             let listaMembrosHtml = "";
+            let estouEscaladoNestaCeb = false;
+            let minhaFuncaoNestaCeb = "";
+            let meuStatusNestaCeb = "Pendente";
+
             const funcoes = [
                 { id: 'altar1', label: 'Altar 1' }, { id: 'altar2', label: 'Altar 2' },
                 { id: 'altar3', label: 'Altar 3' }, { id: 'altar4', label: 'Altar 4' },
@@ -343,38 +273,89 @@
                 { id: 'turiferario', label: 'Turiferário' }, { id: 'naveteiro', label: 'Naveteiro' }
             ];
 
+            // Mapeia quem está escalado na celebração atual
             funcoes.forEach(f => {
                 const item = esc[f.id];
                 if(item && item.nome) {
                     const ehVoce = item.nome === usuarioLogadoDados.nome;
+                    if(ehVoce) {
+                        estouEscaladoNestaCeb = true;
+                        minhaFuncaoNestaCeb = f.id;
+                        meuStatusNestaCeb = item.status || "Pendente";
+                    }
+
                     const statusText = item.status || "Pendente";
-                    let badgeStatus = `<span class="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-100 text-amber-800">Pendente</span>`;
-                    if(statusText === 'Confirmado') badgeStatus = `<span class="text-[9px] px-1 py-0.2 rounded font-bold bg-emerald-100 text-emerald-800">Confirmado</span>`;
-                    if(statusText === 'Substituição Solicitada') badgeStatus = `<span class="text-[9px] px-1 py-0.2 rounded font-bold bg-rose-100 text-rose-800">Falta / Pedido Subst.</span>`;
+                    let badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-amber-100 text-amber-800">Pendente</span>`;
+                    if(statusText === 'Confirmado') badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">✓ Confirmado</span>`;
+                    if(statusText === 'Substituição Solicitada') badgeStatus = `<span class="text-[9px] px-1 py-0.5 rounded font-bold bg-rose-100 text-rose-800">Subst. Pedida</span>`;
 
                     listaMembrosHtml += `
-                        <div class="flex justify-between items-center p-1.5 rounded-lg border text-xs ${ehVoce ? 'bg-amber-100/70 border-amber-500 font-bold ring-1 ring-amber-400' : 'bg-white border-gray-100'}">
+                        <div class="flex justify-between items-center p-2 rounded-lg border text-xs ${ehVoce ? 'bg-amber-100/60 border-amber-400 font-bold' : 'bg-white border-gray-100'}">
                             <span class="text-gray-500 text-[11px]">${f.label}:</span>
-                            <div class="flex items-center gap-1.5 truncate">
-                                <span class="truncate max-w-[120px] ${ehVoce ? 'text-amber-950 font-black' : 'text-gray-800'}">${item.nome} ${ehVoce ? '(Você)' : ''}</span>
+                            <div class="flex items-center gap-2 truncate">
+                                <span class="truncate max-w-[130px] ${ehVoce ? 'text-amber-950 font-black' : 'text-gray-800'}">${item.nome} ${ehVoce ? '(Você)' : ''}</span>
                                 ${badgeStatus}
                             </div>
                         </div>`;
                 }
             });
 
+            // Se o coroinha logado estiver escalado, monta a barra de ações permanentes específica desse dia/horário
+            let painelAcaoUsuarioHtml = "";
+            if(estouEscaladoNestaCeb) {
+                const btnConfirmarClass = meuStatusNestaCeb === 'Confirmado' ? 'bg-emerald-700 text-white font-bold ring-2 ring-emerald-300' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50';
+                const btnSubstClass = meuStatusNestaCeb === 'Substituição Solicitada' ? 'bg-rose-700 text-white font-bold ring-2 ring-rose-300' : 'bg-white text-rose-700 border border-rose-200 hover:bg-rose-50';
+
+                painelAcaoUsuarioHtml = `
+                    <div class="bg-amber-900 text-white p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 shadow-xs mt-2">
+                        <div>
+                            <span class="text-[9px] text-amber-200 uppercase tracking-wider block font-bold">Sua Escala nesta Celebração</span>
+                            <span class="text-[10px] block text-amber-100">Status atual: <strong class="uppercase">${meuStatusNestaCeb}</strong></span>
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto justify-end">
+                            <button onclick="window.votarPresencaItem('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Confirmado')" class="${btnConfirmarClass} px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all">
+                                ${meuStatusNestaCeb === 'Confirmado' ? '<i class="fa-solid fa-circle-check"></i> Presença Confirmada' : 'Confirmar Presença'}
+                            </button>
+                            <button onclick="window.votarPresencaItem('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Substituição Solicitada')" class="${btnSubstClass} px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all">
+                                ${meuStatusNestaCeb === 'Substituição Solicitada' ? '<i class="fa-solid fa-handshake-angle"></i> Substituição Solicitada' : 'Pedir Substituição'}
+                            </button>
+                        </div>
+                    </div>`;
+            } else {
+                painelAcaoUsuarioHtml = `
+                    <div class="bg-blue-50 border border-blue-100 text-blue-900 p-2.5 rounded-xl text-center text-[11px] font-medium mt-2">
+                        <i class="fa-solid fa-info-circle"></i> Você não está escalado para este horário.
+                    </div>`;
+            }
+
             resultadoEscalaGeral.innerHTML += `
-                <div class="border border-amber-100 rounded-xl p-3 bg-amber-50/20 space-y-2">
-                    <div class="flex justify-between border-b border-amber-100 pb-1.5 font-bold text-amber-950 text-[12px]">
-                        <span><i class="fa-solid fa-calendar-day text-amber-700"></i> ${esc.titulo}</span>
-                        <span>${esc.horario}h</span>
+                <div class="border border-gray-200 rounded-2xl p-4 bg-gray-50/50 space-y-3 shadow-2xs">
+                    <div class="flex justify-between border-b border-gray-200 pb-2 font-black text-amber-950 text-xs sm:text-sm">
+                        <span><i class="fa-solid fa-church text-amber-800 mr-1"></i> ${esc.titulo}</span>
+                        <span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md">${esc.horario}h</span>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         ${listaMembrosHtml}
                     </div>
+                    ${painelAcaoUsuarioHtml}
                 </div>`;
         });
     }
+
+    // ALTERAÇÃO: Atualiza estritamente a linha/função selecionada no documento específico da escala
+    window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
+        if(!idDocEscala || !campoFuncao) return;
+        const refDoc = doc(db, "escalas", idDocEscala);
+        const dUp = {};
+        dUp[`${campoFuncao}.status`] = novoStatus;
+
+        try {
+            await setDoc(refDoc, dUp, { merge: true });
+            alert(novoStatus === "Confirmado" ? "Presença confirmada com sucesso para este horário!" : "Pedido de substituição enviado com sucesso!");
+        } catch (error) {
+            alert("Erro ao salvar resposta. Tente novamente.");
+        }
+    };
 
     buscaEscalaData?.addEventListener('change', renderizarEscalaGeralPorData);
 
