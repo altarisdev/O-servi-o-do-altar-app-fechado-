@@ -6,8 +6,23 @@
     <title>Altaris - Painel do Coordenador</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos para o Dark Mode */
+        body { transition: background-color 0.3s, color 0.3s; }
+        .dark-mode { background-color: #111827 !important; color: #f3f4f6 !important; }
+        .dark-mode .bg-white { background-color: #1f2937 !important; border-color: #374151 !important; color: #f9fafb !important; }
+        .dark-mode .bg-gray-100 { background-color: #111827 !important; }
+        .dark-mode .bg-gray-50 { background-color: #374151 !important; border-color: #4b5563 !important; color: #e5e7eb !important; }
+        .dark-mode .text-gray-800, .dark-mode .text-gray-700 { color: #f9fafb !important; }
+        .dark-mode .text-gray-500 { color: #9ca3af !important; }
+        .dark-mode .border-gray-200 { border-color: #374151 !important; }
+    </style>
 </head>
 <body class="bg-gray-100 font-sans min-h-screen flex flex-col md:flex-row">
+
+    <button id="btn-toggle-theme" class="fixed top-4 right-4 z-[999] bg-red-900 text-white p-3 rounded-full shadow-lg hover:bg-red-800 transition-all cursor-pointer">
+        <i id="theme-icon" class="fa-solid fa-moon"></i>
+    </button>
 
     <div id="tela-loading" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="relative flex items-center justify-center mb-5">
@@ -198,6 +213,15 @@
     </main>
 
 <script type="module">
+    // Lógica do botão de tema
+    const btnToggleTheme = document.getElementById('btn-toggle-theme');
+    const themeIcon = document.getElementById('theme-icon');
+
+    btnToggleTheme.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        themeIcon.className = document.body.classList.contains('dark-mode') ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    });
+
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -227,7 +251,6 @@
     const selectIrmaoTitular = document.getElementById('cad-irmao-titular-select');
     
     const chamadaReuniaoData = document.getElementById('chamada-reuniao-data');
-    const llamadaReuniaoHorario = document.getElementById('chamada-reuniao-horario');
     const chamadaReuniaoTitulo = document.getElementById('chamada-reuniao-titulo');
     const listaChamadaCoroinhas = document.getElementById('lista-chamada-coroinhas');
     const btnSalvarChamada = document.getElementById('btn-salvar-chamada');
