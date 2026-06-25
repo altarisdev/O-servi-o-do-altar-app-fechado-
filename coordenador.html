@@ -90,6 +90,24 @@
                 <div><h3 class="text-sm font-black text-gray-800">Visualizar / Editar / Apagar Escalas Vigentes</h3></div>
                 <input type="date" id="editor-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold">
             </div>
+
+            <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200 space-y-3">
+                <h4 class="text-xs font-black text-amber-900 flex items-center gap-1.5"><i class="fa-solid fa-circle-plus"></i> Adicionar Celebração Extra / Solenidade nesta Data</h4>
+                <form id="form-criar-escala-manual" class="flex flex-col sm:flex-row gap-2 items-end">
+                    <div class="flex-1 w-full">
+                        <label class="block text-[10px] font-bold text-amber-800 uppercase mb-0.5">Título da Celebração</label>
+                        <input type="text" id="add-manual-titulo" required placeholder="Ex: Missa de Solenidade de Corpus Christi" class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs font-medium focus:outline-amber-700">
+                    </div>
+                    <div class="w-full sm:w-32">
+                        <label class="block text-[10px] font-bold text-amber-800 uppercase mb-0.5">Horário</label>
+                        <input type="time" id="add-manual-horario" required class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs font-bold focus:outline-amber-700">
+                    </div>
+                    <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs px-4 py-2.5 rounded-lg whitespace-nowrap cursor-pointer w-full sm:w-auto shadow-xs transition-all">
+                        Criar Escala
+                    </button>
+                </form>
+            </div>
+
             <div id="container-editores-missa" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
@@ -99,6 +117,10 @@
                 <div class="space-y-3">
                     <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Mês de Referência</label><input type="month" id="enq-mes-alvo" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700"></div>
                     <div class="flex gap-2"><button id="btn-disparar-enquete" class="flex-1 bg-blue-700 text-white font-bold text-xs py-2 rounded-lg cursor-pointer">Abrir Pesquisa</button><button id="btn-fechar-enquete" class="flex-1 bg-gray-800 text-white font-bold text-xs py-2 rounded-lg cursor-pointer">Fechar</button></div>
+                    
+                    <button type="button" id="btn-limpar-escalas-mes" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs py-2 rounded-lg cursor-pointer mt-1 shadow-2xs transition-all">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Apagar Todas as Escalas do Mês
+                    </button>
                 </div>
                 <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-100"><h4 class="text-[11px] font-bold text-amber-900 uppercase">Fila de Respostas</h4><div id="lista-fila-prioridade" class="space-y-1 max-h-24 overflow-y-auto"></div></div>
                 <form id="form-escala-automatica" class="space-y-3">
@@ -138,7 +160,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -341,6 +363,33 @@
         await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false }); alert("Pesquisa fechada.");
     });
 
+    // AÇÃO DE LIMPAR TODAS AS ESCALAS DO MÊS SELECIONADO
+    document.getElementById('btn-limpar-escalas-mes')?.addEventListener('click', async () => {
+        const mes = document.getElementById('enq-mes-alvo').value;
+        if(!mes) return alert("Por favor, selecione o Mês de Referência primeiro!");
+        if(!confirm(`ATENÇÃO: Deseja REALMENTE apagar TODAS as escalas oficiais registradas no mês ${mes}? Isso evitará duplicidades de horários, mas a ação é irreversível.`)) return;
+
+        try {
+            const snap = await getDocs(collection(db, "escalas"));
+            const promessasDeRemocao = [];
+            let contadorRemovidos = 0;
+
+            snap.forEach(documento => {
+                const dataEscala = documento.data().data;
+                if(dataEscala && dataEscala.startsWith(mes)) {
+                    promessasDeRemocao.push(deleteDoc(doc(db, "escalas", documento.id)));
+                    contadorRemovidos++;
+                }
+            });
+
+            await Promise.all(promessasDeRemocao);
+            alert(`Sucesso! Foram excluídas ${contadorRemovidos} escalas vinculadas ao mês ${mes}.`);
+            if(editorEscalaData && editorEscalaData.value.startsWith(mes)) {
+                carregarEditorEscalasPorData(editorEscalaData.value);
+            }
+        } catch(err) { alert("Erro ao limpar o banco: " + err.message); }
+    });
+
     document.getElementById('form-escala-automatica')?.addEventListener('submit', async (e) => {
         e.preventDefault(); 
         const mes = document.getElementById('enq-mes-alvo').value; 
@@ -369,6 +418,36 @@
         alert("Escalas oficiais lançadas e gravadas com sucesso!");
     });
 
+    // AÇÃO DE ADICIONAR UMA CELEBRAÇÃO EXTRA / SOLENIDADE MANUALMENTE
+    document.getElementById('form-criar-escala-manual')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dataAlvo = editorEscalaData.value;
+        if(!dataAlvo) return alert("Selecione um dia no calendário primeiro!");
+
+        const titulo = document.getElementById('add-manual-titulo').value.trim();
+        const horario = document.getElementById('add-manual-horario').value;
+        const idDoc = `${dataAlvo}_${horario.replace(':', '')}`;
+
+        const checarSeExiste = await getDoc(doc(db, "escalas", idDoc));
+        if(checarSeExiste.exists()) {
+            if(!confirm("Já existe uma escala para este exato horário. Deseja sobrescrever os dados?")) return;
+        }
+
+        try {
+            await setDoc(doc(db, "escalas", idDoc), {
+                titulo: titulo, horario: horario, data: dataAlvo,
+                altar1: { nome: "A definir", status: "Pendente" }, altar2: { nome: "A definir", status: "Pendente" },
+                altar3: { nome: "A definir", status: "Pendente" }, altar4: { nome: "A definir", status: "Pendente" },
+                altar5: { nome: "A definir", status: "Pendente" }, altar6: { nome: "A definir", status: "Pendente" },
+                turibuloAtivo: false, turiferario: { nome: "A definir", status: "Pendente" }, navetaAtiva: false, naveteiro: { nome: "A definir", status: "Pendente" }
+            });
+
+            alert("Solenidade/Escala manual adicionada com sucesso!");
+            document.getElementById('form-criar-escala-manual').reset();
+            carregarEditorEscalasPorData(dataAlvo);
+        } catch(err) { alert("Erro ao criar escala manual: " + err.message); }
+    });
+
     window.excluirEscalaInteira = async function(idDoc) {
         if(confirm("Tem certeza absoluta que deseja APAGAR esta celebração da escala oficial?")) {
             await deleteDoc(doc(db, "escalas", idDoc));
@@ -377,14 +456,29 @@
         }
     };
 
-    // CORREÇÃO EFETUADA AQUI: Ajustada a array de horários removendo strings duplicadas
+    // MOTOR ATUALIZADO: Busca de forma dinâmica qualquer horário direto do banco de dados (Suporta Solenidades)
     async function carregarEditorEscalasPorData(dataString) {
         if(!containerEditoresMissa) return; containerEditoresMissa.innerHTML = "";
-        const hrs = ["19:00", "17:00", "09:00"]; let fnd = false;
-        for (const hr of hrs) {
-            const idDoc = `${dataString}_${hr.replace(':','')}`; const snap = await getDoc(doc(db, "escalas", idDoc));
-            if (snap.exists()) {
-                fnd = true; const d = snap.data(); const dv = document.createElement('div');
+        let fnd = false;
+
+        try {
+            const consulta = query(collection(db, "escalas"), where("data", "==", dataString));
+            const snapshot = await getDocs(consulta);
+            let listaDeEscalas = [];
+
+            snapshot.forEach(docSnap => {
+                const dadosMissa = docSnap.data();
+                dadosMissa.idDocumentoFirebase = docSnap.id;
+                listaDeEscalas.push(dadosMissa);
+            });
+
+            // Ordena as missas pelo horário de início de forma crescente
+            listaDeEscalas.sort((a, b) => a.horario.localeCompare(b.horario));
+
+            listaDeEscalas.forEach(d => {
+                fnd = true; 
+                const idDoc = d.idDocumentoFirebase;
+                const dv = document.createElement('div');
                 dv.className = "bg-white border p-5 rounded-2xl space-y-3 text-xs shadow-xs border-gray-200";
                 dv.innerHTML = `
                     <div class="flex justify-between items-center font-bold border-b pb-2">
@@ -409,8 +503,9 @@
                         <button type="button" onclick="excluirEscalaInteira('${idDoc}')" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-2 rounded-xl font-bold cursor-pointer hover:bg-rose-100">Apagar Escala</button>
                     </div>
                 `; containerEditoresMissa.appendChild(dv);
-            }
-        }
+            });
+        } catch(erro) { console.error("Erro ao resgatar escalas vigentes: ", erro); }
+
         if(!fnd) containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic text-center col-span-2 py-4">Nenhuma escala cadastrada ou ativa para esta data.</p>`;
         else {
             document.querySelectorAll('.btn-salvar-edicao').forEach(btn => {
