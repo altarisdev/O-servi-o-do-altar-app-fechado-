@@ -9,22 +9,25 @@
 </head>
 <body class="bg-slate-50 dark:bg-zinc-950 font-sans min-h-screen flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-500 selection:bg-red-200">
 
+    <!-- Fundo Premium Litúrgico Dinâmico -->
     <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div class="absolute -top-[40%] -left-[20%] w-[80%] h-[80%] rounded-full bg-red-600/10 dark:bg-red-900/10 blur-[120px] animate-pulse duration-[6000ms]"></div>
         <div class="absolute -bottom-[40%] -right-[20%] w-[80%] h-[80%] rounded-full bg-amber-600/5 dark:bg-amber-900/5 blur-[120px] animate-pulse duration-[8000ms]"></div>
-        
         <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] dark:bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:24px_24px]"></div>
     </div>
 
+    <!-- Botão de Alternar Modo Claro/Escuro Animado -->
     <div class="absolute top-4 right-4 z-50">
         <button id="btn-dark-mode" class="relative w-14 h-8 bg-slate-200 dark:bg-zinc-800 rounded-full p-1 cursor-pointer transition-all duration-500 shadow-inner group overflow-hidden border border-slate-300/30 dark:border-zinc-700/30">
-            <div id="dark-mode-thumb" class="w-6 h-6 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center shadow-md transform transition-all duration-500 ease-out translate-x-0 dark:translate-x-6">
+            <!-- Nota: Removida a classe fixa 'dark:translate-x-6' para evitar conflito com o controle do script -->
+            <div id="dark-mode-thumb" class="w-6 h-6 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center shadow-md transform transition-all duration-500 ease-out translate-x-0">
                 <i class="fa-solid fa-sun text-amber-500 text-xs absolute transition-all duration-500 scale-100 rotate-0 dark:scale-0 dark:rotate-180"></i>
-                <i class="fa-solid fa-moon text-red-500 text-xs absolute transition-all duration-500 scale-0 -rotate-180 dark:scale-100 dark:dark:rotate-0"></i>
+                <i class="fa-solid fa-moon text-red-500 text-xs absolute transition-all duration-500 scale-0 -rotate-180 dark:scale-100 dark:rotate-0"></i>
             </div>
         </button>
     </div>
 
+    <!-- Tela de Carregamento Refinada -->
     <div id="tela-loading" class="fixed inset-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-50 flex flex-col items-center justify-center transition-opacity duration-500 pointer-events-none opacity-0">
         <div class="relative flex items-center justify-center mb-4">
             <div class="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-red-600 border-b-amber-500"></div>
@@ -33,6 +36,7 @@
         <p class="text-[10px] font-black text-gray-400 dark:text-zinc-500 tracking-widest uppercase animate-pulse">Sincronizando Presbitério...</p>
     </div>
 
+    <!-- Card Principal de Login -->
     <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-md border border-slate-100/80 dark:border-zinc-800/80 transition-all duration-500 z-10 hover:shadow-[0_24px_60px_rgba(220,38,38,0.06)] dark:hover:shadow-[0_24px_60px_rgba(220,38,38,0.15)] relative backdrop-blur-xs">
         
         <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-red-700 via-amber-500 to-red-600 rounded-t-3xl"></div>
@@ -101,22 +105,37 @@
     const erroLogin = document.getElementById('erro-login');
     const erroLoginTexto = document.getElementById('erro-login-texto');
     const btnDarkMode = document.getElementById('btn-dark-mode');
+    const darkModeThumb = document.getElementById('dark-mode-thumb');
 
-    // Lógica e Controle Animado do Modo Escuro (Persistente no Navegador)
-    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
+    // Função interna para gerenciar o deslizamento físico do botão
+    function sincronizarVisualBotao(isDark) {
+        if (isDark) {
+            darkModeThumb.classList.remove('translate-x-0');
+            darkModeThumb.classList.add('translate-x-6');
+        } else {
+            darkModeThumb.classList.remove('translate-x-6');
+            darkModeThumb.classList.add('translate-x-0');
+        }
     }
 
+    // Lógica e Controle do Modo Escuro (Estado Inicial Fixo)
+    const temaSalvo = localStorage.getItem('theme');
+    const prefereSistemaEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const deveAtivarDark = temaSalvo === 'dark' || (!temaSalvo && prefereSistemaEscuro);
+
+    if (deveAtivarDark) {
+        document.documentElement.classList.add('dark');
+        sincronizarVisualBotao(true);
+    } else {
+        document.documentElement.classList.remove('dark');
+        sincronizarVisualBotao(false);
+    }
+
+    // Evento do clique com tratamento dinâmico de classes de movimentação
     btnDarkMode?.addEventListener('click', () => {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        }
+        const modificadoParaDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', modificadoParaDark ? 'dark' : 'light');
+        sincronizarVisualBotao(modificadoParaDark);
     });
 
     function showLoading() { if(telaLoading) telaLoading.classList.replace('opacity-0', 'opacity-100'); }
