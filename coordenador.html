@@ -56,7 +56,6 @@
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 h-fit space-y-4">
                 <div>
                     <h3 class="text-sm font-black text-gray-800">Cadastrar Novo Membro</h3>
-                    <p class="text-[11px] text-gray-400 font-medium">Cada membro possui seu próprio login e senha individuais.</p>
                 </div>
                 <form id="form-cadastro-usuario" class="space-y-3">
                     <div>
@@ -66,82 +65,72 @@
                             <option value="Coordenador">Coordenador</option>
                         </select>
                     </div>
-
                     <div class="flex items-center gap-2 pt-1 pb-1">
                         <input type="checkbox" id="chk-possui-irmao" class="w-4 h-4 text-amber-700 border-gray-300 rounded focus:ring-amber-500 cursor-pointer">
                         <label for="chk-possui-irmao" class="text-xs font-bold text-gray-700 cursor-pointer select-none">Possui irmão já cadastrado?</label>
                     </div>
-
                     <div id="div-lista-irmaos" class="hidden bg-blue-50/50 p-3 rounded-xl border border-blue-100 space-y-1.5">
-                        <label class="block text-[10px] font-bold text-blue-800 uppercase"><i class="fa-solid fa-link"></i> Selecione o Irmão Cadastrado</label>
-                        <select id="cad-irmao-titular-select" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs font-medium text-gray-800">
-                            <option value="">Selecione um membro...</option>
-                        </select>
+                        <label class="block text-[10px] font-bold text-blue-800 uppercase">Selecione o Irmão Cadastrado</label>
+                        <select id="cad-irmao-titular-select" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs font-medium text-gray-800"></select>
                     </div>
-
                     <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Nome Completo</label><input type="text" id="cad-nome" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
                     <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">E-mail de Login Único</label><input type="email" id="cad-email" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-medium"></div>
                     <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Senha de Acesso</label><div class="flex gap-2"><input type="text" id="cad-senha" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-mono font-bold"><button type="button" id="btn-gerar-senha" class="bg-gray-800 text-white px-2.5 rounded-lg text-xs font-bold cursor-pointer"><i class="fa-solid fa-key"></i></button></div></div>
-                    
-                    <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-xs cursor-pointer"><i class="fa-solid fa-user-plus mr-1"></i> Registrar Membro</button>
+                    <button type="submit" class="w-full bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-xs cursor-pointer">Registrar Membro</button>
                 </form>
             </div>
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 overflow-hidden flex flex-col">
+            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 flex flex-col">
                 <div class="mb-3 flex justify-between items-center"><div><h3 class="text-sm font-black text-gray-800">Lista Geral do Presbitério</h3></div><input type="text" id="busca-usuario-lista" placeholder="Buscar irmão..." class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-xs font-medium"></div>
-                <div class="overflow-x-auto"><table class="w-full text-left text-xs border-collapse"><thead><tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] border-b"><th class="p-3">Nome</th><th class="p-3">E-mail de Login</th><th class="p-3">Senha</th><th class="p-3">Vínculo de Família</th><th class="p-3 text-center">Tipo</th><th class="p-3 text-center">Ações</th></tr></thead><tbody id="tabela-usuarios-recuperacao"></tbody></table></div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-xs border-collapse"><thead><tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] border-b"><th class="p-3">Nome</th><th class="p-3">E-mail</th><th class="p-3">Senha</th><th class="p-3">Vínculo</th><th class="p-3 text-center">Tipo</th><th class="p-3 text-center">Ações</th></tr></thead><tbody id="tabela-usuarios-recuperacao"></tbody></table></div>
             </div>
         </section>
 
         <section id="sec-coord-escalas" class="hidden-coord-tab hidden space-y-4">
             <div class="bg-white p-4 rounded-xl shadow-xs border border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <div><h3 class="text-sm font-black text-gray-800">Editor Manual de Escalas Oficiais</h3></div><input type="date" id="editor-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold">
+                <div><h3 class="text-sm font-black text-gray-800">Visualizar / Editar / Apagar Escalas Vigentes</h3></div>
+                <input type="date" id="editor-escala-data" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold">
             </div>
             <div id="container-editores-missa" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
         <section id="sec-coord-sorteio" class="hidden-coord-tab hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 h-fit">
-                <div><h3 class="text-sm font-black text-gray-800">Controles do Mapeador</h3></div>
+                <div><h3 class="text-sm font-black text-gray-800">Gerador Automático</h3></div>
                 <div class="space-y-3">
                     <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Mês de Referência</label><input type="month" id="enq-mes-alvo" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700"></div>
                     <div class="flex gap-2"><button id="btn-disparar-enquete" class="flex-1 bg-blue-700 text-white font-bold text-xs py-2 rounded-lg cursor-pointer">Abrir Pesquisa</button><button id="btn-fechar-enquete" class="flex-1 bg-gray-800 text-white font-bold text-xs py-2 rounded-lg cursor-pointer">Fechar</button></div>
                 </div>
-                <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-100"><h4 class="text-[11px] font-bold text-amber-900 uppercase">Fila de Prioridade</h4><div id="lista-fila-prioridade" class="space-y-1 max-h-24 overflow-y-auto"></div></div>
+                <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-100"><h4 class="text-[11px] font-bold text-amber-900 uppercase">Fila de Respostas</h4><div id="lista-fila-prioridade" class="space-y-1 max-h-24 overflow-y-auto"></div></div>
                 <form id="form-escala-automatica" class="space-y-3">
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Título Padrão</label><input type="text" id="auto-titulo" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
-                    <button type="submit" class="w-full bg-amber-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-xs cursor-pointer"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gerar Escalas</button>
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Título Padrão das Missas</label><input type="text" id="auto-titulo" required placeholder="Ex: Santa Missa" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
+                    <button type="submit" class="w-full bg-amber-700 text-white font-bold py-2.5 rounded-lg text-xs shadow-xs cursor-pointer"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Lançar Escalas do Mês</button>
                 </form>
             </div>
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 lg:col-span-2 space-y-3">
-                <div><h3 class="text-sm font-black text-gray-800">Lista de Respostas / Disponíveis</h3></div>
+                <div><h3 class="text-sm font-black text-gray-800">Lista de Disponibilidade Recebida</h3></div>
                 <div id="lista-nomes-enquete" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto bg-gray-50 p-3 rounded-xl border"></div>
             </div>
         </section>
 
         <section id="sec-coord-material" class="hidden-coord-tab hidden grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 h-fit">
-                <div>
-                    <h3 class="text-sm font-black text-gray-800">Adicionar Material Didático</h3>
-                    <p class="text-[11px] text-gray-400 font-medium">Os conteúdos salvos aparecerão em formato de lista contínua para os coroinhas.</p>
-                </div>
+                <div><h3 class="text-sm font-black text-gray-800">Adicionar Material Didático</h3></div>
                 <form id="form-upload-formacao" class="space-y-3">
                     <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Título do Material</label><input type="text" id="form-titulo-input" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
-                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">URL do Conteúdo / Drive</label><input type="url" id="form-url-input" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
-                    <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2.5 rounded-lg shadow-xs cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Publicar Conteúdo</button>
+                    <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">URL do Conteúdo (Drive/Link)</label><input type="url" id="form-url-input" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs"></div>
+                    <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2.5 rounded-lg shadow-xs cursor-pointer">Publicar Conteúdo</button>
                 </form>
             </div>
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 md:col-span-2">
-                <h3 class="text-sm font-black text-gray-800 mb-3">Conteúdos Ativos no Aplicativo</h3>
-                <div id="lista-adm-materiais" class="space-y-2">
-                    <p class="text-xs text-gray-400 italic">Buscando lista de arquivos...</p>
-                </div>
+                <h3 class="text-sm font-black text-gray-800 mb-3">Materiais Visíveis para os Coroinhas</h3>
+                <div id="lista-adm-materiais" class="space-y-2"><p class="text-xs text-gray-400 italic">Buscando lista...</p></div>
             </div>
         </section>
 
         <section id="sec-coord-avisos-tab" class="hidden-coord-tab hidden max-w-xl bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4">
             <form id="form-publicar-aviso" class="space-y-3">
-                <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Texto do Comunicado</label><textarea id="txt-aviso-coordenador" required rows="6" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs"></textarea></div>
-                <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2.5 rounded-lg cursor-pointer"><i class="fa-solid fa-bullhorn mr-1"></i> Publicar no Mural</button>
+                <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Texto do Comunicado Geral</label><textarea id="txt-aviso-coordenador" required rows="6" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs"></textarea></div>
+                <button type="submit" class="w-full bg-amber-800 text-white text-xs font-bold py-2.5 rounded-lg cursor-pointer">Publicar no Mural</button>
             </form>
         </section>
     </main>
@@ -171,12 +160,11 @@
     const editorEscalaData = document.getElementById('editor-escala-data');
     const containerEditoresMissa = document.getElementById('container-editores-missa');
     const btnLogout = document.getElementById('btn-logout');
-
     const chkPossuiIrmao = document.getElementById('chk-possui-irmao');
     const divListaIrmaos = document.getElementById('div-lista-irmaos');
     const selectIrmaoTitular = document.getElementById('cad-irmao-titular-select');
 
-    let usuarioLogadoDados = null; let mapaRespostasGerais = {}; let cacheTodosUsuarios = []; let unsubUsuarios = null;
+    let usuarioLogadoDados = null; let mapaRespostasGerais = {}; let cacheTodosUsuarios = [];
 
     const CRONOGRAMA_PAROQUIA = [
         { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" }, { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
@@ -260,7 +248,7 @@
     }
 
     function ouvirUsuariosCadastrados() {
-        unsubUsuarios = onSnapshot(collection(db, "usuarios"), (snap) => {
+        onSnapshot(collection(db, "usuarios"), (snap) => {
             cacheTodosUsuarios = []; snap.forEach(d => { const u = d.data(); u.idDoc = d.id; cacheTodosUsuarios.push(u); });
             cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome)); renderizarTabelaUsuarios();
             if(chkPossuiIrmao && chkPossuiIrmao.checked) { atualizarListboxMembros(); }
@@ -270,46 +258,21 @@
     function renderizarTabelaUsuarios() {
         const b = document.getElementById('tabela-usuarios-recuperacao'); if(!b) return; b.innerHTML = "";
         const termo = buscaUsuarioLista?.value.toLowerCase() || "";
-        
         cacheTodosUsuarios.filter(u => u.nome.toLowerCase().includes(termo)).forEach(u => {
-            let badgeTipo = ""; let colunaConexao = `<span class="text-gray-400 italic text-[11px]">Nenhum</span>`;
+            let badgeTipo = u.funcao === "Coordenador" ? `<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Coordenação</span>` : `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Oficial</span>`;
+            let colunaConexao = u.email_conexao ? `<span class="text-blue-700 font-bold text-[11px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">Irmão de: ${u.email_conexao}</span>` : `<span class="text-gray-400 italic text-[11px]">Nenhum</span>`;
             let senhaExibicao = u.senha_provisoria || `<span class="text-gray-400 italic">Alterada</span>`;
-
-            if (u.funcao === "Coordenador") {
-                badgeTipo = `<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Coordenação</span>`;
-            } else {
-                badgeTipo = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Oficial</span>`;
-                if (u.email_conexao) {
-                    colunaConexao = `<span class="text-blue-700 font-bold text-[11px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">Irmão de: ${u.email_conexao}</span>`;
-                } else {
-                    const temIrmaos = cacheTodosUsuarios.filter(i => i.email_conexao === u.email);
-                    if(temIrmaos.length > 0) { colunaConexao = `<span class="text-emerald-700 text-[10px] font-medium block">Vinculado a: ${temIrmaos.map(i => i.nome.split(' ')[0]).join(', ')}</span>`; }
-                }
-            }
-
-            b.innerHTML += `
-                <tr class="border-b hover:bg-gray-50/50">
-                    <td class="p-3 font-semibold">${u.nome}</td>
-                    <td class="p-3 font-mono text-gray-600">${u.email}</td>
-                    <td class="p-3 font-mono font-bold text-amber-800">${senhaExibicao}</td>
-                    <td class="p-3">${colunaConexao}</td>
-                    <td class="p-3 text-center">${badgeTipo}</td>
-                    <td class="p-3 text-center"><button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2 py-1 rounded border border-rose-200 text-[11px] hover:bg-rose-100 cursor-pointer">Excluir</button></td>
-                </tr>`;
+            b.innerHTML += `<tr class="border-b hover:bg-gray-50/50"><td class="p-3 font-semibold">${u.nome}</td><td class="p-3 font-mono text-gray-600">${u.email}</td><td class="p-3 font-mono font-bold text-amber-800">${senhaExibicao}</td><td class="p-3">${colunaConexao}</td><td class="p-3 text-center">${badgeTipo}</td><td class="p-3 text-center"><button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2 py-1 rounded border border-rose-200 text-[11px] hover:bg-rose-100 cursor-pointer">Excluir</button></td></tr>`;
         });
     }
     buscaUsuarioLista?.addEventListener('input', renderizarTabelaUsuarios);
 
-    // ADICIONA NOVO CONTEÚDO À COLEÇÃO (SUPORTA MÚLTIPLOS)
     document.getElementById('form-upload-formacao')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const titulo = document.getElementById('form-titulo-input').value.trim();
         const url = document.getElementById('form-url-input').value.trim();
-        
-        // Gera um ID baseado em Timestamp para salvar múltiplos
         const idConteudo = "mat_" + Date.now();
         await setDoc(doc(db, "formacao", idConteudo), { id: idConteudo, titulo: titulo, url: url });
-        
         alert("Novo material adicionado com sucesso!");
         document.getElementById('form-upload-formacao').reset();
     });
@@ -321,11 +284,7 @@
             container.innerHTML = "";
             snap.forEach(d => {
                 const mat = d.data();
-                container.innerHTML += `
-                    <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-xs">
-                        <div><strong class="text-gray-800 block">${mat.titulo}</strong><span class="text-[10px] text-gray-400 font-mono">${mat.url}</span></div>
-                        <button onclick="window.removerConteudoDidatico('${d.id}')" class="bg-rose-50 border border-rose-200 text-rose-700 px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-rose-100 cursor-pointer">Excluir</button>
-                    </div>`;
+                container.innerHTML += `<div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-xs"><div><strong class="text-gray-800 block">${mat.titulo}</strong><span class="text-[10px] text-gray-400 font-mono">${mat.url}</span></div><button onclick="window.removerConteudoDidatico('${d.id}')" class="bg-rose-50 border border-rose-200 text-rose-700 px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-rose-100 cursor-pointer">Excluir</button></div>`;
             });
         });
     }
@@ -365,8 +324,8 @@
     }
 
     document.getElementById('btn-disparar-enquete')?.addEventListener('click', async () => {
-        const mes = document.getElementById('enq-mes-alvo').value; if(!mes) return; const [a, m] = mes.split('-').map(Number);
-        const list = []; const curr = new Date(a, m - 1, 1);
+        const mes = document.getElementById('enq-mes-alvo').value; if(!mes) return alert("Selecione o mês!");
+        const [a, m] = mes.split('-').map(Number); const list = []; const curr = new Date(a, m - 1, 1);
         while(curr.getMonth() === m - 1) {
             CRONOGRAMA_PAROQUIA.filter(c => c.diaSemana === curr.getDay()).forEach(item => {
                 const dStr = curr.toISOString().split('T')[0];
@@ -375,22 +334,26 @@
             curr.setDate(curr.getDate() + 1);
         }
         await setDoc(doc(db, "enquetes", "disponibilidade_atual"), { mesReferencia: mes, ativa: true, celebracoes: list, respostas: {} });
-        alert("Pesquisa disparada!");
+        alert("Pesquisa de disponibilidade aberta!");
     });
 
     document.getElementById('btn-fechar-enquete')?.addEventListener('click', async () => {
         await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false }); alert("Pesquisa fechada.");
     });
 
+    // CORREÇÃO CRÍTICA: GERAÇÃO DA NOVA ESCALA USANDO O CAMPO DO MÊS CORRETAMENTE
     document.getElementById('form-escala-automatica')?.addEventListener('submit', async (e) => {
-        e.preventDefault(); const mes = document.getElementById('enq-mes-alvo').value; if(!mes) return;
+        e.preventDefault(); 
+        const mes = document.getElementById('enq-mes-alvo').value; 
+        if(!mes) return alert("Por favor, selecione o mês alvo no campo acima antes de gerar!");
+        
         const [a, m] = mes.split('-').map(Number); const list = []; const curr = new Date(a, m - 1, 1);
         while(curr.getMonth() === m - 1) {
             CRONOGRAMA_PAROQUIA.filter(c => c.diaSemana === curr.getDay()).forEach(item => {
                 const dStr = curr.toISOString().split('T')[0];
                 list.push({ idChave: `${dStr}_${item.horario.replace(':','')}`, data: dStr, horario: item.horario, rotulo: item.rotulo });
             });
-            curr.setDate(curr.setDate() + 1);
+            curr.setDate(curr.getDate() + 1);
         }
         const tit = document.getElementById('auto-titulo').value.trim();
         for(const cel of list) {
@@ -404,31 +367,52 @@
                 turibuloAtivo: false, turiferario: { nome: "A definir", status: "Pendente" }, navetaAtiva: false, naveteiro: { nome: "A definir", status: "Pendente" }
             });
         }
-        alert("Escalas salvas!");
+        alert("Escalas oficiais lançadas e gravadas com sucesso!");
     });
+
+    // CORREÇÃO CRÍTICA: REMOÇÃO E EDIÇÃO DE ESCALA VIGENTE
+    window.excluirEscalaInteira = async function(idDoc) {
+        if(confirm("Tem certeza absoluta que deseja APAGAR esta celebração da escala oficial?")) {
+            await deleteDoc(doc(db, "escalas", idDoc));
+            alert("Escala excluída!");
+            carregarEditorEscalasPorData(editorEscalaData.value);
+        }
+    };
 
     async function carregarEditorEscalasPorData(dataString) {
         if(!containerEditoresMissa) return; containerEditoresMissa.innerHTML = "";
-        const hrs = ["1900", "1700", "0900"]; let fnd = false;
+        const hrs = ["19:00", "17:00", "09:00", "1900", "1700", "0900"]; let fnd = false;
         for (const hr of hrs) {
-            const idDoc = `${dataString}_${hr}`; const snap = await getDoc(doc(db, "escalas", idDoc));
+            const idDoc = `${dataString}_${hr.replace(':','')}`; const snap = await getDoc(doc(db, "escalas", idDoc));
             if (snap.exists()) {
                 fnd = true; const d = snap.data(); const dv = document.createElement('div');
-                dv.className = "bg-gray-50 border p-4 rounded-xl space-y-3 text-xs";
+                dv.className = "bg-white border p-5 rounded-2xl space-y-3 text-xs shadow-xs border-gray-200";
                 dv.innerHTML = `
-                    <div class="flex justify-between font-bold"><span>Missa: ${d.horario}h</span><span class="bg-amber-200 p-0.5 rounded">${d.titulo}</span></div>
-                    <div class="grid grid-cols-2 gap-1">
-                        <input type="text" id="edit-a1-${idDoc}" value="${d.altar1?.nome||''}" class="border p-1 bg-white rounded"> <input type="text" id="edit-a2-${idDoc}" value="${d.altar2?.nome||''}" class="border p-1 bg-white rounded">
-                        <input type="text" id="edit-a3-${idDoc}" value="${d.altar3?.nome||''}" class="border p-1 bg-white rounded"> <input type="text" id="edit-a4-${idDoc}" value="${d.altar4?.nome||''}" class="border p-1 bg-white rounded">
-                        <input type="text" id="edit-a5-${idDoc}" value="${d.altar5?.nome||''}" class="border p-1 bg-white rounded"> <input type="text" id="edit-a6-${idDoc}" value="${d.altar6?.nome||''}" class="border p-1 bg-white rounded">
+                    <div class="flex justify-between items-center font-bold border-b pb-2">
+                        <span class="text-amber-950">Horário: ${d.horario}h</span>
+                        <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[10px]">${d.titulo}</span>
                     </div>
-                    <div class="flex gap-4"><label><input type="checkbox" id="chk-turi-${idDoc}" ${d.turibuloAtivo?'checked':''}> Turíbulo</label><label><input type="checkbox" id="chk-nave-${idDoc}" ${d.navetaAtiva?'checked':''}> Naveta</label></div>
-                    <div class="grid grid-cols-2 gap-1"><input type="text" id="edit-turi-${idDoc}" value="${d.turiferario?.nome||''}" class="border p-1 bg-white rounded"><input type="text" id="edit-nave-${idDoc}" value="${d.naveteiro?.nome||''}" class="border p-1 bg-white rounded"></div>
-                    <button type="button" data-id="${idDoc}" class="btn-salvar-edicao w-full bg-amber-800 text-white py-1 rounded font-bold cursor-pointer">Atualizar Escala</button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 1</label><input type="text" id="edit-a1-${idDoc}" value="${d.altar1?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 2</label><input type="text" id="edit-a2-${idDoc}" value="${d.altar2?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 3</label><input type="text" id="edit-a3-${idDoc}" value="${d.altar3?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 4</label><input type="text" id="edit-a4-${idDoc}" value="${d.altar4?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 5</label><input type="text" id="edit-a5-${idDoc}" value="${d.altar5?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 6</label><input type="text" id="edit-a6-${idDoc}" value="${d.altar6?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                    </div>
+                    <div class="flex gap-4 border-t pt-2"><label class="flex items-center gap-1"><input type="checkbox" id="chk-turi-${idDoc}" ${d.turibuloAtivo?'checked':''}> Turíbulo</label><label class="flex items-center gap-1"><input type="checkbox" id="chk-nave-${idDoc}" ${d.navetaAtiva?'checked':''}> Naveta</label></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Turiferário</label><input type="text" id="edit-turi-${idDoc}" value="${d.turiferario?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Naveteiro</label><input type="text" id="edit-nave-${idDoc}" value="${d.naveteiro?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                    </div>
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" data-id="${idDoc}" class="btn-salvar-edicao flex-1 bg-emerald-700 text-white py-2 rounded-xl font-bold cursor-pointer hover:bg-emerald-800">Salvar Alterações</button>
+                        <button type="button" onclick="excluirEscalaInteira('${idDoc}')" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-2 rounded-xl font-bold cursor-pointer hover:bg-rose-100">Apagar Escala</button>
+                    </div>
                 `; containerEditoresMissa.appendChild(dv);
             }
         }
-        if(!fnd) containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma escala programada.</p>`;
+        if(!fnd) containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic text-center col-span-2 py-4">Nenhuma escala cadastrada ou ativa para esta data.</p>`;
         else {
             document.querySelectorAll('.btn-salvar-edicao').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
@@ -446,12 +430,9 @@
     }
     editorEscalaData?.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
 
-    // LÓGICA DE ESTILIZAÇÃO DO MENU VERTICAL DA SIDEBAR
     window.switchCoordTab = function(tabID) {
         document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
         document.getElementById('sec-' + tabID)?.classList.remove('hidden');
-
-        // Atualiza estilo dos botões da sidebar
         const ids = ['usuarios', 'escalas', 'sorteio', 'material', 'avisos'];
         ids.forEach(id => {
             const btn = document.getElementById(`btn-c-${id}`);
