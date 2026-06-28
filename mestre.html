@@ -51,24 +51,13 @@
 
         <section id="sec-m-missas" class="hidden-mestre-tab space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-100 pb-4">
-                    <div>
-                        <h3 class="text-sm font-black text-gray-800">Frequência e Substituições em Missas</h3>
-                        <p class="text-[11px] text-gray-400">Auditoria de assiduidade dos coroinhas no altar por mês.</p>
-                    </div>
-                    <input type="month" id="filtro-mes-missas" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-xs font-bold text-gray-700">
+                <div class="flex justify-between items-center border-b pb-4">
+                    <h3 class="text-sm font-black text-gray-800">Frequência em Missas</h3>
+                    <input type="month" id="filtro-mes-missas" class="bg-gray-50 border p-2 rounded-lg text-xs font-bold">
                 </div>
                 <div class="overflow-x-auto mt-4">
                     <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-gray-50 text-gray-600 font-bold uppercase text-[10px] border-b">
-                                <th class="p-3">Coroinha / Acólito</th>
-                                <th class="p-3 text-center text-emerald-700">✓ Confirmadas</th>
-                                <th class="p-3 text-center text-rose-700">X Faltas</th>
-                                <th class="p-3 text-center text-blue-700">🔄 Subs. Solicitadas</th>
-                                <th class="p-3 text-center text-amber-700">⚡ Atendeu Sub.</th>
-                            </tr>
-                        </thead>
+                        <thead><tr class="bg-gray-50 uppercase text-[10px] text-gray-600 border-b"><th class="p-3">Coroinha</th><th class="p-3 text-center">✓ Conf</th><th class="p-3 text-center">X Faltas</th><th class="p-3 text-center">🔄 Subs</th><th class="p-3 text-center">⚡ Atendeu</th></tr></thead>
                         <tbody id="tabela-frequencia-missas" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
@@ -77,18 +66,10 @@
 
         <section id="sec-m-reunioes" class="hidden-mestre-tab hidden space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200">
-                <h3 class="text-sm font-black text-gray-800">Frequência Geral em Reuniões</h3>
+                <h3 class="text-sm font-black text-gray-800">Frequência em Reuniões</h3>
                 <div class="overflow-x-auto mt-4">
                     <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-gray-50 text-gray-600 font-bold uppercase text-[10px] border-b">
-                                <th class="p-3">Membro</th>
-                                <th class="p-3 text-center text-emerald-700">✓ Presente</th>
-                                <th class="p-3 text-center text-rose-700">X Falta</th>
-                                <th class="p-3 text-center text-blue-700">FJ Justificada</th>
-                                <th class="p-3 text-center">Aproveitamento</th>
-                            </tr>
-                        </thead>
+                        <thead><tr class="bg-gray-50 uppercase text-[10px] text-gray-600 border-b"><th class="p-3">Membro</th><th class="p-3 text-center">✓ Pres</th><th class="p-3 text-center">X Falta</th><th class="p-3 text-center">FJ Just</th><th class="p-3 text-center">Aproveitamento</th></tr></thead>
                         <tbody id="tabela-frequencia-reunioes" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
@@ -96,114 +77,83 @@
         </section>
 
         <section id="sec-m-material" class="hidden-mestre-tab hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 space-y-4 h-fit">
-                <h3 class="text-sm font-black text-gray-800">Adicionar Material</h3>
-                <form id="form-mestre-material" class="space-y-3">
-                    <input type="text" id="mat-titulo" required placeholder="Título" class="w-full bg-gray-50 border p-2 rounded-lg text-xs">
-                    <input type="url" id="mat-url" required placeholder="URL do Link" class="w-full bg-gray-50 border p-2 rounded-lg text-xs">
-                    <button type="submit" class="w-full bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg">Publicar</button>
-                </form>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200 md:col-span-2 space-y-3">
-                <h3 class="text-sm font-black text-gray-800">Acervo Histórico</h3>
-                <div id="lista-mestre-materiais" class="space-y-2 divide-y divide-gray-50"></div>
-            </div>
+            <form id="form-mestre-material" class="bg-white p-5 rounded-2xl shadow-xs border h-fit space-y-3">
+                <h3 class="text-sm font-black">Adicionar Material</h3>
+                <input type="text" id="mat-titulo" required placeholder="Título" class="w-full bg-gray-50 border p-2 rounded-lg text-xs">
+                <input type="url" id="mat-url" required placeholder="URL Link" class="w-full bg-gray-50 border p-2 rounded-lg text-xs">
+                <button type="submit" class="w-full bg-amber-700 text-white p-2 rounded-lg text-xs font-bold">Publicar</button>
+            </form>
+            <div id="lista-mestre-materiais" class="md:col-span-2 bg-white p-5 rounded-2xl shadow-xs border"></div>
         </section>
 
         <section id="sec-m-disciplina" class="hidden-mestre-tab hidden space-y-6">
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200">
-                <h3 class="text-sm font-black text-gray-800">Registrar Ação Disciplinar</h3>
-                <form id="form-disciplina" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <select id="disc-membro" required class="bg-gray-50 border p-2 rounded-lg text-xs"><option value="">Selecione o Membro</option></select>
-                    <select id="disc-tipo" required class="bg-gray-50 border p-2 rounded-lg text-xs">
-                        <option value="Advertência">Advertência</option>
-                        <option value="Suspensão">Suspensão</option>
-                    </select>
-                    <input type="text" id="disc-motivo" placeholder="Motivação da ação..." required class="md:col-span-2 bg-gray-50 border p-2 rounded-lg text-xs">
+            <div class="bg-white p-5 rounded-2xl shadow-xs border">
+                <h3 class="text-sm font-black text-rose-800 mb-4"><i class="fa-solid fa-triangle-exclamation"></i> Registrar Medida</h3>
+                <form id="form-disciplina" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <select id="disc-membro" required class="bg-gray-50 border p-2 rounded-lg text-xs"></select>
+                    <select id="disc-tipo" required class="bg-gray-50 border p-2 rounded-lg text-xs"><option value="Advertência">Advertência</option><option value="Suspensão">Suspensão</option></select>
+                    <input type="text" id="disc-motivo" placeholder="Motivação da medida..." required class="md:col-span-2 bg-gray-50 border p-2 rounded-lg text-xs">
                     <button type="submit" class="md:col-span-2 bg-rose-700 text-white py-2 rounded-lg text-xs font-bold hover:bg-rose-800 transition-all">Aplicar Medida</button>
                 </form>
             </div>
-            <div class="bg-white p-5 rounded-2xl shadow-xs border border-gray-200">
-                <h3 class="text-sm font-black text-gray-800 mb-4">Histórico Disciplinar</h3>
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead class="text-gray-500 border-b"><tr><th class="p-2">Membro</th><th class="p-2">Tipo</th><th class="p-2">Motivo</th><th class="p-2">Data</th></tr></thead>
-                    <tbody id="lista-disciplinar" class="divide-y divide-gray-100"></tbody>
-                </table>
-            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-xs border"><div id="lista-disciplinar" class="space-y-2"></div></div>
         </section>
-
     </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, collection, onSnapshot, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
+    const db = getFirestore(initializeApp({
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
         authDomain: "tarcisius-d03d7.firebaseapp.com",
         projectId: "tarcisius-d03d7",
         storageBucket: "tarcisius-d03d7.firebasestorage.app",
         messagingSenderId: "186797936591",
         appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
-    };
+    }));
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    
     let cacheUsuarios = [];
 
-    // --- Inicialização ---
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const docSnap = await getDoc(doc(db, "usuarios", user.uid));
-            if (docSnap.exists() && (docSnap.data().funcao === "Coordenador" || docSnap.data().funcao === "Mestre")) {
-                inicializarPainelMestre();
-            } else { window.location.href = "index.html"; }
-        } else { window.location.href = "index.html"; }
-        document.getElementById('tela-loading')?.classList.add('opacity-0', 'pointer-events-none');
-    });
-
-    function inicializarPainelMestre() {
-        // Carrega usuários e inicializa relatórios
+    // Lógica Inicialização e Autenticação
+    onAuthStateChanged(getAuth(), async (user) => {
+        if (!user) return window.location.href = "index.html";
+        document.getElementById('tela-loading').classList.add('opacity-0', 'pointer-events-none');
+        
         onSnapshot(collection(db, "usuarios"), (snap) => {
             cacheUsuarios = [];
-            snap.forEach(d => { if(d.data().funcao !== "Coordenador") cacheUsuarios.push(d.data().nome); });
-            cacheUsuarios.sort();
-            
             const select = document.getElementById('disc-membro');
             select.innerHTML = '<option value="">Selecione o Membro</option>';
-            cacheUsuarios.forEach(nome => select.innerHTML += `<option value="${nome}">${nome}</option>`);
-            
+            snap.forEach(d => {
+                if(d.data().funcao !== "Coordenador") {
+                    cacheUsuarios.push(d.data().nome);
+                    select.innerHTML += `<option value="${d.data().nome}">${d.data().nome}</option>`;
+                }
+            });
             carregarRelatorioMissas();
             carregarRelatorioReunioes();
         });
-
         ouvirMateriaisMestre();
         ouvirDisciplinas();
-        
-        document.getElementById('filtro-mes-missas').value = new Date().toISOString().substring(0, 7);
-        document.getElementById('filtro-mes-missas').addEventListener('change', carregarRelatorioMissas);
-    }
+    });
 
-    // --- Relatórios de Missas ---
+    // Funções de Processamento
     async function carregarRelatorioMissas() {
         const tbody = document.getElementById('tabela-frequencia-missas');
-        const mes = document.getElementById('filtro-mes-missas').value;
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center italic">Carregando...</td></tr>`;
-        
+        if(!tbody) return;
+        tbody.innerHTML = "";
+        const mes = document.getElementById('filtro-mes-missas')?.value || new Date().toISOString().substring(0, 7);
         const snapEscalas = await getDocs(collection(db, "escalas"));
         let relatorio = {};
         cacheUsuarios.forEach(n => relatorio[n] = { pres: 0, falt: 0, sub: 0, atende: 0 });
-
-        snapEscalas.forEach(docSnap => {
-            const e = docSnap.data();
-            if(e.data && e.data.startsWith(mes)) {
+        snapEscalas.forEach(d => {
+            const e = d.data();
+            if(e.data?.startsWith(mes)) {
                 for(let i=1; i<=6; i++) {
-                    const v = e[`altar${i}`];
+                    const v = e['altar'+i];
                     if(v && relatorio[v.nome]) {
-                        if(v.status == "Confirmado" || v.status == "Presente") relatorio[v.nome].pres++;
+                        if(v.status == "Presente" || v.status == "Confirmado") relatorio[v.nome].pres++;
                         if(v.status == "Falta") relatorio[v.nome].falt++;
                         if(v.status == "Substituido") relatorio[v.nome].sub++;
                     }
@@ -211,60 +161,45 @@
                 if(e.substitutoNome && relatorio[e.substitutoNome]) relatorio[e.substitutoNome].atende++;
             }
         });
-
-        tbody.innerHTML = "";
         Object.keys(relatorio).forEach(n => {
             const d = relatorio[n];
             tbody.innerHTML += `<tr><td class="p-3 font-bold">${n}</td><td class="p-3 text-center text-emerald-700">${d.pres}</td><td class="p-3 text-center text-rose-700">${d.falt}</td><td class="p-3 text-center text-blue-700">${d.sub}</td><td class="p-3 text-center text-amber-700">${d.atende}</td></tr>`;
         });
     }
 
-    // --- Relatórios de Reuniões ---
     async function carregarRelatorioReunioes() {
         const snap = await getDocs(collection(db, "reunioes"));
         const tbody = document.getElementById('tabela-frequencia-reunioes');
+        if(!tbody) return;
         tbody.innerHTML = "";
-        
         cacheUsuarios.forEach(nome => {
-            let p=0, f=0, j=0, total=0;
-            snap.forEach(doc => {
-                const pres = doc.data().presencas || {};
+            let p=0, f=0, j=0, tot=0;
+            snap.forEach(d => {
+                const pres = d.data().presencas || {};
                 if(pres[nome]) {
-                    total++;
+                    tot++;
                     if(pres[nome] == "presente") p++;
                     if(pres[nome] == "falta") f++;
                     if(pres[nome] == "justificada") j++;
                 }
             });
-            const apr = total > 0 ? Math.round(((p+j)/total)*100) : 100;
-            tbody.innerHTML += `<tr><td class="p-3 font-bold">${nome}</td><td class="p-3 text-center text-emerald-600">${p}</td><td class="p-3 text-center text-rose-600">${f}</td><td class="p-3 text-center text-blue-600">${j}</td><td class="p-3 text-center"><span class="${apr < 75 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'} font-black px-2 py-0.5 rounded">${apr}%</span></td></tr>`;
+            const apr = tot > 0 ? Math.round(((p+j)/tot)*100) : 100;
+            tbody.innerHTML += `<tr><td class="p-3 font-bold">${nome}</td><td class="p-3 text-center text-emerald-600">${p}</td><td class="p-3 text-center text-rose-600">${f}</td><td class="p-3 text-center text-blue-600">${j}</td><td class="p-3 text-center"><span class="${apr < 75 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'} px-2 py-0.5 rounded font-black">${apr}%</span></td></tr>`;
         });
     }
 
-    // --- Materiais e Disciplina ---
-    function ouvirMateriaisMestre() {
-        onSnapshot(collection(db, "formacao"), (snap) => {
-            const div = document.getElementById('lista-mestre-materiais');
-            div.innerHTML = "";
-            snap.forEach(d => {
-                const m = d.data();
-                div.innerHTML += `<div class="flex justify-between py-2 text-xs"><div><strong>${m.titulo}</strong><br><a href="${m.url}" class="text-amber-700" target="_blank">${m.url}</a></div><button onclick="removerMaterial('${d.id}')" class="text-rose-600">Excluir</button></div>`;
-            });
-        });
-    }
-
+    // Disciplina e Materiais
     function ouvirDisciplinas() {
         onSnapshot(collection(db, "disciplina"), (snap) => {
-            const lista = document.getElementById('lista-disciplinar');
-            lista.innerHTML = "";
+            const div = document.getElementById('lista-disciplinar');
+            div.innerHTML = "";
             snap.forEach(d => {
                 const i = d.data();
-                lista.innerHTML += `<tr><td class="p-2 font-bold">${i.membro}</td><td class="p-2">${i.tipo}</td><td class="p-2">${i.motivo}</td><td class="p-2">${i.data}</td></tr>`;
+                div.innerHTML += `<div class="p-2 border-b text-xs flex justify-between"><div><span class="font-bold text-rose-700">${i.tipo}</span> - ${i.membro}: ${i.motivo}</div><div class="text-gray-400">${i.data}</div></div>`;
             });
         });
     }
 
-    // --- Handlers de Ação ---
     document.getElementById('form-disciplina').addEventListener('submit', async (e) => {
         e.preventDefault();
         await setDoc(doc(db, "disciplina", "disc_" + Date.now()), {
@@ -277,21 +212,23 @@
         e.target.reset();
     });
 
-    document.getElementById('form-mestre-material').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await setDoc(doc(db, "formacao", "mat_" + Date.now()), {
-            titulo: document.getElementById('mat-titulo').value,
-            url: document.getElementById('mat-url').value
+    function ouvirMateriaisMestre() {
+        onSnapshot(collection(db, "formacao"), (snap) => {
+            const div = document.getElementById('lista-mestre-materiais');
+            div.innerHTML = "";
+            snap.forEach(d => {
+                const m = d.data();
+                div.innerHTML += `<div class="flex justify-between py-2 border-b text-xs"><div><strong>${m.titulo}</strong><br><a href="${m.url}" target="_blank" class="text-amber-700">${m.url}</a></div><button onclick="removerMaterial('${d.id}')" class="text-rose-600">Excluir</button></div>`;
+            });
         });
-        e.target.reset();
-    });
+    }
 
     window.removerMaterial = async (id) => await deleteDoc(doc(db, "formacao", id));
     window.switchMestreTab = (tabID) => {
         document.querySelectorAll('.hidden-mestre-tab').forEach(el => el.classList.add('hidden'));
         document.getElementById('sec-' + tabID).classList.remove('hidden');
     };
-    document.getElementById('btn-logout').addEventListener('click', () => signOut(auth).then(() => location.href = "index.html"));
+    document.getElementById('btn-logout').addEventListener('click', () => signOut(getAuth()).then(() => location.href = "index.html"));
 </script>
 </body>
 </html>
