@@ -16,7 +16,7 @@
         /* Fundo Litúrgico - Padrão Sacro */
         .bg-sacro-dourado {
             background-color: #f8fafc;
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA5OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
         }
 
         .dark .bg-sacro-dourado {
@@ -58,7 +58,7 @@
             </div>
             
             <div class="flex items-center gap-4">
-                <button id="btn-dark-mode" class="relative w-12 h-7 bg-red-950/40 dark:bg-zinc-800 rounded-full p-1 cursor-pointer transition-all duration-500 border border-white/5 dark:border-zinc-700/30">
+                <button id="btn-dark-mode" aria-label="Alternar Tema" class="relative w-12 h-7 bg-red-950/40 dark:bg-zinc-800 rounded-full p-1 cursor-pointer transition-all duration-500 border border-white/5 dark:border-zinc-700/30">
                     <div id="dark-mode-thumb" class="w-5 h-5 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center shadow-md transform transition-all duration-500 ease-out translate-x-0 dark:translate-x-5">
                         <i class="fa-solid fa-sun text-amber-500 text-[10px] absolute transition-all duration-500 scale-100 rotate-0 dark:scale-0 dark:rotate-180"></i>
                         <i class="fa-solid fa-moon text-red-500 text-[10px] absolute transition-all duration-500 scale-0 -rotate-180 dark:scale-100 dark:rotate-0"></i>
@@ -105,7 +105,7 @@
                     </div>
                 </div>
 
-                <div p-6 class="p-6">
+                <div class="p-6">
                     <div id="resultado-escala-geral" class="space-y-5 text-xs">
                         <p class="text-slate-400 dark:text-zinc-500 italic flex items-center gap-2"><i class="fa-solid fa-circle-notch animate-spin"></i> Buscando informações do dia...</p>
                     </div>
@@ -139,7 +139,6 @@
                             <p id="txt-aviso-mural" class="text-xs font-medium text-slate-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed">Nenhum comunicado oficial recente.</p>
                             <span id="data-aviso-mural" class="block text-[9px] font-bold text-slate-400 dark:text-zinc-500 mt-3 text-right tracking-wider">--/--/----</span>
                         </div>
-                        <!-- As penalidades específicas deste usuário serão injetadas dinamicamente aqui -->
                     </div>
                 </div>
             </div>
@@ -211,7 +210,6 @@
     let usuarioLogadoDados = null; 
     let todasEscalasCache = [];
 
-    // Persistência e sincronização visual do Dark Mode
     function sincronizarVisualBotao(isDark) {
         if (darkModeThumb) {
             if (isDark) {
@@ -297,13 +295,10 @@
         if(!containerMural) return;
 
         onSnapshot(collection(db, "penalidades"), (snap) => {
-            // Remove os cards de penalidade antigos para não duplicar na renderização em tempo real
             document.querySelectorAll('.card-penalidade-dinamico').forEach(el => el.remove());
 
             snap.forEach(docSnap => {
                 const data = docSnap.data();
-                
-                // Valida se a penalidade pertence ao coroinha atualmente logado
                 if(data.nome && usuarioLogadoDados && data.nome.toLowerCase().trim() === usuarioLogadoDados.nome.toLowerCase().trim()) {
                     const cardPenalidade = document.createElement('div');
                     cardPenalidade.className = "card-penalidade-dinamico bg-red-50/70 dark:bg-red-950/20 p-4 rounded-2xl border border-red-200 dark:border-red-900/40 hover:border-red-500/50 transition-all shadow-xs relative overflow-hidden animate-pulse";
@@ -335,7 +330,7 @@
             snap.forEach(docSnap => {
                 const data = docSnap.data();
                 container.innerHTML += `
-                    <a href="${data.url}" target="_blank" class="flex items-center gap-3 bg-slate-50/70 dark:bg-zinc-800/30 hover:bg-red-50/40 dark:hover:bg-red-950/20 p-2.5 rounded-xl border border-slate-100 dark:border-zinc-800/60 transition-all block group">
+                    <a href="${data.url}" target="_blank" rel="noopener" class="flex items-center gap-3 bg-slate-50/70 dark:bg-zinc-800/30 hover:bg-red-50/40 dark:hover:bg-red-950/20 p-2.5 rounded-xl border border-slate-100 dark:border-zinc-800/60 transition-all block group">
                         <div class="w-8 h-8 rounded-lg bg-red-600 text-white flex items-center justify-center text-xs shadow-xs"><i class="fa-solid fa-book"></i></div>
                         <div class="flex-1 overflow-hidden">
                             <h4 class="text-xs font-bold text-slate-700 dark:text-zinc-200 truncate group-hover:text-red-600">${data.titulo}</h4>
@@ -354,12 +349,12 @@
                 listaCelebracoesCheckboxes.innerHTML = "";
                 
                 const minhasEscolhasSalvas = dados.respostas?.[usuarioLogadoDados.nome]?.escolhas || [];
-                let opçõesVisíveisCount = 0;
+                let opcoesVisiveisCount = 0;
 
                 dados.celebracoes.forEach(cel => {
                     if(minhasEscolhasSalvas.includes(cel.idChave)) return;
 
-                    opçõesVisíveisCount++;
+                    opcoesVisiveisCount++;
                     const formatData = cel.data.split('-').reverse().join('/');
                     listaCelebracoesCheckboxes.innerHTML += `
                         <label class="flex items-center gap-3 bg-slate-50/50 dark:bg-zinc-800/30 p-2.5 rounded-xl border border-slate-100 dark:border-zinc-800/60 cursor-pointer text-[11px] font-medium text-slate-700 dark:text-zinc-300 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition-all">
@@ -368,7 +363,7 @@
                         </label>`;
                 });
 
-                if(opçõesVisíveisCount > 0) {
+                if(opcoesVisiveisCount > 0) {
                     cardEnqueteDisponibilidade.classList.remove('hidden');
                 } else {
                     cardEnqueteDisponibilidade.classList.add('hidden');
@@ -601,9 +596,12 @@
     async function carregarLiturgiaDoDia() {
         try {
             const r = await fetch('https://liturgia.up.railway.app/'); 
+            if (!r.ok) throw new Error();
             const data = await r.json();
-            document.getElementById('ref-evangelho-dia').innerText = data.evangelho.referencia;
-            document.getElementById('txt-evangelho-dia').innerText = data.evangelho.texto;
+            if (data?.evangelho) {
+                document.getElementById('ref-evangelho-dia').innerText = data.evangelho.referencia || "Evangelho";
+                document.getElementById('txt-evangelho-dia').innerText = data.evangelho.texto || "Erro ao renderizar texto.";
+            }
         } catch (e) { 
             document.getElementById('txt-evangelho-dia').innerText = "Consulta offline disponível na sacristia."; 
         }
