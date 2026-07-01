@@ -4,40 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Altaris - Painel do Coordenador</title>
-    <!-- Atualizado com query string para quebrar o cache do compilador Tailwind v4 -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4?v=4.0.0"></script>
+    <!-- Tailwind v4 Browser Script -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* Estilos nativos para garantir renderização imediata independente do motor do Tailwind */
         :root {
             --bg-light: #f8fafc;
             --bg-dark: #09090b;
         }
-        
-        html.dark {
-            color-scheme: dark;
-        }
+        html.dark { color-scheme: dark; }
 
-        /* Fundo Litúrgico - Injeção Direta */
+        /* Fundo Litúrgico */
         .bg-sacro-dourado {
             background-color: var(--bg-light);
             background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
         }
-
         html.dark .bg-sacro-dourado {
             background-color: var(--bg-dark);
             background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjZDk3NzA2IiBmaWxsLW9wYWNpdHk9IjAuMDciPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
         }
 
-        /* Classes utilitárias compiladas nativamente para mitigar falha de leitura da CDN */
         .card-sacro {
             background-color: #ffffff;
             padding: 1.5rem;
             border-radius: 1.5rem;
             border: 1px solid #f1f5f9;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
         html.dark .card-sacro {
             background-color: #18181b;
@@ -50,7 +44,7 @@
         @custom-variant dark (&:where(.dark, .dark *));
         
         .input-sacro {
-            @apply w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-850 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all;
+            @apply w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all;
         }
         .btn-primary-sacro {
             @apply bg-gradient-to-r from-red-800 to-red-900 text-amber-100 font-semibold py-2.5 px-5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md hover:from-red-700 hover:to-red-800 transition-all cursor-pointer border-0;
@@ -75,23 +69,24 @@
                 </div>
             </div>
 
+            <!-- Removidos os onclicks em linha para evitar colisão com escopo do módulo -->
             <nav class="space-y-1.5">
-                <button id="btn-c-usuarios" onclick="switchCoordTab('coord-usuarios')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-red-800 text-white shadow-md border border-red-700/50">
+                <button id="btn-c-usuarios" data-tab="coord-usuarios" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-red-800 text-white shadow-md border border-red-700/50">
                     <i class="fa-solid fa-users w-4 text-center"></i> Usuários
                 </button>
-                <button id="btn-c-escalas" onclick="switchCoordTab('coord-escalas')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <button id="btn-c-escalas" data-tab="coord-escalas" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                     <i class="fa-solid fa-calendar-days w-4 text-center"></i> Gerenciar Escalas
                 </button>
-                <button id="btn-c-sorteio" onclick="switchCoordTab('coord-sorteio')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <button id="btn-c-sorteio" data-tab="coord-sorteio" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                     <i class="fa-solid fa-dice w-4 text-center"></i> Sorteio Litúrgico
                 </button>
-                <button id="btn-c-reunioes" onclick="switchCoordTab('coord-reunioes')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <button id="btn-c-reunioes" data-tab="coord-reunioes" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                     <i class="fa-solid fa-handshake w-4 text-center"></i> Reuniões
                 </button>
-                <button id="btn-c-material" onclick="switchCoordTab('coord-material')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <button id="btn-c-material" data-tab="coord-material" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                     <i class="fa-solid fa-book-open w-4 text-center"></i> Materiais de Estudo
                 </button>
-                <button id="btn-c-avisos" onclick="switchCoordTab('coord-avisos-tab')" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <button id="btn-c-avisos" data-tab="coord-avisos-tab" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                     <i class="fa-solid fa-bullhorn w-4 text-center"></i> Mural de Avisos
                 </button>
             </nav>
@@ -207,18 +202,16 @@
                 </div>
                 <div class="sm:col-span-2 space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Detalhamento ou Ata Descritiva</label>
-                    <textarea id="reuniao-conteudo" rows="3" placeholder="Insira aqui o link da ata, tópicos abordados ou informações de presença..." class="input-sacro resize-none" required></textarea>
+                    <textarea id="reuniao-conteudo" rows="3" placeholder="Insira aqui o link da ata, tópicos abordados..." class="input-sacro resize-none" required></textarea>
                 </div>
                 <div class="sm:col-span-2 flex justify-end">
-                    <button type="submit" class="btn-primary-sacro border-0">
+                    <button type="submit" class="btn-primary-sacro">
                         <i class="fa-solid fa-plus"></i> Registrar Encontro
                     </button>
                 </div>
             </form>
 
-            <div id="lista-reunioes-admin" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                <!-- Injeção via JS -->
-            </div>
+            <div id="lista-reunioes-admin" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
         </section>
 
         <!-- ABA: MATERIAIS DE ESTUDO -->
@@ -241,18 +234,16 @@
                 </div>
                 <div class="sm:col-span-2 space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Breve contextualização</label>
-                    <input type="text" id="mat-desc" placeholder="Ex: Instruções detalhadas para posturas durante a Liturgia Eucarística" class="input-sacro" required>
+                    <input type="text" id="mat-desc" placeholder="Ex: Instruções detalhadas para posturas..." class="input-sacro" required>
                 </div>
                 <div class="sm:col-span-2 flex justify-end">
-                    <button type="submit" class="btn-primary-sacro border-0">
+                    <button type="submit" class="btn-primary-sacro">
                         <i class="fa-solid fa-cloud-arrow-up"></i> Publicar Documento
                     </button>
                 </div>
             </form>
 
-            <div id="lista-materiais-admin" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                <!-- Injeção via JS -->
-            </div>
+            <div id="lista-materiais-admin" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
         </section>
 
         <!-- ABA: AVISOS -->
@@ -270,20 +261,18 @@
                     <textarea id="aviso-texto" rows="3" placeholder="Digite aqui o aviso importante para todo o grupo..." class="input-sacro resize-none" required></textarea>
                 </div>
                 <div class="flex justify-end">
-                    <button type="submit" class="btn-primary-sacro border-0">
+                    <button type="submit" class="btn-primary-sacro">
                         <i class="fa-solid fa-paper-plane"></i> Lançar Comunicado
                     </button>
                 </div>
             </form>
 
-            <div id="lista-avisos-admin" class="space-y-3 pt-2">
-                <!-- Injeção via JS -->
-            </div>
+            <div id="lista-avisos-admin" class="space-y-3 pt-2"></div>
         </section>
 
     </main>
 
-    <!-- INTEGRALIDADE DOS SCRIPTS BACKEND DO FIREBASE MANTIDOS ABSOLUTAMENTE INTACTOS -->
+    <!-- SCRIPTS EXECUTADOS EM ESCOPO SEGURO E PROTEGIDO -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -301,16 +290,13 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // CORREÇÃO LOGICIAL DE TEMA E QUEBRA DE CACHE VISUAL
+        // CONTROLE DO TEMA (DARK/LIGHT)
         const btnToggleTheme = document.getElementById('btn-toggle-theme');
         const themeIcon = document.getElementById('theme-icon');
 
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(pre-scheme-color: dark)').matches)) {
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
             if(themeIcon) themeIcon.className = "fa-solid fa-sun";
-        } else {
-            document.documentElement.classList.remove('dark');
-            if(themeIcon) themeIcon.className = "fa-solid fa-moon";
         }
 
         btnToggleTheme?.addEventListener('click', () => {
@@ -319,7 +305,40 @@
             if(themeIcon) themeIcon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
         });
 
-        // VERIFICAÇÃO SEGUINTE DO PERFIL ADMIN E RESOLUÇÃO DE TRAVAMENTO NO CARREGAMENTO
+        // NAVEGAÇÃO ENTRE ABAS COMPATÍVEL COM MÓDULOS (EVENT LISTENERS DINÂMICOS)
+        function switchCoordTab(tabID) {
+            document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
+            
+            // Tratamento especial para ID do botão vs ID da seção
+            const targetSecID = tabID.startsWith('coord-') ? 'sec-' + tabID : 'sec-coord-' + tabID;
+            const targetSection = document.getElementById(targetSecID) || document.getElementById('sec-' + tabID);
+            
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+
+            const ids = ['usuarios', 'escalas', 'sorteio', 'reunioes', 'material', 'avisos'];
+            ids.forEach(id => {
+                const btn = document.getElementById(`btn-c-${id}`);
+                if(btn) {
+                    if(tabID.includes(id)) {
+                        btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-red-800 text-white shadow-md border border-red-700/50";
+                    } else {
+                        btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
+                    }
+                }
+            });
+        }
+
+        // Vincula cliques aos botões da sidebar de forma segura
+        document.querySelectorAll('nav[class*="space-y"] button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const tabTarget = e.currentTarget.getAttribute('data-tab');
+                if(tabTarget) switchCoordTab(tabTarget);
+            });
+        });
+
+        // OBSERVAÇÃO DO ESTADO DE AUTENTICAÇÃO
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = "login.html"; return; }
             try {
@@ -329,14 +348,17 @@
                     window.location.href = "index.html";
                     return;
                 }
+                
+                // Dispara os carregamentos apenas após validação de segurança ativa
                 carregarUsuariosPendentes();
                 carregarReunioesAdmin();
                 carregarMateriaisAdmin();
                 carregarAvisosAdmin();
             } catch (err) {
-                console.error("Erro na validação do coordenador:", err);
+                console.error("Erro fatal de validação:", err);
+                // Libera o travamento visual inserindo aviso amigável
                 const tableContainer = document.getElementById('lista-usuarios-pendentes');
-                if(tableContainer) tableContainer.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-rose-500 font-medium">Erro ao carregar os dados. Recarregue a página.</td></tr>';
+                if(tableContainer) tableContainer.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-rose-500 font-medium">Erro ao carregar banco de dados. Verifique suas regras no Firestore.</td></tr>';
             }
         });
 
@@ -344,6 +366,7 @@
             signOut(auth).then(() => window.location.href = "login.html");
         });
 
+        // MANIPULAÇÃO DO FIRESTORE: USUÁRIOS
         async function carregarUsuariosPendentes() {
             const container = document.getElementById('lista-usuarios-pendentes');
             if(!container) return;
@@ -352,7 +375,7 @@
                 const snap = await getDocs(q);
                 container.innerHTML = "";
                 if(snap.empty) {
-                    container.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">Nenhum acólito cadastrado no sistema.</td></tr>';
+                    container.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">Nenhum acólito cadastrado.</td></tr>';
                     return;
                 }
                 snap.forEach(d => {
@@ -364,45 +387,58 @@
                         <td class="px-4 py-3.5 text-slate-400 dark:text-zinc-500">${u.email}</td>
                         <td class="px-4 py-3.5"><span class="bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 px-2 py-0.5 rounded-md font-mono text-[11px]">${u.funcao}</span></td>
                         <td class="px-4 py-3.5">
-                            <span class="px-2 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wide ${u.homologado ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'}">
+                            <span class="px-2 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wide ${u.homologado ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'}">
                                 ${u.homologado ? 'Homologado' : 'Pendente'}
                             </span>
                         </td>
                         <td class="px-4 py-3.5 text-center flex justify-center gap-2">
-                            ${!u.homologado ? `<button onclick="homologarUsuario('${d.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-1 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer border-0"><i class="fa-solid fa-check"></i> Aprovar</button>` : ''}
-                            <button onclick="removerUsuario('${d.id}')" class="bg-rose-600/10 hover:bg-rose-600 text-rose-600 hover:text-white py-1 px-2.5 rounded-lg text-[11px] font-bold border border-rose-500/10 transition-all cursor-pointer"><i class="fa-solid fa-trash"></i> Excluir</button>
+                            ${!u.homologado ? `<button data-id="${d.id}" class="btn-aprovar-user bg-emerald-600 hover:bg-emerald-700 text-white py-1 px-2.5 rounded-lg text-[11px] font-bold border-0 cursor-pointer"><i class="fa-solid fa-check"></i> Aprovar</button>` : ''}
+                            <button data-id="${d.id}" class="btn-deletar-user bg-rose-600/10 hover:bg-rose-600 text-rose-600 hover:text-white py-1 px-2.5 rounded-lg text-[11px] font-bold border border-rose-500/10 transition-all cursor-pointer"><i class="fa-solid fa-trash"></i> Excluir</button>
                         </td>
                     `;
                     container.appendChild(tr);
                 });
+
+                // Vincula os eventos aos botões gerados dinamicamente
+                container.querySelectorAll('.btn-aprovar-user').forEach(b => {
+                    b.addEventListener('click', async (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        if(confirm("Homologar este acólito?")) {
+                            await updateDoc(doc(db, "usuarios", id), { homologado: true });
+                            carregarUsuariosPendentes();
+                        }
+                    });
+                });
+
+                container.querySelectorAll('.btn-deletar-user').forEach(b => {
+                    b.addEventListener('click', async (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        if(confirm("Excluir permanentemente este registro?")) {
+                            await deleteDoc(doc(db, "usuarios", id));
+                            carregarUsuariosPendentes();
+                        }
+                    });
+                });
+
             } catch(e) {
-                container.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-rose-500">Erro de conexão com banco de dados.</td></tr>';
+                console.error(e);
+                container.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-rose-500">Erro de permissão ou conexão ativa com banco de dados.</td></tr>';
             }
         }
 
-        window.homologarUsuario = async function(id) {
-            if(confirm("Homologar este acólito para visualização de escalas?")) {
-                await updateDoc(doc(db, "usuarios", id), { homologado: true });
-                carregarUsuariosPendentes();
-            }
-        }
-        window.removerUsuario = async function(id) {
-            if(confirm("Excluir permanentemente este registro do sistema?")) {
-                await deleteDoc(doc(db, "usuarios", id));
-                carregarUsuariosPendentes();
-            }
-        }
-
+        // RECONSTRUTOR DE ESCALAS POR DATA
         const editorEscalaData = document.getElementById('editor-escala-data');
         async function carregarEditorEscalasPorData(dataStr) {
-            const container = document.getElementById('container-editor-posicoes');
-            if(!container) return;
-            container.innerHTML = '<div class="col-span-full py-4 text-center text-slate-400"><i class="fa-solid fa-circle-notch animate-spin mr-2"></i> Buscando posições...</div>';
+            const container = document.getElementById('container-editor-posPositions');
+            const realContainer = document.getElementById('container-editor-posicoes') || container;
+            if(!realContainer) return;
+            
+            realContainer.innerHTML = '<div class="col-span-full py-4 text-center text-slate-400"><i class="fa-solid fa-circle-notch animate-spin mr-2"></i> Buscando posições da data...</div>';
             if(!dataStr) return;
 
             const dcol = ["missa_07h", "missa_09h", "missa_11h", "missa_17h", "missa_19h"];
             const titulos = ["Missa das 07:00h", "Missa das 09:00h", "Missa das 11:00h", "Missa das 17:00h", "Missa das 19:00h"];
-            container.innerHTML = "";
+            realContainer.innerHTML = "";
 
             for(let i=0; i<dcol.length; i++) {
                 const idDoc = `${dataStr}_${dcol[i]}`;
@@ -434,7 +470,7 @@
                         </div>
                     </div>
                 `;
-                container.appendChild(div);
+                realContainer.appendChild(div);
             }
         }
 
@@ -453,15 +489,17 @@
             }
             alert("Alterações salvas na escala litúrgica!");
         });
+        
         editorEscalaData?.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
 
+        // GERENCIADOR DE REUNIÕES
         document.getElementById('form-reuniao')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const tit = document.getElementById('reuniao-titulo').value;
             const dat = document.getElementById('reuniao-data').value;
             const con = document.getElementById('reuniao-conteudo').value;
             await setDoc(doc(collection(db, "reunioes")), { titulo: tit, data: dat, conteudo: con, criadoEm: serverTimestamp() });
-            e.target.reset(); alert("Ata registrada com sucesso!"); carregarReunioesAdmin();
+            e.target.reset(); alert("Ata registrada!"); carregarReunioesAdmin();
         });
 
         async function carregarReunioesAdmin() {
@@ -478,22 +516,27 @@
                         <p class="text-[10px] text-red-800 font-semibold">${r.data}</p>
                         <p class="text-slate-400 dark:text-zinc-500 text-[11px] leading-relaxed line-clamp-2">${r.conteudo}</p>
                     </div>
-                    <button onclick="deletarReuniao('${d.id}')" class="text-slate-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-all border-0 cursor-pointer"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    <button data-id="${d.id}" class="btn-del-reuniao text-slate-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-all border-0 cursor-pointer"><i class="fa-solid fa-trash-can text-xs"></i></button>
                 `;
                 container.appendChild(div);
             });
-        }
-        window.deletarReuniao = async function(id) {
-            if(confirm("Remover esta reunião permanentemente?")) { await deleteDoc(doc(db, "reunioes", id)); carregarReunioesAdmin(); }
+
+            container.querySelectorAll('.btn-del-reuniao').forEach(b => {
+                b.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    if(confirm("Remover esta reunião?")) { await deleteDoc(doc(db, "reunioes", id)); carregarReunioesAdmin(); }
+                });
+            });
         }
 
+        // GERENCIADOR DE MATERIAIS
         document.getElementById('form-material')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const tit = document.getElementById('mat-titulo').value;
             const url = document.getElementById('mat-url').value;
             const desc = document.getElementById('mat-desc').value;
             await setDoc(doc(collection(db, "materiais")), { titulo: tit, url: url, descricao: desc, criadoEm: serverTimestamp() });
-            e.target.reset(); alert("Material formativo compartilhado!"); carregarMateriaisAdmin();
+            e.target.reset(); alert("Material publicado!"); carregarMateriaisAdmin();
         });
 
         async function carregarMateriaisAdmin() {
@@ -509,20 +552,25 @@
                         <h4 class="font-bold text-slate-800 dark:text-zinc-200 text-xs">${m.titulo}</h4>
                         <p class="text-slate-400 dark:text-zinc-500 text-[11px] leading-relaxed line-clamp-2">${m.descricao}</p>
                     </div>
-                    <button onclick="deletarMaterial('${d.id}')" class="text-slate-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-all border-0 cursor-pointer"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    <button data-id="${d.id}" class="btn-del-mat text-slate-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-all border-0 cursor-pointer"><i class="fa-solid fa-trash-can text-xs"></i></button>
                 `;
                 container.appendChild(div);
             });
-        }
-        window.deletarMaterial = async function(id) {
-            if(confirm("Remover este material didático?")) { await deleteDoc(doc(db, "materiais", id)); carregarMateriaisAdmin(); }
+
+            container.querySelectorAll('.btn-del-mat').forEach(b => {
+                b.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    if(confirm("Remover este material?")) { await deleteDoc(doc(db, "materiais", id)); carregarMateriaisAdmin(); }
+                });
+            });
         }
 
+        // MURAL DE AVISOS
         document.getElementById('form-aviso')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const txt = document.getElementById('aviso-texto').value;
             await setDoc(doc(collection(db, "avisos")), { texto: txt, criadoEm: serverTimestamp() });
-            e.target.reset(); alert("Comunicado publicado no mural público!"); carregarAvisosAdmin();
+            e.target.reset(); alert("Aviso lançado!"); carregarAvisosAdmin();
         });
 
         async function carregarAvisosAdmin() {
@@ -535,33 +583,22 @@
                 div.className = "p-4 rounded-2xl bg-slate-50/50 dark:bg-zinc-950 border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center gap-4";
                 div.innerHTML = `
                     <p class="text-slate-700 dark:text-zinc-300 text-xs leading-relaxed flex-1">${a.texto}</p>
-                    <button onclick="deletarAviso('${d.id}')" class="text-slate-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-all border-0 cursor-pointer"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    <button data-id="${d.id}" class="btn-del-aviso text-slate-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-all border-0 cursor-pointer"><i class="fa-solid fa-trash-can text-xs"></i></button>
                 `;
                 container.appendChild(div);
             });
-        }
-        window.deletarAviso = async function(id) {
-            if(confirm("Remover este comunicado do painel público?")) { await deleteDoc(doc(db, "avisos", id)); carregarAvisosAdmin(); }
-        }
 
-        window.switchCoordTab = function(tabID) {
-            document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
-            document.getElementById('sec-' + tabID)?.classList.remove('hidden');
-            const ids = ['usuarios', 'escalas', 'sorteio', 'reunioes', 'material', 'avisos'];
-            ids.forEach(id => {
-                const btn = document.getElementById(`btn-c-${id}`);
-                if(btn) {
-                    if(tabID === `coord-${id}` || (id === 'avisos' && tabID === 'coord-avisos-tab')) {
-                        btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-red-800 text-white shadow-md border border-red-700/50";
-                    } else {
-                        btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
-                    }
-                }
+            container.querySelectorAll('.btn-del-aviso').forEach(b => {
+                b.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    if(confirm("Remover este comunicado?")) { await deleteDoc(doc(db, "avisos", id)); carregarAvisosAdmin(); }
+                });
             });
         }
 
+        // MOTOR DE SORTEIO LITÚRGICO AUTOMÁTICO
         document.getElementById('btn-executar-sorteio')?.addEventListener('click', async () => {
-            if(!confirm("Deseja iniciar o sorteio de posições com base nos acólitos homologados?")) return;
+            if(!confirm("Deseja iniciar o sorteio automatizado?")) return;
             const uSnap = await getDocs(query(collection(db, "usuarios"), where("homologado", "==", true)));
             let acolitos = []; uSnap.forEach(d => { acolitos.push(d.data().nome); });
             if(acolitos.length === 0) { alert("Nenhum acólito homologado encontrado."); return; }
@@ -594,7 +631,7 @@
                     naveteiro: { ativa: true, nome: n }
                 }, { merge: true });
             }
-            alert("Sorteio litúrgico concluído com sucesso para a data de hoje!");
+            alert("Sorteio litúrgico concluído!");
             if(editorEscalaData) { editorEscalaData.value = hoje; carregarEditorEscalasPorData(hoje); }
         });
     </script>
