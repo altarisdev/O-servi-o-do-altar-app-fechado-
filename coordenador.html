@@ -316,34 +316,36 @@
         });
     }
 
-    // ==========================================
-    // CONTROLE DE FLUXO DE LOGIN / REDIRECIONAMENTO
+    /    // ==========================================
+    // CONTROLE DE FLUXO DE LOGIN / REDIRECIONAMENTO (CORRIGIDO)
     // ==========================================
     onAuthStateChanged(auth, async (user) => {
+        // Pega apenas o nome do arquivo atual (ex: coordenador.html)
         const paginaAtual = window.location.pathname.split("/").pop() || "index.html";
         const devSession = sessionStorage.getItem("dev_user");
 
         if (devSession) { 
             usuarioLogadoDados = JSON.parse(devSession); 
-            validarRotaPorFuncao(usuarioLogadoDados.funcao, paginaAtual);
+            executarRegraRoteamento(usuarioLogadoDados.funcao, paginaAtual);
         } else if (user) {
             try {
                 const docSnap = await getDoc(doc(db, "usuarios", user.uid));
                 if (docSnap.exists()) {
                     usuarioLogadoDados = docSnap.data();
                     const funcao = usuarioLogadoDados.funcao || "";
-                    validarRotaPorFuncao(funcao, paginaAtual);
+                    executarRegraRoteamento(funcao, paginaAtual);
                 } else {
-                    // Usuário autenticado mas sem documento no Firestore
-                    renderizarErroSeguranca("Usuário não cadastrado na base do Firestore.");
-                    if (paginaAtual !== "index.html") window.location.href = "index.html";
+                    renderizarErroSeguranca("Usuário autenticado, mas não localizado no banco de dados.");
+                    if (paginaAtual !== "index.html" && paginaAtual !== "login.html") {
+                        window.location.href = "index.html";
+                    }
                 }
             } catch (err) {
                 console.error("Erro ao validar usuário:", err);
-                renderizarErroSeguranca("Erro ao carregar permissões.");
+                renderizarErroSeguranca("Erro ao carregar permissões do Firestore.");
             }
         } else { 
-            // Nenhum usuário logado
+            // Nenhum usuário logado - protege as páginas internas
             if (paginaAtual !== "index.html" && paginaAtual !== "login.html") {
                 window.location.href = "index.html";
             }
@@ -351,29 +353,26 @@
         setTimeout(hideLoading, 400);
     });
 
-    // Função que decide quem vai para onde baseado na página que está tentando acessar
-    function validarRotaPorFuncao(funcao, paginaAtual) {
+    // Nova lógica de roteamento sem loop/conflito de execução
+    function ejecutarRegraRoteamento(funcao, paginaAtual) {
         const ehCoordenador = funcao.toLowerCase() === "coordenador";
 
         if (ehCoordenador) {
-            // Se ele é coordenador e está na index ou na do coroinha, manda pra tela de coordenação
+            // Se for coordenador e estiver fora da página de coordenação, redireciona
             if (paginaAtual === "index.html" || paginaAtual === "coroinha.html") {
                 window.location.href = "coordenador.html";
-                return;
+            } else {
+                // Se JÁ ESTÁ na coordenador.html, apenas monta as funções do painel!
+                inicializarPainel();
             }
-            inicializarPainel();
         } else {
-            // Se NÃO é coordenador e tentou entrar na coordenador.html, joga pro painel de coroinha dele
+            // Se NÃO for coordenador e tentar entrar na página da coordenação, expulsa
             if (paginaAtual === "coordenador.html") {
                 window.location.href = "coroinha.html";
-                return;
-            }
-            // Se ele está na index, empurra ele para a tela de coroinha
-            if (paginaAtual === "index.html") {
+            } else if (paginaAtual === "index.html") {
                 window.location.href = "coroinha.html";
-                return;
             }
-            // Caso já esteja na tela certa (coroinha.html), inicializa o que for preciso (se aplicável)
+            // Se já estiver na coroinha.html, deixa ele navegar em paz.
         }
     }
 
