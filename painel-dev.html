@@ -468,13 +468,14 @@
         } catch(e) { registrarLogTerminal(e.message, "ERRO"); }
     };
 
-    // BYPASS LOGIN SIMULATOR
+    // BYPASS LOGIN SIMULATOR (MODIFICADO COM COMPORTAMENTO MASTER BYPASS)
     window.executarBypassSimulacao = function() {
         const id = document.getElementById('dev-select-bypass').value;
         const u = usuariosLocais.find(x => x.uid === id);
         if(u) {
             sessionStorage.setItem("dev_user", JSON.stringify({ uid: u.uid, nome: u.nome, email: u.email || "dev@altaris.com", funcao: u.funcao }));
-            registrarLogTerminal(`Token injetado na sessão local. Redirecionando como ${u.nome}...`, "SUCESSO");
+            sessionStorage.setItem("is_dev_master", "true"); 
+            registrarLogTerminal(`Token e controle mestre injetados na sessão. Redirecionando como ${u.nome}...`, "SUCESSO");
             window.location.href = "index.html";
         }
     };
