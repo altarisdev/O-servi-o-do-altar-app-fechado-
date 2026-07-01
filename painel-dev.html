@@ -94,7 +94,7 @@
             
             <main class="flex-1 p-4 md:p-6 overflow-y-auto max-h-[500px]">
                 
-                <div id="conteudo-aba-usuarios" class="aba-dev-conteudo ativa space-y-4">
+                <div id="conteuda-aba-usuarios" class="aba-dev-conteudo ativa space-y-4">
                     <div class="bg-stone-950 border border-stone-800 p-4 rounded-xl space-y-3 shadow-inner">
                         <h4 class="text-xs font-bold text-amber-500 uppercase tracking-wider">Engine de Modificação de Matrículas</h4>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -382,7 +382,15 @@
                 batch.set(doc(db, "escalas", id), {
                     id: id, data: hoje, horario: `1${i}:00`,
                     altar1: { nome: usuariosLocais[0]?.nome || "Membro 1", status: "Pendente" },
-                    altar2: { nome: usuariosLocais[1]?.nome || "Membro 2", status: "Confirmado" }
+                    altar2: { nome: usuariosLocais[1]?.nome || "Membro 2", status: "Pendente" },
+                    altar3: { nome: "Vago", status: "Pendente" },
+                    altar4: { nome: "Vago", status: "Pendente" },
+                    altar5: { nome: "Vago", status: "Pendente" },
+                    altar6: { nome: "Vago", status: "Pendente" },
+                    turibuloAtivo: true,
+                    turiferario: { nome: usuariosLocais[2]?.nome || "Membro 3", status: "Pendente" },
+                    navetaAtiva: true,
+                    naveteiro: { nome: usuariosLocais[3]?.nome || "Membro 4", status: "Pendente" }
                 });
             }
             await batch.commit();
@@ -404,19 +412,49 @@
         } catch(e) { registrarLogTerminal(e.message, "ERRO"); }
     };
 
+    // ─── RESETAR STATUS ESCALAS (CORRIGIDO PARA MAPEAMENTO DE OBJETOS ANINHADOS) ───
     window.resetarStatusEscalas = async function() {
+        await esperarRedeSimulada();
         const dt = document.getElementById('dev-data-escala').value;
+        if(!dt) return alert("Selecione uma data para realizar o Rollback de status!");
+
         try {
-            const snap = await getDocs(query(collection(db, "escalas"), where("data", "==", dt)));
+            const q = query(collection(db, "escalas"), where("data", "==", dt));
+            const snap = await getDocs(q);
+            
+            if(snap.empty) {
+                registrarLogTerminal(`Nenhuma escala localizada na data ${dt} para restaurar.`, "ERRO");
+                return alert("Nenhuma escala encontrada nesta data.");
+            }
+
             const batch = writeBatch(db);
             snap.forEach(d => {
                 let upd = {};
-                for(let i=1; i<=6; i++) { if(d.data()[`altar${i}`]) upd[`altar${i}.status`] = "Pendente"; }
+                const dadosEscala = d.data();
+
+                // Varre e mapeia as propriedades internas dos subobjetos do Altar 1 ao 6
+                for(let i=1; i<=6; i++) { 
+                    if(dadosEscala[`altar${i}`]) {
+                        upd[`altar${i}.status`] = "Pendente"; 
+                    }
+                }
+                // Varre e limpa o nó do Turiferário e Naveteiro
+                if(dadosEscala.turiferario) upd["turiferario.status"] = "Pendente";
+                if(dadosEscala.naveteiro)   upd["naveteiro.status"] = "Pendente";
+                
+                // Remove substitutos vinculados caso existam para reset total
+                upd["substitutoNome"] = "";
+
                 batch.update(d.ref, upd);
             });
+
             await batch.commit();
-            registrarLogTerminal(`Status de vagas de ${dt} resetados para depuração.`, "INFO");
-        } catch(e) { registrarLogTerminal(e.message, "ERRO"); }
+            registrarLogTerminal(`Rollback executado: Status de todas as vagas de ${dt} retornaram para 'Pendente'.`, "SUCESSO");
+            alert("Status das vagas restaurados para Pendente com sucesso!");
+        } catch(e) { 
+            registrarLogTerminal("Falha na sementeira de Rollback: " + e.message, "ERRO"); 
+            console.error(e);
+        }
     };
 
     // EXPORTAR BACKUP COMO ARQUIVO DOWNLOADABLE JSON
