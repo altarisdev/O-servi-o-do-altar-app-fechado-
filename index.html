@@ -16,7 +16,7 @@
         /* Fundo Litúrgico - Padrão Sacro em Base64 para compatibilidade total */
         .bg-sacro-dourado {
             background-color: #f8fafc; /* bg-slate-50 */
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek02NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
         }
 
         .dark .bg-sacro-dourado {
@@ -119,6 +119,10 @@
     const btnDarkMode = document.getElementById('btn-dark-mode');
     const darkModeThumb = document.getElementById('dark-mode-thumb');
 
+    // Sempre que carregar a tela de login pura, limpa estados antigos de simulação dev
+    sessionStorage.removeItem("is_dev_master");
+    sessionStorage.removeItem("dev_user");
+
     // ─── ESCUTA EM TEMPO REAL DO MODO MANUTENÇÃO ───
     onSnapshot(doc(db, "configuracoes", "flags_sistema"), (snapshot) => {
         if (snapshot.exists()) {
@@ -144,22 +148,6 @@
             } else {
                 document.getElementById('bloqueio-manutencao')?.remove();
             }
-        }
-    });
-
-    // ─── BOTÃO FLUTUANTE DE RETORNO DO DESENVOLVEDOR ───
-    document.addEventListener("DOMContentLoaded", () => {
-        const isDevMaster = sessionStorage.getItem("is_dev_master") === "true";
-        if (isDevMaster && !document.getElementById('btn-retorno-dev')) {
-            const btnRetorno = document.createElement('button');
-            btnRetorno.id = 'btn-retorno-dev';
-            btnRetorno.innerHTML = `<i class="fa-solid fa-terminal mr-1.5 text-[10px]"></i> Voltar ao Painel Dev`;
-            btnRetorno.className = "fixed bottom-4 right-4 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs px-3.5 py-2.5 rounded-xl shadow-xl z-[10000] cursor-pointer transition-all active:scale-95 flex items-center font-mono border-b-2 border-amber-600";
-            
-            btnRetorno.onclick = () => {
-                window.location.href = "painel-dev.html"; 
-            };
-            document.body.appendChild(btnRetorno);
         }
     });
 
@@ -230,10 +218,11 @@
             const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
             const senhaInput = document.getElementById('login-senha').value.trim();
 
+            // LOGIN DE SIMULAÇÃO DO DESENVOLVEDOR
             if (emailInput === "dev@altaris.com" && senhaInput === "dev1234") {
                 const devUser = { nome: "Desenvolvedor Altaris", funcao: "Coordenador" };
                 sessionStorage.setItem("dev_user", JSON.stringify(devUser));
-                sessionStorage.setItem("is_dev_master", "true");
+                sessionStorage.setItem("is_dev_master", "true"); // Ativado apenas aqui
                 window.location.href = "coordenador.html";
                 return;
             }
