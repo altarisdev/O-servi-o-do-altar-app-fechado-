@@ -208,19 +208,22 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import {  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    // CORREÇÃO AQUI: Importando as funções do Firestore do pacote correto (firebase-firestore.js)
+    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Reimportando de forma explícita para evitar falhas globais do snapshot
-    const dbUnificado = getFirestore(initializeApp({
+    // Inicialização unificada
+    const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
         authDomain: "tarcisius-d03d7.firebaseapp.com",
         projectId: "tarcisius-d03d7",
         storageBucket: "tarcisius-d03d7.firebasestorage.app",
         messagingSenderId: "186797936591",
         appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
-    }));
-    const auth = getAuth();
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const dbUnificado = getFirestore(app);
+    const auth = getAuth(app);
 
     const telaLoading = document.getElementById('tela-loading');
     const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
@@ -258,11 +261,11 @@
         usuarioLogadoDados = usuarioMock;
         if(selectDevFuncao) selectDevFuncao.value = "Acólito";
         inicializarPainelAcolito();
+        alert("Usuário fake injetado!");
     });
 
     selectDevFuncao?.addEventListener('change', (e) => {
         if(!usuarioLogadoDados) {
-            // Se alterar sem injetar antes, cria o usuário fake automaticamente
             usuarioLogadoDados = { nome: "Membro de Testes", email: "teste.dev@altaris.com", funcao: e.target.value };
         } else {
             usuarioLogadoDados.funcao = e.target.value;
@@ -310,13 +313,17 @@
             if(selectDevFuncao) selectDevFuncao.value = usuarioLogadoDados.funcao;
             inicializarPainelAcolito(); 
         } else if(user) {
-            const docSnap = await getDoc(doc(dbUnificado, "usuarios", user.uid));
-            if(docSnap.exists()) { 
-                usuarioLogadoDados = docSnap.data(); 
-                inicializarPainelAcolito(); 
-            } else { 
-                signOut(auth); 
-                window.location.href = "index.html"; 
+            try {
+                const docSnap = await getDoc(doc(dbUnificado, "usuarios", user.uid));
+                if(docSnap.exists()) { 
+                    usuarioLogadoDados = docSnap.data(); 
+                    inicializarPainelAcolito(); 
+                } else { 
+                    signOut(auth); 
+                    window.location.href = "index.html"; 
+                }
+            } catch (e) {
+                console.error("Erro ao buscar dados do usuário:", e);
             }
         } else { 
             if(!devSessionAtiva) window.location.href = "index.html"; 
@@ -445,7 +452,7 @@
         try {
             const docSnap = await getDoc(refDoc);
             let escolhasExistentes = docSnap.exists() ? (docSnap.data().respostas?.[usuarioLogadoDados.nome]?.escolhas || []) : [];
-            const novasEscolhasUnificadas = [...new Set([...choicesExistentes, ...listIds])];
+            const novasEscolhasUnificadas = [...new Set([...escolhasExistentes, ...listIds])];
 
             const atualizacaoEstruturada = {};
             atualizacaoEstruturada[`respostas.${usuarioLogadoDados.nome}`] = {
@@ -614,7 +621,6 @@
         document.getElementById('conteudo-escala').classList.toggle('hidden', tabName !== 'escala');
         document.getElementById('conteudo-escala').classList.toggle('block', tabName === 'escala');
         
-        // Correção do bug: Manipula apenas os blocos de conteúdo internos sem afetar a integridade da coluna principal
         document.getElementById('conteudo-avisos').classList.toggle('hidden', tabName !== 'avisos' && window.innerWidth < 768);
         document.getElementById('conteudo-conteudos').classList.toggle('hidden', tabName !== 'conteudos');
         document.getElementById('conteudo-liturgia').classList.toggle('hidden', tabName !== 'liturgia');
