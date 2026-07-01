@@ -229,7 +229,7 @@
 
     <!-- SCRIPTS EXECUTADOS EM ESCOPO SEGURO -->
 <script type="module">
-    // Lógica do botão de tema original (Corrigido para evitar quebra caso elementos não existam)
+    // Lógica do botão de tema original
     const btnToggleTheme = document.getElementById('btn-toggle-theme');
     const themeIcon = document.getElementById('theme-icon');
 
@@ -316,35 +316,67 @@
         });
     }
 
-    // OBSERVAÇÃO DE LOGIN PROTEGIDA CONTRA SOFTLOCK (Mantém no index.html e renderiza erro amigável)
+    // ==========================================
+    // CONTROLE DE FLUXO DE LOGIN / REDIRECIONAMENTO
+    // ==========================================
     onAuthStateChanged(auth, async (user) => {
+        const paginaAtual = window.location.pathname.split("/").pop() || "index.html";
         const devSession = sessionStorage.getItem("dev_user");
+
         if (devSession) { 
             usuarioLogadoDados = JSON.parse(devSession); 
-            inicializarPainel(); 
+            validarRotaPorFuncao(usuarioLogadoDados.funcao, paginaAtual);
         } else if (user) {
             try {
                 const docSnap = await getDoc(doc(db, "usuarios", user.uid));
-                if (docSnap.exists() && docSnap.data().funcao?.toLowerCase() === "coordenador") { 
-                    usuarioLogadoDados = docSnap.data(); 
-                    inicializarPainel(); 
+                if (docSnap.exists()) {
+                    usuarioLogadoDados = docSnap.data();
+                    const funcao = usuarioLogadoDados.funcao || "";
+                    validarRotaPorFuncao(funcao, paginaAtual);
                 } else {
-                    const funcaoAtual = docSnap.exists() ? docSnap.data().funcao : 'Não registrada';
-                    renderizarErroSeguranca(`Acesso restrito à coordenação. Sua conta atual possui o cargo de "${funcaoAtual}" ou não está homologada neste banco de dados (UID: ${user.uid}).`);
-                    // Não força redirecionamento em loop, apenas impede a inicialização
+                    // Usuário autenticado mas sem documento no Firestore
+                    renderizarErroSeguranca("Usuário não cadastrado na base do Firestore.");
+                    if (paginaAtual !== "index.html") window.location.href = "index.html";
                 }
             } catch (err) {
                 console.error("Erro ao validar usuário:", err);
-                renderizarErroSeguranca("Erro crítico de permissões ao tentar acessar a coleção 'usuarios'.");
+                renderizarErroSeguranca("Erro ao carregar permissões.");
             }
         } else { 
-            console.log("Nenhum usuário detectado. Aguardando login...");
-            renderizarErroSeguranca("Nenhum usuário logado. Por favor, acesse através da tela de login padrão.");
+            // Nenhum usuário logado
+            if (paginaAtual !== "index.html" && paginaAtual !== "login.html") {
+                window.location.href = "index.html";
+            }
         }
         setTimeout(hideLoading, 400);
     });
 
-    // Mostra erro amigável no container de usuários sem quebrar o resto do layout
+    // Função que decide quem vai para onde baseado na página que está tentando acessar
+    function validarRotaPorFuncao(funcao, paginaAtual) {
+        const ehCoordenador = funcao.toLowerCase() === "coordenador";
+
+        if (ehCoordenador) {
+            // Se ele é coordenador e está na index ou na do coroinha, manda pra tela de coordenação
+            if (paginaAtual === "index.html" || paginaAtual === "coroinha.html") {
+                window.location.href = "coordenador.html";
+                return;
+            }
+            inicializarPainel();
+        } else {
+            // Se NÃO é coordenador e tentou entrar na coordenador.html, joga pro painel de coroinha dele
+            if (paginaAtual === "coordenador.html") {
+                window.location.href = "coroinha.html";
+                return;
+            }
+            // Se ele está na index, empurra ele para a tela de coroinha
+            if (paginaAtual === "index.html") {
+                window.location.href = "coroinha.html";
+                return;
+            }
+            // Caso já esteja na tela certa (coroinha.html), inicializa o que for preciso (se aplicável)
+        }
+    }
+
     function renderizarErroSeguranca(mensagem) {
         const b = document.getElementById('tabela-usuarios-recuperacao');
         if (b) {
@@ -380,7 +412,7 @@
     if(btnLogout) {
         btnLogout.addEventListener('click', () => { 
             sessionStorage.removeItem("dev_user"); 
-            signOut(auth).then(() => { location.reload(); }); 
+            signOut(auth).then(() => { window.location.href = "index.html"; }); 
         });
     }
 
