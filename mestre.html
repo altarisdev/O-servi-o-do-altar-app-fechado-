@@ -40,6 +40,10 @@
             <button id="btn-m-material" onclick="switchMestreTab('m-material')" class="w-full text-left py-3 px-4 rounded-xl text-xs font-bold text-stone-400 hover:bg-stone-800/50 hover:text-stone-100 transition-all flex items-center gap-3.5 cursor-pointer border border-transparent hover:border-stone-800">
                 <i class="fa-solid fa-cloud-arrow-up text-base w-5 text-center text-stone-500"></i> Enviar Materiais
             </button>
+            <!-- NOVA ABA: PENALIDADES -->
+            <button id="btn-m-penalidades" onclick="switchMestreTab('m-penalidades')" class="w-full text-left py-3 px-4 rounded-xl text-xs font-bold text-stone-400 hover:bg-stone-800/50 hover:text-stone-100 transition-all flex items-center gap-3.5 cursor-pointer border border-transparent hover:border-stone-800">
+                <i class="fa-solid fa-gavel text-base w-5 text-center text-stone-500"></i> Aplicar Penalidade
+            </button>
         </nav>
 
         <div class="p-4 border-t border-stone-800/60 bg-stone-950/30">
@@ -149,6 +153,54 @@
             </div>
         </section>
 
+        <!-- NOVA SEÇÃO: REGISTRO DE ADVERTÊNCIAS / SUSPENSÕES -->
+        <section id="sec-m-penalidades" class="hidden-mestre-tab hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-stone-200/60 h-fit space-y-5">
+                <div>
+                    <h3 class="text-sm font-black text-stone-900 tracking-tight flex items-center gap-2">
+                        <span class="w-1.5 h-3.5 bg-rose-600 rounded-sm"></span> Aplicar Medida Disciplinar
+                    </h3>
+                    <p class="text-[11px] text-stone-400 mt-0.5">Registre advertências formais ou suspensões de escalas.</p>
+                </div>
+                <form id="form-mestre-penalidade" class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1.5">Selecionar Coroinha / Acólito</label>
+                        <select id="pen-usuario" required class="w-full bg-stone-50 border border-stone-200 hover:border-stone-300 focus:border-amber-500 focus:bg-white rounded-xl p-2.5 text-xs outline-none transition-all shadow-sm font-bold text-stone-700">
+                            <option value="">Selecione um membro...</option>
+                            <!-- Injetado via Javascript baseado nos coroinhas cadastrados -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1.5">Tipo de Medida</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="border border-stone-200 rounded-xl p-2.5 flex items-center gap-2 cursor-pointer text-xs font-bold text-stone-700 bg-stone-50 hover:bg-stone-100">
+                                <input type="radio" name="pen-tipo" value="Advertência" checked class="accent-amber-600"> Advertência
+                            </label>
+                            <label class="border border-stone-200 rounded-xl p-2.5 flex items-center gap-2 cursor-pointer text-xs font-bold text-stone-700 bg-stone-50 hover:bg-stone-100">
+                                <input type="radio" name="pen-tipo" value="Suspensão" class="accent-rose-600"> Suspensão
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1.5">Motivo / Descrição Ocorrência</label>
+                        <textarea id="pen-motivo" required rows="3" placeholder="Ex: Falta não justificada na escala de Corpus Christi ou atrasos recorrentes." class="w-full bg-stone-50 border border-stone-200 hover:border-stone-300 focus:border-amber-500 focus:bg-white rounded-xl p-2.5 text-xs outline-none transition-all shadow-inner resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-rose-900 hover:bg-rose-950 text-rose-100 border border-rose-950 text-xs font-bold py-3 rounded-xl shadow-md cursor-pointer transition-all flex items-center justify-center gap-2 mt-2">
+                        <i class="fa-solid fa-gavel text-xs"></i> Registrar Penalidade
+                    </button>
+                </form>
+            </div>
+            
+            <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-stone-200/60 md:col-span-2 space-y-4">
+                <h3 class="text-sm font-black text-stone-900 tracking-tight flex items-center gap-2 border-b border-stone-100 pb-4">
+                    <span class="w-1.5 h-3.5 bg-stone-800 rounded-sm"></span> Histórico Disciplinar Geral
+                </h3>
+                <div id="lista-mestre-penalidades" class="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                    <!-- Injetado dinamicamente -->
+                </div>
+            </div>
+        </section>
+
     </main>
 
 <script type="module">
@@ -174,6 +226,8 @@
     const tabelaFrequenciaMissas = document.getElementById('tabela-frequencia-missas');
     const tabelaFrequenciaReunioes = document.getElementById('tabela-frequencia-reunioes');
     const listaMestreMateriais = document.getElementById('lista-mestre-materiais');
+    const selectPenUsuario = document.getElementById('pen-usuario');
+    const listaMestrePenalidades = document.getElementById('lista-mestre-penalidades');
 
     let cacheUsuarios = [];
 
@@ -206,8 +260,15 @@
         
         onSnapshot(collection(db, "usuarios"), (snap) => {
             cacheUsuarios = [];
+            if(selectPenUsuario) selectPenUsuario.innerHTML = '<option value="">Selecione um membro...</option>';
+            
             snap.forEach(d => {
-                if(d.data().funcao !== "Coordenador") cacheUsuarios.push(d.data().nome);
+                if(d.data().funcao !== "Coordenador") {
+                    cacheUsuarios.push(d.data().nome);
+                    if(selectPenUsuario) {
+                        selectPenUsuario.innerHTML += `<option value="${d.data().nome}">${d.data().nome}</option>`;
+                    }
+                }
             });
             cacheUsuarios.sort();
             
@@ -216,6 +277,7 @@
         });
 
         ouvirMateriaisMestre();
+        ouvirPenalidadesMestre();
     }
 
     async function carregarRelatorioMissas() {
@@ -371,11 +433,76 @@
         }
     }
 
+    // ==========================================
+    // NOVA FUNÇÃO: ESCUTA E REGISTRO DE PENALIDADES
+    // ==========================================
+    document.getElementById('form-mestre-penalidade')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nomeCoroinha = document.getElementById('pen-usuario').value;
+        const tipoMedida = document.querySelector('input[name="pen-tipo"]:checked').value;
+        const motivo = document.getElementById('pen-motivo').value.trim();
+        const idPenalidade = "pen_" + Date.now();
+
+        try {
+            await setDoc(doc(db, "penalidades", idPenalidade), {
+                id: idPenalidade,
+                nome: nomeCoroinha,
+                tipo: tipoMedida,
+                motivo: motivo,
+                dataAplicada: new Date().toLocaleDateString('pt-BR'),
+                timestamp: Date.now()
+            });
+            alert(`A medida de ${tipoMedida} foi registrada com sucesso para ${nomeCoroinha}!`);
+            document.getElementById('form-mestre-penalidade').reset();
+        } catch(err) { alert("Erro ao salvar medida disciplinar: " + err.message); }
+    });
+
+    function ouvirPenalidadesMestre() {
+        if(!listaMestrePenalidades) return;
+        onSnapshot(collection(db, "penalidades"), (snap) => {
+            if(snap.empty) {
+                listaMestrePenalidades.innerHTML = `<p class="text-xs text-stone-400 italic p-4 bg-stone-50/50 rounded-xl text-center border border-dashed border-stone-200">Nenhuma medida disciplinar registrada até o momento.</p>`;
+                return;
+            }
+            listaMestrePenalidades.innerHTML = "";
+            
+            // Transformar em array para ordenar por data mais recente
+            let pList = [];
+            snap.forEach(d => pList.push(d.data()));
+            pList.sort((a,b) => b.timestamp - a.timestamp);
+
+            pList.forEach(pen => {
+                const badgeStyle = pen.tipo === "Suspensão" ? "bg-rose-100 text-rose-800 border-rose-200" : "bg-amber-100 text-amber-800 border-amber-200";
+                listaMestrePenalidades.innerHTML += `
+                    <div class="p-4 bg-white rounded-xl border border-stone-100 hover:border-stone-200 hover:shadow-xs transition-all text-xs space-y-2">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <strong class="text-stone-900 font-bold text-sm block">${pen.nome}</strong>
+                                <span class="text-[10px] text-stone-400 font-medium block mt-0.5"><i class="fa-regular fa-calendar mr-1"></i> Aplicada em: ${pen.dataAplicada}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-md border text-[10px] font-extrabold uppercase tracking-wide ${badgeStyle}">${pen.tipo}</span>
+                                <button onclick="window.removerPenalidadeMestre('${pen.id}')" class="text-stone-400 hover:text-rose-600 p-1 rounded-md transition-colors cursor-pointer" title="Remover Registro"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </div>
+                        <p class="text-stone-600 bg-stone-50/50 p-2.5 rounded-lg border border-stone-100 text-[11px] leading-relaxed font-medium">${pen.motivo}</p>
+                    </div>
+                `;
+            });
+        });
+    }
+
+    window.removerPenalidadeMestre = async function(id) {
+        if(confirm("Deseja retirar e deletar permanentemente este registro disciplinar?")) {
+            await deleteDoc(doc(db, "penalidades", id));
+        }
+    }
+
     window.switchMestreTab = function(tabID) {
         document.querySelectorAll('.hidden-mestre-tab').forEach(el => el.classList.add('hidden'));
         document.getElementById('sec-' + tabID)?.classList.remove('hidden');
         
-        const ids = ['missas', 'reunioes', 'material'];
+        const ids = ['missas', 'reunioes', 'material', 'penalidades'];
         ids.forEach(id => {
             const btn = document.getElementById(`btn-m-${id}`);
             if(btn) {
@@ -383,8 +510,6 @@
                     btn.className = "w-full text-left py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center gap-3.5 cursor-pointer bg-amber-500 text-stone-950 shadow-lg shadow-amber-500/10";
                 } else {
                     btn.className = "w-full text-left py-3 px-4 rounded-xl text-xs font-bold text-stone-400 hover:bg-stone-800/50 hover:text-stone-100 transition-all flex items-center gap-3.5 cursor-pointer border border-transparent hover:border-stone-800";
-                    const icon = btn.querySelector('i');
-                    if(icon) icon.className = icon.className.replace('text-stone-100', 'text-stone-500');
                 }
             }
         });
