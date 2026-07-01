@@ -228,381 +228,601 @@
     </main>
 
     <!-- SCRIPTS EXECUTADOS EM ESCOPO SEGURO -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, setDoc, deleteDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script type="module">
+    // Lógica do botão de tema original (Corrigido para evitar quebra caso elementos não existam)
+    const btnToggleTheme = document.getElementById('btn-toggle-theme');
+    const themeIcon = document.getElementById('theme-icon');
 
-        // CONFIGURAÇÃO DO FIREBASE ATUALIZADA
-        const firebaseConfig = {
-            apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
-            authDomain: "tarcisius-d03d7.firebaseapp.com",
-            projectId: "tarcisius-d03d7",
-            storageBucket: "tarcisius-d03d7.firebasestorage.app",
-            messagingSenderId: "186797936591",
-            appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // NAVEGAÇÃO ENTRE ABAS
-        const buttons = document.querySelectorAll('.tab-btn');
-        const contents = document.querySelectorAll('.tab-content');
-
-        buttons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const targetTab = btn.getAttribute('data-tab');
-                
-                contents.forEach(content => {
-                    if(content.id === `sec-${targetTab}`) {
-                        content.classList.remove('hidden');
-                    } else {
-                        content.classList.add('hidden');
-                    }
-                });
-
-                buttons.forEach(b => {
-                    if(b === btn) {
-                        b.className = "tab-btn w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-red-800 text-white shadow-md border border-red-700/50";
-                    } else {
-                        b.className = "tab-btn w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
-                    }
-                });
-            });
-        });
-
-        // TEMA (DARK/LIGHT)
-        const btnToggleTheme = document.getElementById('btn-toggle-theme');
-        const themeIcon = document.getElementById('theme-icon');
-
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            if(themeIcon) themeIcon.className = "fa-solid fa-sun";
+    btnToggleTheme?.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        if (themeIcon) {
+            themeIcon.className = document.body.classList.contains('dark-mode') ? "fa-solid fa-sun" : "fa-solid fa-moon";
         }
+    });
 
-        btnToggleTheme?.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            if(themeIcon) themeIcon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
+        authDomain: "tarcisius-d03d7.firebaseapp.com",
+        projectId: "tarcisius-d03d7",
+        storageBucket: "tarcisius-d03d7.firebasestorage.app",
+        messagingSenderId: "186797936591",
+        appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
+    };
+
+    const app = initializeApp(firebaseConfig); 
+    const auth = getAuth(app); 
+    const db = getFirestore(app);
+    
+    // App secundário para criar usuários sem deslogar o coordenador atual
+    const appSecundario = initializeApp(firebaseConfig, "SecondaryApp"); 
+    const authSecundario = getAuth(appSecundario);
+
+    const telaLoading = document.getElementById('tela-loading');
+    const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
+    const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
+    const formCadastroUsuario = document.getElementById('form-cadastro-usuario');
+    const buscaUsuarioLista = document.getElementById('busca-usuario-lista');
+    const editorEscalaData = document.getElementById('editor-escala-data');
+    const containerEditoresMissa = document.getElementById('container-editores-missa');
+    const btnLogout = document.getElementById('btn-logout');
+    const chkPossuiIrmao = document.getElementById('chk-possui-irmao');
+    const divListaIrmaos = document.getElementById('div-lista-irmaos');
+    const selectIrmaoTitular = document.getElementById('cad-irmao-titular-select');
+    
+    const chamadaReuniaoData = document.getElementById('chamada-reuniao-data');
+    const chamadaReuniaoTitulo = document.getElementById('chamada-reuniao-titulo');
+    const listaChamadaCoroinhas = document.getElementById('lista-chamada-coroinhas');
+    const btnSalvarChamada = document.getElementById('btn-salvar-chamada');
+
+    let usuarioLogadoDados = null; 
+    let mapaRespostasGerais = {}; 
+    let cacheTodosUsuarios = [];
+    let mapaPresencaAtual = {};
+
+    const CRONOGRAMA_PAROQUIA = [
+        { diaSemana: 2, horario: "19:00", rotulo: "Terça-feira" }, 
+        { diaSemana: 4, horario: "17:00", rotulo: "Quinta-feira" },
+        { diaSemana: 6, horario: "19:00", rotulo: "Sábado" }, 
+        { diaSemana: 0, horario: "09:00", rotulo: "Domingo de Manhã" }, 
+        { diaSemana: 0, horario: "19:00", rotulo: "Domingo de Noite" }
+    ];
+
+    function showLoading() { if(telaLoading) telaLoading.classList.remove('opacity-0', 'pointer-events-none'); }
+    function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
+    
+    chkPossuiIrmao?.addEventListener('change', (e) => {
+        if(e.target.checked) {
+            divListaIrmaos?.classList.remove('hidden'); 
+            selectIrmaoTitular?.setAttribute('required', 'true'); 
+            atualizarListboxMembros();
+        } else { 
+            divListaIrmaos?.classList.add('hidden'); 
+            selectIrmaoTitular?.removeAttribute('required'); 
+        }
+    });
+
+    function atualizarListboxMembros() {
+        if(!selectIrmaoTitular) return; 
+        selectIrmaoTitular.innerHTML = '<option value="">Selecione um membro...</option>';
+        cacheTodosUsuarios.filter(u => u.funcao?.toLowerCase() !== "coordenador").forEach(u => {
+            const opt = document.createElement('option'); 
+            opt.value = u.email; 
+            opt.textContent = `${u.nome} (${u.email})`; 
+            selectIrmaoTitular.appendChild(opt);
         });
+    }
 
-        // OBSERVAÇÃO DE LOGIN CORRIGIDA PARA MANTTER NO INDEX.HTML
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) { 
-                console.log("Nenhum usuário logado. Aguardando login...");
-                // Se você tiver uma tela de login acoplada ou quiser apenas travar o carregamento:
-                renderizarErroSeguranca("Nenhum usuário detectado. Faça login primeiro.");
-                return; 
-            }
+    // OBSERVAÇÃO DE LOGIN PROTEGIDA CONTRA SOFTLOCK (Mantém no index.html e renderiza erro amigável)
+    onAuthStateChanged(auth, async (user) => {
+        const devSession = sessionStorage.getItem("dev_user");
+        if (devSession) { 
+            usuarioLogadoDados = JSON.parse(devSession); 
+            inicializarPainel(); 
+        } else if (user) {
             try {
-                const uDoc = await getDoc(doc(db, "usuarios", user.uid));
-                
-                if (!uDoc.exists()) {
-                    renderizarErroSeguranca(`Seu UID (${user.uid}) não possui um documento criado na coleção 'usuarios' do Firestore.`);
-                    return;
+                const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+                if (docSnap.exists() && docSnap.data().funcao?.toLowerCase() === "coordenador") { 
+                    usuarioLogadoDados = docSnap.data(); 
+                    inicializarPainel(); 
+                } else {
+                    const funcaoAtual = docSnap.exists() ? docSnap.data().funcao : 'Não registrada';
+                    renderizarErroSeguranca(`Acesso restrito à coordenação. Sua conta atual possui o cargo de "${funcaoAtual}" ou não está homologada neste banco de dados (UID: ${user.uid}).`);
+                    // Não força redirecionamento em loop, apenas impede a inicialização
                 }
-
-                const dadosUsuario = uDoc.data();
-                if (dadosUsuario.funcao !== "coordenador") {
-                    renderizarErroSeguranca(`Acesso negado. Sua função atual é '${dadosUsuario.funcao}', mas este painel exige a função 'coordenador'.`);
-                    return;
-                }
-                
-                // Se passou nas validações, carrega os dados normalmente
-                carregarUsuariosPendentes();
-                carregarReunioesAdmin();
-                carregarMateriaisAdmin();
-                carregarAvisosAdmin();
             } catch (err) {
-                console.error("Erro fatal de autenticação/permissões:", err);
-                renderizarErroSeguranca("Erro crítico ao verificar permissões no Firestore. Cheque as Regras de Segurança (Rules).");
+                console.error("Erro ao validar usuário:", err);
+                renderizarErroSeguranca("Erro crítico de permissões ao tentar acessar a coleção 'usuarios'.");
             }
-        });
-
-        // Exibe o erro de forma amigável na tela em vez de quebrar a página
-        function renderizarErroSeguranca(mensagem) {
-            const container = document.getElementById('lista-usuarios-pendentes');
-            if(container) {
-                container.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-rose-500 font-medium">
-                    <i class="fa-solid fa-triangle-exclamation text-xl mb-2 block"></i>
-                    ${mensagem}
-                </td></tr>`;
-            }
+        } else { 
+            console.log("Nenhum usuário detectado. Aguardando login...");
+            renderizarErroSeguranca("Nenhum usuário logado. Por favor, acesse através da tela de login padrão.");
         }
+        setTimeout(hideLoading, 400);
+    });
 
-        document.getElementById('btn-logout')?.addEventListener('click', () => {
-            signOut(auth).then(() => { location.reload(); });
-        });
-
-        // FUNÇÃO: CARREGAR USUÁRIOS
-        async function carregarUsuariosPendentes() {
-            const container = document.getElementById('lista-usuarios-pendentes');
-            if(!container) return;
-            try {
-                const q = query(collection(db, "usuarios"), orderBy("nome", "asc"));
-                const snap = await getDocs(q);
-                container.innerHTML = "";
-                if(snap.empty) {
-                    container.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">Nenhum acólito cadastrado.</td></tr>';
-                    return;
-                }
-                snap.forEach(d => {
-                    const u = d.data();
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors border-b border-slate-100 dark:border-zinc-800/60";
-                    tr.innerHTML = `
-                        <td class="px-4 py-3.5 font-medium text-slate-800 dark:text-zinc-200">${u.nome || 'Sem Nome'}</td>
-                        <td class="px-4 py-3.5 text-slate-400 dark:text-zinc-500">${u.email}</td>
-                        <td class="px-4 py-3.5"><span class="bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 px-2 py-0.5 rounded-md font-mono text-[11px]">${u.funcao}</span></td>
-                        <td class="px-4 py-3.5">
-                            <span class="px-2 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wide ${u.homologado ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'}">
-                                ${u.homologado ? 'Homologado' : 'Pendente'}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3.5 text-center flex justify-center gap-2">
-                            ${!u.homologado ? `<button data-id="${d.id}" class="btn-aprovar-user bg-emerald-600 hover:bg-emerald-700 text-white py-1 px-2.5 rounded-lg text-[11px] font-bold border-0 cursor-pointer"><i class="fa-solid fa-check"></i> Aprovar</button>` : ''}
-                            <button data-id="${d.id}" class="btn-deletar-user bg-rose-600/10 hover:bg-rose-600 text-rose-600 hover:text-white py-1 px-2.5 rounded-lg text-[11px] font-bold border border-rose-500/10 transition-all cursor-pointer"><i class="fa-solid fa-trash"></i> Excluir</button>
-                        </td>
-                    `;
-                    container.appendChild(tr);
-                });
-
-                container.querySelectorAll('.btn-aprovar-user').forEach(b => {
-                    b.addEventListener('click', async (e) => {
-                        const id = e.currentTarget.getAttribute('data-id');
-                        if(confirm("Homologar este acólito?")) {
-                            await updateDoc(doc(db, "usuarios", id), { homologado: true });
-                            carregarUsuariosPendentes();
-                        }
-                    });
-                });
-
-                container.querySelectorAll('.btn-deletar-user').forEach(b => {
-                    b.addEventListener('click', async (e) => {
-                        const id = e.currentTarget.getAttribute('data-id');
-                        if(confirm("Excluir permanentemente este registro?")) {
-                            await deleteDoc(doc(db, "usuarios", id));
-                            carregarUsuariosPendentes();
-                        }
-                    });
-                });
-            } catch(e) {
-                console.error(e);
-                container.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-rose-500">Erro ao buscar usuários do Firestore.</td></tr>';
-            }
+    // Mostra erro amigável no container de usuários sem quebrar o resto do layout
+    function renderizarErroSeguranca(mensagem) {
+        const b = document.getElementById('tabela-usuarios-recuperacao');
+        if (b) {
+            b.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-rose-600 font-bold bg-rose-50/50">
+                <i class="fa-solid fa-triangle-exclamation text-lg mr-2"></i> ${mensagem}
+            </td></tr>`;
         }
+    }
 
-        // GERENCIADOR DE ESCALAS POR DATA
-        const editorEscalaData = document.getElementById('editor-escala-data');
-        const containerEditorPosicoes = document.getElementById('container-editor-posicoes');
+    function inicializarPainel() {
+        if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = "Salve, " + usuarioLogadoDados.nome.split(' ')[0];
+        if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = usuarioLogadoDados.funcao;
 
-        async function carregarEditorEscalasPorData(dataStr) {
-            if(!containerEditorPosicoes) return;
-            containerEditorPosicoes.innerHTML = '<div class="col-span-full py-4 text-center text-slate-400"><i class="fa-solid fa-circle-notch animate-spin mr-2"></i> Buscando posições...</div>';
-            if(!dataStr) return;
-
-            const dcol = ["missa_07h", "missa_09h", "missa_11h", "missa_17h", "missa_19h"];
-            const titulos = ["Missa das 07:00h", "Missa das 09:00h", "Missa das 11:00h", "Missa das 17:00h", "Missa das 19:00h"];
-            containerEditorPosicoes.innerHTML = "";
-
-            for(let i=0; i<dcol.length; i++) {
-                const idDoc = `${dataStr}_${dcol[i]}`;
-                const snap = await getDoc(doc(db, "escalas", idDoc));
-                let c = snap.exists() ? snap.data() : {
-                    ceriferario: { ativa: false, nome: "" },
-                    turiferario: { ativa: false, nome: "" },
-                    naveteiro: { ativa: false, nome: "" }
-                };
-
-                const div = document.createElement('div');
-                div.className = "bg-slate-50/40 dark:bg-zinc-950/40 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800/60 space-y-3.5";
-                div.innerHTML = `
-                    <h3 class="text-xs font-black text-slate-800 dark:text-zinc-200 border-b border-slate-100 dark:border-zinc-800/60 pb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-clock text-red-700/60"></i> ${titulos[i]}
-                    </h3>
-                    <div class="space-y-2.5">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" id="chk-ceri-${idDoc}" ${c.ceriferario?.ativa ? 'checked' : ''} class="w-4 h-4 accent-red-800">
-                            <input type="text" id="edit-ceri-${idDoc}" value="${c.ceriferario?.nome || ''}" placeholder="Nome do Ceriferário" class="w-full py-1.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all">
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" id="chk-turi-${idDoc}" ${c.turiferario?.ativa ? 'checked' : ''} class="w-4 h-4 accent-red-800">
-                            <input type="text" id="edit-turi-${idDoc}" value="${c.turiferario?.nome || ''}" placeholder="Nome do Turiferário" class="w-full py-1.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all">
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" id="chk-nave-${idDoc}" ${c.naveteiro?.ativa ? 'checked' : ''} class="w-4 h-4 accent-red-800">
-                            <input type="text" id="edit-nave-${idDoc}" value="${c.naveteiro?.nome || ''}" placeholder="Nome do Naveteiro" class="w-full py-1.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all">
-                        </div>
-                    </div>
-                `;
-                containerEditorPosicoes.appendChild(div);
-            }
-        }
-
-        document.getElementById('btn-salvar-modificacoes')?.addEventListener('click', async () => {
-            const dataStr = editorEscalaData.value;
-            if(!dataStr) { alert("Indique o dia da escala."); return; }
-            const dcol = ["missa_07h", "missa_09h", "missa_11h", "missa_17h", "missa_19h"];
-            
-            try {
-                for(let m of dcol) {
-                    const id = `${dataStr}_${m}`;
-                    await setDoc(doc(db, "escalas", id), {
-                        ceriferario: { ativa: document.getElementById(`chk-ceri-${id}`).checked, nome: document.getElementById(`edit-ceri-${id}`).value },
-                        turiferario: { ativa: document.getElementById(`chk-turi-${id}`).checked, nome: document.getElementById(`edit-turi-${id}`).value },
-                        naveteiro: { ativa: document.getElementById(`chk-nave-${id}`).checked, nome: document.getElementById(`edit-nave-${id}`).value }
-                    }, { merge: true });
-                }
-                alert("Alterações salvas na escala litúrgica!");
-            } catch (e) { console.error(e); alert("Erro ao salvar."); }
-        });
+        ouvirEnqueteTempoRealCoordenador();
+        ouvirUsuariosCadastrados();
+        ouvirMateriaisComoAdmin();
+        carregarAvisoNoInputCoordenador();
+        switchCoordTab('coord-usuarios');
         
-        editorEscalaData?.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
-
-        // GERENCIADOR DE REUNIÕES
-        document.getElementById('form-reuniao')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const tit = document.getElementById('reuniao-titulo').value;
-            const dat = document.getElementById('reuniao-data').value;
-            const con = document.getElementById('reuniao-conteudo').value;
-            await setDoc(doc(collection(db, "reunioes")), { titulo: tit, data: dat, conteudo: con, criadoEm: serverTimestamp() });
-            e.target.reset(); alert("Ata registrada!"); carregarReunioesAdmin();
-        });
-
-        async function carregarReunioesAdmin() {
-            const container = document.getElementById('lista-reunioes-admin');
-            if(!container) return; container.innerHTML = "";
-            const snap = await getDocs(query(collection(db, "reunioes"), orderBy("data", "desc")));
-            snap.forEach(d => {
-                const r = d.data();
-                const div = document.createElement('div');
-                div.className = "p-4 rounded-2xl bg-slate-50/50 dark:bg-zinc-950 border border-slate-100 dark:border-zinc-800/60 flex justify-between items-start gap-4";
-                div.innerHTML = `
-                    <div class="space-y-1">
-                        <h4 class="font-bold text-slate-800 dark:text-zinc-200 text-xs">${r.titulo}</h4>
-                        <p class="text-[10px] text-red-800 font-semibold">${r.data}</p>
-                        <p class="text-slate-400 dark:text-zinc-500 text-[11px] leading-relaxed line-clamp-2">${r.conteudo}</p>
-                    </div>
-                    <button data-id="${d.id}" class="btn-del-reuniao text-slate-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-all border-0 cursor-pointer"><i class="fa-solid fa-trash-can text-xs"></i></button>
-                `;
-                container.appendChild(div);
-            });
-
-            container.querySelectorAll('.btn-del-reuniao').forEach(b => {
-                b.addEventListener('click', async (e) => {
-                    const id = e.currentTarget.getAttribute('data-id');
-                    if(confirm("Remover esta reunião?")) { await deleteDoc(doc(db, "reunioes", id)); carregarReunioesAdmin(); }
-                });
-            });
+        if(editorEscalaData) {
+            editorEscalaData.value = new Date().toISOString().split('T')[0]; 
+            carregarEditorEscalasPorData(editorEscalaData.value);
         }
-
-        // GERENCIADOR DE MATERIAIS
-        document.getElementById('form-material')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const tit = document.getElementById('mat-titulo').value;
-            const url = document.getElementById('mat-url').value;
-            const desc = document.getElementById('mat-desc').value;
-            await setDoc(doc(collection(db, "materiais")), { titulo: tit, url: url, descricao: desc, criadoEm: serverTimestamp() });
-            e.target.reset(); alert("Material publicado!"); carregarMateriaisAdmin();
-        });
-
-        async function carregarMateriaisAdmin() {
-            const realContainer = document.getElementById('lista-materiais-admin');
-            if(!realContainer) return; realContainer.innerHTML = "";
-            const snap = await getDocs(query(collection(db, "materiais"), orderBy("criadoEm", "desc")));
-            snap.forEach(d => {
-                const m = d.data();
-                const div = document.createElement('div');
-                div.className = "p-4 rounded-2xl bg-slate-50/50 dark:bg-zinc-950 border border-slate-100 dark:border-zinc-800/60 flex justify-between items-start gap-4";
-                div.innerHTML = `
-                    <div class="space-y-1">
-                        <h4 class="font-bold text-slate-800 dark:text-zinc-200 text-xs">${m.titulo}</h4>
-                        <p class="text-slate-400 dark:text-zinc-500 text-[11px] leading-relaxed line-clamp-2">${m.descricao}</p>
-                    </div>
-                    <button data-id="${d.id}" class="btn-del-mat text-slate-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-all border-0 cursor-pointer"><i class="fa-solid fa-trash-can text-xs"></i></button>
-                `;
-                realContainer.appendChild(div);
-            });
-
-            realContainer.querySelectorAll('.btn-del-mat').forEach(b => {
-                b.addEventListener('click', async (e) => {
-                    const id = e.currentTarget.getAttribute('data-id');
-                    if(confirm("Remover este material?")) { await deleteDoc(doc(db, "materiais", id)); carregarMateriaisAdmin(); }
-                });
-            });
+        if(chamadaReuniaoData) {
+            chamadaReuniaoData.value = new Date().toISOString().split('T')[0];
+            const inputHorario = document.getElementById('chamada-reuniao-horario');
+            if(inputHorario) inputHorario.value = "15:00";
+            if(chamadaReuniaoTitulo) chamadaReuniaoTitulo.value = "Reunião de Formação";
+            carregarListaDeChamada(chamadaReuniaoData.value);
         }
+    }
 
-        // MURAL DE AVISOS
-        document.getElementById('form-aviso')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const txt = document.getElementById('aviso-texto').value;
-            await setDoc(doc(collection(db, "avisos")), { texto: txt, criadoEm: serverTimestamp() });
-            e.target.reset(); alert("Aviso lançado!"); carregarAvisosAdmin();
+    if(btnLogout) {
+        btnLogout.addEventListener('click', () => { 
+            sessionStorage.removeItem("dev_user"); 
+            signOut(auth).then(() => { location.reload(); }); 
         });
+    }
 
-        async function carregarAvisosAdmin() {
-            const container = document.getElementById('lista-avisos-admin');
-            if(!container) return; container.innerHTML = "";
-            const snap = await getDocs(query(collection(db, "avisos"), orderBy("criadoEm", "desc")));
-            snap.forEach(d => {
-                const a = d.data();
-                const div = document.createElement('div');
-                div.className = "p-4 rounded-2xl bg-slate-50/50 dark:bg-zinc-950 border border-slate-100 dark:border-zinc-800/60 flex justify-between items-center gap-4";
-                div.innerHTML = `
-                    <p class="text-slate-700 dark:text-zinc-300 text-xs leading-relaxed flex-1">${a.texto}</p>
-                    <button data-id="${d.id}" class="btn-del-aviso text-slate-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-all border-0 cursor-pointer"><i class="fa-solid fa-trash-can text-xs"></i></button>
-                `;
-                container.appendChild(div);
-            });
+    document.getElementById('btn-gerar-senha')?.addEventListener('click', () => {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; 
+        let s = '';
+        for (let i = 0; i < 6; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
+        const inputSenha = document.getElementById('cad-senha');
+        if(inputSenha) inputSenha.value = s;
+    });
 
-            container.querySelectorAll('.btn-del-aviso').forEach(b => {
-                b.addEventListener('click', async (e) => {
-                    const id = e.currentTarget.getAttribute('data-id');
-                    if(confirm("Remover este comunicado?")) { await deleteDoc(doc(db, "avisos", id)); carregarAvisosAdmin(); }
-                });
-            });
-        }
+    if(formCadastroUsuario) {
+        formCadastroUsuario.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('cad-nome').value.trim();
+            const funcao = document.getElementById('cad-funcao').value;
+            const email = document.getElementById('cad-email').value.trim().toLowerCase();
+            const senha = document.getElementById('cad-senha').value.trim();
+            const ehIrmao = chkPossuiIrmao ? chkPossuiIrmao.checked : false;
 
-        // MOTOR DE SORTEIO LITÚRGICO AUTOMÁTICO
-        document.getElementById('btn-executar-sorteio')?.addEventListener('click', async () => {
-            if(!confirm("Deseja iniciar o sorteio automatizado?")) return;
-            const uSnap = await getDocs(query(collection(db, "usuarios"), where("homologado", "==", true)));
-            let acolitos = []; uSnap.forEach(d => { acolitos.push(d.data().nome); });
-            if(acolitos.length === 0) { alert("Nenhum acólito homologado encontrado."); return; }
-
-            const hoje = new Date().toISOString().split('T')[0];
-            const dcol = ["missa_07h", "missa_09h", "missa_11h", "missa_17h", "missa_19h"];
-
-            function embaralhar(array) {
-                let arr = [...array];
-                for (let i = arr.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [arr[i], arr[j]] = [arr[j], arr[i]];
+            try {
+                const res = await createUserWithEmailAndPassword(authSecundario, email, senha);
+                const novoUsuario = { nome, email, senha_provisoria: senha, funcao, tipoConta: "Oficial" };
+                if (ehIrmao && selectIrmaoTitular?.value) {
+                    novoUsuario.email_conexao = selectIrmaoTitular.value.toLowerCase(); 
+                    novoUsuario.tipoConta = "ComVinculo";
                 }
-                return arr;
-            }
-
-            let pool = embaralhar(acolitos);
-            for(let m of dcol) {
-                const idDoc = `${hoje}_${m}`;
-                if(pool.length < 3) pool = embaralhar(acolitos);
-                const c = pool.pop();
-                if(pool.length < 3) pool = embaralhar(acolitos);
-                const t = pool.pop();
-                if(pool.length < 3) pool = embaralhar(acolitos);
-                const n = pool.pop();
-
-                await setDoc(doc(db, "escalas", idDoc), {
-                    ceriferario: { ativa: true, nome: c },
-                    turiferario: { ativa: true, nome: t },
-                    naveteiro: { ativa: true, nome: n }
-                }, { merge: true });
-            }
-            alert("Sorteio litúrgico concluído!");
-            if(editorEscalaData) { editorEscalaData.value = hoje; carregarEditorEscalasPorData(hoje); }
+                await setDoc(doc(db, "usuarios", res.user.uid), novoUsuario);
+                await signOut(authSecundario);
+                alert("Membro cadastrado com sucesso!"); 
+                formCadastroUsuario.reset(); 
+                divListaIrmaos?.classList.add('hidden');
+            } catch (err) { alert(err.message); }
         });
-    </script>
+    }
+
+    window.deletarUsuarioDoSistema = async function(id, nome) {
+        if(confirm(`Remover permanentemente ${nome}?`)) { await deleteDoc(doc(db, "usuarios", id)); }
+    }
+
+    function ouvirUsuariosCadastrados() {
+        onSnapshot(collection(db, "usuarios"), (snap) => {
+            cacheTodosUsuarios = []; 
+            snap.forEach(d => { const u = d.data(); u.idDoc = d.id; cacheTodosUsuarios.push(u); });
+            cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome)); 
+            renderizarTabelaUsuarios();
+            if(chkPossuiIrmao && chkPossuiIrmao.checked) { atualizarListboxMembros(); }
+            if(chamadaReuniaoData && chamadaReuniaoData.value) { renderizarInterfaceChamada(); }
+        });
+    }
+
+    function renderizarTabelaUsuarios() {
+        const b = document.getElementById('tabela-usuarios-recuperacao'); 
+        if(!b) return; 
+        b.innerHTML = "";
+        const termo = buscaUsuarioLista?.value.toLowerCase() || "";
+        
+        cacheTodosUsuarios.filter(u => u.nome.toLowerCase().includes(termo)).forEach(u => {
+            let badgeTipo = u.funcao?.toLowerCase() === "coordenador" ? `<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Coordenação</span>` : `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Oficial</span>`;
+            let colunaConexao = u.email_conexao ? `<span class="text-blue-700 font-bold text-[11px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">Irmão de: ${u.email_conexao}</span>` : `<span class="text-gray-400 italic text-[11px]">Nenhum</span>`;
+            let senhaExibicao = u.senha_provisoria || `<span class="text-gray-400 italic">Alterada</span>`;
+            
+            b.innerHTML += `<tr class="border-b hover:bg-gray-50/50">
+                <td class="p-3 font-semibold">${u.nome}</td>
+                <td class="p-3 font-mono text-gray-600">${u.email}</td>
+                <td class="p-3 font-mono font-bold text-red-800">${senhaExibicao}</td>
+                <td class="p-3">${colunaConexao}</td>
+                <td class="p-3 text-center">${badgeTipo}</td>
+                <td class="p-3 text-center">
+                    <button onclick="deletarUsuarioDoSistema('${u.idDoc}', '${u.nome}')" class="text-rose-600 font-bold bg-rose-50 px-2 py-1 rounded border border-rose-200 text-[11px] hover:bg-rose-100 cursor-pointer">Excluir</button>
+                </td>
+            </tr>`;
+        });
+    }
+    buscaUsuarioLista?.addEventListener('input', renderizarTabelaUsuarios);
+
+    async function carregarListaDeChamada(dataString) {
+        if(!dataString) return;
+        mapaPresencaAtual = {};
+        try {
+            const docSnap = await getDoc(doc(db, "reunioes", dataString));
+            const inputHorario = document.getElementById('chamada-reuniao-horario');
+            if(docSnap.exists()) {
+                const dados = docSnap.data();
+                mapaPresencaAtual = dados.presencas || {};
+                if(dados.horario && inputHorario) inputHorario.value = dados.horario;
+                if(dados.titulo && chamadaReuniaoTitulo) chamadaReuniaoTitulo.value = dados.titulo;
+            } else {
+                if(inputHorario) inputHorario.value = "15:00";
+                if(chamadaReuniaoTitulo) chamadaReuniaoTitulo.value = "Reunião de Formação";
+            }
+            renderizarInterfaceChamada();
+        } catch(err) { console.error("Erro ao carregar chamada: ", err); }
+    }
+
+    function renderizarInterfaceChamada() {
+        if(!listaChamadaCoroinhas) return;
+        const listaCoroinhas = cacheTodosUsuarios.filter(u => u.funcao?.toLowerCase() !== "coordenador");
+        
+        if(listaCoroinhas.length === 0) {
+            listaChamadaCoroinhas.innerHTML = `<p class="text-xs text-gray-400 italic py-4 text-center">Nenhum coroinha cadastrado no sistema.</p>`;
+            return;
+        }
+
+        listaChamadaCoroinhas.innerHTML = "";
+        listaCoroinhas.forEach(c => {
+            const statusAtual = mapaPresencaAtual[c.nome] || "presente";
+            const idLimpo = c.nome.replace(/\s+/g, '');
+            listaChamadaCoroinhas.innerHTML += `
+                <div class="flex justify-between items-center py-2.5 px-1 hover:bg-gray-50/60 transition-all">
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-gray-800">${c.nome}</span>
+                        <span class="text-[10px] text-gray-400 font-mono">${c.email}</span>
+                    </div>
+                    <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200/60">
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'presente')" id="btn-p-${idLimpo}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'presente' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">✓ P</button>
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'falta')" id="btn-f-${idLimpo}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'falta' ? 'bg-rose-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">X F</button>
+                        <button type="button" onclick="window.alterarStatusPresencaLocal('${c.nome}', 'justificada')" id="btn-j-${idLimpo}" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${statusAtual === 'justificada' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}">FJ</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    window.alterarStatusPresencaLocal = function(nomeCoroinha, novoStatus) {
+        mapaPresencaAtual[nomeCoroinha] = novoStatus;
+        const idLimpo = nomeCoroinha.replace(/\s+/g, '');
+        const btnP = document.getElementById(`btn-p-${idLimpo}`);
+        const btnF = document.getElementById(`btn-f-${idLimpo}`);
+        const btnJ = document.getElementById(`btn-j-${idLimpo}`);
+
+        if(btnP) btnP.className = `px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'presente' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}`;
+        if(btnF) btnF.className = `px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'falta' ? 'bg-rose-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}`;
+        if(btnJ) btnJ.className = `px-2.5 py-1 rounded-lg text-[10px] font-extrabold cursor-pointer transition-all ${novoStatus === 'justificada' ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-400 hover:text-gray-600'}`;
+    };
+
+    btnSalvarChamada?.addEventListener('click', async () => {
+        const dataReuniao = chamadaReuniaoData?.value;
+        const horarioReuniao = document.getElementById('chamada-reuniao-horario')?.value;
+        const tituloReuniao = chamadaReuniaoTitulo?.value.trim();
+
+        if(!dataReuniao) return alert("Por favor, selecione uma data válida!");
+        if(!horarioReuniao) return alert("Por favor, selecione um horário válido!");
+
+        cacheTodosUsuarios.filter(u => u.funcao?.toLowerCase() !== "coordenador").forEach(c => {
+            if(!mapaPresencaAtual[c.nome]) mapaPresencaAtual[c.nome] = "presente";
+        });
+
+        try {
+            await setDoc(doc(db, "reunioes", dataReuniao), {
+                data: dataReuniao,
+                horario: horarioReuniao,
+                titulo: tituloReuniao || "Reunião Geral",
+                presencas: mapaPresencaAtual,
+                atualizadoEm: Date.now()
+            });
+            alert("Dados da reunião e lista de chamada salvos com sucesso!");
+        } catch(err) { alert("Erro ao salvar dados da reunião: " + err.message); }
+    });
+
+    chamadaReuniaoData?.addEventListener('change', (e) => carregarListaDeChamada(e.target.value));
+
+    document.getElementById('form-upload-formacao')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const titulo = document.getElementById('form-titulo-input').value.trim();
+        const url = document.getElementById('form-url-input').value.trim();
+        const idConteudo = "mat_" + Date.now();
+        await setDoc(doc(db, "formacao", idConteudo), { id: idConteudo, titulo: titulo, url: url });
+        alert("Novo material adicionado com sucesso!");
+        document.getElementById('form-upload-formacao').reset();
+    });
+
+    function ouvirMateriaisComoAdmin() {
+        const container = document.getElementById('lista-adm-materiais');
+        if(!container) return;
+        onSnapshot(collection(db, "formacao"), (snap) => {
+            if(snap.empty) { container.innerHTML = `<p class="text-xs text-gray-400 italic">Nenhum arquivo ativo.</p>`; return; }
+            container.innerHTML = "";
+            snap.forEach(d => {
+                const mat = d.data();
+                container.innerHTML += `<div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-xs"><div><strong class="text-gray-800 block">${mat.titulo}</strong><span class="text-[10px] text-gray-400 font-mono">${mat.url}</span></div><button onclick="window.removerConteudoDidatico('${d.id}')" class="bg-rose-50 border border-rose-200 text-rose-700 px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-rose-100 cursor-pointer">Excluir</button></div>`;
+            });
+        });
+    }
+
+    window.removerConteudoDidatico = async function(id) {
+        if(confirm("Deseja apagar esse material didático?")) { await deleteDoc(doc(db, "formacao", id)); }
+    };
+
+    function ouvirEnqueteTempoRealCoordenador() {
+        onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (docSnap) => {
+            if (!docSnap.exists()) return; 
+            const dados = docSnap.data(); 
+            mapaRespostasGerais = dados.respostas || {};
+            
+            const fila = document.getElementById('lista-fila-prioridade');
+            if(fila) {
+                fila.innerHTML = ""; 
+                let arr = Object.keys(mapaRespostasGerais).map(n => ({nome: n, t: mapaRespostasGerais[n].respondidoEm || 0}));
+                arr.sort((a,b) => a.t - b.t);
+                if(arr.length===0) fila.innerHTML = `<p class="text-[10px] text-gray-400 italic">Ninguém respondeu ainda.</p>`;
+                else arr.forEach((v, i) => fila.innerHTML += `<div class="flex justify-between bg-white px-2 py-0.5 rounded border text-[11px]"><span class="font-bold">${i+1}. ${v.nome}</span></div>`);
+            }
+            
+            const container = document.getElementById('lista-nomes-enquete');
+            if(container && dados.celebracoes) {
+                container.innerHTML = ""; 
+                dados.celebracoes.forEach(cel => {
+                    let aptos = []; 
+                    Object.keys(mapaRespostasGerais).forEach(n => { if((mapaRespostasGerais[n].escolhas||[]).includes(cel.idChave)) aptos.push(n); });
+                    container.innerHTML += `<div class="bg-white p-1 border rounded mb-1"><strong class="text-red-900 text-[10px] block border-b">${cel.data.split('-').reverse().join('/')} - ${cel.rotulo}:</strong><p class="text-[10px] text-emerald-700 font-medium">${aptos.length>0?'✓ '+aptos.join(', '):'Ninguém'}</p></div>`;
+                });
+            }
+        });
+    }
+
+    document.getElementById('form-publicar-aviso')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const txtAviso = document.getElementById('txt-aviso-coordenador');
+        if(txtAviso) {
+            await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAviso.value, dataPublicacao: new Date().toLocaleDateString('pt-BR') });
+            alert("Mural updated!");
+        }
+    });
+
+    async function carregarAvisoNoInputCoordenador() {
+        const d = await getDoc(doc(db, "mural", "aviso_geral")); 
+        const txtAviso = document.getElementById('txt-aviso-coordenador');
+        if(d.exists() && txtAviso) txtAviso.value = d.data().texto || "";
+    }
+
+    document.getElementById('btn-disparar-enquete')?.addEventListener('click', async () => {
+        const mes = document.getElementById('enq-mes-alvo').value; 
+        if(!mes) return alert("Selecione o mês!");
+        const [a, m] = mes.split('-').map(Number); 
+        const list = []; 
+        const curr = new Date(a, m - 1, 1);
+        
+        while(curr.getMonth() === m - 1) {
+            CRONOGRAMA_PAROQUIA.filter(c => c.diaSemana === curr.getDay()).forEach(item => {
+                const dStr = curr.toISOString().split('T')[0];
+                list.push({ idChave: `${dStr}_${item.horario.replace(':','')}`, data: dStr, horario: item.horario, rotulo: item.rotulo });
+            });
+            curr.setDate(curr.getDate() + 1);
+        }
+        await setDoc(doc(db, "enquetes", "disponibilidade_atual"), { mesReferencia: mes, ativa: true, celebracoes: list, respostas: {} });
+        alert("Pesquisa de disponibilidade aberta!");
+    });
+
+    document.getElementById('btn-fechar-enquete')?.addEventListener('click', async () => {
+        await updateDoc(doc(db, "enquetes", "disponibilidade_atual"), { ativa: false }); 
+        alert("Pesquisa fechada.");
+    });
+
+    document.getElementById('btn-limpar-escalas-mes')?.addEventListener('click', async () => {
+        const mes = document.getElementById('enq-mes-alvo').value;
+        if(!mes) return alert("Por favor, selecione o Mês de Referência primeiro!");
+        if(!confirm(`ATENÇÃO: Deseja REALMENTE apagar TODAS as escalas oficiais registradas no mês ${mes}?`)) return;
+
+        try {
+            const snap = await getDocs(collection(db, "escalas"));
+            const promessasDeRemocao = [];
+            let contadorRemovidos = 0;
+
+            snap.forEach(documento => {
+                const dataEscala = documento.data().data;
+                if(dataEscala && dataEscala.startsWith(mes)) {
+                    promessasDeRemocao.push(deleteDoc(doc(db, "escalas", documento.id)));
+                    contadorRemovidos++;
+                }
+            });
+
+            await Promise.all(promessasDeRemocao);
+            alert(`Sucesso! Foram excluídas ${contadorRemovidos} escalas vinculadas ao mês ${mes}.`);
+            if(editorEscalaData && editorEscalaData.value.startsWith(mes)) {
+                carregarEditorEscalasPorData(editorEscalaData.value);
+            }
+        } catch(err) { alert("Erro ao limpar o banco: " + err.message); }
+    });
+
+    document.getElementById('form-escala-automatica')?.addEventListener('submit', async (e) => {
+        e.preventDefault(); 
+        const mes = document.getElementById('enq-mes-alvo').value; 
+        if(!mes) return alert("Por favor, selecione o mês alvo no campo acima antes de gerar!");
+        
+        const [a, m] = mes.split('-').map(Number); 
+        const list = []; 
+        const curr = new Date(a, m - 1, 1);
+        while(curr.getMonth() === m - 1) {
+            CRONOGRAMA_PAROQUIA.filter(c => c.diaSemana === curr.getDay()).forEach(item => {
+                const dStr = curr.toISOString().split('T')[0];
+                list.push({ idChave: `${dStr}_${item.horario.replace(':','')}`, data: dStr, horario: item.horario, rotulo: item.rotulo });
+            });
+            curr.setDate(curr.getDate() + 1);
+        }
+        
+        const tit = document.getElementById('auto-titulo').value.trim();
+        for(const cel of list) {
+            let disp = []; 
+            Object.keys(mapaRespostasGerais).forEach(n => { if((mapaRespostasGerais[n].escolhas||[]).includes(cel.idChave)) disp.push(n); });
+            disp.sort(() => Math.random() - 0.5);
+            
+            await setDoc(doc(db, "escalas", `${cel.data}_${cel.horario.replace(':','')}`), {
+                titulo: `${tit} (${cel.rotulo})`, horario: cel.horario, data: cel.data,
+                altar1: { nome: disp[0] || "A definir", status: "Pendente" }, altar2: { nome: disp[1] || "A definir", status: "Pendente" },
+                altar3: { nome: disp[2] || "A definir", status: "Pendente" }, altar4: { nome: disp[3] || "A definir", status: "Pendente" },
+                altar5: { nome: disp[4] || "A definir", status: "Pendente" }, altar6: { nome: disp[5] || "A definir", status: "Pendente" },
+                turibuloAtivo: false, turiferario: { nome: "A definir", status: "Pendente" }, navetaAtiva: false, naveteiro: { nome: "A definir", status: "Pendente" }
+            });
+        }
+        alert("Escalas oficiais lançadas com sucesso!");
+    });
+
+    document.getElementById('form-criar-escala-manual')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dataAlvo = editorEscalaData?.value;
+        if(!dataAlvo) return alert("Selecione um dia no calendário primeiro!");
+
+        const titulo = document.getElementById('add-manual-titulo').value.trim();
+        const horario = document.getElementById('add-manual-horario').value;
+        const idDoc = `${dataAlvo}_${horario.replace(':', '')}`;
+
+        const checarSeExiste = await getDoc(doc(db, "escalas", idDoc));
+        if(checarSeExiste.exists()) {
+            if(!confirm("Já existe uma escala para este exato horário. Deseja sobrescrever os dados?")) return;
+        }
+
+        try {
+            await setDoc(doc(db, "escalas", idDoc), {
+                titulo: titulo, horario: horario, data: dataAlvo,
+                altar1: { nome: "A definir", status: "Pendente" }, altar2: { nome: "A definir", status: "Pendente" },
+                altar3: { nome: "A definir", status: "Pendente" }, altar4: { nome: "A definir", status: "Pendente" },
+                altar5: { nome: "A definir", status: "Pendente" }, altar6: { nome: "A definir", status: "Pendente" },
+                turibuloAtivo: false, turiferario: { nome: "A definir", status: "Pendente" }, navetaAtiva: false, naveteiro: { nome: "A definir", status: "Pendente" }
+            });
+
+            alert("Solenidade adicionada com sucesso!");
+            document.getElementById('form-criar-escala-manual').reset();
+            carregarEditorEscalasPorData(dataAlvo);
+        } catch(err) { alert("Erro ao criar escala manual: " + err.message); }
+    });
+
+    window.excluirEscalaInteira = async function(idDoc) {
+        if(confirm("Tem certeza absoluta que deseja APAGAR esta celebração?")) {
+            await deleteDoc(doc(db, "escalas", idDoc));
+            alert("Escala de celebração excluída!");
+            if(editorEscalaData) carregarEditorEscalasPorData(editorEscalaData.value);
+        }
+    };
+
+    async function carregarEditorEscalasPorData(dataString) {
+        if(!containerEditoresMissa) return; 
+        containerEditoresMissa.innerHTML = "";
+        let fnd = false;
+
+        try {
+            const consulta = query(collection(db, "escalas"), where("data", "==", dataString));
+            const snapshot = await getDocs(consulta);
+            let listaDeEscalas = [];
+
+            snapshot.forEach(docSnap => {
+                const dadosMissa = docSnap.data();
+                dadosMissa.idDocumentoFirebase = docSnap.id;
+                listaDeEscalas.push(dadosMissa);
+            });
+
+            listaDeEscalas.sort((a, b) => a.horario.localeCompare(b.horario));
+
+            listaDeEscalas.forEach(d => {
+                fnd = true; 
+                const idDoc = d.idDocumentoFirebase;
+                const dv = document.createElement('div');
+                dv.className = "bg-white border p-5 rounded-2xl space-y-3 text-xs shadow-xs border-gray-200";
+                dv.innerHTML = `
+                    <div class="flex justify-between items-center font-bold border-b pb-2">
+                        <span class="text-red-950">Horário: ${d.horario}h</span>
+                        <span class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-[10px]">${d.titulo}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 1</label><input type="text" id="edit-a1-${idDoc}" value="${d.altar1?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 2</label><input type="text" id="edit-a2-${idDoc}" value="${d.altar2?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 3</label><input type="text" id="edit-a3-${idDoc}" value="${d.altar3?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 4</label><input type="text" id="edit-a4-${idDoc}" value="${d.altar4?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 5</label><input type="text" id="edit-a5-${idDoc}" value="${d.altar5?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Altar 6</label><input type="text" id="edit-a6-${idDoc}" value="${d.altar6?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                    </div>
+                    <div class="flex gap-4 border-t pt-2">
+                        <label class="flex items-center gap-1"><input type="checkbox" id="chk-turi-${idDoc}" ${d.turibuloAtivo?'checked':''}> Turíbulo</label>
+                        <label class="flex items-center gap-1"><input type="checkbox" id="chk-nave-${idDoc}" ${d.navetaAtiva?'checked':''}> Naveta</label>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Turiferário</label><input type="text" id="edit-turi-${idDoc}" value="${d.turiferario?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                        <div><label class="text-[9px] text-gray-400 font-bold uppercase">Naveteiro</label><input type="text" id="edit-nave-${idDoc}" value="${d.naveteiro?.nome||''}" class="w-full border p-1 bg-gray-50 rounded"></div>
+                    </div>
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" data-id="${idDoc}" class="btn-salvar-edicao flex-1 bg-emerald-700 text-white py-2 rounded-xl font-bold cursor-pointer hover:bg-emerald-800">Salvar Alterações</button>
+                        <button type="button" onclick="excluirEscalaInteira('${idDoc}')" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-2 rounded-xl font-bold cursor-pointer hover:bg-rose-100">Apagar</button>
+                    </div>
+                `; 
+                containerEditoresMissa.appendChild(dv);
+            });
+        } catch(erro) { console.error("Erro ao resgatar escalas vigentes: ", erro); }
+
+        if(!fnd) containerEditoresMissa.innerHTML = `<p class="text-xs text-gray-400 italic text-center col-span-2 py-4">Nenhuma escala ativa para esta data.</p>`;
+        else {
+            document.querySelectorAll('.btn-salvar-edicao').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    await updateDoc(doc(db, "escalas", id), {
+                        "altar1.nome": document.getElementById(`edit-a1-${id}`).value, 
+                        "altar2.nome": document.getElementById(`edit-a2-${id}`).value,
+                        "altar3.nome": document.getElementById(`edit-a3-${id}`).value, 
+                        "altar4.nome": document.getElementById(`edit-a4-${id}`).value,
+                        "altar5.nome": document.getElementById(`edit-a5-${id}`).value, 
+                        "altar6.nome": document.getElementById(`edit-a6-${id}`).value,
+                        "turibuloAtivo": document.getElementById(`chk-turi-${id}`).checked, 
+                        "turiferario.nome": document.getElementById(`edit-turi-${id}`).value,
+                        "navetaAtiva": document.getElementById(`chk-nave-${id}`).checked, 
+                        "naveteiro.nome": document.getElementById(`edit-nave-${id}`).value
+                    }); 
+                    alert("Modificações salvas!");
+                });
+            });
+        }
+    }
+    editorEscalaData?.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
+
+    window.switchCoordTab = function(tabID) {
+        document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
+        document.getElementById('sec-' + tabID)?.classList.remove('hidden');
+        const ids = ['usuarios', 'escalas', 'sorteio', 'reunioes', 'material', 'avisos'];
+        ids.forEach(id => {
+            const btn = document.getElementById(`btn-c-${id}`);
+            if(btn) {
+                if(tabID === `coord-${id}` || (id === 'avisos' && tabID === 'coord-avisos-tab')) {
+                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-red-800 text-white shadow-xs";
+                } else {
+                    btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
+                }
+            }
+        });
+    }
+</script>
 </body>
 </html>
