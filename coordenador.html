@@ -233,7 +233,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, setDoc, deleteDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIGURAÇÃO DO FIREBASE ATUALIZADA COM SUCESSO
+        // CONFIGURAÇÃO DO FIREBASE ATUALIZADA
         const firebaseConfig = {
             apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
             authDomain: "tarcisius-d03d7.firebaseapp.com",
@@ -247,7 +247,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // NAVEGAÇÃO ENTRE ABAS CORRIGIDA
+        // NAVEGAÇÃO ENTRE ABAS
         const buttons = document.querySelectorAll('.tab-btn');
         const contents = document.querySelectorAll('.tab-content');
 
@@ -288,30 +288,52 @@
             if(themeIcon) themeIcon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
         });
 
-        // OBSERVAÇÃO DE LOGIN E VALIDAÇÃO DE SEGURANÇA
+        // OBSERVAÇÃO DE LOGIN CORRIGIDA PARA MANTTER NO INDEX.HTML
         onAuthStateChanged(auth, async (user) => {
-            if (!user) { window.location.href = "index.html"; return; }
+            if (!user) { 
+                console.log("Nenhum usuário logado. Aguardando login...");
+                // Se você tiver uma tela de login acoplada ou quiser apenas travar o carregamento:
+                renderizarErroSeguranca("Nenhum usuário detectado. Faça login primeiro.");
+                return; 
+            }
             try {
                 const uDoc = await getDoc(doc(db, "usuarios", user.uid));
-                if (!uDoc.exists() || uDoc.data().funcao !== "coordenador") {
-                    alert("Acesso restrito à coordenação.");
-                    window.location.href = "index.html";
+                
+                if (!uDoc.exists()) {
+                    renderizarErroSeguranca(`Seu UID (${user.uid}) não possui um documento criado na coleção 'usuarios' do Firestore.`);
+                    return;
+                }
+
+                const dadosUsuario = uDoc.data();
+                if (dadosUsuario.funcao !== "coordenador") {
+                    renderizarErroSeguranca(`Acesso negado. Sua função atual é '${dadosUsuario.funcao}', mas este painel exige a função 'coordenador'.`);
                     return;
                 }
                 
+                // Se passou nas validações, carrega os dados normalmente
                 carregarUsuariosPendentes();
                 carregarReunioesAdmin();
                 carregarMateriaisAdmin();
                 carregarAvisosAdmin();
             } catch (err) {
                 console.error("Erro fatal de autenticação/permissões:", err);
-                const tableContainer = document.getElementById('lista-usuarios-pendentes');
-                if(tableContainer) tableContainer.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-rose-500 font-medium">Erro crítico: Verifique as regras de segurança no console do Firebase.</td></tr>';
+                renderizarErroSeguranca("Erro crítico ao verificar permissões no Firestore. Cheque as Regras de Segurança (Rules).");
             }
         });
 
+        // Exibe o erro de forma amigável na tela em vez de quebrar a página
+        function renderizarErroSeguranca(mensagem) {
+            const container = document.getElementById('lista-usuarios-pendentes');
+            if(container) {
+                container.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-rose-500 font-medium">
+                    <i class="fa-solid fa-triangle-exclamation text-xl mb-2 block"></i>
+                    ${mensagem}
+                </td></tr>`;
+            }
+        }
+
         document.getElementById('btn-logout')?.addEventListener('click', () => {
-            signOut(auth).then(() => window.location.href = "index.html");
+            signOut(auth).then(() => { location.reload(); });
         });
 
         // FUNÇÃO: CARREGAR USUÁRIOS
