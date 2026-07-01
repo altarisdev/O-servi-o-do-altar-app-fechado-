@@ -157,7 +157,7 @@
             btnRetorno.className = "fixed bottom-4 right-4 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs px-3.5 py-2.5 rounded-xl shadow-xl z-[10000] cursor-pointer transition-all active:scale-95 flex items-center font-mono border-b-2 border-amber-600";
             
             btnRetorno.onclick = () => {
-                window.location.href = "dev.html"; 
+                window.location.href = "painel-dev.html"; 
             };
             document.body.appendChild(btnRetorno);
         }
@@ -216,6 +216,8 @@
     function redirecionarPorFuncao(funcao, email = "") {
         if (funcao === "Coordenador") {
             window.location.href = "coordenador.html";
+        } else if (funcao === "desenvolvedor" || email === "dev@altaris.com") {
+            window.location.href = "painel-dev.html";
         } else if (funcao === "Mestre" || email === "padre@altaris.com" || email === "casalcoordenador@altaris.com") {
             window.location.href = "mestre.html";
         } else {
