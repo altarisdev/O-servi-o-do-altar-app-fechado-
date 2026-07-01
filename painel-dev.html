@@ -3,70 +3,433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Altaris - Sandbox Dev</title>
-    <link rel="stylesheet" href="style.css"> <!-- Opcional: Seu arquivo de estilos -->
+    <title>Altaris - Central do Desenvolvedor</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aba-dev-conteudo { display: none; }
+        .aba-dev-conteudo.ativa { display: block; }
+    </style>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+<body class="bg-stone-950 text-stone-100 font-sans min-h-screen antialiased flex items-center justify-center p-4">
 
-    <div class="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold text-center mb-6 text-yellow-500">Acesso do Desenvolvedor</h2>
+    <div id="container-login-dev" class="w-full max-w-md p-8 bg-stone-900 border border-stone-800 rounded-2xl shadow-2xl">
+        <div class="flex flex-col items-center mb-6">
+            <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-center text-amber-400 mb-3 shadow-inner">
+                <i class="fa-solid fa-code text-xl"></i>
+            </div>
+            <h2 class="text-xl font-black text-center text-stone-100 tracking-tight">Acesso do Desenvolvedor</h2>
+            <p class="text-[11px] text-stone-400 mt-1">Ambiente de depuração e engenharia do Altaris</p>
+        </div>
         
-        <!-- Formulário do Dev com IDs alinhados ao Script -->
         <form id="form-login-dev" class="space-y-4">
             <div>
-                <label for="dev-email" class="block text-sm font-medium mb-1">E-mail Dev:</label>
-                <input type="email" id="dev-email" required 
-                       class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:outline-none focus:border-yellow-500">
+                <label for="dev-email" class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">E-mail Dev:</label>
+                <input type="email" id="dev-email" required placeholder="dev@altaris.com"
+                       class="w-full bg-stone-950 border border-stone-800 hover:border-stone-700 focus:border-amber-500 focus:bg-stone-900 rounded-xl p-2.5 text-xs outline-none transition-all text-white">
             </div>
             
             <div>
-                <label for="dev-senha" class="block text-sm font-medium mb-1">Senha Dev:</label>
-                <input type="password" id="dev-senha" required 
-                       class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:outline-none focus:border-yellow-500">
+                <label for="dev-senha" class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Senha Dev:</label>
+                <input type="password" id="dev-senha" required placeholder="••••••••"
+                       class="w-full bg-stone-950 border border-stone-800 hover:border-stone-700 focus:border-amber-500 focus:bg-stone-900 rounded-xl p-2.5 text-xs outline-none transition-all text-white">
             </div>
 
             <button type="submit" 
-                    class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded transition duration-200">
-                Injetar Bypass e Entrar
+                    class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-black text-xs py-3 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-amber-600/10 uppercase tracking-wider">
+                Autenticar no Console Dev
             </button>
         </form>
         
-        <div class="text-center mt-4">
-            <a href="index.html" class="text-sm text-gray-400 hover:underline">Voltar para o Login Padrão</a>
+        <div class="text-center mt-5 border-t border-stone-800/60 pt-4">
+            <a href="index.html" class="text-xs text-stone-500 hover:text-amber-400 hover:underline transition-colors flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-arrow-left text-[10px]"></i> Voltar para o Login Padrão
+            </a>
         </div>
     </div>
 
-    <!-- Script de validação local do Dev -->
-    <script>
-        const formLoginDev = document.getElementById('form-login-dev');
 
-        if (formLoginDev) {
-            formLoginDev.addEventListener('submit', (e) => {
-                e.preventDefault();
+    <div id="painel-controle-dev" class="hidden w-full max-w-5xl bg-stone-900 border border-stone-800 rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
+        
+        <aside class="w-full md:w-64 bg-stone-950 p-5 flex flex-col gap-6 border-r border-stone-800/60">
+            <div>
+                <div class="flex items-center gap-2 text-amber-400 font-black text-sm uppercase tracking-wider">
+                    <i class="fa-solid fa-terminal"></i> Altaris Core Engine
+                </div>
+                <div class="text-[10px] text-stone-500 font-mono mt-1">Status: Conectado ao Firestore</div>
+            </div>
+
+            <nav class="flex flex-col gap-1.5 flex-1">
+                <button onclick="alternarAbaDev('usuarios')" id="btn-aba-usuarios" class="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 cursor-pointer bg-amber-500 text-stone-950 shadow-md">
+                    <i class="fa-solid fa-users-gear text-sm w-4 text-center"></i> Gerenciar Usuários
+                </button>
+                <button onclick="alternarAbaDev('escalas')" id="btn-aba-escalas" class="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-stone-400 hover:bg-stone-800/40 hover:text-stone-200 transition-all flex items-center gap-2.5 cursor-pointer">
+                    <i class="fa-solid fa-calendar-minus text-sm w-4 text-center"></i> Ajustes de Escalas
+                </button>
+                <button onclick="alternarAbaDev('banco')" id="btn-aba-banco" class="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-stone-400 hover:bg-stone-800/40 hover:text-stone-200 transition-all flex items-center gap-2.5 cursor-pointer">
+                    <i class="fa-solid fa-database text-sm w-4 text-center"></i> Coleções Firestore
+                </button>
+                <button onclick="alternarAbaDev('bypass')" id="btn-aba-bypass" class="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-stone-400 hover:bg-stone-800/40 hover:text-stone-200 transition-all flex items-center gap-2.5 cursor-pointer">
+                    <i class="fa-solid fa-user-secret text-sm w-4 text-center"></i> Simulação (Bypass)
+                </button>
+            </nav>
+
+            <button onclick="window.location.reload()" class="w-full bg-stone-900 border border-stone-800 hover:bg-rose-950/40 hover:text-rose-400 hover:border-rose-900/50 p-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all text-stone-400">
+                Bloquear Console <i class="fa-solid fa-lock text-[10px]"></i>
+            </button>
+        </aside>
+
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto max-h-[600px]">
+            
+            <div id="conteudo-aba-usuarios" class="aba-dev-conteudo ativa space-y-4">
+                <div>
+                    <h3 class="text-base font-black text-stone-100 tracking-tight">Modificações Cruciais de Usuários</h3>
+                    <p class="text-xs text-stone-400 mt-0.5">Altere níveis hierárquicos e remova privilégios sem autenticação externa.</p>
+                </div>
                 
-                const emailInput = document.getElementById('dev-email').value.trim().toLowerCase();
-                const senhaInput = document.getElementById('dev-senha').value.trim();
+                <div class="bg-stone-950 border border-stone-800 p-4 rounded-xl space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Selecionar Alvo</label>
+                            <select id="dev-select-usuarios" class="w-full bg-stone-900 border border-stone-800 rounded-xl p-2 text-xs font-medium text-stone-200 outline-none">
+                                <option value="">Buscando usuários...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Nova Função Operacional</label>
+                            <select id="dev-nova-funcao" class="w-full bg-stone-900 border border-stone-800 rounded-xl p-2 text-xs font-bold text-amber-400 outline-none">
+                                <option value="Coroinha">Coroinha</option>
+                                <option value="Acólito">Acólito</option>
+                                <option value="Mestre">Mestre</option>
+                                <option value="Coordenador">Coordenador</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <button onclick="alterarFuncaoUsuario()" class="bg-amber-500 text-stone-950 text-xs font-bold px-4 py-2 rounded-xl hover:bg-amber-400 cursor-pointer transition-all">
+                            Forçar Atualização de Nível
+                        </button>
+                        <button onclick="dispararResetSenha()" class="bg-stone-900 border border-stone-800 text-stone-300 text-xs font-bold px-4 py-2 rounded-xl hover:border-stone-700 cursor-pointer transition-all">
+                            Enviar E-mail de Recuperação
+                        </button>
+                        <button onclick="deletarUsuarioFirestore()" class="bg-rose-950 text-rose-300 border border-rose-900/60 text-xs font-bold px-4 py-2 rounded-xl hover:bg-rose-900 cursor-pointer transition-all">
+                            Excluir Registro do DB
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                if (emailInput === "dev@altaris.com" && senhaInput === "dev1234") {
-                    console.log("Bypass Dev Autorizado localmente.");
-                    
-                    const usuarioDev = {
-                        uid: "dev_bypass_id",
-                        nome: "Desenvolvedor Altaris",
-                        email: "dev@altaris.com",
-                        funcao: "Coordenador"
-                    };
-                    
-                    // Salva na sessão para o index.html ler
-                    sessionStorage.setItem("dev_user", JSON.stringify(usuarioDev));
-                    
-                    // Redireciona para o painel principal
-                    window.location.href = "index.html";
-                } else {
-                    alert("Credenciais de desenvolvedor incorretas.");
-                }
+            <div id="conteudo-aba-escalas" class="aba-dev-conteudo space-y-4">
+                <div>
+                    <h3 class="text-base font-black text-stone-100 tracking-tight">Controle Crítico de Escalas</h3>
+                    <p class="text-xs text-stone-400 mt-0.5">Operações de purga e formatação rápida de dados das missas publicados.</p>
+                </div>
+
+                <div class="bg-stone-950 border border-stone-800 p-4 rounded-xl space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Filtrar Data Específica</label>
+                        <input type="date" id="dev-data-escala" class="bg-stone-900 border border-stone-800 text-white rounded-xl p-2 text-xs outline-none">
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <button onclick="limparEscalasPorData()" class="bg-rose-900 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-rose-800 cursor-pointer transition-all">
+                            <i class="fa-solid fa-trash mr-1"></i> Apagar Escalas Desta Data
+                        </button>
+                        <button onclick="resetarStatusEscalas()" class="bg-stone-900 border border-stone-800 text-amber-400 text-xs font-bold px-4 py-2 rounded-xl hover:border-stone-700 cursor-pointer transition-all">
+                            <i class="fa-solid fa-arrow-rotate-left mr-1"></i> Resetar Status de Vagas para "Pendente"
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-stone-500 italic"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Nota: Essas ações são irreversíveis e afetam o aplicativo em tempo real.</p>
+                </div>
+            </div>
+
+            <div id="conteudo-aba-banco" class="aba-dev-conteudo space-y-4">
+                <div>
+                    <h3 class="text-base font-black text-stone-100 tracking-tight">Estruturação e Limpeza de Tabelas</h3>
+                    <p class="text-xs text-stone-400 mt-0.5">Visão analítica de tamanho das coleções no banco de dados e engenharia reversa.</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-stone-950 border border-stone-800 p-3 rounded-xl text-center">
+                        <span class="text-[10px] uppercase font-bold text-stone-500 block">Usuários</span>
+                        <strong id="log-count-usuarios" class="text-xl font-mono text-white">...</strong>
+                    </div>
+                    <div class="bg-stone-950 border border-stone-800 p-3 rounded-xl text-center">
+                        <span class="text-[10px] uppercase font-bold text-stone-500 block">Escalas</span>
+                        <strong id="log-count-escalas" class="text-xl font-mono text-amber-400">...</strong>
+                    </div>
+                    <div class="bg-stone-950 border border-stone-800 p-3 rounded-xl text-center">
+                        <span class="text-[10px] uppercase font-bold text-stone-500 block">Formações</span>
+                        <strong id="log-count-formacao" class="text-xl font-mono text-white">...</strong>
+                    </div>
+                    <div class="bg-stone-950 border border-stone-800 p-3 rounded-xl text-center">
+                        <span class="text-[10px] uppercase font-bold text-stone-500 block">Penalidades</span>
+                        <strong id="log-count-penalidades" class="text-xl font-mono text-rose-400">...</strong>
+                    </div>
+                </div>
+
+                <div class="bg-stone-950 border border-stone-800 p-4 rounded-xl space-y-3">
+                    <h4 class="text-xs font-bold text-stone-300">Wipeout de Testes (Limpar Tabelas)</h4>
+                    <p class="text-[11px] text-stone-400">Útil para limpar dados fantasmas criados durante testes de homologação no Sandbox.</p>
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        <button onclick="limparColecaoCompleta('penalidades')" class="bg-stone-900 border border-stone-800 hover:border-rose-900 text-rose-400 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all cursor-pointer">
+                            Limpar Histórico Disciplinar
+                        </button>
+                        <button onclick="limparColecaoCompleta('formacao')" class="bg-stone-900 border border-stone-800 hover:border-stone-700 text-stone-300 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all cursor-pointer">
+                            Limpar Todo o Acervo de Materiais
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="conteudo-aba-bypass" class="aba-dev-conteudo space-y-4">
+                <div>
+                    <h3 class="text-base font-black text-stone-100 tracking-tight">Espelhamento de Contas (Bypass Auth)</h3>
+                    <p class="text-xs text-stone-400 mt-0.5">Injete dados na sessão local para simular a visão exata do painel de qualquer usuário sem saber a senha dele.</p>
+                </div>
+
+                <div class="bg-stone-950 border border-stone-800 p-4 rounded-xl space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Escolha a Identidade para Assumir</label>
+                        <select id="dev-select-bypass" class="w-full bg-stone-900 border border-stone-800 rounded-xl p-2 text-xs font-medium text-stone-200 outline-none">
+                            <option value="">Carregando lista...</option>
+                        </select>
+                    </div>
+                    <button onclick="executarBypassSimulacao()" class="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 text-xs font-black px-5 py-2.5 rounded-xl transition-all cursor-pointer shadow-md">
+                        Injetar Token e Clonar Sessão
+                    </button>
+                    <p class="text-[11px] text-stone-500 leading-relaxed"><i class="fa-solid fa-circle-info mr-1"></i> Como funciona: O sistema gerará as credenciais simuladas no `sessionStorage` e o redirecionará para a `index.html`. O sistema entenderá que você é este usuário temporariamente.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc, deleteDoc, collection, getDocs, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Mantendo a sincronia com a sua infraestrutura configurada
+    const firebaseConfig = {
+        apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
+        authDomain: "tarcisius-d03d7.firebaseapp.com",
+        projectId: "tarcisius-d03d7",
+        storageBucket: "tarcisius-d03d7.firebasestorage.app",
+        messagingSenderId: "186797936591",
+        appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const formLoginDev = document.getElementById('form-login-dev');
+    const containerLoginDev = document.getElementById('container-login-dev');
+    const painelControleDev = document.getElementById('painel-controle-dev');
+
+    let usuariosLocais = [];
+
+    // VALIDAÇÃO LOCAL DO DEV
+    if (formLoginDev) {
+        formLoginDev.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const emailInput = document.getElementById('dev-email').value.trim().toLowerCase();
+            const senhaInput = document.getElementById('dev-senha').value.trim();
+
+            // Credenciais solicitadas no escopo original
+            if (emailInput === "dev@altaris.com" && senhaInput === "dev1234") {
+                containerLoginDev.classList.add('hidden');
+                painelControleDev.classList.remove('hidden');
+                document.body.className = "bg-stone-950 text-stone-100 font-sans min-h-screen antialiased flex items-center justify-center p-4 md:p-8";
+                
+                inicializarPainelDesenvolvedor();
+            } else {
+                alert("Credenciais de desenvolvedor incorretas.");
+            }
+        });
+    }
+
+    // CARREGAMENTO DOS SUPERPODERES E DADOS DO FIRESTORE
+    async function inicializarPainelDesenvolvedor() {
+        try {
+            const snapUsuarios = await getDocs(collection(db, "usuarios"));
+            usuariosLocais = [];
+            
+            const selectUsuarios = document.getElementById('dev-select-usuarios');
+            const selectBypass = document.getElementById('dev-select-bypass');
+
+            selectUsuarios.innerHTML = '<option value="">Selecione um usuário alvo...</option>';
+            selectBypass.innerHTML = '<option value="">Selecione quem deseja clonar...</option>';
+
+            snapUsuarios.forEach(d => {
+                const user = d.data();
+                // Vincula o ID do documento (uid) aos dados coletados
+                user.uid = d.id; 
+                usuariosLocais.push(user);
+
+                const optionHTML = `<option value="${user.uid}">${user.nome} (${user.funcao})</option>`;
+                selectUsuarios.innerHTML += optionHTML;
+                selectBypass.innerHTML += optionHTML;
             });
+
+            // Atualizar os contadores de log na aba do Firestore
+            document.getElementById('log-count-usuarios').innerText = usuariosLocais.length;
+            
+            const snapEscalas = await getDocs(collection(db, "escalas"));
+            document.getElementById('log-count-escalas').innerText = snapEscalas.size;
+
+            const snapFormacao = await getDocs(collection(db, "formacao"));
+            document.getElementById('log-count-formacao').innerText = snapFormacao.size;
+
+            const snapPenalidades = await getDocs(collection(db, "penalidades"));
+            document.getElementById('log-count-penalidades').innerText = snapPenalidades.size;
+
+        } catch (err) {
+            console.error("Erro ao mapear o Firestore: ", err);
         }
-    </script>
+    }
+
+    // ABA 1: OPERAÇÕES DE USUÁRIOS
+    window.alterarFuncaoUsuario = async function() {
+        const uid = document.getElementById('dev-select-usuarios').value;
+        const novaFuncao = document.getElementById('dev-nova-funcao').value;
+
+        if(!uid) return alert("Selecione um usuário alvo primeiro!");
+
+        try {
+            await updateDoc(doc(db, "usuarios", uid), { funcao: novaFuncao });
+            alert("Sucesso! Nível hierárquico alterado no Firestore.");
+            inicializarPainelDesenvolvedor();
+        } catch (err) { alert("Erro ao alterar função: " + err.message); }
+    };
+
+    window.dispararResetSenha = async function() {
+        const uid = document.getElementById('dev-select-usuarios').value;
+        if(!uid) return alert("Selecione um usuário alvo primeiro!");
+
+        const alvo = usuariosLocais.find(u => u.uid === uid);
+        if(alvo && alvo.email) {
+            try {
+                await sendPasswordResetEmail(auth, alvo.email);
+                alert(`E-mail de redefinição enviado com sucesso para: ${alvo.email}`);
+            } catch (err) { alert("Erro ao disparar e-mail: " + err.message); }
+        }
+    };
+
+    window.deletarUsuarioFirestore = async function() {
+        const uid = document.getElementById('dev-select-usuarios').value;
+        if(!uid) return alert("Selecione um usuário alvo!");
+
+        if(confirm("ATENÇÃO: Isso apagará o cadastro do Firestore. O registro de login no Auth precisa ser apagado manualmente no Console Firebase. Continuar?")) {
+            try {
+                await deleteDoc(doc(db, "usuarios", uid));
+                alert("Documento do usuário apagado da coleção.");
+                inicializarPainelDesenvolvedor();
+            } catch (err) { alert("Erro ao excluir: " + err.message); }
+        }
+    };
+
+    // ABA 2: MANIPULAÇÃO MASSIVA DE ESCALAS
+    window.limparEscalasPorData = async function() {
+        const dataAlvo = document.getElementById('dev-data-escala').value;
+        if(!dataAlvo) return alert("Selecione uma data válida!");
+
+        if(confirm(`Tem certeza que deseja DELETAR todas as missas e escalas do dia ${dataAlvo}?`)) {
+            try {
+                const q = query(collection(db, "escalas"), where("data", "==", dataAlvo));
+                const snap = await getDocs(q);
+                
+                const batch = writeBatch(db);
+                snap.forEach(d => batch.delete(d.ref));
+                
+                await batch.commit();
+                alert(`Todas as escalas de ${dataAlvo} foram removidas com sucesso.`);
+                inicializarPainelDesenvolvedor();
+            } catch (err) { alert("Erro na purga: " + err.message); }
+        }
+    };
+
+    window.resetarStatusEscalas = async function() {
+        const dataAlvo = document.getElementById('dev-data-escala').value;
+        if(!dataAlvo) return alert("Selecione a data para redefinir!");
+
+        if(confirm(`Isso mudará o status de confirmação das vagas do dia ${dataAlvo} de volta para Pendente. Continuar?`)) {
+            try {
+                const q = query(collection(db, "escalas"), where("data", "==", dataAlvo));
+                const snap = await getDocs(q);
+                const batch = writeBatch(db);
+
+                snap.forEach(d => {
+                    let atualizacao = {};
+                    for(let i=1; i<=6; i++) {
+                        if(d.data()[`altar${i}`]) atualizacao[`altar${i}.status`] = "Pendente";
+                    }
+                    if(d.data().turiferario) atualizacao["turiferario.status"] = "Pendente";
+                    if(d.data().naveteiro) atualizacao["naveteiro.status"] = "Pendente";
+                    
+                    batch.update(d.ref, atualizacao);
+                });
+
+                await batch.commit();
+                alert("Status resetados com sucesso para testes.");
+            } catch (err) { alert("Erro ao resetar: " + err.message); }
+        }
+    };
+
+    // ABA 3: PURGA COMPLETA DE COLEÇÕES (WIPEOUT)
+    window.limparColecaoCompleta = async function(nomeColecao) {
+        if(confirm(`PERIGO EXTANTE: Você tem certeza que deseja APAGAR TODOS os registros da tabela de '${nomeColecao}'?`)) {
+            try {
+                const snap = await getDocs(collection(db, nomeColecao));
+                const batch = writeBatch(db);
+                snap.forEach(d => batch.delete(d.ref));
+                await batch.commit();
+                alert(`Coleção '${nomeColecao}' totalmente limpa.`);
+                inicializarPainelDesenvolvedor();
+            } catch (err) { alert("Falha ao limpar tabela: " + err.message); }
+        }
+    };
+
+    // ABA 4: CLONAGEM DE PRIVILÉGIOS (BYPASS)
+    window.executarBypassSimulacao = function() {
+        const uid = document.getElementById('dev-select-bypass').value;
+        if(!uid) return alert("Escolha um perfil para espelhar!");
+
+        const alvo = usuariosLocais.find(u => u.uid === uid);
+        if(alvo) {
+            const usuarioSimulado = {
+                uid: alvo.uid,
+                nome: alvo.nome,
+                email: alvo.email || "dev_bypass@altaris.com",
+                funcao: alvo.funcao // Assume se é Mestre, Coordenador, etc.
+            };
+
+            // Salva na sessionStorage para simular a validação padrão que seus arquivos fazem
+            sessionStorage.setItem("dev_user", JSON.stringify(usuarioSimulado));
+            alert(`Injeção concluída! Redirecionando como: ${alvo.nome}`);
+            window.location.href = "index.html";
+        }
+    };
+
+    // CONTROLE VISUAL DE ABAS DO CONSOLE DEV
+    window.alternarAbaDev = function(idAba) {
+        document.querySelectorAll('.aba-dev-conteudo').forEach(el => el.classList.remove('ativa'));
+        document.getElementById('conteudo-aba-' + idAba)?.classList.add('ativa');
+
+        const abas = ['usuarios', 'escalas', 'banco', 'bypass'];
+        abas.forEach(id => {
+            const btn = document.getElementById(`btn-aba-${id}`);
+            if(btn) {
+                if(id === idAba) {
+                    btn.className = "w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 cursor-pointer bg-amber-500 text-stone-950 shadow-md";
+                } else {
+                    btn.className = "w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-stone-400 hover:bg-stone-800/40 hover:text-stone-200 transition-all flex items-center gap-2.5 cursor-pointer";
+                }
+            }
+        });
+    };
+</script>
 </body>
 </html>
