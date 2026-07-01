@@ -9,13 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root {
-            --bg-light: #f8fafc;
-            --bg-dark: #09090b;
-        }
+        :root { --bg-light: #f8fafc; --bg-dark: #09090b; }
         html.dark { color-scheme: dark; }
-
-        /* Fundo Litúrgico */
         .bg-sacro-dourado {
             background-color: var(--bg-light);
             background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
@@ -24,25 +19,15 @@
             background-color: var(--bg-dark);
             background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjZDk3NzA2IiBmaWxsLW9wYWNpdHk9IjAuMDciPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
         }
-
         .card-sacro {
-            background-color: #ffffff;
-            padding: 1.5rem;
-            border-radius: 1.5rem;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s ease;
+            background-color: #ffffff; padding: 1.5rem; border-radius: 1.5rem; border: 1px solid #f1f5f9;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.02); transition: all 0.3s ease;
         }
-        html.dark .card-sacro {
-            background-color: #18181b;
-            border-color: rgba(39, 39, 42, 0.8);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
-        }
+        html.dark .card-sacro { background-color: #18181b; border-color: rgba(39, 39, 42, 0.8); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25); }
     </style>
 
     <style type="text/tailwindcss">
         @custom-variant dark (&:where(.dark, .dark *));
-        
         .input-sacro {
             @apply w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all;
         }
@@ -56,7 +41,7 @@
 </head>
 <body class="bg-sacro-dourado font-sans min-h-screen flex flex-col md:flex-row transition-colors duration-500">
 
-    <!-- BARRA LATERAL (SIDEBAR) -->
+    <!-- BARRA LATERAL -->
     <aside class="w-full md:w-68 bg-gradient-to-b from-red-950 via-red-900 to-red-950 text-white flex flex-col justify-between border-b md:border-b-0 md:border-r border-red-800/30 shrink-0 shadow-xl">
         <div class="p-6">
             <div class="flex items-center gap-3 border-b border-red-800/40 pb-5 mb-6">
@@ -69,24 +54,23 @@
                 </div>
             </div>
 
-            <!-- Removidos os onclicks em linha para evitar colisão com escopo do módulo -->
-            <nav class="space-y-1.5">
-                <button id="btn-c-usuarios" data-tab="coord-usuarios" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-red-800 text-white shadow-md border border-red-700/50">
+            <nav class="space-y-1.5" id="sidebar-nav">
+                <button data-tab="usuarios" class="tab-btn w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-red-800 text-white shadow-md border border-red-700/50">
                     <i class="fa-solid fa-users w-4 text-center"></i> Usuários
                 </button>
-                <button id="btn-c-escalas" data-tab="coord-escalas" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <button data-tab="escalas" class="tab-btn w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                     <i class="fa-solid fa-calendar-days w-4 text-center"></i> Gerenciar Escalas
                 </button>
-                <button id="btn-c-sorteio" data-tab="coord-sorteio" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <button data-tab="sorteio" class="tab-btn w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                     <i class="fa-solid fa-dice w-4 text-center"></i> Sorteio Litúrgico
                 </button>
-                <button id="btn-c-reunioes" data-tab="coord-reunioes" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <button data-tab="reunioes" class="tab-btn w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                     <i class="fa-solid fa-handshake w-4 text-center"></i> Reuniões
                 </button>
-                <button id="btn-c-material" data-tab="coord-material" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <button data-tab="material" class="tab-btn w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                     <i class="fa-solid fa-book-open w-4 text-center"></i> Materiais de Estudo
                 </button>
-                <button id="btn-c-avisos" data-tab="coord-avisos-tab" class="w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
+                <button data-tab="avisos" class="tab-btn w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer">
                     <i class="fa-solid fa-bullhorn w-4 text-center"></i> Mural de Avisos
                 </button>
             </nav>
@@ -106,14 +90,12 @@
     <main class="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full space-y-6">
 
         <!-- ABA: USUÁRIOS -->
-        <section id="sec-coord-usuarios" class="hidden-coord-tab card-sacro space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-zinc-800/80 pb-4">
-                <div>
-                    <h2 class="text-base font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2">
-                        <i class="fa-solid fa-users text-red-800"></i> Homologação de Acólitos
-                    </h2>
-                    <p class="text-xs text-slate-400 dark:text-zinc-500 mt-0.5">Gerencie os novos cadastros e permissões de acesso do grupo.</p>
-                </div>
+        <section id="sec-usuarios" class="tab-content card-sacro space-y-6">
+            <div>
+                <h2 class="text-base font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2">
+                    <i class="fa-solid fa-users text-red-800"></i> Homologação de Acólitos
+                </h2>
+                <p class="text-xs text-slate-400 dark:text-zinc-500 mt-0.5">Gerencie os novos cadastros e permissões de acesso do grupo.</p>
             </div>
             <div class="overflow-x-auto rounded-2xl border border-slate-100 dark:border-zinc-800/60">
                 <table class="w-full min-w-max border-collapse">
@@ -138,14 +120,13 @@
         </section>
 
         <!-- ABA: GERENCIAR ESCALAS -->
-        <section id="sec-coord-escalas" class="hidden-coord-tab card-sacro space-y-6 hidden">
+        <section id="sec-escalas" class="tab-content card-sacro space-y-6 hidden">
             <div>
                 <h2 class="text-base font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2">
                     <i class="fa-solid fa-calendar-days text-red-800"></i> Consolidador de Escala Litúrgica
                 </h2>
                 <p class="text-xs text-slate-400 dark:text-zinc-500 mt-0.5">Selecione um dia específico para visualizar ou reformular a escala de serviço.</p>
             </div>
-            
             <div class="grid grid-cols-1 sm:grid-cols-3 items-end gap-4 bg-slate-50/50 dark:bg-zinc-950 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800/50">
                 <div class="sm:col-span-2 space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Selecione a Data</label>
@@ -155,7 +136,6 @@
                     <i class="fa-solid fa-floppy-disk"></i> Confirmar Alterações
                 </button>
             </div>
-
             <div id="container-editor-posicoes" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="col-span-full p-6 text-center text-slate-400 dark:text-zinc-500">
                     <i class="fa-solid fa-calendar-pointer text-lg mb-1 block"></i> Aguardando seleção de data para renderizar posições.
@@ -164,7 +144,7 @@
         </section>
 
         <!-- ABA: SORTEIO -->
-        <section id="sec-coord-sorteio" class="hidden-coord-tab card-sacro space-y-6 hidden">
+        <section id="sec-sorteio" class="tab-content card-sacro space-y-6 hidden">
             <div>
                 <h2 class="text-base font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2">
                     <i class="fa-solid fa-dice text-red-800"></i> Distribuição Aleatória de Funções
@@ -174,7 +154,7 @@
             <div class="bg-amber-500/5 border border-amber-500/20 p-4 rounded-2xl flex gap-3 items-start">
                 <i class="fa-solid fa-circle-info text-amber-600 dark:text-amber-500 mt-0.5 text-sm"></i>
                 <p class="text-xs text-amber-800/90 dark:text-amber-400/90 leading-relaxed">
-                    O sorteio distribui as posições (Ceriferário, Turiferário, Naveteiro) entre todos os membros ativos que foram homologados no sistema.
+                    O sorteio distribui as posições entre todos os membros ativos que foram homologados no sistema.
                 </p>
             </div>
             <button id="btn-executar-sorteio" class="btn-primary-sacro w-max">
@@ -183,18 +163,17 @@
         </section>
 
         <!-- ABA: REUNIÕES -->
-        <section id="sec-coord-reunioes" class="hidden-coord-tab card-sacro space-y-6 hidden">
+        <section id="sec-reunioes" class="tab-content card-sacro space-y-6 hidden">
             <div>
                 <h2 class="text-base font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2">
                     <i class="fa-solid fa-handshake text-red-800"></i> Atas e Agendamentos de Reuniões
                 </h2>
-                <p class="text-xs text-slate-400 dark:text-zinc-500 mt-0.5">Publique novas convocações, pautas formativas e registre atas de reuniões passadas.</p>
+                <p class="text-xs text-slate-400 dark:text-zinc-500 mt-0.5">Publique novas convocações e registre atas.</p>
             </div>
-
             <form id="form-reuniao" class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/50 dark:bg-zinc-950 p-5 rounded-2xl border border-slate-100 dark:border-zinc-800/50">
                 <div class="space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Pauta / Título</label>
-                    <input type="text" id="reuniao-titulo" placeholder="Ex: Formação Litúrgica de Quaresma" class="input-sacro" required>
+                    <input type="text" id="reuniao-titulo" class="input-sacro" required>
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Data do Encontro</label>
@@ -202,77 +181,66 @@
                 </div>
                 <div class="sm:col-span-2 space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Detalhamento ou Ata Descritiva</label>
-                    <textarea id="reuniao-conteudo" rows="3" placeholder="Insira aqui o link da ata, tópicos abordados..." class="input-sacro resize-none" required></textarea>
+                    <textarea id="reuniao-conteudo" rows="3" class="input-sacro resize-none" required></textarea>
                 </div>
                 <div class="sm:col-span-2 flex justify-end">
-                    <button type="submit" class="btn-primary-sacro">
-                        <i class="fa-solid fa-plus"></i> Registrar Encontro
-                    </button>
+                    <button type="submit" class="btn-primary-sacro"><i class="fa-solid fa-plus"></i> Registrar Encontro</button>
                 </div>
             </form>
-
             <div id="lista-reunioes-admin" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
         </section>
 
         <!-- ABA: MATERIAIS DE ESTUDO -->
-        <section id="sec-coord-material" class="hidden-coord-tab card-sacro space-y-6 hidden">
+        <section id="sec-material" class="tab-content card-sacro space-y-6 hidden">
             <div>
                 <h2 class="text-base font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2">
                     <i class="fa-solid fa-book-open text-red-800"></i> Biblioteca Formativa e Documentos
                 </h2>
-                <p class="text-xs text-slate-400 dark:text-zinc-500 mt-0.5">Disponibilize PDFs, manuais e links de diretrizes pastorais para o grupo.</p>
+                <p class="text-xs text-slate-400 dark:text-zinc-500 mt-0.5">Disponibilize PDFs e manuais para o grupo.</p>
             </div>
-
             <form id="form-material" class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/50 dark:bg-zinc-950 p-5 rounded-2xl border border-slate-100 dark:border-zinc-800/50">
                 <div class="space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Identificação do Material</label>
-                    <input type="text" id="mat-titulo" placeholder="Ex: Manual do Ceriferário v2" class="input-sacro" required>
+                    <input type="text" id="mat-titulo" class="input-sacro" required>
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Link de Acesso (Drive / PDF)</label>
-                    <input type="url" id="mat-url" placeholder="https://drive.google.com/..." class="input-sacro" required>
+                    <input type="url" id="mat-url" class="input-sacro" required>
                 </div>
                 <div class="sm:col-span-2 space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Breve contextualização</label>
-                    <input type="text" id="mat-desc" placeholder="Ex: Instruções detalhadas para posturas..." class="input-sacro" required>
+                    <input type="text" id="mat-desc" class="input-sacro" required>
                 </div>
                 <div class="sm:col-span-2 flex justify-end">
-                    <button type="submit" class="btn-primary-sacro">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Publicar Documento
-                    </button>
+                    <button type="submit" class="btn-primary-sacro"><i class="fa-solid fa-cloud-arrow-up"></i> Publicar Documento</button>
                 </div>
             </form>
-
             <div id="lista-materiais-admin" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
         </section>
 
         <!-- ABA: AVISOS -->
-        <section id="sec-coord-avisos-tab" class="hidden-coord-tab card-sacro space-y-6 hidden">
+        <section id="sec-avisos" class="tab-content card-sacro space-y-6 hidden">
             <div>
                 <h2 class="text-base font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2">
                     <i class="fa-solid fa-bullhorn text-red-800"></i> Central do Mural de Avisos
                 </h2>
-                <p class="text-xs text-slate-400 dark:text-zinc-500 mt-0.5">Gerencie os comunicados e alertas instantâneos visíveis no painel principal dos acólitos.</p>
+                <p class="text-xs text-slate-400 dark:text-zinc-500 mt-0.5">Gerencie os comunicados e alertas instantâneos visíveis no painel.</p>
             </div>
-
             <form id="form-aviso" class="space-y-4 bg-slate-50/50 dark:bg-zinc-950 p-5 rounded-2xl border border-slate-100 dark:border-zinc-800/50">
                 <div class="space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Conteúdo do Comunicado Urgente</label>
-                    <textarea id="aviso-texto" rows="3" placeholder="Digite aqui o aviso importante para todo o grupo..." class="input-sacro resize-none" required></textarea>
+                    <textarea id="aviso-texto" rows="3" class="input-sacro resize-none" required></textarea>
                 </div>
                 <div class="flex justify-end">
-                    <button type="submit" class="btn-primary-sacro">
-                        <i class="fa-solid fa-paper-plane"></i> Lançar Comunicado
-                    </button>
+                    <button type="submit" class="btn-primary-sacro"><i class="fa-solid fa-paper-plane"></i> Lançar Comunicado</button>
                 </div>
             </form>
-
             <div id="lista-avisos-admin" class="space-y-3 pt-2"></div>
         </section>
 
     </main>
 
-    <!-- SCRIPTS EXECUTADOS EM ESCOPO SEGURO E PROTEGIDO -->
+    <!-- SCRIPTS EXECUTADOS EM ESCOPO SEGURO -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -290,7 +258,33 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // CONTROLE DO TEMA (DARK/LIGHT)
+        // NAVEGAÇÃO ENTRE ABAS CORRIGIDA
+        const buttons = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.getAttribute('data-tab');
+                
+                contents.forEach(content => {
+                    if(content.id === `sec-${targetTab}`) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+
+                buttons.forEach(b => {
+                    if(b === btn) {
+                        b.className = "tab-btn w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-red-800 text-white shadow-md border border-red-700/50";
+                    } else {
+                        b.className = "tab-btn w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
+                    }
+                });
+            });
+        });
+
+        // TEMA (DARK/LIGHT)
         const btnToggleTheme = document.getElementById('btn-toggle-theme');
         const themeIcon = document.getElementById('theme-icon');
 
@@ -305,40 +299,7 @@
             if(themeIcon) themeIcon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
         });
 
-        // NAVEGAÇÃO ENTRE ABAS COMPATÍVEL COM MÓDULOS (EVENT LISTENERS DINÂMICOS)
-        function switchCoordTab(tabID) {
-            document.querySelectorAll('.hidden-coord-tab').forEach(el => el.classList.add('hidden'));
-            
-            // Tratamento especial para ID do botão vs ID da seção
-            const targetSecID = tabID.startsWith('coord-') ? 'sec-' + tabID : 'sec-coord-' + tabID;
-            const targetSection = document.getElementById(targetSecID) || document.getElementById('sec-' + tabID);
-            
-            if (targetSection) {
-                targetSection.classList.remove('hidden');
-            }
-
-            const ids = ['usuarios', 'escalas', 'sorteio', 'reunioes', 'material', 'avisos'];
-            ids.forEach(id => {
-                const btn = document.getElementById(`btn-c-${id}`);
-                if(btn) {
-                    if(tabID.includes(id)) {
-                        btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer bg-red-800 text-white shadow-md border border-red-700/50";
-                    } else {
-                        btn.className = "w-full text-left py-2.5 px-3.5 rounded-xl text-xs font-bold text-red-200/70 hover:bg-red-800/30 hover:text-white transition-all flex items-center gap-3 cursor-pointer";
-                    }
-                }
-            });
-        }
-
-        // Vincula cliques aos botões da sidebar de forma segura
-        document.querySelectorAll('nav[class*="space-y"] button').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const tabTarget = e.currentTarget.getAttribute('data-tab');
-                if(tabTarget) switchCoordTab(tabTarget);
-            });
-        });
-
-        // OBSERVAÇÃO DO ESTADO DE AUTENTICAÇÃO
+        // OBSERVAÇÃO DE LOGIN E VALIDAÇÃO DE SEGURANÇA
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = "login.html"; return; }
             try {
@@ -349,16 +310,14 @@
                     return;
                 }
                 
-                // Dispara os carregamentos apenas após validação de segurança ativa
                 carregarUsuariosPendentes();
                 carregarReunioesAdmin();
                 carregarMateriaisAdmin();
                 carregarAvisosAdmin();
             } catch (err) {
-                console.error("Erro fatal de validação:", err);
-                // Libera o travamento visual inserindo aviso amigável
+                console.error("Erro fatal de autenticação/permissões:", err);
                 const tableContainer = document.getElementById('lista-usuarios-pendentes');
-                if(tableContainer) tableContainer.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-rose-500 font-medium">Erro ao carregar banco de dados. Verifique suas regras no Firestore.</td></tr>';
+                if(tableContainer) tableContainer.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-rose-500 font-medium">Erro crítico: Verifique as regras de segurança no console do Firebase.</td></tr>';
             }
         });
 
@@ -366,7 +325,7 @@
             signOut(auth).then(() => window.location.href = "login.html");
         });
 
-        // MANIPULAÇÃO DO FIRESTORE: USUÁRIOS
+        // FUNÇÃO: CARREGAR USUÁRIOS
         async function carregarUsuariosPendentes() {
             const container = document.getElementById('lista-usuarios-pendentes');
             if(!container) return;
@@ -399,7 +358,6 @@
                     container.appendChild(tr);
                 });
 
-                // Vincula os eventos aos botões gerados dinamicamente
                 container.querySelectorAll('.btn-aprovar-user').forEach(b => {
                     b.addEventListener('click', async (e) => {
                         const id = e.currentTarget.getAttribute('data-id');
@@ -419,26 +377,24 @@
                         }
                     });
                 });
-
             } catch(e) {
                 console.error(e);
-                container.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-rose-500">Erro de permissão ou conexão ativa com banco de dados.</td></tr>';
+                container.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-rose-500">Erro ao buscar usuários do Firestore.</td></tr>';
             }
         }
 
-        // RECONSTRUTOR DE ESCALAS POR DATA
+        // GERENCIADOR DE ESCALAS POR DATA
         const editorEscalaData = document.getElementById('editor-escala-data');
+        const containerEditorPosicoes = document.getElementById('container-editor-posicoes');
+
         async function carregarEditorEscalasPorData(dataStr) {
-            const container = document.getElementById('container-editor-posPositions');
-            const realContainer = document.getElementById('container-editor-posicoes') || container;
-            if(!realContainer) return;
-            
-            realContainer.innerHTML = '<div class="col-span-full py-4 text-center text-slate-400"><i class="fa-solid fa-circle-notch animate-spin mr-2"></i> Buscando posições da data...</div>';
+            if(!containerEditorPosicoes) return;
+            containerEditorPosicoes.innerHTML = '<div class="col-span-full py-4 text-center text-slate-400"><i class="fa-solid fa-circle-notch animate-spin mr-2"></i> Buscando posições...</div>';
             if(!dataStr) return;
 
             const dcol = ["missa_07h", "missa_09h", "missa_11h", "missa_17h", "missa_19h"];
             const titulos = ["Missa das 07:00h", "Missa das 09:00h", "Missa das 11:00h", "Missa das 17:00h", "Missa das 19:00h"];
-            realContainer.innerHTML = "";
+            containerEditorPosicoes.innerHTML = "";
 
             for(let i=0; i<dcol.length; i++) {
                 const idDoc = `${dataStr}_${dcol[i]}`;
@@ -470,7 +426,7 @@
                         </div>
                     </div>
                 `;
-                realContainer.appendChild(div);
+                containerEditorPosicoes.appendChild(div);
             }
         }
 
@@ -479,15 +435,17 @@
             if(!dataStr) { alert("Indique o dia da escala."); return; }
             const dcol = ["missa_07h", "missa_09h", "missa_11h", "missa_17h", "missa_19h"];
             
-            for(let m of dcol) {
-                const id = `${dataStr}_${m}`;
-                await setDoc(doc(db, "escalas", id), {
-                    ceriferario: { ativa: document.getElementById(`chk-ceri-${id}`).checked, nome: document.getElementById(`edit-ceri-${id}`).value },
-                    turiferario: { ativa: document.getElementById(`chk-turi-${id}`).checked, nome: document.getElementById(`edit-turi-${id}`).value },
-                    naveteiro: { ativa: document.getElementById(`chk-nave-${id}`).checked, nome: document.getElementById(`edit-nave-${id}`).value }
-                }, { merge: true });
-            }
-            alert("Alterações salvas na escala litúrgica!");
+            try {
+                for(let m of dcol) {
+                    const id = `${dataStr}_${m}`;
+                    await setDoc(doc(db, "escalas", id), {
+                        ceriferario: { ativa: document.getElementById(`chk-ceri-${id}`).checked, nome: document.getElementById(`edit-ceri-${id}`).value },
+                        turiferario: { ativa: document.getElementById(`chk-turi-${id}`).checked, nome: document.getElementById(`edit-turi-${id}`).value },
+                        naveteiro: { ativa: document.getElementById(`chk-nave-${id}`).checked, nome: document.getElementById(`edit-nave-${id}`).value }
+                    }, { merge: true });
+                }
+                alert("Alterações salvas na escala litúrgica!");
+            } catch (e) { console.error(e); alert("Erro ao salvar."); }
         });
         
         editorEscalaData?.addEventListener('change', (e) => carregarEditorEscalasPorData(e.target.value));
@@ -540,8 +498,9 @@
         });
 
         async function carregarMateriaisAdmin() {
-            const container = document.getElementById('lista-materiais-admin');
-            if(!container) return; container.innerHTML = "";
+            const container = document.getElementById('lista-materials-admin');
+            const realContainer = document.getElementById('lista-materiais-admin') || container;
+            if(!realContainer) return; realContainer.innerHTML = "";
             const snap = await getDocs(query(collection(db, "materiais"), orderBy("criadoEm", "desc")));
             snap.forEach(d => {
                 const m = d.data();
@@ -554,10 +513,10 @@
                     </div>
                     <button data-id="${d.id}" class="btn-del-mat text-slate-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-500/10 transition-all border-0 cursor-pointer"><i class="fa-solid fa-trash-can text-xs"></i></button>
                 `;
-                container.appendChild(div);
+                realContainer.appendChild(div);
             });
 
-            container.querySelectorAll('.btn-del-mat').forEach(b => {
+            realContainer.querySelectorAll('.btn-del-mat').forEach(b => {
                 b.addEventListener('click', async (e) => {
                     const id = e.currentTarget.getAttribute('data-id');
                     if(confirm("Remover este material?")) { await deleteDoc(doc(db, "materiais", id)); carregarMateriaisAdmin(); }
