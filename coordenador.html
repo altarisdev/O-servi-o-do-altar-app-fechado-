@@ -25,19 +25,6 @@
         }
         html.dark .card-sacro { background-color: #18181b; border-color: rgba(39, 39, 42, 0.8); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25); }
     </style>
-
-    <style type="text/tailwindcss">
-        @custom-variant dark (&:where(.dark, .dark *));
-        .input-sacro {
-            @apply w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all;
-        }
-        .btn-primary-sacro {
-            @apply bg-gradient-to-r from-red-800 to-red-900 text-amber-100 font-semibold py-2.5 px-5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md hover:from-red-700 hover:to-red-800 transition-all cursor-pointer border-0;
-        }
-        .th-sacro {
-            @apply px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800/80;
-        }
-    </style>
 </head>
 <body class="bg-sacro-dourado font-sans min-h-screen flex flex-col md:flex-row transition-colors duration-500">
 
@@ -101,11 +88,11 @@
                 <table class="w-full min-w-max border-collapse">
                     <thead>
                         <tr class="bg-slate-50/50 dark:bg-zinc-950">
-                            <th class="th-sacro">Nome</th>
-                            <th class="th-sacro">E-mail</th>
-                            <th class="th-sacro">Função</th>
-                            <th class="th-sacro">Status</th>
-                            <th class="th-sacro text-center">Ações</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800/80">Nome</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800/80">E-mail</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800/80">Função</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800/80">Status</th>
+                            <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800/80">Ações</th>
                         </tr>
                     </thead>
                     <tbody id="lista-usuarios-pendentes" class="divide-y divide-slate-100 dark:divide-zinc-800/60 text-slate-700 dark:text-zinc-300 text-xs">
@@ -130,9 +117,9 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 items-end gap-4 bg-slate-50/50 dark:bg-zinc-950 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800/50">
                 <div class="sm:col-span-2 space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Selecione a Data</label>
-                    <input type="date" id="editor-escala-data" class="input-sacro">
+                    <input type="date" id="editor-escala-data" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all">
                 </div>
-                <button id="btn-salvar-modificacoes" class="btn-primary-sacro h-10">
+                <button id="btn-salvar-modificacoes" class="bg-gradient-to-r from-red-800 to-red-900 text-amber-100 font-semibold py-2.5 px-5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md hover:from-red-700 hover:to-red-800 transition-all cursor-pointer border-0 h-10">
                     <i class="fa-solid fa-floppy-disk"></i> Confirmar Alterações
                 </button>
             </div>
@@ -157,7 +144,7 @@
                     O sorteio distribui as posições entre todos os membros ativos que foram homologados no sistema.
                 </p>
             </div>
-            <button id="btn-executar-sorteio" class="btn-primary-sacro w-max">
+            <button id="btn-executar-sorteio" class="bg-gradient-to-r from-red-800 to-red-900 text-amber-100 font-semibold py-2.5 px-5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md hover:from-red-700 hover:to-red-800 transition-all cursor-pointer border-0 w-max">
                 <i class="fa-solid fa-wand-magic-sparkles"></i> Processar Sorteio Automático
             </button>
         </section>
@@ -173,18 +160,18 @@
             <form id="form-reuniao" class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/50 dark:bg-zinc-950 p-5 rounded-2xl border border-slate-100 dark:border-zinc-800/50">
                 <div class="space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Pauta / Título</label>
-                    <input type="text" id="reuniao-titulo" class="input-sacro" required>
+                    <input type="text" id="reuniao-titulo" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all" required>
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Data do Encontro</label>
-                    <input type="date" id="reuniao-data" class="input-sacro" required>
+                    <input type="date" id="reuniao-data" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all" required>
                 </div>
                 <div class="sm:col-span-2 space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Detalhamento ou Ata Descritiva</label>
-                    <textarea id="reuniao-conteudo" rows="3" class="input-sacro resize-none" required></textarea>
+                    <textarea id="reuniao-conteudo" rows="3" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all resize-none" required></textarea>
                 </div>
                 <div class="sm:col-span-2 flex justify-end">
-                    <button type="submit" class="btn-primary-sacro"><i class="fa-solid fa-plus"></i> Registrar Encontro</button>
+                    <button type="submit" class="bg-gradient-to-r from-red-800 to-red-900 text-amber-100 font-semibold py-2.5 px-5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md hover:from-red-700 hover:to-red-800 transition-all cursor-pointer border-0"><i class="fa-solid fa-plus"></i> Registrar Encontro</button>
                 </div>
             </form>
             <div id="lista-reunioes-admin" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
@@ -201,18 +188,18 @@
             <form id="form-material" class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/50 dark:bg-zinc-950 p-5 rounded-2xl border border-slate-100 dark:border-zinc-800/50">
                 <div class="space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Identificação do Material</label>
-                    <input type="text" id="mat-titulo" class="input-sacro" required>
+                    <input type="text" id="mat-titulo" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all" required>
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Link de Acesso (Drive / PDF)</label>
-                    <input type="url" id="mat-url" class="input-sacro" required>
+                    <input type="url" id="mat-url" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all" required>
                 </div>
                 <div class="sm:col-span-2 space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Breve contextualização</label>
-                    <input type="text" id="mat-desc" class="input-sacro" required>
+                    <input type="text" id="mat-desc" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all" required>
                 </div>
                 <div class="sm:col-span-2 flex justify-end">
-                    <button type="submit" class="btn-primary-sacro"><i class="fa-solid fa-cloud-arrow-up"></i> Publicar Documento</button>
+                    <button type="submit" class="bg-gradient-to-r from-red-800 to-red-900 text-amber-100 font-semibold py-2.5 px-5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md hover:from-red-700 hover:to-red-800 transition-all cursor-pointer border-0"><i class="fa-solid fa-cloud-arrow-up"></i> Publicar Documento</button>
                 </div>
             </form>
             <div id="lista-materiais-admin" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"></div>
@@ -229,10 +216,10 @@
             <form id="form-aviso" class="space-y-4 bg-slate-50/50 dark:bg-zinc-950 p-5 rounded-2xl border border-slate-100 dark:border-zinc-800/50">
                 <div class="space-y-1.5">
                     <label class="text-[11px] font-bold uppercase text-slate-400 dark:text-zinc-500">Conteúdo do Comunicado Urgente</label>
-                    <textarea id="aviso-texto" rows="3" class="input-sacro resize-none" required></textarea>
+                    <textarea id="aviso-texto" rows="3" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all resize-none" required></textarea>
                 </div>
                 <div class="flex justify-end">
-                    <button type="submit" class="btn-primary-sacro"><i class="fa-solid fa-paper-plane"></i> Lançar Comunicado</button>
+                    <button type="submit" class="bg-gradient-to-r from-red-800 to-red-900 text-amber-100 font-semibold py-2.5 px-5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md hover:from-red-700 hover:to-red-800 transition-all cursor-pointer border-0"><i class="fa-solid fa-paper-plane"></i> Lançar Comunicado</button>
                 </div>
             </form>
             <div id="lista-avisos-admin" class="space-y-3 pt-2"></div>
@@ -414,15 +401,15 @@
                     <div class="space-y-2.5">
                         <div class="flex items-center gap-3">
                             <input type="checkbox" id="chk-ceri-${idDoc}" ${c.ceriferario?.ativa ? 'checked' : ''} class="w-4 h-4 accent-red-800">
-                            <input type="text" id="edit-ceri-${idDoc}" value="${c.ceriferario?.nome || ''}" placeholder="Nome do Ceriferário" class="input-sacro !py-1.5">
+                            <input type="text" id="edit-ceri-${idDoc}" value="${c.ceriferario?.nome || ''}" placeholder="Nome do Ceriferário" class="w-full py-1.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all">
                         </div>
                         <div class="flex items-center gap-3">
                             <input type="checkbox" id="chk-turi-${idDoc}" ${c.turiferario?.ativa ? 'checked' : ''} class="w-4 h-4 accent-red-800">
-                            <input type="text" id="edit-turi-${idDoc}" value="${c.turiferario?.nome || ''}" placeholder="Nome do Turiferário" class="input-sacro !py-1.5">
+                            <input type="text" id="edit-turi-${idDoc}" value="${c.turiferario?.nome || ''}" placeholder="Nome do Turiferário" class="w-full py-1.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all">
                         </div>
                         <div class="flex items-center gap-3">
                             <input type="checkbox" id="chk-nave-${idDoc}" ${c.naveteiro?.ativa ? 'checked' : ''} class="w-4 h-4 accent-red-800">
-                            <input type="text" id="edit-nave-${idDoc}" value="${c.naveteiro?.nome || ''}" placeholder="Nome do Naveteiro" class="input-sacro !py-1.5">
+                            <input type="text" id="edit-nave-${idDoc}" value="${c.naveteiro?.nome || ''}" placeholder="Nome do Naveteiro" class="w-full py-1.5 px-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 text-sm transition-all">
                         </div>
                     </div>
                 `;
