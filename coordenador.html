@@ -20,7 +20,7 @@
         }
         .dark .bg-sacro-dourado {
             background-color: #09090b;
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjZmU0YzA2IiBmaWxsLW9wYWNpdHk9IjAuMDI1Ij48cGF0aCBkPSJNNDAgMEw4MCA0MEw0MCA4MEwwIDQwWiIvPjwvZz48L3N2Zz4=");
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjZmU0YzA2IiBmaWxsLW9wYWNpdHk9IjAuMDI1Ij48cGF0aCBkPSJNNDAgMEw4MCA4MEwwIDQwWiIvPjwvZz48L3N2Zz4=");
         }
     </style>
 </head>
@@ -354,7 +354,6 @@
     function showLoading() { if(telaLoading) telaLoading.classList.remove('opacity-0', 'pointer-events-none'); }
     function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
     
-    // Dispara o loading visual imediatamente
     showLoading();
 
     btnToggleTheme?.addEventListener('click', () => {
@@ -378,7 +377,10 @@
     function atualizarListboxMembros() {
         if(!selectIrmaoTitular) return; 
         selectIrmaoTitular.innerHTML = '<option value="">Selecione um membro...</option>';
-        cacheTodosUsuarios.filter(u => (u.funcao || '').toLowerCase() !== "coordenador").forEach(u => {
+        cacheTodosUsuarios.filter(u => {
+            const f = (u.funcao || '').toLowerCase();
+            return f !== "coordenador" && f !== "mestre";
+        }).forEach(u => {
             const opt = document.createElement('option'); 
             opt.value = u.email; 
             opt.textContent = `${u.nome} (${u.email})`; 
@@ -394,11 +396,17 @@
         } else if (user) {
             try {
                 const docSnap = await getDoc(doc(db, "usuarios", user.uid));
-                if (docSnap.exists() && (docSnap.data().funcao || '').toLowerCase() === "coordenador") { 
-                    usuarioLogadoDados = docSnap.data(); 
-                    inicializarPainel(); 
+                if (docSnap.exists()) {
+                    const func = (docSnap.data().funcao || '').toLowerCase();
+                    if (func === "coordenador" || func === "mestre") {
+                        usuarioLogadoDados = docSnap.data(); 
+                        inicializarPainel(); 
+                    } else {
+                        console.warn("Acesso negado: Usuário sem permissões administrativas.");
+                        await signOut(auth); 
+                        window.location.href = "index.html"; 
+                    }
                 } else { 
-                    console.warn("Acesso negado: Usuário sem permissões administrativas.");
                     await signOut(auth); 
                     window.location.href = "index.html"; 
                 }
@@ -486,11 +494,21 @@
     function ouvirUsuariosCadastrados() {
         onSnapshot(collection(db, "usuarios"), (snap) => {
             cacheTodosUsuarios = []; 
-            snap.forEach(d => { const u = d.data(); u.idDoc = d.id; cacheTodosUsuarios.push(u); });
+            snap.forEach(d => { 
+                const u = d.data(); 
+                u.idDoc = d.id; 
+                u.nome = u.nome || "Usuário Sem Nome";
+                u.funcao = u.funcao || "Coroinha";
+                cacheTodosUsuarios.push(u); 
+            });
             cacheTodosUsuarios.sort((a,b) => a.nome.localeCompare(b.nome)); 
+            
             renderizarTabelaUsuarios();
+            renderizarInterfaceChamada();
+            
             if(chkPossuiIrmao && chkPossuiIrmao.checked) { atualizarListboxMembros(); }
-            if(llamadaReuniaoData && llamadaReuniaoData.value) { renderizarInterfaceChamada(); }
+        }, (error) => {
+            console.error("Erro ao escutar usuários:", error);
         });
     }
 
@@ -498,10 +516,22 @@
         const b = document.getElementById('tabela-usuarios-recuperacao'); 
         if(!b) return; 
         b.innerHTML = "";
-        const termo = buscaUsuarioLista?.value.toLowerCase() || "";
+        const termo = buscaUsuarioLista?.value ? buscaUsuarioLista.value.toLowerCase() : "";
         
-        cacheTodosUsuarios.filter(u => u.nome.toLowerCase().includes(termo)).forEach(u => {
-            let badgeTipo = (u.funcao || '').toLowerCase() === "coordenador" ? `<span class="bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-400 font-black px-2.5 py-0.5 rounded-lg border border-purple-200 dark:border-purple-800/40 text-[10px]">Coordenação</span>` : `<span class="bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 font-black px-2.5 py-0.5 rounded-lg border border-emerald-200 dark:border-emerald-800/40 text-[10px]">Oficial</span>`;
+        const usuariosFiltrados = cacheTodosUsuarios.filter(u => 
+            u.nome.toLowerCase().includes(termo) || u.email.toLowerCase().includes(termo)
+        );
+
+        if (usuariosFiltrados.length === 0) {
+            b.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-zinc-400 italic">Nenhum membro encontrado.</td></tr>`;
+            return;
+        }
+
+        usuariosFiltrados.forEach(u => {
+            const funcLimpa = (u.funcao || '').toLowerCase();
+            const ehAdministrador = funcLimpa === "coordenador" || funcLimpa === "mestre";
+            
+            let badgeTipo = ehAdministrador ? `<span class="bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-400 font-black px-2.5 py-0.5 rounded-lg border border-purple-200 dark:border-purple-800/40 text-[10px]">Coordenação</span>` : `<span class="bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 font-black px-2.5 py-0.5 rounded-lg border border-emerald-200 dark:border-emerald-800/40 text-[10px]">Oficial</span>`;
             let colunaConexao = u.email_conexao ? `<span class="text-blue-700 dark:text-blue-400 font-bold text-[11px] bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 rounded-lg border border-blue-200 dark:border-blue-900/30">Irmão de: ${u.email_conexao}</span>` : `<span class="text-zinc-400 italic text-[11px]">Nenhum</span>`;
             let senhaExibicao = u.senha_provisoria || `<span class="text-zinc-400 italic">Alterada</span>`;
             
@@ -540,10 +570,14 @@
 
     function renderizarInterfaceChamada() {
         if(!listaChamadaCoroinhas) return;
-        const listaCoroinhas = cacheTodosUsuarios.filter(u => (u.funcao || '').toLowerCase() !== "coordenador");
+        
+        const listaCoroinhas = cacheTodosUsuarios.filter(u => {
+            const f = (u.funcao || '').toLowerCase();
+            return f !== "coordenador" && f !== "mestre";
+        });
         
         if(listaCoroinhas.length === 0) {
-            listaChamadaCoroinhas.innerHTML = `<p class="text-xs text-zinc-400 italic py-6 text-center">Nenhum coroinha cadastrado no sistema.</p>`;
+            listaChamadaCoroinhas.innerHTML = `<p class="text-xs text-zinc-400 italic py-6 text-center">Nenhum coroinha disponível para chamada.</p>`;
             return;
         }
 
@@ -587,7 +621,10 @@
         if(!dataReuniao) return alert("Por favor, selecione uma data válida!");
         if(!horarioReuniao) return alert("Por favor, selecione um horário válido!");
 
-        cacheTodosUsuarios.filter(u => (u.funcao || '').toLowerCase() !== "coordenador").forEach(c => {
+        cacheTodosUsuarios.filter(u => {
+            const f = (u.funcao || '').toLowerCase();
+            return f !== "coordenador" && f !== "mestre";
+        }).forEach(c => {
             if(!mapaPresencaAtual[c.nome]) mapaPresencaAtual[c.nome] = "presente";
         });
 
@@ -664,7 +701,7 @@
         const txtAviso = document.getElementById('txt-aviso-coordenador');
         if(txtAviso) {
             await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAviso.value, dataPublicacao: new Date().toLocaleDateString('pt-BR') });
-            alert("Mural updated!");
+            alert("Mural atualizado!");
         }
     });
 
@@ -830,8 +867,8 @@
                         <div><label class="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold uppercase block mb-1">Altar 6</label><input type="text" id="edit-a6-${idDoc}" value="${d.altar6?.nome||''}" class="w-full border dark:border-zinc-800 p-2 bg-zinc-50 dark:bg-zinc-950 rounded-xl focus:outline-red-700 dark:text-white"></div>
                     </div>
                     <div class="flex gap-4 border-t dark:border-zinc-800 pt-2.5 font-bold text-zinc-700 dark:text-zinc-300">
-                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="w-4 h-4 rounded text-red-700 focus:ring-red-500" id="chk-turi-${idDoc}" ${d.turibuloAtivo?'checked':''}> Turíbulo</label>
-                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="w-4 h-4 rounded text-red-700 focus:ring-red-500" id="chk-nave-${idDoc}" ${d.navetaAtiva?'checked':''}> Naveta</label>
+                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="w-4 h-4 rounded text-red-700 focus:ring-red-500" id="chk-turi-${idDoc}" ${d.turibuloAtive || d.turibuloAtivo?'checked':''}> Turíbulo</label>
+                        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="w-4 h-4 rounded text-red-700 focus:ring-red-500" id="chk-nave-${idDoc}" ${d.navetaAtive || d.navetaAtiva?'checked':''}> Naveta</label>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div><label class="text-[9px] text-zinc-400 dark:text-zinc-500 font-bold uppercase block mb-1">Turiferário</label><input type="text" id="edit-turi-${idDoc}" value="${d.turiferario?.nome||''}" class="w-full border dark:border-zinc-800 p-2 bg-zinc-50 dark:bg-zinc-950 rounded-xl focus:outline-red-700 dark:text-white"></div>
