@@ -474,7 +474,7 @@
             });
 
             await batch.commit();
-            registrarLogTerminal(`Rollback executado: Status de todas as vagas de ${dt} retornaram para 'Pendente'.`, "SUCESSO");
+            registrarLogTerminal(`Rollback executed: Status de todas as vagas de ${dt} retornaram para 'Pendente'.`, "SUCESSO");
             alert("Status das vagas restaurados para Pendente com sucesso!");
         } catch(e) { 
             registrarLogTerminal("Falha na sementeira de Rollback: " + e.message, "ERRO"); 
@@ -558,9 +558,10 @@
         } catch(e) { registrarLogTerminal("JSON Syntax Error ou rejeição DB", "ERRO"); }
     };
 
-    // ALTERAR FEATURE FLAGS EM RUNTIME
+    // ALTERAR FEATURE FLAGS EM RUNTIME (CORRIGIDO PARA CAPTURAR O ID DO ELEMENTO CORRETAMENTE)
     window.alternarFlagNoDB = async function(campoFlag) {
-        const chk = document.getElementById(`flag-${campoFlag === 'manutencao' ? 'manutencao' : 'congelar-escalas'}`).checked;
+        const idElemento = campoFlag === 'manutencao' ? 'flag-manutencao' : 'flag-congelar-escalas';
+        const chk = document.getElementById(idElemento).checked;
         try {
             await setDoc(doc(db, "configuracoes", "flags_sistema"), { [campoFlag]: chk }, { merge: true });
             registrarLogTerminal(`Feature Flag [${campoFlag}] alternada para: ${chk.toString().toUpperCase()}`, "INFO");
