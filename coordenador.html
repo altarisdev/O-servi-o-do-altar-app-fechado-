@@ -30,7 +30,7 @@
         <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
     </button>
 
-    <div id="tela-loading" class="fixed inset-0 bg-white/90 dark:bg-zinc-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center transition-opacity duration-500 pointer-events-none opacity-0">
+    <div id="tela-loading" class="fixed inset-0 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="relative flex items-center justify-center mb-4">
             <div class="animate-spin rounded-full h-16 w-16 border-3 border-transparent border-t-red-700 border-b-red-700 border-r-amber-500"></div>
             <i class="fa-solid fa-cross text-amber-500 absolute text-base"></i>
@@ -298,16 +298,6 @@
     </main>
 
 <script type="module">
-    const btnToggleTheme = document.getElementById('btn-toggle-theme');
-    const themeIcon = document.getElementById('theme-icon');
-
-    btnToggleTheme?.addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-        if (themeIcon) {
-            themeIcon.className = document.documentElement.classList.contains('dark') ? "fa-solid fa-sun text-lg text-amber-400" : "fa-solid fa-moon text-lg";
-        }
-    });
-
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, deleteDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -322,11 +312,15 @@
     };
 
     const app = initializeApp(firebaseConfig); 
-    const auth = getAuth(app); 
     const db = getFirestore(app);
+    const auth = getAuth(app); 
+
+    // Instância Secundária isolada sem afetar a persistência principal
     const appSecundario = initializeApp(firebaseConfig, "SecondaryApp"); 
     const authSecundario = getAuth(appSecundario);
 
+    const btnToggleTheme = document.getElementById('btn-toggle-theme');
+    const themeIcon = document.getElementById('theme-icon');
     const telaLoading = document.getElementById('tela-loading');
     const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
     const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
@@ -360,6 +354,16 @@
     function showLoading() { if(telaLoading) telaLoading.classList.remove('opacity-0', 'pointer-events-none'); }
     function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
     
+    // Dispara o loading visual imediatamente
+    showLoading();
+
+    btnToggleTheme?.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        if (themeIcon) {
+            themeIcon.className = document.documentElement.classList.contains('dark') ? "fa-solid fa-sun text-lg text-amber-400" : "fa-solid fa-moon text-lg";
+        }
+    });
+
     chkPossuiIrmao?.addEventListener('change', (e) => {
         if(e.target.checked) {
             divListaIrmaos?.classList.remove('hidden'); 
@@ -405,7 +409,7 @@
         } else { 
             window.location.href = "index.html"; 
         }
-        setTimeout(hideLoading, 400);
+        setTimeout(hideLoading, 500);
     });
 
     function inicializarPainel() {
@@ -420,7 +424,7 @@
         ouvirUsuariosCadastrados();
         ouvirMateriaisComoAdmin();
         carregarAvisoNoInputCoordenador();
-        switchCoordTab('coord-usuarios');
+        window.switchCoordTab('coord-usuarios');
         
         if(editorEscalaData) {
             editorEscalaData.value = new Date().toISOString().split('T')[0]; 
@@ -660,7 +664,7 @@
         const txtAviso = document.getElementById('txt-aviso-coordenador');
         if(txtAviso) {
             await setDoc(doc(db, "mural", "aviso_geral"), { texto: txtAviso.value, dataPublicacao: new Date().toLocaleDateString('pt-BR') });
-            alert("Mural atualizado!");
+            alert("Mural updated!");
         }
     });
 
