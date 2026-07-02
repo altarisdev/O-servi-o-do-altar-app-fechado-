@@ -34,8 +34,13 @@
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Senha Master Bypass:</label>
-                <input type="password" id="dev-senha" required placeholder="••••••••"
-                       class="w-full bg-stone-950 border border-stone-800 focus:border-amber-500 focus:bg-stone-900 rounded-xl p-2.5 text-xs outline-none transition-all text-white font-mono">
+                <div class="relative">
+                    <input type="password" id="dev-senha" required placeholder="••••••••"
+                           class="w-full bg-stone-950 border border-stone-800 focus:border-amber-500 focus:bg-stone-900 rounded-xl p-2.5 pr-10 text-xs outline-none transition-all text-white font-mono">
+                    <button type="button" id="btn-revelar-senha" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-amber-500 text-xs cursor-pointer">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
             </div>
             <button type="submit" class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-black text-xs py-3 rounded-xl transition duration-200 cursor-pointer shadow-lg uppercase tracking-wider">
                 Injetar Overdrive Kernel
@@ -179,8 +184,12 @@
                             <input type="text" id="json-id-doc" placeholder="Document ID" class="bg-stone-900 border border-stone-800 rounded-lg p-2 text-xs outline-none font-mono text-white">
                             <button onclick="puxarDocumentoJSON()" class="bg-stone-900 border border-stone-800 text-stone-200 text-xs font-bold p-2 rounded-lg hover:bg-stone-800 cursor-pointer">Puxar Documento</button>
                         </div>
-                        <textarea id="json-editor-textarea" rows="8" placeholder="{\n  ...objeto bruto no banco\n}" class="w-full bg-stone-900 border border-stone-800 text-amber-400 p-3 rounded-xl text-xs font-mono outline-none resize-none"></textarea>
-                        <button onclick="salvarDocumentoJSON()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-4 py-2 rounded-lg cursor-pointer">Gravar Mutação Direta</button>
+                        <div class="relative">
+                            <textarea id="json-editor-textarea" rows="8" placeholder="{\n  ...objeto bruto no banco\n}" class="w-full bg-stone-900 border border-stone-800 text-amber-400 p-3 rounded-xl text-xs font-mono outline-none resize-none transition-colors duration-200"></textarea>
+                            <button type="button" id="btn-formatar-json" class="absolute right-3 bottom-3 bg-stone-950 hover:bg-stone-800 border border-stone-800 text-stone-400 hover:text-amber-500 text-[10px] px-2 py-1 rounded font-mono cursor-pointer transition-all">Prettify JSON</button>
+                        </div>
+                        <div id="json-error-msg" class="text-[10px] text-rose-400 hidden font-mono"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Sintaxe JSON inválida detectada. Gravação bloqueada.</div>
+                        <button id="btn-salvar-json" onclick="salvarDocumentoJSON()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-4 py-2 rounded-lg cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">Gravar Mutação Direta</button>
                     </div>
                 </div>
 
@@ -254,6 +263,10 @@
     let usuariosLocais = [];
     let latênciaSimuladaMs = 0;
 
+    // ESTRUTURAS DO HISTÓRICO DO TERMINAL
+    let historicoComandos = [];
+    let indiceHistorico = -1;
+
     // SINK LOGS INTERNOS
     function registrarLogTerminal(mensagem, categoria = "INFO") {
         const stream = document.getElementById('dev-event-stream');
@@ -284,6 +297,19 @@
             registrarLogTerminal(`Latência de rede alterada para +${val}ms`, "INFO");
         }
     };
+
+    // BOTÃO REVELAR SENHA (MUTAÇÃO LOCAL)
+    document.getElementById('btn-revelar-senha').addEventListener('click', function() {
+        const inputSenha = document.getElementById('dev-senha');
+        const icone = this.querySelector('i');
+        if (inputSenha.type === "password") {
+            inputSenha.type = "text";
+            icone.className = "fa-solid fa-eye-slash";
+        } else {
+            inputSenha.type = "password";
+            icone.className = "fa-solid fa-eye";
+        }
+    });
 
     // VALIDAR SEED DEV
     document.getElementById('form-login-dev').addEventListener('submit', (e) => {
@@ -402,17 +428,19 @@
     window.limparEscalasPorData = async function() {
         const dt = document.getElementById('dev-data-escala').value;
         if(!dt) return alert("Selecione data");
-        try {
-            const snap = await getDocs(query(collection(db, "escalas"), where("data", "==", dt)));
-            const batch = writeBatch(db);
-            snap.forEach(d => batch.delete(d.ref));
-            await batch.commit();
-            registrarLogTerminal(`Limpas todas as escalas publicadas em ${dt}.`, "SUCESSO");
-            inicializarPainelDesenvolvedor();
-        } catch(e) { registrarLogTerminal(e.message, "ERRO"); }
+        if(confirm(`Aviso de Segurança: Você deseja deletar DEFINITIVAMENTE todas as escalas do dia ${dt}?`)) {
+            try {
+                const snap = await getDocs(query(collection(db, "escalas"), where("data", "==", dt)));
+                const batch = writeBatch(db);
+                snap.forEach(d => batch.delete(d.ref));
+                await batch.commit();
+                registrarLogTerminal(`Limpas todas as escalas publicadas em ${dt}.`, "SUCESSO");
+                inicializarPainelDesenvolvedor();
+            } catch(e) { registrarLogTerminal(e.message, "ERRO"); }
+        }
     };
 
-    // ─── RESETAR STATUS ESCALAS (CORRIGIDO PARA MAPEAMENTO DE OBJETOS ANINHADOS) ───
+    // RESETAR STATUS ESCALAS
     window.resetarStatusEscalas = async function() {
         await esperarRedeSimulada();
         const dt = document.getElementById('dev-data-escala').value;
@@ -432,17 +460,14 @@
                 let upd = {};
                 const dadosEscala = d.data();
 
-                // Varre e mapeia as propriedades internas dos subobjetos do Altar 1 ao 6
                 for(let i=1; i<=6; i++) { 
                     if(dadosEscala[`altar${i}`]) {
                         upd[`altar${i}.status`] = "Pendente"; 
                     }
                 }
-                // Varre e limpa o nó do Turiferário e Naveteiro
                 if(dadosEscala.turiferario) upd["turiferario.status"] = "Pendente";
                 if(dadosEscala.naveteiro)   upd["naveteiro.status"] = "Pendente";
                 
-                // Remove substitutos vinculados caso existam para reset total
                 upd["substitutoNome"] = "";
 
                 batch.update(d.ref, upd);
@@ -473,6 +498,41 @@
         } catch(e) { registrarLogTerminal(e.message, "ERRO"); }
     };
 
+    // VALIDOR PASSIVO E FORMATADOR DE JSON LIVE
+    const txEditor = document.getElementById('json-editor-textarea');
+    const btnSalvarJson = document.getElementById('btn-salvar-json');
+    const msgErroJson = document.getElementById('json-error-msg');
+
+    txEditor.addEventListener('input', function() {
+        const valor = this.value.trim();
+        if (!valor) {
+            btnSalvarJson.removeAttribute('disabled');
+            msgErroJson.classList.add('hidden');
+            this.classList.remove('border-rose-900/60');
+            return;
+        }
+        try {
+            JSON.parse(valor);
+            btnSalvarJson.removeAttribute('disabled');
+            msgErroJson.classList.add('hidden');
+            this.classList.remove('border-rose-900/60');
+        } catch (e) {
+            btnSalvarJson.setAttribute('disabled', 'true');
+            msgErroJson.classList.remove('hidden');
+            this.classList.add('border-rose-900/60');
+        }
+    });
+
+    document.getElementById('btn-formatar-json').addEventListener('click', function() {
+        try {
+            const parsed = JSON.parse(txEditor.value);
+            txEditor.value = JSON.stringify(parsed, null, 2);
+            registrarLogTerminal("JSON reindentado via engine local Prettify.", "INFO");
+        } catch (e) {
+            registrarLogTerminal("Prettify abortado: Sintaxe JSON quebrado.", "ERRO");
+        }
+    });
+
     // EDITAR E PUXAR JSON BRUTO
     window.puxarDocumentoJSON = async function() {
         const col = document.getElementById('json-colecao').value.trim();
@@ -480,7 +540,8 @@
         try {
             const snap = await getDoc(doc(db, col, id));
             if(snap.exists()) {
-                document.getElementById('json-editor-textarea').value = JSON.stringify(snap.data(), null, 2);
+                txEditor.value = JSON.stringify(snap.data(), null, 2);
+                txEditor.dispatchEvent(new Event('input')); // Dispara o validador de sintaxe
                 registrarLogTerminal(`Documento [${id}] importado para o editor JSON.`, "INFO");
             } else { registrarLogTerminal("Objeto inexistente.", "ERRO"); }
         } catch(e) { registrarLogTerminal(e.message, "ERRO"); }
@@ -489,7 +550,7 @@
     window.salvarDocumentoJSON = async function() {
         const col = document.getElementById('json-colecao').value.trim();
         const id = document.getElementById('json-id-doc').value.trim();
-        const txt = document.getElementById('json-editor-textarea').value;
+        const txt = txEditor.value;
         try {
             await setDoc(doc(db, col, id), JSON.parse(txt), { merge: true });
             registrarLogTerminal(`Documento [${id}] mutado com modificações diretas de JSON.`, "SUCESSO");
@@ -506,7 +567,7 @@
         } catch(e) { registrarLogTerminal(e.message, "ERRO"); }
     };
 
-    // BYPASS LOGIN SIMULATOR (MODIFICADO COM COMPORTAMENTO MASTER BYPASS)
+    // BYPASS LOGIN SIMULATOR
     window.executarBypassSimulacao = function() {
         const id = document.getElementById('dev-select-bypass').value;
         const u = usuariosLocais.find(x => x.uid === id);
@@ -518,12 +579,35 @@
         }
     };
 
-    // INTERPRETADOR CLI - TERMINAL EM LINHA DE COMANDO
+    // INTERPRETADOR CLI - TERMINAL EM LINHA DE COMANDO COM COPIER DE SETAS
     document.getElementById('dev-terminal-input').addEventListener('keydown', async function(e) {
+        if(e.key === "ArrowUp") {
+            e.preventDefault();
+            if(historicoComandos.length > 0 && indiceHistorico < historicoComandos.length - 1) {
+                indiceHistorico++;
+                this.value = historicoComandos[historicoComandos.length - 1 - indiceHistorico];
+            }
+            return;
+        }
+        if(e.key === "ArrowDown") {
+            e.preventDefault();
+            if(indiceHistorico > 0) {
+                indiceHistorico--;
+                this.value = historicoComandos[historicoComandos.length - 1 - indiceHistorico];
+            } else if (indiceHistorico === 0) {
+                indiceHistorico = -1;
+                this.value = '';
+            }
+            return;
+        }
+
         if(e.key === "Enter") {
             const comando = this.value.trim();
             this.value = '';
             if(!comando) return;
+
+            historicoComandos.push(comando);
+            indiceHistorico = -1; // Reseta índice de navegação
 
             registrarLogTerminal(comando, "CMD");
 
@@ -539,8 +623,24 @@
                 } catch { registrarLogTerminal("Coleção inválida informada.", "ERRO"); }
                 return;
             }
+            if(comando === "/flags") {
+                try {
+                    const snapFlags = await getDoc(doc(db, "configuracoes", "flags_sistema"));
+                    if(snapFlags.exists()) {
+                        const m = snapFlags.data().manutencao ? "ON" : "OFF";
+                        const c = snapFlags.data().congelado ? "ON" : "OFF";
+                        registrarLogTerminal(`Flags atuais -> Manutenção: ${m} | Trancamento Escalas: ${c}`, "INFO");
+                    } else { registrarLogTerminal("Nenhuma flag configurada no DB.", "ERRO"); }
+                } catch(e) { registrarLogTerminal(e.message, "ERRO"); }
+                return;
+            }
+            if(comando === "/status") {
+                const lat = latênciaSimuladaMs === 9999999 ? "INFINITA (OFFLINE)" : `+${latênciaSimuladaMs}ms`;
+                registrarLogTerminal(`Kernel state: Sincronizado. Latência Simulada: ${lat}`, "INFO");
+                return;
+            }
             if(comando === "/help") {
-                registrarLogTerminal("Comandos aceitos: /clear (Limpa logs), /count [colecao] (Conta registros)", "INFO");
+                registrarLogTerminal("Comandos: /clear (Limpa logs), /count [colecao], /flags (Lista status), /status (Inspeciona rede)", "INFO");
                 return;
             }
             registrarLogTerminal("Instrução CLI não reconhecida. Digite /help", "ERRO");
