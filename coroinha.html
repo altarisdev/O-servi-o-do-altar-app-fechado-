@@ -763,7 +763,7 @@
             if (apiData) {
                 let tituloSemana = apiData.liturgia || "Tempo Litúrgico";
                 // CORREÇÃO: Evita anular o texto caso seja uma celebração do Tempo Comum/Féria
-                let santoDoDia = apiData.entrada || "Féria do Dia (Sem memória litúrgica específica)";
+                let santoDoDia = apiData.data || "Dia (Sem memória litúrgica específica)";
 
                 cacheLiturgiaDados = {
                     semanaTitulo: tituloSemana,
