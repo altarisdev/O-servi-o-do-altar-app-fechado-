@@ -761,17 +761,24 @@
             const apiData = await r.json();
             
             if (apiData) {
+                let tituloSemana = apiData.titulo || "Tempo Litúrgico";
+                let santoDoDia = apiData.santo || "";
+
+                if (!santoDoDia || santoDoDia.toLowerCase().includes("féria")) {
+                    santoDoDia = "Féria do Dia (Sem memória litúrgica específica)";
+                }
+
                 cacheLiturgiaDados = {
-                    semanaTitulo: apiData.titulo || "Tempo Litúrgico",
+                    semanaTitulo: tituloSemana,
                     cor: apiData.cor,
-                    santo: apiData.santo,
+                    santo: santoDoDia,
                     primeiraLeitura: {
                         referencia: apiData.primeiraLeitura?.referencia || "I Leitura",
                         texto: apiData.primeiraLeitura?.texto
                     },
                     salmo: {
                         referencia: apiData.salmo?.referencia || "Salmo Responsorial",
-                        refrao: apiData.salmo?.refrao || "",
+                        refrao: apiData.salmo?.refrao || apiData.salmo?.refrão || "",
                         texto: apiData.salmo?.texto
                     },
                     segundaLeitura: apiData.segundaLeitura ? {
@@ -784,13 +791,11 @@
                     }
                 };
                 
-                // Atualiza o Título com a Semana Litúrgica (como no site da CNBB)
                 const semTituloEl = document.getElementById('liturgia-semana-titulo');
                 if (semTituloEl) semTituloEl.innerText = cacheLiturgiaDados.semanaTitulo;
 
-                // Atualiza o Santo do Dia logo abaixo
                 const santoTxt = document.getElementById('liturgia-santo-dia');
-                if(santoTxt) santoTxt.innerText = cacheLiturgiaDados.santo || "Feria do Dia";
+                if(santoTxt) santoTxt.innerText = cacheLiturgiaDados.santo;
 
                 const colBadge = document.getElementById('liturgia-cor-badge');
                 if(colBadge && cacheLiturgiaDados.cor) {
@@ -844,7 +849,6 @@
         if(targetData) {
             refEl.innerText = targetData.referencia || "";
             
-            // Tratamento especial para montagem limpa e estruturada do Salmo
             if (subTabName === 'salmo') {
                 let salmoHtml = "";
                 if (targetData.refrao) {
@@ -853,16 +857,17 @@
                 
                 if (targetData.texto) {
                     if (typeof targetData.texto === 'string') {
-                        salmoHtml += `<div class="space-y-2">${targetData.texto}</div>`;
+                        salmoHtml += `<div class="space-y-2 whitespace-pre-wrap">${targetData.texto}</div>`;
                     } else if (Array.isArray(targetData.texto)) {
                         salmoHtml += `<div class="space-y-2">${targetData.texto.join('<br>')}</div>`;
+                    } else {
+                        salmoHtml += `<div class="space-y-2">${JSON.stringify(targetData.texto)}</div>`;
                     }
                 } else {
                     salmoHtml += "<p class='italic text-slate-400'>Versos não disponíveis.</p>";
                 }
                 corpoEl.innerHTML = salmoHtml;
             } else {
-                // Demais leituras normais
                 if (targetData.texto) {
                     if (typeof targetData.texto === 'string') {
                         corpoEl.innerHTML = targetData.texto;
