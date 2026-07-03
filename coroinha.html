@@ -16,7 +16,7 @@
         /* Fundo Litúrgico - Padrão Sacro */
         .bg-sacro-dourado {
             background-color: #f8fafc;
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek02NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA5bC04ek0xOCAzNmgydjhoLTJNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
         }
 
         .dark .bg-sacro-dourado {
@@ -32,6 +32,15 @@
         .dark .active-tab {
             border-bottom: 3px solid #ef4444;
             color: #ef4444;
+        }
+        .active-subtab {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            font-weight: 700;
+        }
+        .dark .active-subtab {
+            background-color: #27272a;
+            color: #f4f4f5;
         }
     </style>
 </head>
@@ -171,14 +180,33 @@
             <div id="conteudo-liturgia" class="space-y-4 hidden md:block w-full">
                 <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
                     <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-600 via-red-600 to-amber-500"></div>
-                    <div class="p-5 border-b border-slate-100 dark:border-zinc-800/60 flex items-center gap-2.5">
-                        <i class="fa-solid fa-scroll text-amber-600 dark:text-amber-500 text-base"></i>
-                        <h3 class="text-sm font-black text-slate-800 dark:text-zinc-100 tracking-tight">Liturgia Diária</h3>
+                    <div class="p-5 border-b border-slate-100 dark:border-zinc-800/60 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-scroll text-amber-600 dark:text-amber-500 text-base"></i>
+                            <h3 class="text-sm font-black text-slate-800 dark:text-zinc-100 tracking-tight">Liturgia Diária</h3>
+                        </div>
+                        <span id="liturgia-cor-badge" class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400">---</span>
                     </div>
                     <div class="p-5 space-y-4">
+                        <div class="bg-slate-50/60 dark:bg-zinc-800/30 p-3.5 rounded-2xl border border-slate-100 dark:border-zinc-800/50">
+                            <span class="block text-[8px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-0.5">Santo do Dia</span>
+                            <p id="liturgia-santo-dia" class="text-xs font-bold text-slate-700 dark:text-zinc-300">Carregando...</p>
+                        </div>
+
+                        <!-- Abas internas da liturgia -->
+                        <div class="flex bg-slate-100 dark:bg-zinc-800 p-1 rounded-xl text-[10px] font-bold text-slate-500 dark:text-zinc-400">
+                            <button onclick="switchSubTab('1leitura')" id="subtab-1leitura" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all active-subtab">1ª Leit.</button>
+                            <button onclick="switchSubTab('salmo')" id="subtab-salmo" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all">Salmo</button>
+                            <button onclick="switchSubTab('2leitura')" id="subtab-2leitura" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all hidden">2ª Leit.</button>
+                            <button onclick="switchSubTab('evangelho')" id="subtab-evangelho" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all">Evang.</button>
+                        </div>
+
+                        <!-- Container de Textos Litúrgicos Dinâmicos -->
                         <div class="bg-amber-50/30 dark:bg-amber-950/10 p-4 rounded-2xl border border-amber-100/50 dark:border-amber-900/20">
-                            <span id="ref-evangelho-dia" class="block text-[9px] font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-1.5">Evangelho</span>
-                            <p id="txt-evangelho-dia" class="text-xs text-slate-600 dark:text-zinc-400 font-medium leading-relaxed max-h-36 overflow-y-auto pr-1">Carregando palavra do dia...</p>
+                            <span id="liturgia-texto-referencia" class="block text-[9px] font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-1.5">Carregando...</span>
+                            <div id="liturgia-texto-corpo" class="text-xs text-slate-600 dark:text-zinc-400 font-medium leading-relaxed h-44 overflow-y-auto pr-1 text-justify">
+                                Buscando os textos litúrgicos da mesa da Palavra...
+                            </div>
                         </div>
 
                         <div class="border-t border-slate-100 dark:border-zinc-800/60 pt-4 space-y-3">
@@ -272,10 +300,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
     import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // FLAG DE MANUTENÇÃO MANUAL DO CÓDIGO
-    // Mude para 'true' para forçar a tela de manutenção ou 'false' para seguir o Firestore
 
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -305,6 +331,7 @@
 
     let usuarioLogadoDados = null; 
     let todasEscalasCache = [];
+    let cacheLiturgiaDados = null; // Armazena os nós da liturgia completa
 
     function sincronizarVisualBotao(isDark) {
         if (darkModeThumb) {
@@ -336,7 +363,6 @@
 
     function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
 
-    // Ouvinte do Estado de Manutenção Geral unificado com a Flag Local do Código
     onSnapshot(doc(db, "configuracoes", "flags_sistema"), (snapshot) => {
         if (snapshot.exists()) {
             const data = snapshot.data();
@@ -516,9 +542,11 @@
                 respondidoEm: Date.now()
             };
             await updateDoc(refDoc, atualizacaoEstruturada);
+            cardEnqueteDisponibilidade.classList.add('hidden'); // Oculta o card imediatamente
             alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
         } catch (error) {
             await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
+            cardEnqueteDisponibilidade.classList.add('hidden'); // Oculta o card imediatamente
             alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
         }
     });
@@ -720,24 +748,75 @@
 
     async function carregarLiturgiaDoDia() {
         try {
-            // Requisição apontando para a rota unificada e estável da API liturgia-diaria (Dancrf)
             const r = await fetch('https://dancrf.github.io/liturgia-diaria/v3/diaria.json'); 
             if (!r.ok) throw new Error();
             const data = await r.json();
             
-            // Tratamento e mapeamento dos nós da nova API de código aberto
-            if (data && data.evangelho) {
-                const ref = data.evangelho.referencia || "Evangelho";
-                const texto = data.evangelho.texto || "Erro ao renderizar o texto litúrgico.";
+            if (data) {
+                cacheLiturgiaDados = data;
                 
-                document.getElementById('ref-evangelho-dia').innerText = ref;
-                document.getElementById('txt-evangelho-dia').innerText = texto;
+                // 1. Atualizar Cor Litúrgica
+                const corBadge = document.getElementById('liturgia-cor-badge');
+                if(corBadge && data.cor) {
+                    corBadge.innerText = data.cor;
+                    // Ajuste de cores básicas visuais com base no retorno da API
+                    if(data.cor.toLowerCase().includes('verde')) corBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400";
+                    else if(data.cor.toLowerCase().includes('vermelho')) corBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400";
+                    else if(data.cor.toLowerCase().includes('branco')) corBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-stone-100 text-stone-800 dark:bg-stone-800 dark:text-stone-300";
+                    else if(data.cor.toLowerCase().includes('roxo')) corBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-400";
+                }
+
+                // 2. Atualizar Santo do dia
+                const santoTxt = document.getElementById('liturgia-santo-dia');
+                if(santoTxt) santoTxt.innerText = data.santo || "Feria do Tempo Comum";
+
+                // 3. Verificar existência da segunda leitura para exibir o botão ou não
+                const btn2Leitura = document.getElementById('subtab-2leitura');
+                if(data.segundaLeitura && data.segundaLeitura.texto) {
+                    btn2Leitura.classList.remove('hidden');
+                } else {
+                    btn2Leitura.classList.add('hidden');
+                }
+
+                // Carrega por padrão a primeira leitura na interface
+                switchSubTab('1leitura');
             } else {
-                throw new Error("Estrutura inválida");
+                throw new Error();
             }
         } catch (e) { 
-            document.getElementById('txt-evangelho-dia').innerText = "Consulta offline ou instabilidade na API. Verifique os livros na sacristia."; 
+            document.getElementById('liturgia-texto-corpo').innerText = "Consulta offline ou instabilidade na API de Liturgias."; 
         }
+    }
+
+    window.switchSubTab = function(subTabName) {
+        if(!cacheLiturgiaDados) return;
+
+        const refEl = document.getElementById('liturgia-texto-referencia');
+        const corpoEl = document.getElementById('liturgia-texto-corpo');
+        const mapeamentoAbas = ['1leitura', 'salmo', '2leitura', 'evangelho'];
+
+        mapeamentoAbas.forEach(aba => {
+            const btn = document.getElementById(`subtab-${aba}`);
+            if(btn) {
+                if(aba === subTabName) btn.classList.add('active-subtab');
+                else btn.classList.remove('active-subtab');
+            }
+        });
+
+        if(subTabName === '1leitura' && cacheLiturgiaDados.primeiraLeitura) {
+            refEl.innerText = cacheLiturgiaDados.primeiraLeitura.referencia || "Primeira Leitura";
+            corpoEl.innerText = cacheLiturgiaDados.primeiraLeitura.texto || "";
+        } else if(subTabName === 'salmo' && cacheLiturgiaDados.salmo) {
+            refEl.innerText = cacheLiturgiaDados.salmo.referencia || "Salmo Responsorial";
+            corpoEl.innerText = cacheLiturgiaDados.salmo.texto || "";
+        } else if(subTabName === '2leitura' && cacheLiturgiaDados.segundaLeitura) {
+            refEl.innerText = cacheLiturgiaDados.segundaLeitura.referencia || "Segunda Leitura";
+            corpoEl.innerText = cacheLiturgiaDados.segundaLeitura.texto || "";
+        } else if(subTabName === 'evangelho' && cacheLiturgiaDados.evangelho) {
+            refEl.innerText = cacheLiturgiaDados.evangelho.referencia || "Evangelho";
+            corpoEl.innerText = cacheLiturgiaDados.evangelho.texto || "";
+        }
+        corpoEl.scrollTop = 0;
     }
 
     function inicializarLeitorBiblia() {
@@ -746,7 +825,6 @@
         
         if(!selectLivro || !inputCapitulo) return;
 
-        // Dicionário corrigido com os mapeamentos oficiais da API externa em inglês
         const correspondenciaIngles = {
             "gn": "genesis", "ex": "exodus", "lv": "leviticus", "nm": "numbers", "dt": "deuteronomy",
             "js": "joshua", "jz": "judges", "rt": "ruth", "1sm": "1samuel", "2sm": "2samuel",
@@ -776,7 +854,6 @@
                 </div>`;
             
             try {
-                // Adicionado o parâmetro ?translation=almeida para forçar o retorno em português
                 const res = await fetch(`https://bible-api.com/${livroIngles}+${cap}?translation=almeida`);
                 if(!res.ok) throw new Error();
                 const data = await res.json();
