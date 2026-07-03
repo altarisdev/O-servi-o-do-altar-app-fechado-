@@ -37,6 +37,16 @@
 </head>
 <body class="bg-sacro-dourado font-sans min-h-screen flex flex-col transition-colors duration-500 selection:bg-red-200">
 
+    <!-- Tela de Bloqueio de Manutenção Global -->
+    <div id="tela-manutencao" class="fixed inset-0 bg-slate-50 dark:bg-zinc-950 z-55 flex flex-col items-center justify-center p-6 text-center hidden">
+        <div class="w-16 h-16 bg-amber-500/10 dark:bg-amber-500/5 text-amber-600 rounded-2xl flex items-center justify-center text-2xl border border-amber-500/20 shadow-xs mb-4 animate-bounce">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+        </div>
+        <h2 class="text-base font-black text-slate-800 dark:text-zinc-100 uppercase tracking-tight">Sistema em Manutenção</h2>
+        <p class="text-xs text-slate-500 dark:text-zinc-400 max-w-sm mt-2 leading-relaxed font-medium">Estamos atualizando os sacrários e arquivos do presbitério. O painel estará disponível novamente em breve.</p>
+    </div>
+
+    <!-- Tela de Loading Inicial -->
     <div id="tela-loading" class="fixed inset-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-50 flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="relative flex items-center justify-center mb-4">
             <div class="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-red-600 border-b-amber-500"></div>
@@ -278,6 +288,7 @@
     const db = getFirestore(app);
 
     const telaLoading = document.getElementById('tela-loading');
+    const telaManutencao = document.getElementById('tela-manutencao');
     const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
     const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
     const cardEnqueteDisponibilidade = document.getElementById('card-enquete-disponibilidade');
@@ -321,6 +332,15 @@
     });
 
     function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
+
+    // Ouvinte ativo do Estado de Manutenção Geral do Sistema
+    onSnapshot(doc(db, "configuracoes", "manutencao"), (snapshot) => {
+        if (snapshot.exists() && snapshot.data().ativo === true) {
+            telaManutencao.classList.remove('hidden');
+        } else {
+            telaManutencao.classList.add('hidden');
+        }
+    });
 
     onAuthStateChanged(auth, async (user) => {
         const devSession = sessionStorage.getItem("dev_user");
@@ -690,14 +710,13 @@
         }
     }
 
-    // LEITOR BÍBLICO CORRIGIDO (Dicionário de Siglas em Inglês + Design Premium)
     function inicializarLeitorBiblia() {
         const selectLivro = document.getElementById('select-biblia-livro');
         const inputCapitulo = document.getElementById('input-biblia-capitulo');
         
         if(!selectLivro || !inputCapitulo) return;
 
-        // Mapeamento preciso exigido pela API Rest do bible-api
+        // Dicionário corrigido com os mapeamentos oficiais da API externa em inglês
         const correspondenciaIngles = {
             "gn": "genesis", "ex": "exodus", "lv": "leviticus", "nm": "numbers", "dt": "deuteronomy",
             "js": "joshua", "jz": "judges", "rt": "ruth", "1sm": "1samuel", "2sm": "2samuel",
@@ -707,7 +726,7 @@
             "ez": "ezekiel", "dn": "daniel", "os": "hosea", "jl": "joel", "am": "amos",
             "ob": "obadiah", "jn": "jonah", "mq": "micah", "na": "nahum", "hc": "habakkuk",
             "sf": "zephaniah", "ag": "haggai", "zc": "zechariah", "ml": "malachi", "mt": "matthew",
-            "mc": "mark", "lc": "lucas", "jhn": "john", "act": "acts", "rm": "romans",
+            "mc": "mark", "lc": "luke", "jhn": "john", "act": "acts", "rm": "romans",
             "1co": "1corinthians", "2co": "2corinthians", "gl": "galatians", "ef": "ephesians", "fp": "philippians",
             "cl": "colossians", "1ts": "1thessalonians", "2ts": "2thessalonians", "1tm": "1timothy", "2tm": "2timothy",
             "tt": "titus", "fm": "philemon", "hb": "hebrews", "tg": "james", "1pe": "1peter",
@@ -716,7 +735,7 @@
 
         async function buscarTextoBiblia() {
             const siglaPt = selectLivro.value;
-            const livreIngles = correspondenciaIngles[siglaPt] || "matthew";
+            const livroIngles = correspondenciaIngles[siglaPt] || "matthew";
             const cap = inputCapitulo.value || 1;
             const container = document.getElementById('texto-biblia-container');
             
@@ -727,7 +746,6 @@
                 </div>`;
             
             try {
-                // Requisição direta e estável à base de dados mundial aberta
                 const res = await fetch(`https://bible-api.com/${livroIngles}+${cap}`);
                 if(!res.ok) throw new Error();
                 const data = await res.json();
@@ -745,7 +763,7 @@
                                 </p>
                             </div>`;
                     });
-                    container.scrollTop = 0; // Volta para o topo automaticamente ao mudar de capítulo
+                    container.scrollTop = 0;
                 } else {
                     container.innerHTML = `
                         <p class="text-slate-400 dark:text-zinc-500 italic text-center pt-24 font-medium">
@@ -769,7 +787,6 @@
             if(inputCapitulo.value > 0) buscarTextoBiblia();
         });
 
-        // Executa automaticamente para abrir com o livro inicial sem travar
         buscarTextoBiblia();
     }
 
