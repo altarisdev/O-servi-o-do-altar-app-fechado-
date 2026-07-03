@@ -214,16 +214,27 @@
     });
 
     function redirecionarPorFuncao(funcao, email = "") {
-        if (funcao === "Coordenador") {
-            window.location.href = "coordenador.html";
-        } else if (funcao === "desenvolvedor" || email === "dev@altaris.com") {
-            window.location.href = "painel-dev.html";
-        } else if (funcao === "Mestre" || email === "padre@altaris.com" || email === "casalcoordenador@altaris.com") {
-            window.location.href = "mestre.html";
-        } else {
-            window.location.href = "coroinha.html";
-        }
+    // 1. Prioridade para desenvolvedores
+    if (funcao === "desenvolvedor" || email === "dev@altaris.com") {
+        window.location.href = "painel-dev.html";
+    } 
+    // 2. Verificação de Coordenador
+    else if (funcao === "Coordenador") {
+        window.location.href = "coordenador.html";
+    } 
+    // 3. Verificação de Mestre/Padre
+    else if (funcao === "Mestre" || email === "padre@altaris.com" || email === "casalcoordenador@altaris.com") {
+        window.location.href = "mestre.html";
+    } 
+    // 4. Nova verificação para Pais
+    else if (funcao === "Pai" || funcao === "pais") {
+        window.location.href = "pais.html";
+    } 
+    // 5. Padrão para Coroinha
+    else {
+        window.location.href = "coroinha.html";
     }
+}
 
     if(formLogin) {
         formLogin.addEventListener('submit', async (e) => {
