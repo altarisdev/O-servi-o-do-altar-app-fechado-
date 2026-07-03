@@ -370,7 +370,7 @@
         ouvirPenalidadesMestre();
     }
 
-    async function carregarRelatorioMissas() {
+        async function carregarRelatorioMissas() {
         if(!tabelaFrequenciaMissas) return;
         tabelaFrequenciaMissas.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-stone-400 italic bg-white/30">Processando métricas...</td></tr>`;
         const mesSelecionado = filtroMesMissas.value;
@@ -378,6 +378,8 @@
         try {
             const snapEscalas = await getDocs(collection(db, "escalas"));
             let relatorio = {};
+            
+            // Inicializa o objeto para todos os usuários
             cacheUsuarios.forEach(nome => {
                 relatorio[nome] = { presencas: 0, faltas: 0, solicitouSub: 0, atendeuSub: 0 };
             });
@@ -385,24 +387,32 @@
             snapEscalas.forEach(docSnap => {
                 const scala = docSnap.data();
                 if(scala.data && scala.data.startsWith(mesSelecionado)) {
-                    for(let i = 1; i <= 6; i++) {
-                        const vaga = scala[`altar${i}`];
-                        if(vaga && vaga.nome && relatorio[vaga.nome]) {
-                            if(vaga.status === "Confirmado" || vaga.status === "Presente") relatorio[vaga.nome].presencas++;
-                            if(vaga.status === "Falta") relatorio[vaga.nome].faltas++;
-                            if(vaga.status === "Substituido") relatorio[vaga.nome].solicitouSub++;
+                    
+                    // Função auxiliar para processar cada vaga/função
+                    const processarVaga = (vaga) => {
+                        if(!vaga || !vaga.nome) return;
+                        
+                        // Garante que o usuário existe no nosso cache antes de somar
+                        if(relatorio[vaga.nome]) {
+                            if(vaga.status === "Confirmado" || vaga.status === "Presente") {
+                                relatorio[vaga.nome].presencas++;
+                            } else if(vaga.status === "Falta") {
+                                relatorio[vaga.nome].faltas++;
+                            } else if(vaga.status === "Substituido") {
+                                relatorio[vaga.nome].solicitouSub++;
+                            }
                         }
-                    }
-                    if(scala.turibuloAtivo && scala.turiferario && relatorio[scala.turiferario.nome]) {
-                        if(scala.turiferario.status === "Confirmado") relatorio[scala.turiferario.nome].presencas++;
-                        if(scala.turiferario.status === "Falta") relatorio[scala.turiferario.nome].faltas++;
-                        if(scala.turiferario.status === "Substituido") relatorio[scala.turiferario.nome].solicitouSub++;
-                    }
-                    if(scala.navetaAtiva && scala.naveteiro && relatorio[scala.naveteiro.nome]) {
-                        if(scala.naveteiro.status === "Confirmado") relatorio[scala.naveteiro.nome].presencas++;
-                        if(scala.naveteiro.status === "Falta") relatorio[scala.naveteiro.nome].faltas++;
-                        if(scala.naveteiro.status === "Substituido") relatorio[scala.naveteiro.nome].solicitouSub++;
-                    }
+                    };
+
+                    // Processa altares
+                    for(let i = 1; i <= 6; i++) processarVaga(scala[`altar${i}`]);
+                    
+                    // Processa Turibulo e Naveta
+                    processarVaga(scala.turiferario);
+                    processarVaga(scala.naveteiro);
+
+                    // Lógica do Substituto: 
+                    // Se o campo substitutoNome existir na escala, esse usuário ATENDEU uma sub
                     if(scala.substitutoNome && relatorio[scala.substitutoNome]) {
                         relatorio[scala.substitutoNome].atendeuSub++;
                     }
