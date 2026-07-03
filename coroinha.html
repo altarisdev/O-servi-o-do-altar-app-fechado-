@@ -16,7 +16,7 @@
         /* Fundo Litúrgico - Padrão Sacro */
         .bg-sacro-dourado {
             background-color: #f8fafc;
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iZG9uZSIgcj0iNiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNjAiIHI9IjYiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjQwIiAgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC-4ek0zNiA5bC-4ek0xOCAzNmgydjhoLTJNNTggMzZoMnY4aC-yeiIvPjwvZz48L3N2Zz4=");
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iZG9uZSIgcj0iNiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNjAiIHI9IjYiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjQwIiAgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCB dPSJNMzYgMThoOHYyaC-4ek0zNiA5bC-4ek0xOCAzNmgydjhoLTJNNTggMzZoMnY4aC-yeiIvPjwvZz48L3N2Zz4=");
         }
 
         .dark .bg-sacro-dourado {
@@ -763,7 +763,6 @@
             const apiData = await r.json();
             
             if (apiData) {
-                // Adapta o objeto vindo da API para manter compatibilidade com sua função switchSubTab
                 cacheLiturgiaDados = {
                     cor: apiData.cor,
                     santo: apiData.santo,
@@ -842,20 +841,20 @@
             
             if (targetData.texto) {
                 if (typeof targetData.texto === 'string') {
-                    corpoEl.innerText = targetData.texto;
+                    corpoEl.innerHTML = targetData.texto;
                 } else if (Array.isArray(targetData.texto)) {
-                    corpoEl.innerText = targetData.texto.join('\n');
+                    corpoEl.innerHTML = targetData.texto.join('<br>');
                 } else if (typeof targetData.texto === 'object') {
-                    corpoEl.innerText = targetData.texto.paragrafo || JSON.stringify(targetData.texto);
+                    corpoEl.innerHTML = targetData.texto.paragrafo || JSON.stringify(targetData.texto);
                 } else {
-                    corpoEl.innerText = "Texto não disponível.";
+                    corpoEl.innerHTML = "Texto não disponível.";
                 }
             } else {
-                corpoEl.innerText = "Texto não disponível.";
+                corpoEl.innerHTML = "Texto não disponível.";
             }
         } else {
             refEl.innerText = "Não disponível";
-            corpoEl.innerText = "Nenhum texto associado a esta aba.";
+            corpoEl.innerHTML = "Nenhum texto associado a esta aba.";
         }
         corpoEl.scrollTop = 0;
     }
