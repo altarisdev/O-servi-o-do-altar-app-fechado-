@@ -16,7 +16,7 @@
         /* Fundo Litúrgico - Padrão Sacro */
         .bg-sacro-dourado {
             background-color: #f8fafc;
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA5OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC-4ek0zNiA5OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
         }
 
         .dark .bg-sacro-dourado {
@@ -127,7 +127,7 @@
 
         <div class="space-y-6 md:col-span-1 flex flex-col w-full">
             
-            <div id="conteudo-avisos" class="space-y-4 block md:block w-full">
+            <div id="conteudo-avisos" class="space-y-4 hidden md:block w-full">
                 <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
                     <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 to-red-600"></div>
                     <div class="p-5 border-b border-slate-100 dark:border-zinc-800/60 flex items-center gap-2.5">
@@ -158,7 +158,6 @@
                 </div>
             </div>
 
-            <!-- SEÇÃO DE LITURGIA E BÍBLIA TOTALMENTE CORRIGIDA E PREMIUM -->
             <div id="conteudo-liturgia" class="space-y-4 hidden md:block w-full">
                 <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
                     <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-600 via-red-600 to-amber-500"></div>
@@ -167,19 +166,16 @@
                         <h3 class="text-sm font-black text-slate-800 dark:text-zinc-100 tracking-tight">Liturgia Diária</h3>
                     </div>
                     <div class="p-5 space-y-4">
-                        <!-- Texto do Evangelho do Dia -->
                         <div class="bg-amber-50/30 dark:bg-amber-950/10 p-4 rounded-2xl border border-amber-100/50 dark:border-amber-900/20">
                             <span id="ref-evangelho-dia" class="block text-[9px] font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-1.5">Evangelho</span>
                             <p id="txt-evangelho-dia" class="text-xs text-slate-600 dark:text-zinc-400 font-medium leading-relaxed max-h-36 overflow-y-auto pr-1">Carregando palavra do dia...</p>
                         </div>
 
-                        <!-- Painel de Consulta à Bíblia Totalmente Funcional e Elegante -->
                         <div class="border-t border-slate-100 dark:border-zinc-800/60 pt-4 space-y-3">
                             <span class="block text-[10px] font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
                                 <i class="fa-solid fa-book-bible"></i> Consulta às Sagradas Escrituras
                             </span>
                             
-                            <!-- Seletores -->
                             <div class="grid grid-cols-3 gap-2">
                                 <select id="select-biblia-livro" class="col-span-2 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-700 dark:text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 transition-all shadow-xs">
                                     <option value="gn">Gênesis</option>
@@ -252,7 +248,6 @@
                                 <input type="number" id="input-biblia-capitulo" value="1" min="1" max="150" class="bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-700 dark:text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 text-center shadow-xs" placeholder="Cap.">
                             </div>
 
-                            <!-- Área de Leitura Premium Dinâmica -->
                             <div id="texto-biblia-container" class="w-full h-[320px] overflow-y-auto rounded-2xl border border-slate-100 dark:border-zinc-800/80 bg-linear-to-b from-slate-50/60 to-slate-100/30 dark:from-zinc-950/40 dark:to-zinc-950/20 p-4 space-y-3.5 text-[13px] leading-relaxed text-slate-700 dark:text-zinc-300 scroll-smooth antialiased">
                                 <p class="text-slate-400 dark:text-zinc-500 italic text-center pt-24">Selecione o livro e capítulo para carregar os textos sagrados...</p>
                             </div>
@@ -721,7 +716,7 @@
 
         async function buscarTextoBiblia() {
             const siglaPt = selectLivro.value;
-            const livroIngles = correspondenciaIngles[siglaPt] || "matthew";
+            const livreIngles = correspondenciaIngles[siglaPt] || "matthew";
             const cap = inputCapitulo.value || 1;
             const container = document.getElementById('texto-biblia-container');
             
@@ -780,9 +775,9 @@
 
     window.switchTab = function(tabName) {
         document.getElementById('conteudo-escala').className = tabName === 'escala' ? 'space-y-6 block md:col-span-2' : 'space-y-6 hidden md:col-span-2';
-        document.getElementById('conteudo-avisos').className = tabName === 'avisos' ? 'space-y-4 block' : 'space-y-4 hidden md:block w-full';
-        document.getElementById('conteudo-conteudos').className = tabName === 'conteudos' ? 'space-y-4 block' : 'space-y-4 hidden md:block w-full';
-        document.getElementById('conteudo-liturgia').className = tabName === 'liturgia' ? 'space-y-4 block' : 'space-y-4 hidden md:block w-full';
+        document.getElementById('conteudo-avisos').className = tabName === 'avisos' ? 'space-y-4 block md:block w-full' : 'space-y-4 hidden md:block w-full';
+        document.getElementById('conteudo-conteudos').className = tabName === 'conteudos' ? 'space-y-4 block md:block w-full' : 'space-y-4 hidden md:block w-full';
+        document.getElementById('conteudo-liturgia').className = tabName === 'liturgia' ? 'space-y-4 block md:block w-full' : 'space-y-4 hidden md:block w-full';
         
         const tabs = ['escala', 'avisos', 'conteudos', 'liturgia'];
         tabs.forEach(t => {
