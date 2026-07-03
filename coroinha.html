@@ -761,7 +761,7 @@
             const apiData = await r.json();
             
             if (apiData) {
-                let tituloSemana = apiData.titulo || "Tempo Litúrgico";
+                let tituloSemana = apiData.liturgia || "Tempo Litúrgico";
                 // CORREÇÃO: Evita anular o texto caso seja uma celebração do Tempo Comum/Féria
                 let santoDoDia = apiData.santo || apiData.celebracao || "Féria do Dia (Sem memória litúrgica específica)";
 
