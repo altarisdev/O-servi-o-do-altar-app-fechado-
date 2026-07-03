@@ -21,7 +21,7 @@
 
         .dark .bg-sacro-dourado {
             background-color: #09090b;
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjZDk3NzA2IiBmaWxsLW9wYWNpdHk9IjAuMDciPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek02NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA1OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjZDk3NzA2IiBmaWxsLW9wYWNpdHk9IjAuMDciPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek02NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC04ek0zNiA5bC04ek0xOCAzNmgydjhoLTJNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
         }
 
         .active-tab {
@@ -171,7 +171,7 @@
                     </div>
                     <div class="p-5">
                         <div id="lista-materials-formacao" class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
-                            <p class="text-xs text-slate-400 dark:text-zinc-500 italic">Buscando conteúdos ativos...</p>
+                            <p class="text-xs text-slate-400 dark:text-zinc-500 italic">Buscando conteúdos activos...</p>
                         </div>
                     </div>
                 </div>
@@ -204,7 +204,7 @@
                         <!-- Container de Textos Litúrgicos Dinâmicos -->
                         <div class="bg-amber-50/30 dark:bg-amber-950/10 p-4 rounded-2xl border border-amber-100/50 dark:border-amber-900/20">
                             <span id="liturgia-texto-referencia" class="block text-[9px] font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-1.5">Carregando...</span>
-                            <div id="liturgia-texto-corpo" class="text-xs text-slate-600 dark:text-zinc-400 font-medium leading-relaxed h-44 overflow-y-auto pr-1 text-justify">
+                            <div id="liturgia-texto-corpo" class="text-xs text-slate-600 dark:text-zinc-400 font-medium leading-relaxed h-44 overflow-y-auto pr-1 text-justify whitespace-pre-wrap">
                                 Buscando os textos litúrgicos da mesa da Palavra...
                             </div>
                         </div>
@@ -360,7 +360,11 @@
         sincronizarVisualBotao(modificadoParaDark);
     });
 
-    function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
+    function hideLoading() { 
+        if(telaLoading) {
+            telaLoading.classList.add('opacity-0', 'pointer-events-none'); 
+        }
+    }
 
     onSnapshot(doc(db, "configuracoes", "flags_sistema"), (snapshot) => {
         if (snapshot.exists()) {
@@ -390,23 +394,30 @@
     });
 
     onAuthStateChanged(auth, async (user) => {
-        const devSession = sessionStorage.getItem("dev_user");
-        if(devSession) { 
-            usuarioLogadoDados = JSON.parse(devSession); 
-            inicializarPainelAcolito(); 
-        } else if(user) {
-            const docSnap = await getDoc(doc(db, "usuarios", user.uid));
-            if(docSnap.exists()) { 
-                usuarioLogadoDados = docSnap.data(); 
+        try {
+            const devSession = sessionStorage.getItem("dev_user");
+            if(devSession) { 
+                usuarioLogadoDados = JSON.parse(devSession); 
                 inicializarPainelAcolito(); 
+            } else if(user) {
+                const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+                if(docSnap.exists()) { 
+                    usuarioLogadoDados = docSnap.data(); 
+                    inicializarPainelAcolito(); 
+                } else { 
+                    signOut(auth); 
+                    window.location.href = "index.html"; 
+                    return;
+                }
             } else { 
-                signOut(auth); 
                 window.location.href = "index.html"; 
+                return;
             }
-        } else { 
-            window.location.href = "index.html"; 
+        } catch (error) {
+            console.error("Erro na autenticação:", error);
+        } finally {
+            setTimeout(hideLoading, 500);
         }
-        setTimeout(hideLoading, 500);
     });
 
     function inicializarPainelAcolito() {
@@ -778,7 +789,9 @@
                 throw new Error();
             }
         } catch (e) { 
-            document.getElementById('liturgia-texto-corpo').innerText = "Consulta offline ou instabilidade na API de Liturgias."; 
+            console.error("Erro ao carregar liturgia:", e);
+            const corpoEl = document.getElementById('liturgia-texto-corpo');
+            if (corpoEl) corpoEl.innerText = "Consulta offline ou instabilidade na API de Liturgias."; 
         }
     }
 
@@ -797,18 +810,27 @@
             }
         });
 
-        if(subTabName === '1leitura' && cacheLiturgiaDados.primeiraLeitura) {
-            refEl.innerText = cacheLiturgiaDados.primeiraLeitura.referencia || "Primeira Leitura";
-            corpoEl.innerText = cacheLiturgiaDados.primeiraLeitura.texto || "";
-        } else if(subTabName === 'salmo' && cacheLiturgiaDados.salmo) {
-            refEl.innerText = cacheLiturgiaDados.salmo.referencia || "Salmo Responsorial";
-            corpoEl.innerText = cacheLiturgiaDados.salmo.texto || "";
-        } else if(subTabName === '2leitura' && cacheLiturgiaDados.segundaLeitura) {
-            refEl.innerText = cacheLiturgiaDados.segundaLeitura.referencia || "Segunda Leitura";
-            corpoEl.innerText = cacheLiturgiaDados.segundaLeitura.texto || "";
-        } else if(subTabName === 'evangelho' && cacheLiturgiaDados.evangelho) {
-            refEl.innerText = cacheLiturgiaDados.evangelho.referencia || "Evangelho";
-            corpoEl.innerText = cacheLiturgiaDados.evangelho.texto || "";
+        let targetData = null;
+        if(subTabName === '1leitura') targetData = cacheLiturgiaDados.primeiraLeitura;
+        else if(subTabName === 'salmo') targetData = cacheLiturgiaDados.salmo;
+        else if(subTabName === '2leitura') targetData = cacheLiturgiaDados.segundaLeitura;
+        else if(subTabName === 'evangelho') targetData = cacheLiturgiaDados.evangelho;
+
+        if(targetData) {
+            refEl.innerText = targetData.referencia || "";
+            // Correção aqui: Verifica se .texto é uma string ou um array/objeto e trata adequadamente
+            if (typeof targetData.texto === 'string') {
+                corpoEl.innerText = targetData.texto;
+            } else if (Array.isArray(targetData.texto)) {
+                corpoEl.innerText = targetData.texto.join('\n');
+            } else if (targetData.texto && typeof targetData.texto === 'object') {
+                corpoEl.innerText = JSON.stringify(targetData.texto);
+            } else {
+                corpoEl.innerText = "Texto não disponível.";
+            }
+        } else {
+            refEl.innerText = "Não disponível";
+            corpoEl.innerText = "Nenhum texto associado a esta aba.";
         }
         corpoEl.scrollTop = 0;
     }
