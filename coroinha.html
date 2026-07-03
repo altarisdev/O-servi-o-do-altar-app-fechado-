@@ -493,27 +493,32 @@ window.reproduzirVideoFormacao = function(url) {
     
     if(!containerMidia || !placeholder) return;
     
-    // Extração do ID (mantendo a lógica que criamos)
+    // Identifica o ID do vídeo para criar a thumbnail e o link
     const videoId = url.includes('youtu.be/') ? url.split('youtu.be/')[1].split(/[?#]/)[0] : url.split('v=')[1].split('&')[0];
-    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0`;
-
-    // ESCONDE O PLACEHOLDER
+    
     placeholder.classList.add('hidden');
     containerMidia.classList.remove('hidden');
-
-    // CRIA O IFRAME DE FORMA SEGURA
-    const iframe = document.createElement('iframe');
-    iframe.src = embedUrl;
-    iframe.className = "w-full h-full";
-    iframe.setAttribute('frameborder', '0');
-    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-    iframe.setAttribute('allowfullscreen', 'true');
-
-    // Limpa o container e insere o novo elemento
     containerMidia.innerHTML = "";
-    containerMidia.appendChild(iframe);
-};
 
+    // Criamos uma interface visual que não gera erro de "ID de reprodução"
+    containerMidia.style.display = "flex";
+    containerMidia.style.flexDirection = "column";
+    containerMidia.style.alignItems = "center";
+    containerMidia.style.justifyContent = "center";
+    containerMidia.style.background = "#000";
+    containerMidia.style.color = "#fff";
+    containerMidia.style.minHeight = "200px";
+
+    containerMidia.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+            <p style="margin-bottom: 15px;">Deseja assistir a este vídeo?</p>
+            <a href="${url}" target="_blank" 
+               style="padding: 10px 20px; background: #e62117; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+               Abrir no YouTube
+            </a>
+        </div>
+    `;
+};
 
     function ouvirColecaoConteudos() {
         const container = document.getElementById('lista-materials-formacao');
