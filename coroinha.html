@@ -202,7 +202,7 @@
                         <!-- Container de Textos Litúrgicos Dinâmicos -->
                         <div class="bg-amber-50/30 dark:bg-amber-950/10 p-4 rounded-2xl border border-amber-100/50 dark:border-amber-900/20">
                             <span id="liturgia-texto-referencia" class="block text-[9px] font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-1.5">Carregando...</span>
-                            <div id="liturgia-texto-corpo" class="text-xs text-slate-600 dark:text-zinc-400 font-medium leading-relaxed h-56 overflow-y-auto pr-1 text-justify whitespace-pre-wrap">
+                            <div id="liturgia-texto-corpo" class="text-xs text-slate-600 dark:text-zinc-400 font-medium leading-relaxed min-h-48 h-auto max-h-96 overflow-y-auto pr-1 text-justify whitespace-pre-line">
                                 Buscando os textos litúrgicos da mesa da Palavra...
                             </div>
                         </div>
@@ -753,8 +753,9 @@
     };
 
     buscaEscalaData?.addEventListener('change', renderizarEscalaGeralPorData);
-// Liturgia CNBB 
-       async function carregarLiturgiaDoDia() {
+
+    // Liturgia CNBB 
+    async function carregarLiturgiaDoDia() {
         try {
             const r = await fetch('https://liturgia.up.railway.app/'); 
             if (!r.ok) throw new Error();
@@ -762,7 +763,6 @@
             
             if (apiData) {
                 let tituloSemana = apiData.liturgia || "Tempo Litúrgico";
-                // CORREÇÃO: Evita anular o texto caso seja uma celebração do Tempo Comum/Féria
                 let santoDoDia = apiData.data || "Dia (Sem memória litúrgica específica)";
 
                 cacheLiturgiaDados = {
@@ -829,12 +829,6 @@
         const corpoEl = document.getElementById('liturgia-texto-corpo');
         const mapeamentoAbas = ['1leitura', 'salmo', '2leitura', 'evangelho'];
 
-        // CORREÇÃO: Remove o 'h-56' e deixa o container expandir naturalmente de acordo com o tamanho do texto
-        if (corpoEl) {
-            corpoEl.classList.remove('h-56');
-            corpoEl.classList.add('min-h-48', 'h-auto');
-        }
-
         mapeamentoAbas.forEach(aba => {
             const btn = document.getElementById(`subtab-${aba}`);
             if(btn) {
@@ -860,8 +854,7 @@
                 
                 if (targetData.texto) {
                     if (typeof targetData.texto === 'string') {
-                        // CORREÇÃO: Aplica quebra de linhas para strings brutas
-                        salmoHtml += `<div class="space-y-2 text-justify" style="white-space: pre-line;">${targetData.texto}</div>`;
+                        salmoHtml += `<div class="space-y-2 text-justify">${targetData.texto}</div>`;
                     } else if (Array.isArray(targetData.texto)) {
                         salmoHtml += `<div class="space-y-2 text-justify">${targetData.texto.join('<br>')}</div>`;
                     } else {
@@ -874,8 +867,7 @@
             } else {
                 if (targetData.texto) {
                     if (typeof targetData.texto === 'string') {
-                        // CORREÇÃO: Garante formatação correta para leituras e evangelho
-                        corpoEl.innerHTML = `<div style="white-space: pre-line;">${targetData.texto}</div>`;
+                        corpoEl.innerHTML = `<div>${targetData.texto}</div>`;
                     } else if (Array.isArray(targetData.texto)) {
                         corpoEl.innerHTML = targetData.texto.join('<br>');
                     } else if (typeof targetData.texto === 'object') {
