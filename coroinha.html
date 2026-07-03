@@ -16,7 +16,7 @@
         /* Fundo Litúrgico - Padrão Sacro */
         .bg-sacro-dourado {
             background-color: #f8fafc;
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC-4ek0zNiA5OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek04MCAzOWgxNXYySDQwek06NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSIxIi8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC-4ek0zNiA5OGg4djloLTh6TTE4IDM2aDJ2OGgtMnpNNTggMzZoMnY4aC0yeiIvPjwvZz48L3N2Zz4=");
         }
 
         .dark .bg-sacro-dourado {
@@ -107,7 +107,7 @@
                 <div class="p-6 border-b border-slate-100 dark:border-zinc-800/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h3 class="text-base font-black text-slate-800 dark:text-zinc-100 tracking-tight">Painel Geral de Escalas</h3>
-                        <p class="text-[11px] text-slate-400 dark:text-zinc-400 font-medium mt-0.5">Confirme sua vaga ou assuma uma escala livre/substituição disponível.</p>
+                        <p class="text-[11px] text-slate-400 dark:text-zinc-400 font-medium mt-0.5">Confirme sua vaga ou assuma uma scale livre/substituição disponível.</p>
                     </div>
                     <div class="flex items-center gap-2.5 w-full sm:w-auto">
                         <span class="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider whitespace-nowrap">Data:</span>
@@ -274,6 +274,10 @@
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // FLAG DE MANUTENÇÃO MANUAL DO CÓDIGO
+    // Mude para 'true' para forçar a tela de manutenção ou 'false' para seguir o Firestore
+    const MANUTENCAO_FORCADA = false;
+
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
         authDomain: "tarcisius-d03d7.firebaseapp.com",
@@ -333,9 +337,11 @@
 
     function hideLoading() { if(telaLoading) telaLoading.classList.add('opacity-0', 'pointer-events-none'); }
 
-    // Ouvinte ativo do Estado de Manutenção Geral do Sistema
+    // Ouvinte do Estado de Manutenção Geral unificado com a Flag Local do Código
     onSnapshot(doc(db, "configuracoes", "manutencao"), (snapshot) => {
-        if (snapshot.exists() && snapshot.data().ativo === true) {
+        const manutencaoBancoAtiva = snapshot.exists() && snapshot.data().ativo === true;
+        
+        if (MANUTENCAO_FORCADA === true || manutencaoBancoAtiva === true) {
             telaManutencao.classList.remove('hidden');
         } else {
             telaManutencao.classList.add('hidden');
