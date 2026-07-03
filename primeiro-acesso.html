@@ -9,7 +9,6 @@
 </head>
 <body class="bg-gray-100 font-sans min-h-screen flex items-center justify-center p-4">
 
-    <!-- Tela de Carregamento -->
     <div id="tela-loading" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-none opacity-0">
         <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-amber-700 mb-4"></div>
         <p class="text-xs font-semibold text-gray-500 tracking-wider uppercase">Criando sua credencial de altar...</p>
@@ -21,63 +20,64 @@
                 <i class="fa-solid fa-user-plus"></i>
             </div>
             <h1 class="text-2xl font-black text-gray-800 tracking-tight">Primeiro Acesso</h1>
-            <p class="text-xs text-gray-500 font-medium">Cadastre seu perfil de Coroinha / Acólito no sistema</p>
+            <p class="text-xs text-gray-500 font-medium">Cadastre seu perfil no sistema Altaris</p>
         </div>
 
         <form id="form-cadastro" class="space-y-4">
-            <!-- VALIDAÇÃO DO CÓDIGO -->
             <div>
                 <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Código do Coordenador</label>
                 <div class="relative">
                     <i class="fa-solid fa-key absolute left-3 top-3.5 text-gray-400 text-xs"></i>
-                    <input type="text" id="cad-codigo" required placeholder="Digite o token fornecido pela coordenação" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium uppercase">
+                    <input type="text" id="cad-codigo" required placeholder="Token da coordenação" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium uppercase">
                 </div>
             </div>
 
             <hr class="border-gray-100 my-2">
 
-            <!-- DADOS DO COROINHA -->
+            <!-- NOVO: SELEÇÃO DE PERFIL -->
+            <div>
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tipo de Acesso</label>
+                <select id="cad-tipo" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium" onchange="toggleCampoVinculo()">
+                    <option value="Coroinha">Coroinha / Acólito</option>
+                    <option value="Pai">Responsável (Pais)</option>
+                </select>
+            </div>
+
+            <!-- NOVO: CAMPO DE VÍNCULO -->
+            <div id="container-vinculo" class="hidden">
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nome do Coroinha (Filho)</label>
+                <input type="text" id="cad-vinculo" placeholder="Nome completo do filho" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium">
+            </div>
+
             <div>
                 <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Seu Nome Completo</label>
-                <div class="relative">
-                    <i class="fa-solid fa-user absolute left-3 top-3.5 text-gray-400 text-xs"></i>
-                    <input type="text" id="cad-nome" required placeholder="Ex: João Silva Santos" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium">
-                </div>
+                <input type="text" id="cad-nome" required placeholder="Ex: João Silva" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium">
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">E-mail para Login</label>
-                <div class="relative">
-                    <i class="fa-solid fa-envelope absolute left-3 top-3.5 text-gray-400 text-xs"></i>
-                    <input type="email" id="cad-email" required placeholder="seuemail@provedor.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium">
-                </div>
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">E-mail</label>
+                <input type="email" id="cad-email" required placeholder="seuemail@exemplo.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium">
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Crie uma Senha</label>
-                <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-3 top-3.5 text-gray-400 text-xs"></i>
-                    <input type="password" id="cad-senha" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium">
-                </div>
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Senha</label>
+                <input type="password" id="cad-senha" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-amber-600 transition-all font-medium">
             </div>
 
-            <!-- Avisos de Erro / Sucesso -->
             <div id="msg-erro" class="hidden text-xs bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-lg font-semibold flex items-center gap-2">
-                <i class="fa-solid fa-triangle-exclamation"></i> <span id="msg-erro-texto">Código de validação incorreto.</span>
+                <i class="fa-solid fa-triangle-exclamation"></i> <span id="msg-erro-texto">Erro.</span>
             </div>
             <div id="msg-sucesso" class="hidden text-xs bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-lg font-semibold flex items-center gap-2">
                 <i class="fa-solid fa-circle-check"></i> <span>Cadastro realizado! Redirecionando...</span>
             </div>
 
-            <button type="submit" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-3 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer text-sm tracking-wide">
-                Finalizar Cadastro <i class="fa-solid fa-check ml-1"></i>
+            <button type="submit" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-3 rounded-xl shadow-md transition-all cursor-pointer text-sm tracking-wide">
+                Finalizar Cadastro
             </button>
         </form>
 
         <div class="text-center mt-4">
-            <a href="index.html" class="text-gray-500 hover:text-amber-700 text-xs font-bold transition-colors">
-                <i class="fa-solid fa-arrow-left mr-1"></i> Voltar para a tela de Login
-            </a>
+            <a href="index.html" class="text-gray-500 hover:text-amber-700 text-xs font-bold transition-colors">Voltar para Login</a>
         </div>
     </div>
 
@@ -86,9 +86,7 @@
     import { getAuth, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Modifique esta constante para definir o código secreto que os coroinhas usarão para se cadastrar!
     const CODIGO_VALIDACAO_COORDEANDOR = "ALTAR2026";
-
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
         authDomain: "tarcisius-d03d7.firebaseapp.com",
@@ -98,81 +96,59 @@
         appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
     };
 
-    // Inicialização padrão do App
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const authSecundario = getAuth(initializeApp(firebaseConfig, "SecondaryAuthInstance"));
 
-    // Inicialização SECUNDÁRIA isolada para realizar o cadastro sem quebrar sessões administrativas ativas no dispositivo
-    const appSecundario = initializeApp(firebaseConfig, "SecondaryAuthInstance");
-    const authSecundario = getAuth(appSecundario);
+    // Exibir/Ocultar campo de vínculo
+    window.toggleCampoVinculo = () => {
+        const tipo = document.getElementById('cad-tipo').value;
+        document.getElementById('container-vinculo').classList.toggle('hidden', tipo !== 'Pai');
+    };
 
     const formCadastro = document.getElementById('form-cadastro');
-    const telaLoading = document.getElementById('tela-loading');
-    const msgErro = document.getElementById('msg-erro');
-    const msgErroTexto = document.getElementById('msg-erro-texto');
-    const msgSucesso = document.getElementById('msg-sucesso');
+    formCadastro.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const codigo = document.getElementById('cad-codigo').value.trim().toUpperCase();
+        if (codigo !== CODIGO_VALIDACAO_COORDEANDOR) {
+            document.getElementById('msg-erro-texto').innerText = "Código do Coordenador inválido!";
+            document.getElementById('msg-erro').classList.remove('hidden');
+            return;
+        }
 
-    function showLoading() { if(telaLoading) telaLoading.classList.replace('opacity-0', 'opacity-100'); }
-    function hideLoading() { if(telaLoading) telaLoading.classList.replace('opacity-100', 'opacity-0'); }
+        document.getElementById('tela-loading').classList.replace('opacity-0', 'opacity-100');
+        
+        try {
+            const email = document.getElementById('cad-email').value.trim().toLowerCase();
+            const senha = document.getElementById('cad-senha').value.trim();
+            const tipo = document.getElementById('cad-tipo').value;
+            const nome = document.getElementById('cad-nome').value.trim();
+            
+            const cred = await createUserWithEmailAndPassword(authSecundario, email, senha);
+            
+            const dadosUsuario = {
+                uid: cred.user.uid,
+                nome: nome,
+                email: email,
+                funcao: tipo
+            };
 
-    if(formCadastro) {
-        formCadastro.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(msgErro) msgErro.classList.add('hidden');
-            if(msgSucesso) msgSucesso.classList.add('hidden');
-
-            const codigoInput = document.getElementById('cad-codigo').value.trim().toUpperCase();
-            const nomeInput = document.getElementById('cad-nome').value.trim();
-            const emailInput = document.getElementById('cad-email').value.trim().toLowerCase();
-            const senhaInput = document.getElementById('cad-senha').value.trim();
-
-            // 1. Validação de token de segurança da paróquia
-            if (codigoInput !== CODIGO_VALIDACAO_COORDEANDOR) {
-                if(msgErroTexto) msgErroTexto.innerText = "Código do Coordenador inválido! Solicite o token correto.";
-                if(msgErro) msgErro.classList.remove('hidden');
-                return;
+            if (tipo === "Pai") {
+                dadosUsuario.coroinhaVinculado = document.getElementById('cad-vinculo').value.trim();
             }
 
-            showLoading();
+            await setDoc(doc(db, "usuarios", cred.user.uid), dadosUsuario);
+            await signOut(authSecundario);
 
-            try {
-                // 2. Criação do usuário no Firebase Auth (usando a instância limpa)
-                const credencial = await createUserWithEmailAndPassword(authSecundario, emailInput, senhaInput);
-                const novoUID = credencial.user.uid;
-
-                // 3. Salvamento do documento estruturado do coroinha no Firestore principal
-                await setDoc(doc(db, "usuarios", novoUID), {
-                    uid: novoUID,
-                    nome: nomeInput,
-                    email: emailInput,
-                    funcao: "Coroinha" // Define automaticamente o nível de acesso básico
-                });
-
-                // 4. Limpa o token temporário da instância isolada para evitar conflitos futuros
-                await signOut(authSecundario);
-
-                if(msgSucesso) msgSucesso.classList.remove('hidden');
-                
-                // Redireciona o coroinha para o login após 2 segundos
-                setTimeout(() => {
-                    window.location.href = "index.html";
-                }, 2000);
-
-            } catch (err) {
-                hideLoading();
-                if(msgErro) msgErro.classList.remove('hidden');
-                if(msgErroTexto) {
-                    if (err.code === "auth/email-already-in-check" || err.code === "auth/email-already-in-use") {
-                        msgErroTexto.innerText = "Este e-mail já está cadastrado em nossa comunidade.";
-                    } else if (err.code === "auth/weak-password") {
-                        msgErroTexto.innerText = "A senha deve conter pelo menos 6 caracteres.";
-                    } else {
-                        msgErroTexto.innerText = "Erro ao processar cadastro: " + err.message;
-                    }
-                }
-            }
-        });
-    }
+            document.getElementById('msg-sucesso').classList.remove('hidden');
+            setTimeout(() => { window.location.href = "index.html"; }, 2000);
+        } catch (err) {
+            document.getElementById('tela-loading').classList.replace('opacity-100', 'opacity-0');
+            document.getElementById('msg-erro-texto').innerText = "Erro: " + err.message;
+            document.getElementById('msg-erro').classList.remove('hidden');
+        }
+    });
 </script>
 </body>
 </html>
