@@ -299,22 +299,21 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
-    authDomain: "tarcisius-d03d7.firebaseapp.com",
-    projectId: "tarcisius-d03d7",
-    storageBucket: "tarcisius-d03d7.firebasestorage.app",
-    messagingSenderId: "186797936591",
-    appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
+        authDomain: "tarcisius-d03d7.firebaseapp.com",
+        projectId: "tarcisius-d03d7",
+        storageBucket: "tarcisius-d03d7.firebasestorage.app",
+        messagingSenderId: "186797936591",
+        appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
+    };
 
-const app = initializeApp(firebaseConfig); 
-const auth = getAuth(app); 
-const db = getFirestore(app);
-
+    const app = initializeApp(firebaseConfig); 
+    const auth = getAuth(app); 
+    const db = getFirestore(app);
 
     const telaLoading = document.getElementById('tela-loading');
     const telaManutencao = document.getElementById('tela-manutencao');
@@ -331,7 +330,7 @@ const db = getFirestore(app);
 
     let usuarioLogadoDados = null; 
     let todasEscalasCache = [];
-    let cacheLiturgiaDados = null; // Armazena os nós da liturgia completa
+    let cacheLiturgiaDados = null; 
 
     function sincronizarVisualBotao(isDark) {
         if (darkModeThumb) {
@@ -425,7 +424,7 @@ const db = getFirestore(app);
         ouvirTodasAsEscalas();
         carregarLiturgiaDoDia();
         inicializarLeitorBiblia();
-        if(window.innerWidth < 768) { switchTab('escala'); }
+        if(window.innerWidth < 768) { window.switchTab('escala'); }
     }
 
     if(btnLogout) {
@@ -542,11 +541,11 @@ const db = getFirestore(app);
                 respondidoEm: Date.now()
             };
             await updateDoc(refDoc, atualizacaoEstruturada);
-            cardEnqueteDisponibilidade.classList.add('hidden'); // Oculta o card imediatamente
+            cardEnqueteDisponibilidade.classList.add('hidden'); 
             alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
         } catch (error) {
             await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
-            cardEnqueteDisponibilidade.classList.add('hidden'); // Oculta o card imediatamente
+            cardEnqueteDisponibilidade.classList.add('hidden'); 
             alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
         }
     });
@@ -755,22 +754,18 @@ const db = getFirestore(app);
             if (data) {
                 cacheLiturgiaDados = data;
                 
-                // 1. Atualizar Cor Litúrgica
                 const corBadge = document.getElementById('liturgia-cor-badge');
                 if(corBadge && data.cor) {
                     corBadge.innerText = data.cor;
-                    // Ajuste de cores básicas visuais com base no retorno da API
                     if(data.cor.toLowerCase().includes('verde')) corBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400";
                     else if(data.cor.toLowerCase().includes('vermelho')) corBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400";
                     else if(data.cor.toLowerCase().includes('branco')) corBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-stone-100 text-stone-800 dark:bg-stone-800 dark:text-stone-300";
                     else if(data.cor.toLowerCase().includes('roxo')) corBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-400";
                 }
 
-                // 2. Atualizar Santo do dia
                 const santoTxt = document.getElementById('liturgia-santo-dia');
                 if(santoTxt) santoTxt.innerText = data.santo || "Feria do Tempo Comum";
 
-                // 3. Verificar existência da segunda leitura para exibir o botão ou não
                 const btn2Leitura = document.getElementById('subtab-2leitura');
                 if(data.segundaLeitura && data.segundaLeitura.texto) {
                     btn2Leitura.classList.remove('hidden');
@@ -778,8 +773,7 @@ const db = getFirestore(app);
                     btn2Leitura.classList.add('hidden');
                 }
 
-                // Carrega por padrão a primeira leitura na interface
-                switchSubTab('1leitura');
+                window.switchSubTab('1leitura');
             } else {
                 throw new Error();
             }
