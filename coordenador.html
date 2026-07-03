@@ -507,8 +507,6 @@
             renderizarInterfaceChamada();
             
             if(chkPossuiIrmao && chkPossuiIrmao.checked) { atualizarListboxMembros(); }
-            // Se o editor de escalas estiver aberto, atualiza as listas para refletir novos usuários cadastrados
-            if(editorEscalaData && editorEscalaData.value) { carregarEditorEscalasPorData(editorEscalaData.value); }
         }, (error) => {
             console.error("Erro ao escutar usuários:", error);
         });
@@ -850,8 +848,16 @@
         return opcoes;
     }
 
+    // Ouvinte nativo no input de data para evitar concorrência com loops
+    editorEscalaData?.addEventListener('change', (e) => {
+        carregarEditorEscalasPorData(e.target.value);
+    });
+
     async function carregarEditorEscalasPorData(dataString) {
         if(!containerEditoresMissa) return; 
+        
+        // CORREÇÃO DA DUPLICAÇÃO: O contêiner é limpo IMEDIATAMENTE no início da chamada, 
+        // antes de aguardar a resposta assíncrona do Firestore.
         containerEditoresMissa.innerHTML = "";
         let fnd = false;
 
@@ -938,7 +944,7 @@
                             turibuloAtivo: chkTuri, navetaAtiva: chkNave,
                             "turiferario.nome": turi, "naveteiro.nome": nave
                         });
-                        alert("Escala atualizada com sucesso!");
+                        alert("Escala updated!");
                     } catch(err) { alert("Erro ao atualizar dados: " + err.message); }
                 });
             });
