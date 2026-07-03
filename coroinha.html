@@ -299,22 +299,22 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
-    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
-        authDomain: "tarcisius-d03d7.firebaseapp.com",
-        projectId: "tarcisius-d03d7",
-        storageBucket: "tarcisius-d03d7.firebasestorage.app",
-        messagingSenderId: "186797936591",
-        appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
-    };
+const firebaseConfig = {
+    apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
+    authDomain: "tarcisius-d03d7.firebaseapp.com",
+    projectId: "tarcisius-d03d7",
+    storageBucket: "tarcisius-d03d7.firebasestorage.app",
+    messagingSenderId: "186797936591",
+    appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
+};
 
-    const app = initializeApp(firebaseConfig); 
-    const auth = getAuth(app); 
-    const db = getFirestore(app);
+const app = initializeApp(firebaseConfig); 
+const auth = getAuth(app); 
+const db = getFirestore(app);
+
 
     const telaLoading = document.getElementById('tela-loading');
     const telaManutencao = document.getElementById('tela-manutencao');
