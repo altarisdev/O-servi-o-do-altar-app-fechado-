@@ -380,7 +380,7 @@
         selectIrmaoTitular.innerHTML = '<option value="">Selecione um membro...</option>';
         cacheTodosUsuarios.filter(u => {
             const f = (u.funcao || '').toLowerCase();
-            return f !== "coordenador" && f !== "mestre";
+            return f !== "coordenador" && f !== "mestre" && f !== "responsavel";
         }).forEach(u => {
             const opt = document.createElement('option'); 
             opt.value = u.email; 
@@ -399,7 +399,7 @@
                 const docSnap = await getDoc(doc(db, "usuarios", user.uid));
                 if (docSnap.exists()) {
                     const func = (docSnap.data().funcao || '').toLowerCase();
-                    if (func === "coordenador" || func === "mestre") {
+                    if (func === "coordenador" || func === "mestre"|| func === "responsavel") {
                         usuarioLogadoDados = docSnap.data(); 
                         inicializarPainel(); 
                     } else {
