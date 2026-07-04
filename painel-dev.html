@@ -101,22 +101,32 @@
                 
                 <div id="conteuda-aba-usuarios" class="aba-dev-conteudo ativa space-y-4">
                     <div class="bg-stone-950 border border-stone-800 p-4 rounded-xl space-y-3 shadow-inner">
-                        <h4 class="text-xs font-bold text-amber-500 uppercase tracking-wider">Engine de Modificação de Matrículas</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[10px] text-stone-500 font-bold mb-1">Usuário Alvo</label>
-                                <select id="dev-select-usuarios" class="w-full bg-stone-900 border border-stone-800 rounded-xl p-2 text-xs text-stone-200 outline-none"></select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-stone-500 font-bold mb-1">Mudar Posto</label>
-                                <select id="dev-nova-funcao" class="w-full bg-stone-900 border border-stone-800 rounded-xl p-2 text-xs text-amber-400 font-bold outline-none">
-                                    <option value="Coroinha">Coroinha</option>
-                                    <option value="Responsavel">Pai/Responsável</option>
-                                    <option value="Mestre">Padre</option>
-                                    <option value="Coordenador">Coordenador</option>
-                                </select>
-                            </div>
-                        </div>
+    <h4 class="text-xs font-bold text-amber-500 uppercase tracking-wider">Engine de Modificação de Matrículas</h4>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+            <label class="block text-[10px] text-stone-500 font-bold mb-1">Usuário Alvo (Quem vai ser vinculado)</label>
+            <select id="dev-select-usuarios" class="w-full bg-stone-900 border border-stone-800 rounded-xl p-2 text-xs text-stone-200 outline-none"></select>
+        </div>
+        <div>
+            <label class="block text-[10px] text-stone-500 font-bold mb-1">E-mail do Responsável (Alvo do vínculo)</label>
+            <input type="email" id="dev-email-vinculo" placeholder="email@exemplo.com" class="w-full bg-stone-900 border border-stone-800 rounded-xl p-2 text-xs text-stone-200 outline-none">
+        </div>
+        <div>
+            <label class="block text-[10px] text-stone-500 font-bold mb-1">Mudar Posto</label>
+            <select id="dev-nova-funcao" class="w-full bg-stone-900 border border-stone-800 rounded-xl p-2 text-xs text-amber-400 font-bold outline-none">
+                <option value="Coroinha">Coroinha</option>
+                <option value="Responsavel">Pai/Responsável</option>
+                <option value="Mestre">Padre</option>
+                <option value="Coordenador">Coordenador</option>
+            </select>
+        </div>
+    </div>
+    <div class="flex flex-wrap gap-1.5 pt-2">
+        <button onclick="atualizarVinculoUsuario()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-emerald-500 cursor-pointer">Aplicar Alterações</button>
+        <button onclick="dispararResetSenha()" class="bg-stone-900 border border-stone-800 text-stone-300 text-xs font-bold px-3 py-1.5 rounded-lg hover:border-stone-700 cursor-pointer">Reset Senha</button>
+        <button onclick="deletarUsuarioFirestore()" class="bg-rose-950 border border-rose-900 text-rose-300 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-rose-900 cursor-pointer">Purgar DB</button>
+    </div>
+</div>
                         <div class="flex flex-wrap gap-1.5 pt-2">
                             <button onclick="alterarFuncaoUsuario()" class="bg-amber-500 text-stone-950 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-amber-400 cursor-pointer">Atualizar Cargo</button>
                             <button onclick="dispararResetSenha()" class="bg-stone-900 border border-stone-800 text-stone-300 text-xs font-bold px-3 py-1.5 rounded-lg hover:border-stone-700 cursor-pointer">Enviar Reset de Senha</button>
