@@ -66,20 +66,40 @@
         });
 
         // 2. Carregar Filhos (Busca usuários onde email_conexao seja o email do pai logado)
-        const q = query(collection(db, "usuarios"), where("email_conexao", "==", user.email));
-        const querySnapshot = await getDocs(q);
-        const listaFilhos = document.getElementById('lista-filhos');
-        
-        if (querySnapshot.empty) {
-            listaFilhos.innerHTML = `<p class="text-xs text-slate-400">Nenhum dependente vinculado a este e-mail.</p>`;
-        } else {
-            listaFilhos.innerHTML = querySnapshot.docs.map(doc => `
-                <div class="p-4 bg-slate-50 rounded-xl border flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-700">${doc.data().nome}</span>
-                    <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full font-bold uppercase">Coroinha</span>
+        // Dentro do onAuthStateChanged(auth, async (user) => { ... })
+// Substitua a lógica de busca de filhos por esta:
+
+const q = query(
+    collection(db, "usuarios"), 
+    where("email_conexao", "==", user.email)
+);
+
+const querySnapshot = await getDocs(q);
+const listaFilhos = document.getElementById('lista-filhos');
+
+if (querySnapshot.empty) {
+    listaFilhos.innerHTML = `
+        <div class="text-center py-6">
+            <i class="fa-solid fa-user-slash text-slate-300 text-3xl mb-2"></i>
+            <p class="text-xs text-slate-400">Nenhum acólito vinculado a este e-mail.</p>
+            <p class="text-[10px] text-slate-400 mt-1">Verifique com o coordenador se seu e-mail foi cadastrado corretamente.</p>
+        </div>`;
+} else {
+    listaFilhos.innerHTML = querySnapshot.docs.map(doc => {
+        const dados = doc.data();
+        return `
+            <div class="p-4 bg-white border border-slate-100 rounded-2xl flex justify-between items-center shadow-sm">
+                <div>
+                    <p class="text-xs font-bold text-slate-800">${dados.nome}</p>
+                    <p class="text-[10px] text-slate-400 uppercase font-semibold mt-0.5">${dados.funcao || 'Coroinha'}</p>
                 </div>
-            `).join('');
-        }
+                <div class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase">
+                    Vinculado
+                </div>
+            </div>
+        `;
+    }).join('');
+}
     });
 
     document.getElementById('btn-logout').onclick = () => signOut(auth).then(() => window.location.href = "index.html");
