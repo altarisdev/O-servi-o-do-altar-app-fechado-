@@ -781,18 +781,26 @@ window.reproduzirVideoFormacao = function(url) {
     }
 
     window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
-        if(!idDocEscala || !campoFuncao) return;
-        const refDoc = doc(db, "escalas", idDocEscala);
-        const dUp = {};
-        dUp[`${campoFuncao}.status`] = novoStatus;
+    if(!idDocEscala || !campoFuncao) return;
+    
+    // 1. Feedback visual imediato (Otimista)
+    const btnConfirmar = document.querySelector(`button[onclick*="votarPresencaItem('${idDocEscala}', '${campoFuncao}', 'Confirmado')"]`);
+    if(btnConfirmar) btnConfirmar.disabled = true; // Evita cliques duplos
 
-        try {
-            await updateDoc(refDoc, dUp);
-            alert(novoStatus === "Confirmado" ? "Presença confirmada com sucesso! Bom serviço." : "Substituição solicitada no mural geral com sucesso.");
-        } catch (error) {
-            await setDoc(refDoc, dUp, { merge: true });
-        }
-    };
+    const refDoc = doc(db, "escalas", idDocEscala);
+    const dUp = {};
+    dUp[`${campoFuncao}.status`] = novoStatus;
+
+    try {
+        // 2. Executa a atualização
+        await updateDoc(refDoc, dUp);
+        // O onSnapshot cuidará de atualizar a tela automaticamente.
+    } catch (error) {
+        console.error("Erro ao confirmar:", error);
+        alert("Erro ao salvar. Verifique sua conexão.");
+        if(btnConfirmar) btnConfirmar.disabled = false;
+    }
+};
 
     window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
         if(!idDocEscala || !campoFuncao) return;
