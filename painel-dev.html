@@ -374,16 +374,28 @@
     }
 
     // OPERAÇÕES DE MUTAÇÕES DE USUÁRIOS & CONFIGURAÇÕES
-    window.alterarFuncaoUsuario = async function() {
-        await esperarRedeSimulada();
-        const id = document.getElementById('dev-select-usuarios').value;
-        const fn = document.getElementById('dev-nova-funcao').value;
-        try {
-            await updateDoc(doc(db, "usuarios", id), { funcao: fn });
-            registrarLogTerminal(`Membro UID [${id}] promovido a ${fn}.`, "SUCESSO");
-            inicializarPainelDesenvolvedor();
-        } catch(e) { registrarLogTerminal(e.message, "ERRO"); }
-    };
+    window.atualizarVinculoUsuario = async function() {
+    await esperarRedeSimulada();
+    const id = document.getElementById('dev-select-usuarios').value;
+    const novaFuncao = document.getElementById('dev-nova-funcao').value;
+    const novoEmailVinculo = document.getElementById('dev-email-vinculo').value.trim();
+    
+    try {
+        const updateData = { funcao: novaFuncao };
+        
+        // Só atualiza o vínculo se um e-mail tiver sido digitado
+        if (novoEmailVinculo !== "") {
+            updateData.email_conexao = novoEmailVinculo;
+        }
+
+        await updateDoc(doc(db, "usuarios", id), updateData);
+        
+        registrarLogTerminal(`Usuário [${id}] atualizado: Cargo=${novaFuncao}, Vínculo=${novoEmailVinculo || 'Nenhum'}`, "SUCESSO");
+        inicializarPainelDesenvolvedor(); // Recarrega a lista
+    } catch(e) { 
+        registrarLogTerminal("Erro ao atualizar vínculo: " + e.message, "ERRO"); 
+    }
+};
 
     window.dispararResetSenha = async function() {
         const id = document.getElementById('dev-select-usuarios').value;
