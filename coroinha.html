@@ -781,24 +781,24 @@ window.reproduzirVideoFormacao = function(url) {
     }
 
     window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
-    if(!idDocEscala || !campoFuncao) return;
+    if(!idDocEscala || !campoFuncao) {
+        alert("Erro técnico: ID da escala ou função não encontrado.");
+        return;
+    }
     
-    // 1. Feedback visual imediato (Otimista)
-    const btnConfirmar = document.querySelector(`button[onclick*="votarPresencaItem('${idDocEscala}', '${campoFuncao}', 'Confirmado')"]`);
-    if(btnConfirmar) btnConfirmar.disabled = true; // Evita cliques duplos
-
+    console.log("Tentando atualizar:", idDocEscala, campoFuncao, novoStatus);
+    
     const refDoc = doc(db, "escalas", idDocEscala);
     const dUp = {};
     dUp[`${campoFuncao}.status`] = novoStatus;
 
     try {
-        // 2. Executa a atualização
         await updateDoc(refDoc, dUp);
-        // O onSnapshot cuidará de atualizar a tela automaticamente.
+        console.log("Sucesso!");
     } catch (error) {
-        console.error("Erro ao confirmar:", error);
-        alert("Erro ao salvar. Verifique sua conexão.");
-        if(btnConfirmar) btnConfirmar.disabled = false;
+        console.error("ERRO COMPLETO DO FIREBASE:", error);
+        // Isso vai mostrar a mensagem real do Firebase (ex: permission-denied, not-found)
+        alert("Erro no Firebase: " + error.code + " - " + error.message);
     }
 };
 
