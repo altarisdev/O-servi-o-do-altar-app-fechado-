@@ -55,12 +55,10 @@
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = "index.html"; return; }
         
-        // 1. Carregar Mural
         onSnapshot(collection(db, "mural"), (snap) => {
             document.getElementById('mural-avisos').innerHTML = snap.docs.map(d => `<p class="mb-2 border-b pb-1">${d.data().texto}</p>`).join('');
         });
 
-        // 2. Buscar Filhos e suas Escalas
         const qUsuarios = query(collection(db, "usuarios"), where("email_conexao", "==", user.email));
         const snapUsuarios = await getDocs(qUsuarios);
         const listaEscalas = document.getElementById('lista-escalas-filhos');
@@ -71,8 +69,6 @@
         }
 
         const filhos = snapUsuarios.docs.map(d => d.data().nome);
-        
-        // Busca todas as escalas do Firestore
         const snapEscalas = await getDocs(collection(db, "escalas"));
         let htmlFilhos = "";
 
@@ -81,10 +77,13 @@
             
             snapEscalas.forEach(doc => {
                 const data = doc.data();
-                // Percorre os campos da escala (Altar1, Altar2, etc) procurando o nome do filho
                 Object.keys(data).forEach(key => {
                     if (data[key] && data[key].nome === nomeFilho) {
-                        escalasFilho.push({ ...data, dataEscala: data.data || "Data não definida" });
+                        escalasFilho.push({ 
+                            ...data, 
+                            dataEscala: data.data || "Data não definida",
+                            horario: data.horario || "--:--" 
+                        });
                     }
                 });
             });
@@ -93,9 +92,12 @@
                 <div class="border-b pb-4">
                     <h4 class="font-bold text-emerald-800 mb-2">${nomeFilho}</h4>
                     ${escalasFilho.length > 0 ? escalasFilho.map(e => `
-                        <div class="flex justify-between bg-slate-50 p-2 rounded text-[11px] mb-1">
-                            <span>${e.dataEscala}</span>
-                            <span class="font-bold">${e.evento || 'Santa Missa'}</span>
+                        <div class="flex justify-between bg-slate-50 p-3 rounded-lg text-[11px] mb-2 items-center">
+                            <div>
+                                <span class="font-bold text-slate-700">${e.dataEscala}</span>
+                                <span class="ml-2 text-emerald-700 font-black">${e.horario}</span>
+                            </div>
+                            <span class="font-bold uppercase text-slate-500">${e.evento || 'Santa Missa'}</span>
                         </div>
                     `).join('') : '<p class="text-[10px] text-slate-400">Sem escalas registradas.</p>'}
                 </div>
