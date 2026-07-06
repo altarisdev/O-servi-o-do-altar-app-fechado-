@@ -515,19 +515,20 @@ window.reproduzirVideoFormacao = function(url) {
     
     if(!containerMidia || !placeholder) return;
     
+    // Limpa espaços em branco nas pontas que podem quebrar a leitura
+    const urlLimpa = url.trim();
     let videoId = "";
     
-    // Extrai o ID do vídeo corretamente tanto para links curtos quanto normais
-    if (url.includes('youtu.be/')) {
-        videoId = url.split('youtu.be/')[1].split(/[?#]/)[0];
-    } else if (url.includes('v=')) {
-        videoId = url.split('v=')[1].split('&')[0];
-    } else if (url.includes('embed/')) {
-        videoId = url.split('embed/')[1].split(/[?#]/)[0];
+    // Expressão regular avançada para capturar IDs do YouTube em QUALQUEER formato
+    // (watch?v=, youtu.be/, embed/, /shorts/, live/, etc.)
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/|live\/)([^#\&\?]*).*/;
+    const match = urlLimpa.match(regExp);
+    
+    if (match && match[2].length === 11) {
+        videoId = match[2];
     }
 
     if (videoId) {
-        // Se for um link válido do YouTube, injeta o iframe com o formato /embed/
         placeholder.classList.add('hidden');
         containerMidia.classList.remove('hidden');
         containerMidia.innerHTML = `
@@ -540,23 +541,21 @@ window.reproduzirVideoFormacao = function(url) {
                 allowfullscreen>
             </iframe>
         `;
-    } else if (url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm')) {
-        // Caso usem arquivos diretos de vídeo no banco
+    } else if (urlLimpa.toLowerCase().endsWith('.mp4') || urlLimpa.toLowerCase().endsWith('.webm')) {
         placeholder.classList.add('hidden');
         containerMidia.classList.remove('hidden');
         containerMidia.innerHTML = `
             <video class="w-full h-full rounded-2xl" controls autoplay>
-                <source src="${url}" type="video/mp4">
+                <source src="${urlLimpa}" type="video/mp4">
                 Seu navegador não suporta a reprodução de vídeos.
             </video>
         `;
     } else {
-        // Fallback de segurança para links externos comuns
-        alert("Este link não pôde ser embutido diretamente. Abrindo em nova aba.");
-        window.open(url, '_blank');
+        // Se realmente não for um link do YouTube (ex: um PDF ou site externo), abre em nova aba
+        alert("Este material é um link externo e será aberto em uma nova aba.");
+        window.open(urlLimpa, '_blank');
     }
 };
-
 
     function ouvirColecaoConteudos() {
         const container = document.getElementById('lista-materials-formacao');
