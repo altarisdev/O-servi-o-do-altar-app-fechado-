@@ -838,7 +838,7 @@ window.reproduzirVideoFormacao = function(url) {
         }
     };
 
-    window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
+        window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
         if(!idDocEscala || !campoFuncao) return;
         const refDoc = doc(db, "escalas", idDocEscala);
         
@@ -853,20 +853,29 @@ window.reproduzirVideoFormacao = function(url) {
             const dUp = {};
 
             if (operacao === 'Voltar') {
-                // Mantém o nome do usuário que já estava lá e muda o status para Confirmado
                 const nomeAtual = dadosAtuais[campoFuncao]?.nome || usuarioLogadoDados.nome;
                 dUp[campoFuncao] = {
                     nome: nomeAtual,
                     status: "Confirmado"
                 };
+                // Remove o rastro se o dono original voltou atrás
+                dUp[`${campoFuncao}.substituiuQuem`] = deleteField(); 
                 await updateDoc(refDoc, dUp);
                 alert("Você reassumiu seu posto!");
             } else {
-                // Assume a vaga adicionando o seu nome e alterando o status
+                // Se era uma substituição de alguém, guarda o nome de quem saiu
+                const donoOriginal = dadosAtuais[campoFuncao]?.nome || "";
+                const eraSubstituicao = dadosAtuais[campoFuncao]?.status === "Substituição Solicitada";
+
                 dUp[campoFuncao] = {
                     nome: usuarioLogadoDados.nome,
                     status: "Confirmado"
                 };
+
+                if (eraSubstituicao && donoOriginal && donoOriginal !== "A definir") {
+                    dUp[campoFuncao].substituiuQuem = donoOriginal;
+                }
+
                 await updateDoc(refDoc, dUp);
                 alert("Vaga assumida com sucesso!");
             }
@@ -875,32 +884,7 @@ window.reproduzirVideoFormacao = function(url) {
             alert("Erro ao salvar. Tente novamente.");
         }
     };
-
-
-    window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
-    if(!idDocEscala || !campoFuncao) return;
-    const refDoc = doc(db, "escalas", idDocEscala);
     
-    try {
-        if (operacao === 'Voltar') {
-            // Atualiza apenas o status, mantendo o nome do usuário
-            const dUp = {};
-            dUp[`${campoFuncao}.status`] = "Confirmado";
-            await updateDoc(refDoc, dUp);
-            alert("Você reassumiu seu posto!");
-        } else {
-            // Assume a vaga
-            const dUp = {};
-            dUp[`${campoFuncao}.nome`] = usuarioLogadoDados.nome;
-            dUp[`${campoFuncao}.status`] = "Confirmado";
-            await updateDoc(refDoc, dUp);
-            alert("Vaga assumida com sucesso!");
-        }
-    } catch (error) {
-        console.error("Erro ao atualizar escala:", error);
-        alert("Erro ao salvar. Tente novamente.");
-    }
-};
     buscaEscalaData?.addEventListener('change', renderizarEscalaGeralPorData);
 
     // Liturgia CNBB 
