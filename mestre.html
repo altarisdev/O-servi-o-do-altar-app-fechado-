@@ -375,6 +375,9 @@ async function carregarRelatorioMissas() {
     tabelaFrequenciaMissas.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-stone-400 italic bg-white/30">Processando métricas...</td></tr>`;
     const mesSelecionado = filtroMesMissas.value;
     
+    // Obtém o momento exato do acesso atual para comparar
+    const agora = new Date();
+    
     try {
         const snapEscalas = await getDocs(collection(db, "escalas"));
         let relatorio = {};
@@ -387,53 +390,80 @@ async function carregarRelatorioMissas() {
             const scala = docSnap.data();
             if(scala.data && scala.data.startsWith(mesSelecionado)) {
                 
+                // Converte a data e hora da escala para um objeto Date comparável
+                // scala.data normalmente é "YYYY-MM-DD" e scala.horario é "HH:MM"
+                const horaEscalaStr = scala.horario || "00:00";
+                const dataHoraEscala = new Date(`${scala.data}T${horaEscalaStr}:00`);
+
+                // Se o horário atual já passou do horário da escala, o evento expirou
+                const escalaExpirou = agora > dataHoraEscala;
+                
                 const processarVaga = (vaga) => {
                     if(!vaga || !vaga.nome) return;
                     
                     const nomeAtual = vaga.nome;
                     const status = (vaga.status || "").toLowerCase().trim();
+                    const nomeInvalido = nomeAtual.toLowerCase() === "a definir" || nomeAtual.trim() === "";
                     
-                    // 1. Se o status for Confirmado ou Presente
-                    if(status === "confirmado" || status === "presente") {
-                        if(relatorio[nomeAtual]) {
-                            relatorio[nomeAtual].presencas++;
+                    // CASO 1: A escala JÁ PASSOU do horário
+                    if (escalaExpirou) {
+                        // Se o status ficou abandonado como "Substituição Solicitada", vira FALTA automática para o dono
+                        if (status === "substituição solicitada" || status === "substituido") {
+                            if(relatorio[nomeAtual] && !nomeInvalido) {
+                                relatorio[nomeAtual].faltas++;
+                                relatorio[nomeAtual].solicitouSub++; // Mantém o registro de que ele tentou pedir
+                            }
+                        }
+                        // Se está confirmado ou presente, conta presença normal
+                        else if (status === "confirmado" || status === "presente") {
+                            if(relatorio[nomeAtual] && !nomeInvalido) {
+                                relatorio[nomeAtual].presencas++;
+                            }
+                        }
+                        // Se já foi marcado manualmente como falta
+                        else if (status === "falta" || status === "ausente") {
+                            if(relatorio[nomeAtual] && !nomeInvalido) {
+                                relatorio[nomeAtual].faltas++;
+                            }
                         }
                     } 
-                    // 2. Se o status for Falta ou Ausente
-                    else if(status === "falta" || status === "ausente") {
-                        if(relatorio[nomeAtual]) {
-                            relatorio[nomeAtual].faltas++;
-                        }
-                    } 
-                    // 3. Se o status for Substituição Solicitada
-                    else if(status === "substituição solicitada" || status === "substituido") {
-                        if(relatorio[nomeAtual]) {
-                            relatorio[nomeAtual].solicitouSub++;
+                    // CASO 2: A escala ainda vai acontecer (Futuro)
+                    else {
+                        if (status === "confirmado" || status === "presente") {
+                            // Opcional: Você pode optar por não contar presença de missas futuras, 
+                            // ou manter aqui se quiser que elas já apareçam somadas antes do dia.
+                            if(relatorio[nomeAtual] && !nomeInvalido) {
+                                relatorio[nomeAtual].presencas++; 
+                            }
+                        } else if (status === "substituição solicitada" || status === "substituido") {
+                            if(relatorio[nomeAtual] && !nomeInvalido) {
+                                relatorio[nomeAtual].solicitouSub++;
+                            }
                         }
                     }
 
-                    // 4. Lógica de quem ATENDEU a substituição (Verifica o histórico que salvamos)
+                    // Lógica de quem ATENDEU a substituição (independe de horário antigo ou novo)
                     if(vaga.substituiuQuem && vaga.substituiuQuem.trim() !== "") {
                         const quemPediuOriginalmente = vaga.substituiuQuem;
                         
-                        // O voluntário ganha um ponto por ter atendido
-                        if(relatorio[nomeAtual]) {
+                        if(relatorio[nomeAtual] && !nomeInvalido) {
                             relatorio[nomeAtual].atendeuSub++;
                         }
-                        // O dono original ganha o ponto por ter solicitado (caso já não tenha ganho no status acima)
+                        // Garante que o solicitante original ganhe o ponto de solicitação mesmo se a vaga foi atendida
                         if(relatorio[quemPediuOriginalmente] && status !== "substituição solicitada") {
                             relatorio[quemPediuOriginalmente].solicitouSub++;
                         }
                     }
                 };
 
-                // Processa todas as funções litúrgicas da escala
+                // Executa o mapeamento em todas as posições do altar
                 for(let i = 1; i <= 6; i++) processarVaga(scala[`altar${i}`]);
                 processarVaga(scala.turiferario);
                 processarVaga(scala.naveteiro);
             }
         });
 
+        // Renderização na tabela (Inalterada, mantendo o seu design)
         tabelaFrequenciaMissas.innerHTML = "";
         Object.keys(relatorio).sort().forEach(nome => {
             const dados = relatorio[nome];
@@ -447,7 +477,7 @@ async function carregarRelatorioMissas() {
                 </tr>
             `;
         });
-    } catch (err) { console.error("Erro ao carregar relatório:", err); }
+    } catch (err) { console.error("Erro ao carregar relatório com verificação de tempo:", err); }
 }
 
     // ==========================================
