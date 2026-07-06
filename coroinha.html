@@ -443,6 +443,28 @@
         ouvirTodasAsEscalas();
         carregarLiturgiaDoDia();
         inicializarLeitorBiblia();
+        async function verificarFaltasAutomaticas(escalas) {
+    const agora = new Date();
+    
+    escalas.forEach(async (esc) => {
+        // Converte data e hora para comparar
+        const dataEscala = new Date(`${esc.data}T${esc.horario}:00`);
+        
+        // Se a missa já passou (mais de 1 hora de tolerância) e ainda está pendente
+        if (agora > dataEscala && agora.getHours() > (parseInt(esc.horario.split(':')[0]) + 1)) {
+            const campos = ['altar1', 'altar2', 'altar3', 'altar4', 'altar5', 'altar6', 'turiferario', 'naveteiro'];
+            
+            campos.forEach(async (c) => {
+                if (esc[c] && esc[c].status === 'Pendente') {
+                    const dUp = {};
+                    dUp[`${c}.status`] = "Falta";
+                    await updateDoc(doc(db, "escalas", esc.idDoc), dUp);
+                }
+            });
+        }
+    });
+}
+
         if(window.innerWidth < 768) { window.switchTab('escala'); }
     }
 
@@ -803,25 +825,29 @@ window.reproduzirVideoFormacao = function(url) {
 };
 
     window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
-        if(!idDocEscala || !campoFuncao) return;
-        const refDoc = doc(db, "escalas", idDocEscala);
-        const dUp = {};
-
+    if(!idDocEscala || !campoFuncao) return;
+    const refDoc = doc(db, "escalas", idDocEscala);
+    
+    try {
         if (operacao === 'Voltar') {
-            dUp[`${campoFuncao}.status`] = "Pendente";
-        } else {
-            dUp[`${campoFuncao}.nome`] = usuarioLogadoDados.nome;
-            dUp[`${campoFuncao}.status`] = "Confirmado"; 
-        }
-
-        try {
+            // Atualiza apenas o status, mantendo o nome do usuário
+            const dUp = {};
+            dUp[`${campoFuncao}.status`] = "Confirmado";
             await updateDoc(refDoc, dUp);
-            alert(operacao === 'Voltar' ? "Você reassumiu o seu posto oficial!" : "Você foi adicionado à equipe deste horário com sucesso!");
-        } catch (error) {
-            await setDoc(refDoc, dUp, { merge: true });
+            alert("Você reassumiu seu posto!");
+        } else {
+            // Assume a vaga
+            const dUp = {};
+            dUp[`${campoFuncao}.nome`] = usuarioLogadoDados.nome;
+            dUp[`${campoFuncao}.status`] = "Confirmado";
+            await updateDoc(refDoc, dUp);
+            alert("Vaga assumida com sucesso!");
         }
-    };
-
+    } catch (error) {
+        console.error("Erro ao atualizar escala:", error);
+        alert("Erro ao salvar. Tente novamente.");
+    }
+};
     buscaEscalaData?.addEventListener('change', renderizarEscalaGeralPorData);
 
     // Liturgia CNBB 
