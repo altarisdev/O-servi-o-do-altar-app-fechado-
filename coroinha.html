@@ -515,32 +515,48 @@ window.reproduzirVideoFormacao = function(url) {
     
     if(!containerMidia || !placeholder) return;
     
-    // Identifica o ID do vídeo para criar a thumbnail e o link
-    const videoId = url.includes('youtu.be/') ? url.split('youtu.be/')[1].split(/[?#]/)[0] : url.split('v=')[1].split('&')[0];
+    let videoId = "";
     
-    placeholder.classList.add('hidden');
-    containerMidia.classList.remove('hidden');
-    containerMidia.innerHTML = "";
+    // Extrai o ID do vídeo corretamente tanto para links curtos quanto normais
+    if (url.includes('youtu.be/')) {
+        videoId = url.split('youtu.be/')[1].split(/[?#]/)[0];
+    } else if (url.includes('v=')) {
+        videoId = url.split('v=')[1].split('&')[0];
+    } else if (url.includes('embed/')) {
+        videoId = url.split('embed/')[1].split(/[?#]/)[0];
+    }
 
-    // Criamos uma interface visual que não gera erro de "ID de reprodução"
-    containerMidia.style.display = "flex";
-    containerMidia.style.flexDirection = "column";
-    containerMidia.style.alignItems = "center";
-    containerMidia.style.justifyContent = "center";
-    containerMidia.style.background = "#000";
-    containerMidia.style.color = "#fff";
-    containerMidia.style.minHeight = "200px";
-
-    containerMidia.innerHTML = `
-        <div style="text-align: center; padding: 20px;">
-            <p style="margin-bottom: 15px;">Deseja assistir a este vídeo?</p>
-            <a href="${url}" target="_blank" 
-               style="padding: 10px 20px; background: #e62117; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
-               Abrir no YouTube
-            </a>
-        </div>
-    `;
+    if (videoId) {
+        // Se for um link válido do YouTube, injeta o iframe com o formato /embed/
+        placeholder.classList.add('hidden');
+        containerMidia.classList.remove('hidden');
+        containerMidia.innerHTML = `
+            <iframe 
+                class="w-full h-full rounded-2xl" 
+                src="https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1" 
+                title="Formação Altaris" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        `;
+    } else if (url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm')) {
+        // Caso usem arquivos diretos de vídeo no banco
+        placeholder.classList.add('hidden');
+        containerMidia.classList.remove('hidden');
+        containerMidia.innerHTML = `
+            <video class="w-full h-full rounded-2xl" controls autoplay>
+                <source src="${url}" type="video/mp4">
+                Seu navegador não suporta a reprodução de vídeos.
+            </video>
+        `;
+    } else {
+        // Fallback de segurança para links externos comuns
+        alert("Este link não pôde ser embutido diretamente. Abrindo em nova aba.");
+        window.open(url, '_blank');
+    }
 };
+
 
     function ouvirColecaoConteudos() {
         const container = document.getElementById('lista-materials-formacao');
