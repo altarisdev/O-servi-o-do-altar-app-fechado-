@@ -617,6 +617,7 @@ window.reproduzirVideoFormacao = function(url) {
                 esc.idDoc = d.id; 
                 todasEscalasCache.push(esc); 
             });
+            verificarFaltasAutomaticas(todasEscalasCache);
             renderizarEscalaGeralPorData();
         });
     }
