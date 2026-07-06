@@ -371,70 +371,65 @@
     }
 
         async function carregarRelatorioMissas() {
-        if(!tabelaFrequenciaMissas) return;
-        tabelaFrequenciaMissas.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-stone-400 italic bg-white/30">Processando métricas...</td></tr>`;
-        const mesSelecionado = filtroMesMissas.value;
+    if(!tabelaFrequenciaMissas) return;
+    tabelaFrequenciaMissas.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-stone-400 italic bg-white/30">Processando métricas...</td></tr>`;
+    const mesSelecionado = filtroMesMissas.value;
+    
+    try {
+        const snapEscalas = await getDocs(collection(db, "escalas"));
+        let relatorio = {};
         
-        try {
-            const snapEscalas = await getDocs(collection(db, "escalas"));
-            let relatorio = {};
-            
-            // Inicializa o objeto para todos os usuários
-            cacheUsuarios.forEach(nome => {
-                relatorio[nome] = { presencas: 0, faltas: 0, solicitouSub: 0, atendeuSub: 0 };
-            });
+        cacheUsuarios.forEach(nome => {
+            relatorio[nome] = { presencas: 0, faltas: 0, solicitouSub: 0, atendeuSub: 0 };
+        });
 
-            snapEscalas.forEach(docSnap => {
-                const scala = docSnap.data();
-                if(scala.data && scala.data.startsWith(mesSelecionado)) {
+        snapEscalas.forEach(docSnap => {
+            const scala = docSnap.data();
+            if(scala.data && scala.data.startsWith(mesSelecionado)) {
+                
+                const processarVaga = (vaga) => {
+                    if(!vaga || !vaga.nome) return;
                     
-                    // Função auxiliar para processar cada vaga/função
-                    const processarVaga = (vaga) => {
-                        if(!vaga || !vaga.nome) return;
+                    if(relatorio[vaga.nome]) {
+                        // Normaliza o status para comparação (case-insensitive)
+                        const status = (vaga.status || "").toLowerCase();
                         
-                        // Garante que o usuário existe no nosso cache antes de somar
-                        if(relatorio[vaga.nome]) {
-                            if(vaga.status === "Confirmado" || vaga.status === "Presente") {
-                                relatorio[vaga.nome].presencas++;
-                            } else if(vaga.status === "Falta") {
-                                relatorio[vaga.nome].faltas++;
-                            } else if(vaga.status === "Substituido") {
-                                relatorio[vaga.nome].solicitouSub++;
-                            }
+                        if(status === "confirmado" || status === "presente") {
+                            relatorio[vaga.nome].presencas++;
+                        } else if(status === "falta" || status === "ausente") { // Adicionei 'ausente' caso use
+                            relatorio[vaga.nome].faltas++;
+                        } else if(status === "substituido" || status === "substituição") {
+                            relatorio[vaga.nome].solicitouSub++;
                         }
-                    };
-
-                    // Processa altares
-                    for(let i = 1; i <= 6; i++) processarVaga(scala[`altar${i}`]);
-                    
-                    // Processa Turibulo e Naveta
-                    processarVaga(scala.turiferario);
-                    processarVaga(scala.naveteiro);
-
-                    // Lógica do Substituto: 
-                    // Se o campo substitutoNome existir na escala, esse usuário ATENDEU uma sub
-                    if(scala.substitutoNome && relatorio[scala.substitutoNome]) {
-                        relatorio[scala.substitutoNome].atendeuSub++;
                     }
+                };
+
+                for(let i = 1; i <= 6; i++) processarVaga(scala[`altar${i}`]);
+                processarVaga(scala.turiferario);
+                processarVaga(scala.naveteiro);
+
+                // Lógica de quem ATENDEU a substituição
+                if(scala.substitutoNome && relatorio[scala.substitutoNome]) {
+                    relatorio[scala.substitutoNome].atendeuSub++;
                 }
-            });
+            }
+        });
 
-            tabelaFrequenciaMissas.innerHTML = "";
-            Object.keys(relatorio).forEach(nome => {
-                const dados = relatorio[nome];
-                tabelaFrequenciaMissas.innerHTML += `
-                    <tr class="hover:bg-stone-50/80 transition-colors">
-                        <td class="p-4 pl-5 font-bold text-stone-800">${nome}</td>
-                        <td class="p-4 text-center text-emerald-700 font-extrabold bg-emerald-50/5">${dados.presencas}</td>
-                        <td class="p-4 text-center text-rose-700 font-extrabold bg-rose-50/5">${dados.faltas}</td>
-                        <td class="p-4 text-center text-blue-700 font-bold bg-blue-50/5">${dados.solicitouSub}</td>
-                        <td class="p-4 text-center text-amber-800 font-bold bg-amber-50/5">${dados.atendeuSub}</td>
-                    </tr>
-                `;
-            });
-        } catch (err) { console.error(err); }
-    }
-
+        tabelaFrequenciaMissas.innerHTML = "";
+        Object.keys(relatorio).sort().forEach(nome => {
+            const dados = relatorio[nome];
+            tabelaFrequenciaMissas.innerHTML += `
+                <tr class="hover:bg-stone-50/80 transition-colors">
+                    <td class="p-4 pl-5 font-bold text-stone-800">${nome}</td>
+                    <td class="p-4 text-center text-emerald-700 font-extrabold bg-emerald-50/5">${dados.presencas}</td>
+                    <td class="p-4 text-center text-rose-700 font-extrabold bg-rose-50/5">${dados.faltas}</td>
+                    <td class="p-4 text-center text-blue-700 font-bold bg-blue-50/5">${dados.solicitouSub}</td>
+                    <td class="p-4 text-center text-amber-800 font-bold bg-amber-50/5">${dados.atendeuSub}</td>
+                </tr>
+            `;
+        });
+    } catch (err) { console.error("Erro ao carregar relatório:", err); }
+}
     // ==========================================
     // NOVA FUNÇÃO: CARREGAR QUADRO DE ESCALA MENSAL DINÂMICO
     // ==========================================
