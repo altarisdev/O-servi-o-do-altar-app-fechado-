@@ -802,27 +802,80 @@ window.reproduzirVideoFormacao = function(url) {
         });
     }
 
-    window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
-    if(!idDocEscala || !campoFuncao) {
-        alert("Erro técnico: ID da escala ou função não encontrado.");
-        return;
-    }
-    
-    console.log("Tentando atualizar:", idDocEscala, campoFuncao, novoStatus);
-    
-    const refDoc = doc(db, "escalas", idDocEscala);
-    const dUp = {};
-    dUp[`${campoFuncao}.status`] = novoStatus;
+        window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
+        if(!idDocEscala || !campoFuncao) {
+            alert("Erro técnico: ID da escala ou função não encontrado.");
+            return;
+        }
+        
+        console.log("Tentando atualizar:", idDocEscala, campoFuncao, novoStatus);
+        
+        const refDoc = doc(db, "escalas", idDocEscala);
+        
+        try {
+            // Primeiro buscamos o estado atual do documento para não apagar o nome do acólito
+            const docSnap = await getDoc(refDoc);
+            if (!docSnap.exists()) {
+                alert("Escala não encontrada no servidor.");
+                return;
+            }
+            
+            const dadosAtuais = docSnap.data();
+            // Mantém o nome atual (ou vazio se não houver)
+            const nomeAtual = dadosAtuais[campoFuncao]?.nome || ""; 
 
-    try {
-        await updateDoc(refDoc, dUp);
-        console.log("Sucesso!");
-    } catch (error) {
-        console.error("ERRO COMPLETO DO FIREBASE:", error);
-        // Isso vai mostrar a mensagem real do Firebase (ex: permission-denied, not-found)
-        alert("Erro no Firebase: " + error.code + " - " + error.message);
-    }
-};
+            const dUp = {};
+            dUp[campoFuncao] = {
+                nome: nomeAtual,
+                status: novoStatus
+            };
+
+            await updateDoc(refDoc, dUp);
+            console.log("Status atualizado com sucesso!");
+        } catch (error) {
+            console.error("ERRO COMPLETO DO FIREBASE:", error);
+            alert("Erro no Firebase: " + error.code + " - " + error.message);
+        }
+    };
+
+    window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
+        if(!idDocEscala || !campoFuncao) return;
+        const refDoc = doc(db, "escalas", idDocEscala);
+        
+        try {
+            const docSnap = await getDoc(refDoc);
+            if (!docSnap.exists()) {
+                alert("Escala não encontrada.");
+                return;
+            }
+            
+            const dadosAtuais = docSnap.data();
+            const dUp = {};
+
+            if (operacao === 'Voltar') {
+                // Mantém o nome do usuário que já estava lá e muda o status para Confirmado
+                const nomeAtual = dadosAtuais[campoFuncao]?.nome || usuarioLogadoDados.nome;
+                dUp[campoFuncao] = {
+                    nome: nomeAtual,
+                    status: "Confirmado"
+                };
+                await updateDoc(refDoc, dUp);
+                alert("Você reassumiu seu posto!");
+            } else {
+                // Assume a vaga adicionando o seu nome e alterando o status
+                dUp[campoFuncao] = {
+                    nome: usuarioLogadoDados.nome,
+                    status: "Confirmado"
+                };
+                await updateDoc(refDoc, dUp);
+                alert("Vaga assumida com sucesso!");
+            }
+        } catch (error) {
+            console.error("Erro ao atualizar escala:", error);
+            alert("Erro ao salvar. Tente novamente.");
+        }
+    };
+
 
     window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
     if(!idDocEscala || !campoFuncao) return;
