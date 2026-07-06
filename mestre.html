@@ -370,7 +370,7 @@
         ouvirPenalidadesMestre();
     }
 
-        async function carregarRelatorioMissas() {
+async function carregarRelatorioMissas() {
     if(!tabelaFrequenciaMissas) return;
     tabelaFrequenciaMissas.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-stone-400 italic bg-white/30">Processando métricas...</td></tr>`;
     const mesSelecionado = filtroMesMissas.value;
@@ -390,28 +390,47 @@
                 const processarVaga = (vaga) => {
                     if(!vaga || !vaga.nome) return;
                     
-                    if(relatorio[vaga.nome]) {
-                        // Normaliza o status para comparação (case-insensitive)
-                        const status = (vaga.status || "").toLowerCase();
+                    const nomeAtual = vaga.nome;
+                    const status = (vaga.status || "").toLowerCase().trim();
+                    
+                    // 1. Se o status for Confirmado ou Presente
+                    if(status === "confirmado" || status === "presente") {
+                        if(relatorio[nomeAtual]) {
+                            relatorio[nomeAtual].presencas++;
+                        }
+                    } 
+                    // 2. Se o status for Falta ou Ausente
+                    else if(status === "falta" || status === "ausente") {
+                        if(relatorio[nomeAtual]) {
+                            relatorio[nomeAtual].faltas++;
+                        }
+                    } 
+                    // 3. Se o status for Substituição Solicitada
+                    else if(status === "substituição solicitada" || status === "substituido") {
+                        if(relatorio[nomeAtual]) {
+                            relatorio[nomeAtual].solicitouSub++;
+                        }
+                    }
+
+                    // 4. Lógica de quem ATENDEU a substituição (Verifica o histórico que salvamos)
+                    if(vaga.substituiuQuem && vaga.substituiuQuem.trim() !== "") {
+                        const quemPediuOriginalmente = vaga.substituiuQuem;
                         
-                        if(status === "confirmado" || status === "presente") {
-                            relatorio[vaga.nome].presencas++;
-                        } else if(status === "falta" || status === "ausente") { // Adicionei 'ausente' caso use
-                            relatorio[vaga.nome].faltas++;
-                        } else if(status === "substituido" || status === "Substituição Solicitada") {
-                            relatorio[vaga.nome].solicitouSub++;
+                        // O voluntário ganha um ponto por ter atendido
+                        if(relatorio[nomeAtual]) {
+                            relatorio[nomeAtual].atendeuSub++;
+                        }
+                        // O dono original ganha o ponto por ter solicitado (caso já não tenha ganho no status acima)
+                        if(relatorio[quemPediuOriginalmente] && status !== "substituição solicitada") {
+                            relatorio[quemPediuOriginalmente].solicitouSub++;
                         }
                     }
                 };
 
+                // Processa todas as funções litúrgicas da escala
                 for(let i = 1; i <= 6; i++) processarVaga(scala[`altar${i}`]);
                 processarVaga(scala.turiferario);
                 processarVaga(scala.naveteiro);
-
-                // Lógica de quem ATENDEU a substituição
-                if(scala.substitutoNome && relatorio[scala.substitutoNome]) {
-                    relatorio[scala.substitutoNome].atendeuSub++;
-                }
             }
         });
 
@@ -430,6 +449,7 @@
         });
     } catch (err) { console.error("Erro ao carregar relatório:", err); }
 }
+
     // ==========================================
     // NOVA FUNÇÃO: CARREGAR QUADRO DE ESCALA MENSAL DINÂMICO
     // ==========================================
