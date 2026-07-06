@@ -305,10 +305,12 @@
         </div>
     </main>
 
+    
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    // CORREÇÃO 1: Adicionado o deleteField na importação
+    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot, deleteField } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -443,27 +445,6 @@
         ouvirTodasAsEscalas();
         carregarLiturgiaDoDia();
         inicializarLeitorBiblia();
-        async function verificarFaltasAutomaticas(escalas) {
-    const agora = new Date();
-    
-    escalas.forEach(async (esc) => {
-        // Converte data e hora para comparar
-        const dataEscala = new Date(`${esc.data}T${esc.horario}:00`);
-        
-        // Se a missa já passou (mais de 1 hora de tolerância) e ainda está pendente
-        if (agora > dataEscala && agora.getHours() > (parseInt(esc.horario.split(':')[0]) + 1)) {
-            const campos = ['altar1', 'altar2', 'altar3', 'altar4', 'altar5', 'altar6', 'turiferario', 'naveteiro'];
-            
-            campos.forEach(async (c) => {
-                if (esc[c] && esc[c].status === 'Pendente') {
-                    const dUp = {};
-                    dUp[`${c}.status`] = "Falta";
-                    await updateDoc(doc(db, "escalas", esc.idDoc), dUp);
-                }
-            });
-        }
-    });
-}
 
         if(window.innerWidth < 768) { window.switchTab('escala'); }
     }
@@ -509,53 +490,49 @@
         });
     }
 
-window.reproduzirVideoFormacao = function(url) {
-    const placeholder = document.getElementById('placeholder-player');
-    const containerMidia = document.getElementById('container-midia-player');
-    
-    if(!containerMidia || !placeholder) return;
-    
-    // Limpa espaços em branco nas pontas que podem quebrar a leitura
-    const urlLimpa = url.trim();
-    let videoId = "";
-    
-    // Expressão regular avançada para capturar IDs do YouTube em QUALQUEER formato
-    // (watch?v=, youtu.be/, embed/, /shorts/, live/, etc.)
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/|live\/)([^#\&\?]*).*/;
-    const match = urlLimpa.match(regExp);
-    
-    if (match && match[2].length === 11) {
-        videoId = match[2];
-    }
+    window.reproduzirVideoFormacao = function(url) {
+        const placeholder = document.getElementById('placeholder-player');
+        const containerMidia = document.getElementById('container-midia-player');
+        
+        if(!containerMidia || !placeholder) return;
+        
+        const urlLimpa = url.trim();
+        let videoId = "";
+        
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/|live\/)([^#\&\?]*).*/;
+        const match = urlLimpa.match(regExp);
+        
+        if (match && match[2].length === 11) {
+            videoId = match[2];
+        }
 
-    if (videoId) {
-        placeholder.classList.add('hidden');
-        containerMidia.classList.remove('hidden');
-        containerMidia.innerHTML = `
-            <iframe 
-                class="w-full h-full rounded-2xl" 
-                src="https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1" 
-                title="Formação Altaris" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                allowfullscreen>
-            </iframe>
-        `;
-    } else if (urlLimpa.toLowerCase().endsWith('.mp4') || urlLimpa.toLowerCase().endsWith('.webm')) {
-        placeholder.classList.add('hidden');
-        containerMidia.classList.remove('hidden');
-        containerMidia.innerHTML = `
-            <video class="w-full h-full rounded-2xl" controls autoplay>
-                <source src="${urlLimpa}" type="video/mp4">
-                Seu navegador não suporta a reprodução de vídeos.
-            </video>
-        `;
-    } else {
-        // Se realmente não for um link do YouTube (ex: um PDF ou site externo), abre em nova aba
-        alert("Este material é um link externo e será aberto em uma nova aba.");
-        window.open(urlLimpa, '_blank');
-    }
-};
+        if (videoId) {
+            placeholder.classList.add('hidden');
+            containerMidia.classList.remove('hidden');
+            containerMidia.innerHTML = `
+                <iframe 
+                    class="w-full h-full rounded-2xl" 
+                    src="https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1" 
+                    title="Formação Altaris" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            `;
+        } else if (urlLimpa.toLowerCase().endsWith('.mp4') || urlLimpa.toLowerCase().endsWith('.webm')) {
+            placeholder.classList.add('hidden');
+            containerMidia.classList.remove('hidden');
+            containerMidia.innerHTML = `
+                <video class="w-full h-full rounded-2xl" controls autoplay>
+                    <source src="${urlLimpa}" type="video/mp4">
+                    Seu navegador não suporta a reprodução de vídeos.
+                </video>
+            `;
+        } else {
+            alert("Este material é um link externo e será aberto em uma nova aba.");
+            window.open(urlLimpa, '_blank');
+        }
+    };
 
     function ouvirColecaoConteudos() {
         const container = document.getElementById('lista-materials-formacao');
@@ -570,8 +547,7 @@ window.reproduzirVideoFormacao = function(url) {
                 const data = docSnap.data();
                 const urlLower = (data.url || "").toLowerCase();
                 
-                // Verifica se o link é de vídeo do YouTube ou extensão direta de arquivo de vídeo
-                const ehVideo = urlLower.includes('youtube.com') || urlLower.includes('youtu.be') || urlLower.endsWith('.mp4') || urlLower.endsWith('.m4v') || urlLower.endsWith('.webm');
+                const ehVideo = urlLower.includes('youtube.com') || urlLower.includes('youtu.be') || urlLower.endsWith('.mp4') || urlLower.endsWith('.m4v') || urlLower.endsWith('.webm') || urlLower.includes('shorts/');
 
                 if(ehVideo) {
                     container.innerHTML += `
@@ -650,11 +626,11 @@ window.reproduzirVideoFormacao = function(url) {
             };
             await updateDoc(refDoc, atualizacaoEstruturada);
             cardEnqueteDisponibilidade.classList.add('hidden'); 
-            alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
+            alert("Sua disponibilidade foi registrada!");
         } catch (error) {
             await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
             cardEnqueteDisponibilidade.classList.add('hidden'); 
-            alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
+            alert("Sua disponibilidade foi registrada!");
         }
     });
 
@@ -783,7 +759,7 @@ window.reproduzirVideoFormacao = function(url) {
                 if(vagasLivresOuSubstituicoes.length > 0) {
                     let botoesVagasHtml = "";
                     vagasLivresOuSubstituicoes.forEach(v => {
-                        const txtBotao = v.type === 'vazia' ? `Assumir ${v.label} (Vaga Livre)` : `Substituir ${v.quem} em ${v.label}`;
+                        const txtBotao = v.tipo === 'vazia' ? `Assumir ${v.label} (Vaga Livre)` : `Substituir ${v.quem} em ${v.label}`;
                         botoesVagasHtml += `
                             <button onclick="window.assumirVagaEscala('${esc.idDoc}', '${v.funcaoId}', 'Assumir')" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-2.5 py-1.5 rounded-lg font-bold tracking-wide transition-all cursor-pointer text-[10px] uppercase shadow-xs flex items-center gap-1">
                                 <i class="fa-solid fa-plus-circle text-[9px]"></i> ${txtBotao}
@@ -817,18 +793,15 @@ window.reproduzirVideoFormacao = function(url) {
         });
     }
 
-        window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
+    window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
         if(!idDocEscala || !campoFuncao) {
             alert("Erro técnico: ID da escala ou função não encontrado.");
             return;
         }
         
-        console.log("Tentando atualizar:", idDocEscala, campoFuncao, novoStatus);
-        
         const refDoc = doc(db, "escalas", idDocEscala);
         
         try {
-            // Primeiro buscamos o estado atual do documento para não apagar o nome do acólito
             const docSnap = await getDoc(refDoc);
             if (!docSnap.exists()) {
                 alert("Escala não encontrada no servidor.");
@@ -836,7 +809,6 @@ window.reproduzirVideoFormacao = function(url) {
             }
             
             const dadosAtuais = docSnap.data();
-            // Mantém o nome atual (ou vazio se não houver)
             const nomeAtual = dadosAtuais[campoFuncao]?.nome || ""; 
 
             const dUp = {};
@@ -846,14 +818,13 @@ window.reproduzirVideoFormacao = function(url) {
             };
 
             await updateDoc(refDoc, dUp);
-            console.log("Status atualizado com sucesso!");
         } catch (error) {
             console.error("ERRO COMPLETO DO FIREBASE:", error);
             alert("Erro no Firebase: " + error.code + " - " + error.message);
         }
     };
 
-        window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
+    window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
         if(!idDocEscala || !campoFuncao) return;
         const refDoc = doc(db, "escalas", idDocEscala);
         
@@ -873,12 +844,11 @@ window.reproduzirVideoFormacao = function(url) {
                     nome: nomeAtual,
                     status: "Confirmado"
                 };
-                // Remove o rastro se o dono original voltou atrás
+                // CORREÇÃO 2: O deleteField() agora vai funcionar sem quebrar a linha de execução
                 dUp[`${campoFuncao}.substituiuQuem`] = deleteField(); 
                 await updateDoc(refDoc, dUp);
                 alert("Você reassumiu seu posto!");
             } else {
-                // Se era uma substituição de alguém, guarda o nome de quem saiu
                 const donoOriginal = dadosAtuais[campoFuncao]?.nome || "";
                 const eraSubstituicao = dadosAtuais[campoFuncao]?.status === "Substituição Solicitada";
 
@@ -902,7 +872,6 @@ window.reproduzirVideoFormacao = function(url) {
     
     buscaEscalaData?.addEventListener('change', renderizarEscalaGeralPorData);
 
-    // Liturgia CNBB 
     async function carregarLiturgiaDoDia() {
         try {
             const r = await fetch('https://liturgia.up.railway.app/'); 
@@ -1099,7 +1068,7 @@ window.reproduzirVideoFormacao = function(url) {
                         <i class="fa-solid fa-cloud-solitaire text-xl mb-2"></i>
                         <p class="font-bold text-xs uppercase tracking-wide">Falha na Sincronização</p>
                         <p class="text-[11px] text-slate-400 dark:text-zinc-500 mt-1 font-medium leading-normal">
-                            Não foi possível conectar ao servidor de escrituras. Tente selecionar outro capítulo ou verifique sua conexão.
+                            Não foi possível conectar ao servidor de escrituras.
                         </p>
                     </div>`;
             }
