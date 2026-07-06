@@ -42,6 +42,24 @@
             background-color: #27272a;
             color: #f4f4f5;
         }
+        @media (max-width: 360px) {
+    /* 1. Garante que o corpo do site não crie barras de rolagem fantasmas */
+    html, body {
+        width: 100%;
+        overflow-x: hidden; 
+    }
+
+    /* 2. Força qualquer container principal a se espremer para caber na tela */
+    .container, main, section, div {
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* 3. Se você usar menus ou blocos lado a lado, força eles a ficarem um abaixo do outro */
+    .row, .flex-container, header {
+        flex-direction: column !important;
+    }
+}
     </style>
 </head>
 <body class="bg-sacro-dourado font-sans min-h-screen flex flex-col transition-colors duration-500 selection:bg-red-200">
