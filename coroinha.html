@@ -323,12 +323,12 @@
         </div>
     </main>
 
-    
-<script type="module">
+    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    // CORREÇÃO 1: Adicionado o deleteField na importação
-    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot, deleteField } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    // 1. IMPORTAR O MÓDULO DE MENSAGENS
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
@@ -342,6 +342,8 @@
     const app = initializeApp(firebaseConfig); 
     const auth = getAuth(app); 
     const db = getFirestore(app);
+    // 2. INICIALIZAR O MESSAGING
+    const messaging = getMessaging(app);
 
     const telaLoading = document.getElementById('tela-loading');
     const telaManutencao = document.getElementById('tela-manutencao');
@@ -427,11 +429,14 @@
             if(devSession) { 
                 usuarioLogadoDados = JSON.parse(devSession); 
                 inicializarPainelAcolito(); 
+                // Se for usuário dev simulado, o UID real não existe para receber o token de push
             } else if(user) {
                 const docSnap = await getDoc(doc(db, "usuarios", user.uid));
                 if(docSnap.exists()) { 
                     usuarioLogadoDados = docSnap.data(); 
                     inicializarPainelAcolito(); 
+                    // Configura as notificações para o usuário autenticado
+                    configurarNotificacoesPush(user.uid);
                 } else { 
                     signOut(auth); 
                     window.location.href = "index.html"; 
@@ -446,6 +451,39 @@
         } finally {
             setTimeout(hideLoading, 500);
         }
+    });
+
+    // 3. FUNÇÃO PARA CONFIGURAR AS PERMISSÕES E SALVAR O TOKEN DE NOTIFICAÇÃO
+    async function configurarNotificacoesPush(userUid) {
+        try {
+            // Solicita permissão do navegador para exibir alertas
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                // SUBSTITUA A STRING ABAIXO PELA SUA CHAVE PÚBLICA VAPID GERADA NO PASSO 1
+                const chavePublicaVapid = "SUA_CHAVE_PUBLICA_VAPID_GERADA_NO_CONSOLE_AQUI";
+
+                const tokenAtual = await getToken(messaging, { vapidKey: chavePublicaVapid });
+                
+                if (tokenAtual) {
+                    // Guarda o token de notificação no cadastro do acólito no Firestore
+                    await updateDoc(doc(db, "usuarios", userUid), {
+                        fcmToken: tokenAtual
+                    });
+                    console.log("Token de notificação push registrado com sucesso para o usuário!");
+                } else {
+                    console.log('Nenhum token de registro disponível. Verifique as permissões.');
+                }
+            }
+        } catch (err) {
+            console.error('Erro ao configurar notificações push: ', err);
+        }
+    }
+
+    // Escuta mensagens caso o usuário esteja com o painel aberto na tela
+    onMessage(messaging, (payload) => {
+        console.log('Mensagem recebida em primeiro plano (painel aberto): ', payload);
+        // Exibe um alerta nativo ou customizado se ele já estiver navegando no site
+        alert(`${payload.notification.title}\n\n${payload.notification.body}`);
     });
 
     function inicializarPainelAcolito() {
@@ -463,7 +501,7 @@
         ouvirTodasAsEscalas();
         carregarLiturgiaDoDia();
         inicializarLeitorBiblia();
-
+        
         if(window.innerWidth < 768) { window.switchTab('escala'); }
     }
 
@@ -545,7 +583,7 @@
                     <source src="${urlLimpa}" type="video/mp4">
                     Seu navegador não suporta a reprodução de vídeos.
                 </video>
-            `;
+                `;
         } else {
             alert("Este material é um link externo e será aberto em uma nova aba.");
             window.open(urlLimpa, '_blank');
@@ -565,7 +603,7 @@
                 const data = docSnap.data();
                 const urlLower = (data.url || "").toLowerCase();
                 
-                const ehVideo = urlLower.includes('youtube.com') || urlLower.includes('youtu.be') || urlLower.endsWith('.mp4') || urlLower.endsWith('.m4v') || urlLower.endsWith('.webm') || urlLower.includes('shorts/');
+                const ehVideo = urlLower.includes('youtube.com') || urlLower.includes('youtu.be') || urlLower.endsWith('.mp4') || urlLower.endsWith('.m4v') || urlLower.endsWith('.webm');
 
                 if(ehVideo) {
                     container.innerHTML += `
@@ -644,11 +682,11 @@
             };
             await updateDoc(refDoc, atualizacaoEstruturada);
             cardEnqueteDisponibilidade.classList.add('hidden'); 
-            alert("Sua disponibilidade foi registrada!");
+            alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
         } catch (error) {
             await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
             cardEnqueteDisponibilidade.classList.add('hidden'); 
-            alert("Sua disponibilidade foi registrada!");
+            alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
         }
     });
 
@@ -777,7 +815,7 @@
                 if(vagasLivresOuSubstituicoes.length > 0) {
                     let botoesVagasHtml = "";
                     vagasLivresOuSubstituicoes.forEach(v => {
-                        const txtBotao = v.tipo === 'vazia' ? `Assumir ${v.label} (Vaga Livre)` : `Substituir ${v.quem} em ${v.label}`;
+                        const txtBotao = v.type === 'vazia' ? `Assumir ${v.label} (Vaga Livre)` : `Substituir ${v.quem} em ${v.label}`;
                         botoesVagasHtml += `
                             <button onclick="window.assumirVagaEscala('${esc.idDoc}', '${v.funcaoId}', 'Assumir')" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-2.5 py-1.5 rounded-lg font-bold tracking-wide transition-all cursor-pointer text-[10px] uppercase shadow-xs flex items-center gap-1">
                                 <i class="fa-solid fa-plus-circle text-[9px]"></i> ${txtBotao}
@@ -862,7 +900,6 @@
                     nome: nomeAtual,
                     status: "Confirmado"
                 };
-                // CORREÇÃO 2: O deleteField() agora vai funcionar sem quebrar a linha de execução
                 dUp[`${campoFuncao}.substituiuQuem`] = deleteField(); 
                 await updateDoc(refDoc, dUp);
                 alert("Você reassumiu seu posto!");
@@ -1086,7 +1123,7 @@
                         <i class="fa-solid fa-cloud-solitaire text-xl mb-2"></i>
                         <p class="font-bold text-xs uppercase tracking-wide">Falha na Sincronização</p>
                         <p class="text-[11px] text-slate-400 dark:text-zinc-500 mt-1 font-medium leading-normal">
-                            Não foi possível conectar ao servidor de escrituras.
+                            Não foi possível conectar ao servidor de escrituras. Tente selecionar outro capítulo ou verifique sua conexão.
                         </p>
                     </div>`;
             }
