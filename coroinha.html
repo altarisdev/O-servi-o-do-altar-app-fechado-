@@ -460,7 +460,7 @@
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
                 // SUBSTITUA A STRING ABAIXO PELA SUA CHAVE PÚBLICA VAPID GERADA NO PASSO 1
-                const chavePublicaVapid = "SUA_CHAVE_PUBLICA_VAPID_GERADA_NO_CONSOLE_AQUI";
+                const chavePublicaVapid = "BEJmhfFVnv--4dGBf-MqbzgBNSNudx2mWFSaZaQq4m1X2eotSzS--jeAKx6c_736d6Q5nlHuODVxqWV16l_VvzM";
 
                 const tokenAtual = await getToken(messaging, { vapidKey: chavePublicaVapid });
                 
