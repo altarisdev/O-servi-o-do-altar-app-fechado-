@@ -447,44 +447,44 @@
 
     // COLOQUEI A CORREÇÃO DO SERVICE WORKER E DO ESCOPO DO GITHUB PAGES NESTA FUNÇÃO:
     async function configurarNotificacoesPush(userUid) {
-        try {
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                const chavePublicaVapid = "BEJmhfFVnv--4dGBf-MqbzgBNSNudx2mWFSaZaQq4m1X2eotSzS--jeAKx6c_736d6Q5nlHuODVxqWV16l_VvzM";
+        async function configurarNotificacoesPush(userUid) {
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            const chavePublicaVapid = "BEJmhfFVnv--4dGBf-MqbzgBNSNudx2mWFSaZaQq4m1X2eotSzS--jeAKx6c_736d6Q5nlHuODVxqWV16l_VvzM";
 
-                // Registro manual forçando o ponto-barra para localizar o SW dentro do repositório no subdomínio do Pages
-                // Substitui o bloco do 'serviceWorker' em linha por este:
-if ('serviceWorker' in navigator) {
-    // Registra apontando para o arquivo na mesma pasta, SEM forçar um escopo externo que causa o 404
-    const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
-    console.log("Service Worker registrado com sucesso:", registration.scope);
+            if ('serviceWorker' in navigator) {
+                const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                console.log("Service Worker registrado com sucesso:", registration.scope);
 
-    const tokenAtual = await getToken(messaging, { 
-        vapidKey: chavePublicaVapid,
-        serviceWorkerRegistration: registration // Vincula o registro correto aqui
-    });
-    
-    if (tokenAtual) {
-        // Salva no Firestore
-        await updateDoc(doc(db, "usuarios", userUid), {
-            fcmToken: tokenAtual
-        });
-        console.log("Token salvo com sucesso!");
+                const tokenAtual = await getToken(messaging, { 
+                    vapidKey: chavePublicaVapid,
+                    serviceWorkerRegistration: registration
+                });
+                
+                if (tokenAtual) {
+                    await updateDoc(doc(db, "usuarios", userUid), {
+                        fcmToken: tokenAtual
+                    });
+                    console.log("Token salvo com sucesso!");
 
-        // Faz a chamada para o teu novo Cloudflare Worker
-        fetch("https://fcm-helper.TEU_USUARIO.workers.dev/registrar-topico", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                token: tokenAtual,
-                topico: "acolitos"
-            })
-        })
-        .then(res => console.log("Registrado no tópico com sucesso."))
-        .catch(err => console.error("Erro no Worker de tópicos:", err));
+                    // Chame a URL gerada pelo seu painel da Cloudflare aqui:
+                    await fetch("https://fcm-helper.SEU_USUARIO.workers.dev/registrar-topico", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            token: tokenAtual,
+                            topico: "acolitos"
+                        })
+                    });
+                    console.log("Registrado no tópico com sucesso.");
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Erro ao configurar notificações push: ', err);
     }
 }
-
     onMessage(messaging, (payload) => {
         console.log('Mensagem recebida em primeiro plano (painel aberto): ', payload);
         alert(`${payload.notification.title}\n\n${payload.notification.body}`);
