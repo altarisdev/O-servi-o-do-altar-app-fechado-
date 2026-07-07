@@ -16,7 +16,7 @@
         /* Fundo Litúrgico - Padrão Sacro */
         .bg-sacro-dourado {
             background-color: #f8fafc;
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iZG9uZSIgcj0iNiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNjAiIHI9IjYiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjQwIiAgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCB dPSJNMzYgMThoOHYyaC-4ek0zNiA5bC-4ek0xOCAzNmgydjhoLTJNNTggMzZoMnY4aC-yeiIvPjwvZz48L3N2Zz4=");
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iZG9uZSIgcj0iNiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNjAxIiByPSI2Ii8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDAiIHI9IjEiLz48cGF0aCB dPSJNMzYgMThoOHYyaC-4ek0zNiA5bC-4ek0xOCAzNmgydjhoLTJNNTggMzZoMnY4aC-yeiIvPjwvZz48L3N2Zz4=");
         }
 
         .dark .bg-sacro-dourado {
@@ -43,28 +43,22 @@
             color: #f4f4f5;
         }
         @media (max-width: 360px) {
-    /* 1. Garante que o corpo do site não crie barras de rolagem fantasmas */
-    html, body {
-        width: 100%;
-        overflow-x: hidden; 
-    }
-
-    /* 2. Força qualquer container principal a se espremer para caber na tela */
-    .container, main, section, div {
-        max-width: 100% !important;
-        box-sizing: border-box;
-    }
-
-    /* 3. Se você usar menus ou blocos lado a lado, força eles a ficarem um abaixo do outro */
-    .row, .flex-container, header {
-        flex-direction: column !important;
-    }
-}
+            html, body {
+                width: 100%;
+                overflow-x: hidden; 
+            }
+            .container, main, section, div {
+                max-width: 100% !important;
+                box-sizing: border-box;
+            }
+            .row, .flex-container, header {
+                flex-direction: column !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-sacro-dourado font-sans min-h-screen flex flex-col transition-colors duration-500 selection:bg-red-200">
 
-    <!-- Tela de Bloqueio de Manutenção Global -->
     <div id="tela-manutencao" class="fixed inset-0 bg-slate-50 dark:bg-zinc-950 z-55 flex flex-col items-center justify-center p-6 text-center hidden">
         <div class="w-16 h-16 bg-amber-500/10 dark:bg-amber-500/5 text-amber-600 rounded-2xl flex items-center justify-center text-2xl border border-amber-500/20 shadow-xs mb-4 animate-bounce">
             <i class="fa-solid fa-screwdriver-wrench"></i>
@@ -73,7 +67,6 @@
         <p class="text-xs text-slate-500 dark:text-zinc-400 max-w-sm mt-2 leading-relaxed font-medium">Estamos atualizando os sacrários e arquivos do presbitério. O painel estará disponível novamente em breve.</p>
     </div>
 
-    <!-- Tela de Loading Inicial -->
     <div id="tela-loading" class="fixed inset-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-50 flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="relative flex items-center justify-center mb-4">
             <div class="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-red-600 border-b-amber-500"></div>
@@ -188,7 +181,6 @@
                         <h3 class="text-sm font-black text-slate-800 dark:text-zinc-100 tracking-tight">Materiais de Formação</h3>
                     </div>
                     <div class="p-5 space-y-4">
-                        <!-- Player de Vídeo Integrado -->
                         <div id="wrapper-player-formacao" class="w-full aspect-video rounded-2xl bg-slate-950 overflow-hidden shadow-inner border border-slate-200 dark:border-zinc-800 relative flex flex-col items-center justify-center text-center p-4">
                             <div id="placeholder-player" class="text-slate-500 dark:text-zinc-500 space-y-2">
                                 <i class="fa-solid fa-clapperboard text-2xl animate-pulse text-red-600/60"></i>
@@ -219,7 +211,6 @@
                         <span id="liturgia-cor-badge" class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400 self-start">---</span>
                     </div>
                     <div class="p-5 space-y-4">
-                        <!-- Abas internas da liturgia -->
                         <div class="flex bg-slate-100 dark:bg-zinc-800 p-1 rounded-xl text-[10px] font-bold text-slate-500 dark:text-zinc-400">
                             <button onclick="switchSubTab('1leitura')" id="subtab-1leitura" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all active-subtab">1ª Leit.</button>
                             <button onclick="switchSubTab('salmo')" id="subtab-salmo" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all">Salmo</button>
@@ -227,7 +218,6 @@
                             <button onclick="switchSubTab('evangelho')" id="subtab-evangelho" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all">Evang.</button>
                         </div>
 
-                        <!-- Container de Textos Litúrgicos Dinâmicos -->
                         <div class="bg-amber-50/30 dark:bg-amber-950/10 p-4 rounded-2xl border border-amber-100/50 dark:border-amber-900/20">
                             <span id="liturgia-texto-referencia" class="block text-[9px] font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-1.5">Carregando...</span>
                             <div id="liturgia-texto-corpo" class="text-xs text-slate-600 dark:text-zinc-400 font-medium leading-relaxed min-h-48 h-auto max-h-96 overflow-y-auto pr-1 text-justify whitespace-pre-line">
@@ -326,8 +316,8 @@
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    // 1. IMPORTAR O MÓDULO DE MENSAGENS
+    // MODIFICAÇÃO DE FORÇA DE REDE: Importar initializeFirestore em vez de getFirestore para aplicar Long Polling
+    import { initializeFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot, deleteField } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
     const firebaseConfig = {
@@ -341,8 +331,12 @@
 
     const app = initializeApp(firebaseConfig); 
     const auth = getAuth(app); 
-    const db = getFirestore(app);
-    // 2. INICIALIZAR O MESSAGING
+    
+    // CONFIGURAÇÃO DO FIRESTORE ATUALIZADA: Forçando o protocolo HTTP tradicional contra o erro ERR_QUIC_PROTOCOL_ERROR
+    const db = initializeFirestore(app, {
+        experimentalForceLongPolling: true
+    });
+
     const messaging = getMessaging(app);
 
     const telaLoading = document.getElementById('tela-loading');
@@ -429,13 +423,11 @@
             if(devSession) { 
                 usuarioLogadoDados = JSON.parse(devSession); 
                 inicializarPainelAcolito(); 
-                // Se for usuário dev simulado, o UID real não existe para receber o token de push
             } else if(user) {
                 const docSnap = await getDoc(doc(db, "usuarios", user.uid));
                 if(docSnap.exists()) { 
                     usuarioLogadoDados = docSnap.data(); 
                     inicializarPainelAcolito(); 
-                    // Configura as notificações para o usuário autenticado
                     configurarNotificacoesPush(user.uid);
                 } else { 
                     signOut(auth); 
@@ -453,25 +445,34 @@
         }
     });
 
-    // 3. FUNÇÃO PARA CONFIGURAR AS PERMISSÕES E SALVAR O TOKEN DE NOTIFICAÇÃO
+    // COLOQUEI A CORREÇÃO DO SERVICE WORKER E DO ESCOPO DO GITHUB PAGES NESTA FUNÇÃO:
     async function configurarNotificacoesPush(userUid) {
         try {
-            // Solicita permissão do navegador para exibir alertas
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
-                // SUBSTITUA A STRING ABAIXO PELA SUA CHAVE PÚBLICA VAPID GERADA NO PASSO 1
                 const chavePublicaVapid = "BEJmhfFVnv--4dGBf-MqbzgBNSNudx2mWFSaZaQq4m1X2eotSzS--jeAKx6c_736d6Q5nlHuODVxqWV16l_VvzM";
 
-                const tokenAtual = await getToken(messaging, { vapidKey: chavePublicaVapid });
-                
-                if (tokenAtual) {
-                    // Guarda o token de notificação no cadastro do acólito no Firestore
-                    await updateDoc(doc(db, "usuarios", userUid), {
-                        fcmToken: tokenAtual
+                // Registro manual forçando o ponto-barra para localizar o SW dentro do repositório no subdomínio do Pages
+                if ('serviceWorker' in navigator) {
+                    const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js', {
+                        scope: './'
                     });
-                    console.log("Token de notificação push registrado com sucesso para o usuário!");
-                } else {
-                    console.log('Nenhum token de registro disponível. Verifique as permissões.');
+                    console.log("Service Worker registrado com sucesso no escopo relativo do repositório:", registration.scope);
+
+                    // Passando o registro explicitamente para o Firebase gerar a chave
+                    const tokenAtual = await getToken(messaging, { 
+                        vapidKey: chavePublicaVapid,
+                        serviceWorkerRegistration: registration
+                    });
+                    
+                    if (tokenAtual) {
+                        await updateDoc(doc(db, "usuarios", userUid), {
+                            fcmToken: tokenAtual
+                        });
+                        console.log("Token de notificação push gerado e salvo no Firestore!");
+                    } else {
+                        console.log('Nenhum token de registro disponível. Verifique as permissões.');
+                    }
                 }
             }
         } catch (err) {
@@ -479,10 +480,8 @@
         }
     }
 
-    // Escuta mensagens caso o usuário esteja com o painel aberto na tela
     onMessage(messaging, (payload) => {
         console.log('Mensagem recebida em primeiro plano (painel aberto): ', payload);
-        // Exibe um alerta nativo ou customizado se ele já estiver navegando no site
         alert(`${payload.notification.title}\n\n${payload.notification.body}`);
     });
 
