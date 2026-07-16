@@ -52,14 +52,42 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = "index.html"; return; }
-        
+    // --- BLOCO DE INJEÇÃO DE SESSÃO FAKE PARA DESENVOLVIMENTO ---
+    const devSession = sessionStorage.getItem("dev_user");
+    let usuarioLogadoDados = null;
+
+    if (devSession) {
+        try {
+            usuarioLogadoDados = JSON.parse(devSession);
+            console.warn("⚠️ Modo Desenvolvimento: Logado com usuário fake:", usuarioLogadoDados);
+            // Executa a inicialização do painel usando o e-mail mockado
+            inicializarPainel(usuarioLogadoDados.email);
+        } catch (e) {
+            console.error("Erro ao ler dev_user do sessionStorage", e);
+        }
+    }
+    // -------------------------------------------------------------
+
+    // Só ativa o monitoramento do Firebase se NÃO houver uma sessão fake ativa
+    if (!usuarioLogadoDados) {
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { 
+                window.location.href = "index.html"; 
+                return; 
+            }
+            inicializarPainel(user.email);
+        });
+    }
+
+    // Função centralizada que carrega os dados do painel
+    async function inicializarPainel(emailUsuario) {
+        // 1. Atualiza o mural em tempo real
         onSnapshot(collection(db, "mural"), (snap) => {
             document.getElementById('mural-avisos').innerHTML = snap.docs.map(d => `<p class="mb-2 border-b pb-1">${d.data().texto}</p>`).join('');
         });
 
-        const qUsuarios = query(collection(db, "usuarios"), where("email_conexao", "==", user.email));
+        // 2. Busca os dependentes/filhos baseados no e-mail do usuário logado (real ou fake)
+        const qUsuarios = query(collection(db, "usuarios"), where("email_conexao", "==", emailUsuario));
         const snapUsuarios = await getDocs(qUsuarios);
         const listaEscalas = document.getElementById('lista-escalas-filhos');
 
@@ -105,9 +133,17 @@
         });
 
         listaEscalas.innerHTML = htmlFilhos;
-    });
+    }
 
-    document.getElementById('btn-logout').onclick = () => signOut(auth);
+    // Configuração do botão de logout (limpa a sessão de dev também)
+    document.getElementById('btn-logout').onclick = () => {
+        if (devSession) {
+            sessionStorage.removeItem("dev_user");
+            window.location.href = "index.html";
+        } else {
+            signOut(auth);
+        }
+    };
 </script>
 </body>
 </html>
