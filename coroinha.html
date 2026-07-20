@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="transition-colors duration-500">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altaris - Painel do Acólito</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style type="text/tailwindcss">
+        @theme {
+            --animate-pulse: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @custom-variant dark (&:where(.dark, .dark *));
+
+        /* Fundo Litúrgico - Padrão Sacro */
+        .bg-sacro-dourado {
+            background-color: #f8fafc;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjYjQ1MzA5IiBmaWxsLW9wYWNpdHk9IjAuMDQiPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iZG9uZSIgcj0iNiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNjAxIiByPSI2Ii8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeD0iNDAiIHI9IjEiLz48cGF0aCB dPSJNMzYgMThoOHYyaC-4ek0zNiA5bC-4ek0xOCAzNmgydjhoLTJNNTggMzZoMnY4aC-yeiIvPjwvZz48L3N2Zz4=");
+        }
+
+        .dark .bg-sacro-dourado {
+            background-color: #09090b;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48ZyBmaWxsPSIjZDk3NzA2IiBmaWxsLW9wYWNpdHk9IjAuMDciPjxwYXRoIGQ9Ik0zOSAwaDJ2MTVoLTJ6TTM5IDI1aDJ2MTVoLTJ6TTM5IDQwaDJ2MTVoLTJ6TTM5IDY1aDJ2MTVoLTJ6TTAgMzloMTV2Mkgwek0yNSAzOWgxNXYySDI1ek00MCAzOWgxNXYySDQwek02NSAzOWgxNXYySDY1eiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMjAiIHI9IjYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjYwIiByPSI2Ii8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMSIvPjxjaXJjbGUgY3g9IjQwIiBjeD0iNDAiIHI9IjEiLz48cGF0aCBkPSJNMzYgMThoOHYyaC-4ek0zNiA5bC-4ek0xOCAzNmgydjhoLTJNNTggMzZoMnY4aC-yeiIvPjwvZz48L3N2Zz4=");
+        }
+
+        .active-tab {
+            border-bottom: 3px solid #dc2626;
+            color: #dc2626;
+            font-weight: 800;
+        }
+        .dark .active-tab {
+            border-bottom: 3px solid #ef4444;
+            color: #ef4444;
+        }
+        .active-subtab {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            font-weight: 700;
+        }
+        .dark .active-subtab {
+            background-color: #27272a;
+            color: #f4f4f5;
+        }
+        @media (max-width: 360px) {
+            html, body {
+                width: 100%;
+                overflow-x: hidden; 
+            }
+            .container, main, section, div {
+                max-width: 100% !important;
+                box-sizing: border-box;
+            }
+            .row, .flex-container, header {
+                flex-direction: column !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-sacro-dourado font-sans min-h-screen flex flex-col transition-colors duration-500 selection:bg-red-200">
+
+    <div id="tela-manutencao" class="fixed inset-0 bg-slate-50 dark:bg-zinc-950 z-55 flex flex-col items-center justify-center p-6 text-center hidden">
+        <div class="w-16 h-16 bg-amber-500/10 dark:bg-amber-500/5 text-amber-600 rounded-2xl flex items-center justify-center text-2xl border border-amber-500/20 shadow-xs mb-4 animate-bounce">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+        </div>
+        <h2 class="text-base font-black text-slate-800 dark:text-zinc-100 uppercase tracking-tight">Sistema em Manutenção</h2>
+        <p class="text-xs text-slate-500 dark:text-zinc-400 max-w-sm mt-2 leading-relaxed font-medium">Estamos atualizando os sacrários e arquivos do presbitério. O painel estará disponível novamente em breve.</p>
+    </div>
+
+    <div id="tela-loading" class="fixed inset-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative flex items-center justify-center mb-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-red-600 border-b-amber-500"></div>
+            <i class="fa-solid fa-cross text-red-600 absolute text-xs"></i>
+        </div>
+        <p class="text-[10px] font-black text-gray-400 dark:text-zinc-500 tracking-widest uppercase animate-pulse">Sincronizando Presbitério...</p>
+    </div>
+
+    <header class="bg-gradient-to-r from-red-800 to-red-900 dark:from-zinc-900 dark:to-zinc-900 text-white px-4 py-4 shadow-md sticky top-0 z-40 border-b border-red-900/40 dark:border-zinc-800/80 transition-colors">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/10 shadow-inner">
+                    <i class="fa-solid fa-church text-amber-400 text-base"></i>
+                </div>
+                <div>
+                    <h2 id="nome-usuario-header" class="text-sm font-black tracking-wide uppercase">Carregando...</h2>
+                    <span id="funcao-usuario-header" class="text-[9px] bg-white/20 dark:bg-zinc-800 px-2 py-0.5 rounded-sm font-bold uppercase tracking-wider block mt-0.5">...</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button id="btn-dark-mode" aria-label="Alternar Tema" class="relative w-12 h-7 bg-red-950/40 dark:bg-zinc-800 rounded-full p-1 cursor-pointer transition-all duration-500 border border-white/5 dark:border-zinc-700/30">
+                    <div id="dark-mode-thumb" class="w-5 h-5 bg-white dark:bg-zinc-900 rounded-full flex items-center justify-center shadow-md transform transition-all duration-500 ease-out translate-x-0 dark:translate-x-5">
+                        <i class="fa-solid fa-sun text-amber-500 text-[10px] absolute transition-all duration-500 scale-100 rotate-0 dark:scale-0 dark:rotate-180"></i>
+                        <i class="fa-solid fa-moon text-red-500 text-[10px] absolute transition-all duration-500 scale-0 -rotate-180 dark:scale-100 dark:rotate-0"></i>
+                    </div>
+                </button>
+
+                <button id="btn-logout" class="bg-red-950/40 dark:bg-zinc-800/50 hover:bg-red-900 dark:hover:bg-zinc-800 p-2.5 rounded-xl transition-all text-white/90 cursor-pointer border border-white/5 dark:border-zinc-700/20 text-xs flex items-center gap-2 font-bold">
+                    Sair <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-white dark:bg-zinc-900 border-b border-slate-200/60 dark:border-zinc-800 shadow-xs sticky top-[73px] z-30 flex md:hidden transition-colors">
+        <button id="tab-escala" onclick="switchTab('escala')" class="active-tab flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400">
+            <i class="fa-solid fa-calendar-days text-sm"></i> <span>Escalas</span>
+        </button>
+        <button id="tab-avisos" onclick="switchTab('avisos')" class="flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400">
+            <i class="fa-solid fa-bullhorn text-sm"></i> <span>Avisos</span>
+        </button>
+        <button id="tab-conteudos" onclick="switchTab('conteudos')" class="flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400">
+            <i class="fa-solid fa-book-open text-sm"></i> <span>Conteúdos</span>
+        </button>
+        <button id="tab-liturgia" onclick="switchTab('liturgia')" class="flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400">
+            <i class="fa-solid fa-scroll text-sm"></i> <span>Liturgia</span>
+        </button>
+    </nav>
+
+    <main class="max-w-6xl w-full mx-auto p-4 md:p-6 flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 z-10 relative items-start">
+        
+        <div id="conteudo-escala" class="space-y-6 block md:col-span-2">
+            
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-700 via-amber-500 to-red-600"></div>
+                
+                <div class="p-6 border-b border-slate-100 dark:border-zinc-800/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-base font-black text-slate-800 dark:text-zinc-100 tracking-tight">Painel Geral de Escalas</h3>
+                        <p class="text-[11px] text-slate-400 dark:text-zinc-400 font-medium mt-0.5">Confirme sua vaga ou assuma uma escala livre/substituição disponível.</p>
+                    </div>
+                    <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                        <span class="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider whitespace-nowrap">Data:</span>
+                        <input type="date" id="busca-escala-data" class="w-full sm:w-auto bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700/50 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-zinc-200 outline-none focus:border-red-600 transition-all shadow-xs">
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <div id="resultado-escala-geral" class="space-y-5 text-xs">
+                        <p class="text-slate-400 dark:text-zinc-500 italic flex items-center gap-2"><i class="fa-solid fa-circle-notch animate-spin"></i> Buscando informações do dia...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="card-enquete-disponibilidade" class="hidden bg-amber-50/40 dark:bg-amber-950/10 p-6 rounded-3xl border border-amber-200/60 dark:border-amber-900/30 space-y-4 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 inset-x-0 h-1 bg-amber-500"></div>
+                <div>
+                    <h3 class="text-sm font-black text-amber-900 dark:text-amber-400 flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation text-amber-600 dark:text-amber-500"></i> Enquete de Disponibilidade Mensal</h3>
+                    <p class="text-[11px] text-amber-800/80 dark:text-zinc-400 font-medium mt-0.5">Marque os dias que você pode servir. As opções somem desta lista assim que enviadas.</p>
+                </div>
+                <form id="form-responder-enquete" class="space-y-4">
+                    <div id="lista-celebracoes-checkboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-48 overflow-y-auto bg-white dark:bg-zinc-900 p-4 rounded-xl border border-amber-200/50 dark:border-zinc-800/80"></div>
+                    <button type="submit" class="w-full bg-amber-700 hover:bg-amber-800 dark:bg-amber-600 dark:hover:bg-amber-700 text-white font-bold text-xs py-2.5 rounded-xl transition-all cursor-pointer shadow-xs uppercase tracking-wider">Salvar Disponibilidade</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="space-y-6 md:col-span-1 flex flex-col w-full">
+            
+            <div id="conteudo-avisos" class="space-y-4 hidden md:block w-full">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
+                    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 to-red-600"></div>
+                    <div class="p-5 border-b border-slate-100 dark:border-zinc-800/60 flex items-center gap-2.5">
+                        <i class="fa-solid fa-bullhorn text-amber-600 dark:text-amber-500 text-base"></i>
+                        <h3 class="text-sm font-black text-slate-800 dark:text-zinc-100 tracking-tight">Mural de Avisos</h3>
+                    </div>
+                    <div id="container-mural-e-penalidades" class="p-5 space-y-3">
+                        <div class="bg-slate-50/70 dark:bg-zinc-800/30 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800/60 hover:border-amber-500/30 transition-all">
+                            <p id="txt-aviso-mural" class="text-xs font-medium text-slate-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed">Nenhum comunicado oficial recente.</p>
+                            <span id="data-aviso-mural" class="block text-[9px] font-bold text-slate-400 dark:text-zinc-500 mt-3 text-right tracking-wider">--/--/----</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="conteudo-conteudos" class="space-y-4 hidden md:block w-full">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
+                    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-700 to-amber-500"></div>
+                    <div class="p-5 border-b border-slate-100 dark:border-zinc-800/60 flex items-center gap-2.5">
+                        <i class="fa-solid fa-book-open text-red-600 dark:text-red-500 text-base"></i>
+                        <h3 class="text-sm font-black text-slate-800 dark:text-zinc-100 tracking-tight">Materiais de Formação</h3>
+                    </div>
+                    <div class="p-5 space-y-4">
+                        <div id="wrapper-player-formacao" class="w-full aspect-video rounded-2xl bg-slate-950 overflow-hidden shadow-inner border border-slate-200 dark:border-zinc-800 relative flex flex-col items-center justify-center text-center p-4">
+                            <div id="placeholder-player" class="text-slate-500 dark:text-zinc-500 space-y-2">
+                                <i class="fa-solid fa-clapperboard text-2xl animate-pulse text-red-600/60"></i>
+                                <p class="text-[11px] font-bold uppercase tracking-wider">Nenhum vídeo ativo</p>
+                                <p class="text-[10px] text-slate-400 dark:text-zinc-600 max-w-[200px] mx-auto font-medium leading-tight">Escolha uma das formações em vídeo listadas abaixo para reproduzir.</p>
+                            </div>
+                            <div id="container-midia-player" class="absolute inset-0 hidden w-full h-full"></div>
+                        </div>
+
+                        <div id="lista-materials-formacao" class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                            <p class="text-xs text-slate-400 dark:text-zinc-500 italic">Buscando conteúdos ativos...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="conteudo-liturgia" class="space-y-4 hidden md:block w-full">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_20px_45px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-zinc-800/80 overflow-hidden relative transition-all">
+                    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-600 via-red-600 to-amber-500"></div>
+                    <div class="p-5 border-b border-slate-100 dark:border-zinc-800/60 flex items-center justify-between gap-2">
+                        <div class="flex flex-col gap-0.5">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-scroll text-amber-600 dark:text-amber-500 text-sm"></i>
+                                <h3 id="liturgia-semana-titulo" class="text-xs font-black text-slate-800 dark:text-zinc-100 tracking-tight uppercase">Carregando Semana...</h3>
+                            </div>
+                            <span id="liturgia-santo-dia" class="text-[11px] font-bold text-slate-500 dark:text-zinc-400 block pl-5">Buscando Santo do Dia...</span>
+                        </div>
+                        <span id="liturgia-cor-badge" class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400 self-start">---</span>
+                    </div>
+                    <div class="p-5 space-y-4">
+                        <div class="flex bg-slate-100 dark:bg-zinc-800 p-1 rounded-xl text-[10px] font-bold text-slate-500 dark:text-zinc-400">
+                            <button onclick="switchSubTab('1leitura')" id="subtab-1leitura" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all active-subtab">1ª Leit.</button>
+                            <button onclick="switchSubTab('salmo')" id="subtab-salmo" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all">Salmo</button>
+                            <button onclick="switchSubTab('2leitura')" id="subtab-2leitura" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all hidden">2ª Leit.</button>
+                            <button onclick="switchSubTab('evangelho')" id="subtab-evangelho" class="flex-1 py-1.5 text-center rounded-lg cursor-pointer transition-all">Evang.</button>
+                        </div>
+
+                        <div class="bg-amber-50/30 dark:bg-amber-950/10 p-4 rounded-2xl border border-amber-100/50 dark:border-amber-900/20">
+                            <span id="liturgia-texto-referencia" class="block text-[9px] font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest mb-1.5">Carregando...</span>
+                            <div id="liturgia-texto-corpo" class="text-xs text-slate-600 dark:text-zinc-400 font-medium leading-relaxed min-h-48 h-auto max-h-96 overflow-y-auto pr-1 text-justify whitespace-pre-line">
+                                Buscando os textos litúrgicos da mesa da Palavra...
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-100 dark:border-zinc-800/60 pt-4 space-y-3">
+                            <span class="block text-[10px] font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
+                                <i class="fa-solid fa-book-bible"></i> Consulta às Sagradas Escrituras
+                            </span>
+                            
+                            <div class="grid grid-cols-3 gap-2">
+                                <select id="select-biblia-livro" class="col-span-2 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-700 dark:text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 transition-all shadow-xs">
+                                    <option value="Gênesis" selected>Gênesis</option>
+                                    <option value="Êxodo">Êxodo</option>
+                                    <option value="Levítico">Levítico</option>
+                                    <option value="Números">Números</option>
+                                    <option value="Deuteronômio">Deuteronômio</option>
+                                    <option value="Josué">Josué</option>
+                                    <option value="Juízes">Juízes</option>
+                                    <option value="Rute">Rute</option>
+                                    <option value="1 Samuel">1 Samuel</option>
+                                    <option value="2 Samuel">2 Samuel</option>
+                                    <option value="1 Reis">1 Reis</option>
+                                    <option value="2 Reis">2 Reis</option>
+                                    <option value="1 Crônicas">1 Crônicas</option>
+                                    <option value="2 Crônicas">2 Crônicas</option>
+                                    <option value="Esdras">Esdras</option>
+                                    <option value="Neemias">Neemias</option>
+                                    <option value="Ester">Ester</option>
+                                    <option value="Jó">Jó</option>
+                                    <option value="Salmos">Salmos</option>
+                                    <option value="Provérbios">Provérbios</option>
+                                    <option value="Eclesiastes">Eclesiastes</option>
+                                    <option value="Cânticos">Cânticos</option>
+                                    <option value="Isaías">Isaías</option>
+                                    <option value="Jeremias">Jeremias</option>
+                                    <option value="Lamentações">Lamentações</option>
+                                    <option value="Ezequiel">Ezequiel</option>
+                                    <option value="Daniel">Daniel</option>
+                                    <option value="Oséias">Oséias</option>
+                                    <option value="Joel">Joel</option>
+                                    <option value="Amós">Amós</option>
+                                    <option value="Obadias">Obadias</option>
+                                    <option value="Jonas">Jonas</option>
+                                    <option value="Miqueias">Miqueias</option>
+                                    <option value="Naum">Naum</option>
+                                    <option value="Habacuque">Habacuque</option>
+                                    <option value="Sofonias">Sofonias</option>
+                                    <option value="Ageu">Ageu</option>
+                                    <option value="Zacarias">Zacarias</option>
+                                    <option value="Malaquias">Malaquias</option>
+                                    <option value="Mateus">Mateus</option>
+                                    <option value="Marcos">Marcos</option>
+                                    <option value="Lucas">Lucas</option>
+                                    <option value="João">João</option>
+                                    <option value="Atos">Atos</option>
+                                    <option value="Romanos">Romanos</option>
+                                    <option value="1 Coríntios">1 Coríntios</option>
+                                    <option value="2 Coríntios">2 Coríntios</option>
+                                    <option value="Gálatas">Gálatas</option>
+                                    <option value="Efésios">Efésios</option>
+                                    <option value="Filipenses">Filipenses</option>
+                                    <option value="Colossenses">Colossenses</option>
+                                    <option value="1 Tessalonicenses">1 Tessalonicenses</option>
+                                    <option value="2 Tessalonicenses">2 Tessalonicenses</option>
+                                    <option value="1 Timóteo">1 Timóteo</option>
+                                    <option value="2 Timóteo">2 Timóteo</option>
+                                    <option value="Tito">Tito</option>
+                                    <option value="Filemom">Filemom</option>
+                                    <option value="Hebreus">Hebreus</option>
+                                    <option value="Tiago">Tiago</option>
+                                    <option value="1 Pedro">1 Pedro</option>
+                                    <option value="2 Pedro">2 Pedro</option>
+                                    <option value="1 João">1 João</option>
+                                    <option value="2 João">2 João</option>
+                                    <option value="3 João">3 João</option>
+                                    <option value="Judas">Judas</option>
+                                    <option value="Apocalipse">Apocalipse</option>
+                                </select>
+                                <input type="number" id="input-biblia-capitulo" value="1" min="1" max="150" class="bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-700 dark:text-zinc-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 text-center shadow-xs" placeholder="Cap.">
+                            </div>
+
+                            <div id="texto-biblia-container" class="w-full h-[320px] overflow-y-auto rounded-2xl border border-slate-100 dark:border-zinc-800/80 bg-linear-to-b from-slate-50/60 to-slate-100/30 dark:from-zinc-950/40 dark:to-zinc-950/20 p-4 space-y-3.5 text-[13px] leading-relaxed text-slate-700 dark:text-zinc-300 scroll-smooth antialiased">
+                                <p class="text-slate-400 dark:text-zinc-500 italic text-center pt-24">Selecione o livro e capítulo para carregar os textos sagrados...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { initializeFirestore, doc, updateDoc, setDoc, getDoc, collection, onSnapshot, deleteField } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
+
+    // Certifique-se de carregar/importar o arquivo JSON da Bíblia corretamente aqui
+    // Exemplo: import bibliaData from './biblia.json' assert { type: 'json' };
+    // Ou carregue via fetch local na função de leitor da bíblia abaixo.
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCwPeLrAtNEO41MZ3yxSuYib2LC0z2dv9U",
+        authDomain: "tarcisius-d03d7.firebaseapp.com",
+        projectId: "tarcisius-d03d7",
+        storageBucket: "tarcisius-d03d7.firebasestorage.app",
+        messagingSenderId: "186797936591",
+        appId: "1:186797936591:web:72c81c54fb7c1905c1ccba"
+    };
+
+    const app = initializeApp(firebaseConfig); 
+    const auth = getAuth(app); 
+    
+    const db = initializeFirestore(app, {
+        experimentalForceLongPolling: true
+    });
+
+    const messaging = getMessaging(app);
+
+    const telaLoading = document.getElementById('tela-loading');
+    const telaManutencao = document.getElementById('tela-manutencao');
+    const nomeUsuarioHeader = document.getElementById('nome-usuario-header');
+    const funcaoUsuarioHeader = document.getElementById('funcao-usuario-header');
+    const cardEnqueteDisponibilidade = document.getElementById('card-enquete-disponibilidade');
+    const listaCelebracoesCheckboxes = document.getElementById('lista-celebracoes-checkboxes');
+    const formResponderEnquete = document.getElementById('form-responder-enquete');
+    const btnLogout = document.getElementById('btn-logout');
+    const buscaEscalaData = document.getElementById('busca-escala-data');
+    const resultadoEscalaGeral = document.getElementById('resultado-escala-geral');
+    const btnDarkMode = document.getElementById('btn-dark-mode');
+    const darkModeThumb = document.getElementById('dark-mode-thumb');
+
+    let usuarioLogadoDados = null; 
+    let todasEscalasCache = [];
+    let cacheLiturgiaDados = null; 
+    let bibliaDataCache = null; // Guardará os dados locais do arquivo biblia.json
+
+    function sincronizarVisualBotao(isDark) {
+        if (darkModeThumb) {
+            if (isDark) {
+                darkModeThumb.classList.remove('translate-x-0');
+                darkModeThumb.classList.add('translate-x-5');
+            } else {
+                darkModeThumb.classList.remove('translate-x-5');
+                darkModeThumb.classList.add('translate-x-0');
+            }
+        }
+    }
+
+    const temaSalvo = localStorage.getItem('theme');
+    const prefereSistemaEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (temaSalvo === 'dark' || (!temaSalvo && prefereSistemaEscuro)) {
+        document.documentElement.classList.add('dark');
+        sincronizarVisualBotao(true);
+    } else {
+        document.documentElement.classList.remove('dark');
+        sincronizarVisualBotao(false);
+    }
+
+    btnDarkMode?.addEventListener('click', () => {
+        const modificadoParaDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', modificadoParaDark ? 'dark' : 'light');
+        sincronizarVisualBotao(modificadoParaDark);
+    });
+
+    function hideLoading() { 
+        if(telaLoading) {
+            telaLoading.classList.add('opacity-0', 'pointer-events-none'); 
+        }
+    }
+
+    onSnapshot(doc(db, "configuracoes", "flags_sistema"), (snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.data();
+            const isDevMaster = sessionStorage.getItem("is_dev_master") === "true";
+
+            if (data.manutencao && !isDevMaster) {
+                if (!document.getElementById('bloqueio-manutencao')) {
+                    const modal = document.createElement('div');
+                    modal.id = 'bloqueio-manutencao';
+                    modal.className = "fixed inset-0 bg-stone-950 flex flex-col items-center justify-center z-[9999] p-4 text-center selection:bg-amber-500 selection:text-stone-950";
+                    modal.innerHTML = `
+                        <div class="max-w-sm p-8 bg-stone-900 border border-stone-800 rounded-3xl shadow-2xl transition-all">
+                            <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-500 mb-4 shadow-inner mx-auto">
+                                <i class="fa-solid fa-screwdriver-wrench text-2xl animate-bounce"></i>
+                            </div>
+                            <h1 class="text-base font-black text-white tracking-tight">Manutenção do Sistema</h1>
+                            <p class="text-xs text-stone-400 mt-2 leading-relaxed">O Altaris está passando por otimizações na infraestrutura do presbitério. Voltamos em breve!</p>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                }
+            } else {
+                document.getElementById('bloqueio-manutencao')?.remove();
+            }
+        }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+        try {
+            const devSession = sessionStorage.getItem("dev_user");
+            if(devSession) { 
+                usuarioLogadoDados = JSON.parse(devSession); 
+                inicializarPainelAcolito(); 
+            } else if(user) {
+                const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+                if(docSnap.exists()) { 
+                    usuarioLogadoDados = docSnap.data(); 
+                    inicializarPainelAcolito(); 
+                    configurarNotificacoesPush(user.uid);
+                } else { 
+                    signOut(auth); 
+                    window.location.href = "index.html"; 
+                    return;
+                }
+            } else { 
+                window.location.href = "index.html"; 
+                return;
+            }
+        } catch (error) {
+            console.error("Erro na autenticação:", error);
+        } finally {
+            setTimeout(hideLoading, 500);
+        }
+    });
+
+    async function configurarNotificacoesPush(userUid) {
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                const chavePublicaVapid = "BEJmhfFVnv--4dGBf-MqbzgBNSNudx2mWFSaZaQq4m1X2eotSzS--jeAKx6c_736d6Q5nlHuODVxqWV16l_VvzM";
+
+                if ('serviceWorker' in navigator) {
+                    const baseDir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+                    const swPath = baseDir + 'firebase-messaging-sw.js';
+
+                    const registration = await navigator.serviceWorker.register(swPath);
+
+                    const tokenAtual = await getToken(messaging, { 
+                        vapidKey: chavePublicaVapid,
+                        serviceWorkerRegistration: registration
+                    });
+                    
+                    if (tokenAtual) {
+                        await updateDoc(doc(db, "usuarios", userUid), {
+                            fcmToken: tokenAtual
+                        });
+
+                        fetch("https://fcm-helper.SEU_USUARIO.workers.dev/registrar-topico", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                token: tokenAtual,
+                                topico: "acolitos"
+                            })
+                        })
+                        .then(res => console.log("Registrado no tópico com sucesso."))
+                        .catch(err => console.error("Erro no Worker de tópicos:", err));
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Erro ao configurar notificações push: ', err);
+        }
+    } 
+
+    onMessage(messaging, (payload) => {
+        console.log('Mensagem recebida em primeiro plano (painel aberto): ', payload);
+        alert(`${payload.notification.title}\n\n${payload.notification.body}`);
+    });
+
+    function inicializarPainelAcolito() {
+        if(nomeUsuarioHeader) nomeUsuarioHeader.innerText = usuarioLogadoDados.nome;
+        if(funcaoUsuarioHeader) funcaoUsuarioHeader.innerText = usuarioLogadoDados.funcao;
+
+        if(buscaEscalaData && !buscaEscalaData.value) {
+            buscaEscalaData.value = new Date().toISOString().split('T')[0];
+        }
+
+        ouvirMuralAvisos();
+        ouvirPenalidadesUsuario();
+        ouvirColecaoConteudos();
+        ouvirEnqueteDisponibilidade();
+        ouvirTodasAsEscalas();
+        carregarLiturgiaDoDia();
+        inicializarLeitorBiblia();
+        
+        if(window.innerWidth < 768) { window.switchTab('escala'); }
+    }
+
+    if(btnLogout) {
+        btnLogout.addEventListener('click', () => { sessionStorage.removeItem("dev_user"); signOut(auth).then(() => window.location.href = "index.html"); });
+    }
+
+    function ouvirMuralAvisos() {
+        onSnapshot(doc(db, "mural", "aviso_geral"), (snap) => {
+            if(snap.exists()) {
+                document.getElementById('txt-aviso-mural').innerText = snap.data().texto || "";
+                document.getElementById('data-aviso-mural').innerText = snap.data().dataPublicacao || "--/--/----";
+            }
+        });
+    }
+
+    function ouvirPenalidadesUsuario() {
+        const containerMural = document.getElementById('container-mural-e-penalidades');
+        if(!containerMural) return;
+
+        onSnapshot(collection(db, "penalidades"), (snap) => {
+            document.querySelectorAll('.card-penalidade-dinamico').forEach(el => el.remove());
+
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                if(data.nome && usuarioLogadoDados && data.nome.toLowerCase().trim() === usuarioLogadoDados.nome.toLowerCase().trim()) {
+                    const cardPenalidade = document.createElement('div');
+                    cardPenalidade.className = "card-penalidade-dinamico bg-red-50/70 dark:bg-red-950/20 p-4 rounded-2xl border border-red-200 dark:border-red-900/40 hover:border-red-500/50 transition-all shadow-xs relative overflow-hidden animate-pulse";
+                    cardPenalidade.innerHTML = `
+                        <div class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-triangle-exclamation text-red-600 dark:text-red-500 text-sm mt-0.5"></i>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-black text-red-800 dark:text-red-400 uppercase tracking-wide">Notificação de Advertência</h4>
+                                <p class="text-xs font-medium text-slate-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed mt-1">${data.motivo || "Nenhum motivo especificado."}</p>
+                                <span class="block text-[9px] font-bold text-red-400 dark:text-red-500 mt-3 text-right tracking-wider">${data.dataPenalidade || "--/--/----"}</span>
+                            </div>
+                        </div>
+                    `;
+                    containerMural.appendChild(cardPenalidade);
+                }
+            });
+        });
+    }
+
+    window.reproduzirVideoFormacao = function(url) {
+        const placeholder = document.getElementById('placeholder-player');
+        const containerMidia = document.getElementById('container-midia-player');
+        
+        if(!containerMidia || !placeholder) return;
+        
+        const urlLimpa = url.trim();
+        let videoId = "";
+        
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/|live\/)([^#\&\?]*).*/;
+        const match = urlLimpa.match(regExp);
+        
+        if (match && match[2].length === 11) {
+            videoId = match[2];
+        }
+
+        if (videoId) {
+            placeholder.classList.add('hidden');
+            containerMidia.classList.remove('hidden');
+            containerMidia.innerHTML = `
+                <iframe 
+                    class="w-full h-full rounded-2xl" 
+                    src="https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1" 
+                    title="Formação Altaris" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            `;
+        } else if (urlLimpa.toLowerCase().endsWith('.mp4') || urlLimpa.toLowerCase().endsWith('.webm')) {
+            placeholder.classList.add('hidden');
+            containerMidia.classList.remove('hidden');
+            containerMidia.innerHTML = `
+                <video class="w-full h-full rounded-2xl" controls autoplay>
+                    <source src="${urlLimpa}" type="video/mp4">
+                    Seu navegador não suporta a reprodução de vídeos.
+                </video>
+                `;
+        } else {
+            alert("Este material é um link externo e será aberto em uma nova aba.");
+            window.open(urlLimpa, '_blank');
+        }
+    };
+
+    function ouvirColecaoConteudos() {
+        const container = document.getElementById('lista-materials-formacao');
+        if(!container) return;
+        onSnapshot(collection(db, "formacao"), (snap) => {
+            if(snap.empty) {
+                container.innerHTML = `<p class="text-xs text-slate-400 dark:text-zinc-500 italic">Nenhum material disponível no momento.</p>`;
+                return;
+            }
+            container.innerHTML = "";
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                const urlLower = (data.url || "").toLowerCase();
+                
+                const ehVideo = urlLower.includes('youtube.com') || urlLower.includes('youtu.be') || urlLower.endsWith('.mp4') || urlLower.endsWith('.m4v') || urlLower.endsWith('.webm');
+
+                if(ehVideo) {
+                    container.innerHTML += `
+                        <div class="flex items-center gap-3 bg-slate-50/70 dark:bg-zinc-800/30 hover:bg-red-50/40 dark:hover:bg-red-950/20 p-2.5 rounded-xl border border-slate-100 dark:border-zinc-800/60 transition-all group">
+                            <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center text-xs shadow-xs"><i class="fa-solid fa-video"></i></div>
+                            <div class="flex-1 overflow-hidden">
+                                <h4 class="text-xs font-bold text-slate-700 dark:text-zinc-200 truncate group-hover:text-amber-600">${data.titulo}</h4>
+                                <span class="text-[9px] text-amber-600 dark:text-amber-500 font-bold block truncate">Vídeo de Formação</span>
+                            </div>
+                            <button onclick="window.reproduzirVideoFormacao('${data.url}')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg cursor-pointer transition-all shadow-xs flex items-center gap-1 shrink-0">
+                                <i class="fa-solid fa-play text-[8px]"></i> Assistir
+                            </button>
+                        </div>`;
+                } else {
+                    container.innerHTML += `
+                        <a href="${data.url}" target="_blank" rel="noopener" class="flex items-center gap-3 bg-slate-50/70 dark:bg-zinc-800/30 hover:bg-red-50/40 dark:hover:bg-red-950/20 p-2.5 rounded-xl border border-slate-100 dark:border-zinc-800/60 transition-all block group">
+                            <div class="w-8 h-8 rounded-lg bg-red-600 text-white flex items-center justify-center text-xs shadow-xs"><i class="fa-solid fa-book"></i></div>
+                            <div class="flex-1 overflow-hidden">
+                                <h4 class="text-xs font-bold text-slate-700 dark:text-zinc-200 truncate group-hover:text-red-600">${data.titulo}</h4>
+                                <span class="text-[9px] text-slate-400 dark:text-zinc-500 font-medium block truncate">Acessar link externo</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-300 dark:text-zinc-600 text-[10px] pr-1"></i>
+                        </a>`;
+                }
+            });
+        });
+    }
+
+    function ouvirEnqueteDisponibilidade() {
+        onSnapshot(doc(db, "enquetes", "disponibilidade_atual"), (snap) => {
+            if(snap.exists() && snap.data().ativa === true) {
+                const dados = snap.data(); 
+                listaCelebracoesCheckboxes.innerHTML = "";
+                
+                const minhasEscolhasSalvas = dados.respostas?.[usuarioLogadoDados.nome]?.escolhas || [];
+                let opcoesVisiveisCount = 0;
+
+                dados.celebracoes.forEach(cel => {
+                    if(minhasEscolhasSalvas.includes(cel.idChave)) return;
+
+                    opcoesVisiveisCount++;
+                    const formatData = cel.data.split('-').reverse().join('/');
+                    listaCelebracoesCheckboxes.innerHTML += `
+                        <label class="flex items-center gap-3 bg-slate-50/50 dark:bg-zinc-800/30 p-2.5 rounded-xl border border-slate-100 dark:border-zinc-800/60 cursor-pointer text-[11px] font-medium text-slate-700 dark:text-zinc-300 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition-all">
+                            <input type="checkbox" name="celebracao_resp" value="${cel.idChave}" class="w-4 h-4 accent-amber-700 rounded focus:ring-amber-500">
+                            <div><span class="font-bold text-amber-900 dark:text-amber-500 block">${formatData} - ${cel.horario}</span>${cel.rotulo}</div>
+                        </label>`;
+                });
+
+                if(opcoesVisiveisCount > 0) {
+                    cardEnqueteDisponibilidade.classList.remove('hidden');
+                } else {
+                    cardEnqueteDisponibilidade.classList.add('hidden');
+                }
+            } else { cardEnqueteDisponibilidade.classList.add('hidden'); }
+        });
+    }
+
+    formResponderEnquete?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const boxes = document.querySelectorAll('input[name="celebracao_resp"]:checked');
+        if(boxes.length === 0) { alert("Selecione ao menos uma opção antes de salvar!"); return; }
+        
+        const listIds = []; boxes.forEach(b => listIds.push(b.value));
+        const refDoc = doc(db, "enquetes", "disponibilidade_atual");
+        
+        try {
+            const docSnap = await getDoc(refDoc);
+            let escolhasExistentes = docSnap.exists() ? (docSnap.data().respostas?.[usuarioLogadoDados.nome]?.escolhas || []) : [];
+            const novasEscolhasUnificadas = [...new Set([...escolhasExistentes, ...listIds])];
+
+            const atualizacaoEstruturada = {};
+            atualizacaoEstruturada[`respostas.${usuarioLogadoDados.nome}`] = {
+                escolhas: novasEscolhasUnificadas,
+                respondidoEm: Date.now()
+            };
+            await updateDoc(refDoc, atualizacaoEstruturada);
+            cardEnqueteDisponibilidade.classList.add('hidden'); 
+            alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
+        } catch (error) {
+            await setDoc(refDoc, { respostas: { [usuarioLogadoDados.nome]: { escolhas: listIds, respondidoEm: Date.now() } } }, { merge: true });
+            cardEnqueteDisponibilidade.classList.add('hidden'); 
+            alert("Sua disponibilidade foi registrada! As opções marcadas saíram da sua lista.");
+        }
+    });
+
+    function ouvirTodasAsEscalas() {
+        onSnapshot(collection(db, "escalas"), (snap) => {
+            todasEscalasCache = [];
+            snap.forEach(d => { 
+                const esc = d.data(); 
+                esc.idDoc = d.id; 
+                todasEscalasCache.push(esc); 
+            });
+            renderizarEscalaGeralPorData();
+        });
+    }
+
+    function renderizarEscalaGeralPorData() {
+        if(!resultadoEscalaGeral || !buscaEscalaData) return;
+        const dataAlvo = buscaEscalaData.value;
+        if(!dataAlvo) {
+            resultadoEscalaGeral.innerHTML = `<p class="text-slate-400 dark:text-zinc-500 italic">Selecione uma data acima para consultar.</p>`;
+            return;
+        }
+
+        const escalasDoDia = todasEscalasCache.filter(e => e.data === dataAlvo);
+        if(escalasDoDia.length === 0) {
+            resultadoEscalaGeral.innerHTML = `<p class="text-slate-400 dark:text-zinc-500 italic py-6 text-center bg-slate-50/50 dark:bg-zinc-800/10 rounded-2xl border border-dashed border-slate-200 dark:border-zinc-800">Nenhuma celebração ou escala publicada para este dia.</p>`;
+            return;
+        }
+
+        resultadoEscalaGeral.innerHTML = "";
+        escalasDoDia.forEach(esc => {
+            let listaMembrosHtml = "";
+            let estouEscaladoNestaCeb = false;
+            let minhaFuncaoNestaCeb = "";
+            let meuStatusNestaCeb = "Pendente";
+            let vagasLivresOuSubstituicoes = [];
+
+            const funcoes = [
+                { id: 'altar1', label: 'Altar 1', icone: 'fa-fire' }, { id: 'altar2', label: 'Altar 2', icone: 'fa-fire' },
+                { id: 'altar3', label: 'Altar 3', icone: 'fa-fire' }, { id: 'altar4', label: 'Altar 4', icone: 'fa-fire' },
+                { id: 'altar5', label: 'Altar 5', icone: 'fa-glass-water' }, { id: 'altar6', label: 'Altar 6', icone: 'fa-glass-water' },
+                { id: 'turiferario', label: 'Turiferário', icone: 'fa-smoke' }, { id: 'naveteiro', label: 'Naveteiro', icone: 'fa-box' }
+            ];
+
+            funcoes.forEach(f => {
+                const campoAtivo = f.id.startsWith('altar') ? true : (f.id === 'turiferario' ? esc.turibuloAtivo : esc.navetaAtiva);
+                if (campoAtivo === false) return; 
+
+                const item = esc[f.id];
+                const nomeEscalado = item?.nome || "";
+                const statusText = item?.status || "Pendente";
+
+                const ehVoce = nomeEscalado?.toLowerCase() === usuarioLogadoDados?.nome?.toLowerCase();
+                if(ehVoce) {
+                    estouEscaladoNestaCeb = true;
+                    minhaFuncaoNestaCeb = f.id;
+                    meuStatusNestaCeb = statusText;
+                }
+
+                const ehVagaLivre = !nomeEscalado || nomeEscalado.trim() === "" || nomeEscalado.toLowerCase().trim() === "a definir";
+
+                if(ehVagaLivre) {
+                    vagasLivresOuSubstituicoes.push({ funcaoId: f.id, label: f.label, tipo: 'vazia' });
+                } else if(statusText === 'Substituição Solicitada' && !ehVoce) {
+                    vagasLivresOuSubstituicoes.push({ funcaoId: f.id, label: f.label, tipo: 'subst', quem: nomeEscalado });
+                }
+
+                let badgeStatus = `<span class="text-[9px] px-1.5 py-0.5 rounded-md font-bold bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-100/60 dark:border-amber-900/30">Pendente</span>`;
+                if(ehVagaLivre) badgeStatus = `<span class="text-[9px] px-1.5 py-0.5 rounded-md font-bold bg-slate-100 text-slate-500 dark:bg-zinc-800 dark:text-zinc-400 italic font-medium">Vaga Disponível</span>`;
+                else if(statusText === 'Confirmado') badgeStatus = `<span class="text-[9px] px-1.5 py-0.5 rounded-md font-bold bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100/60 dark:border-emerald-900/30">✓ Confirmado</span>`;
+                else if(statusText === 'Substituição Solicitada') badgeStatus = `<span class="text-[9px] px-1.5 py-0.5 rounded-md font-bold bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-100/60 dark:border-rose-900/30">Subst. Pedida</span>`;
+
+                listaMembrosHtml += `
+                    <div class="flex justify-between items-center p-3 rounded-xl border text-xs transition-all ${
+                        ehVoce 
+                        ? 'bg-red-50/70 dark:bg-red-950/20 border-red-200 dark:border-red-900/40 font-bold ring-2 ring-red-600/10' 
+                        : 'bg-white dark:bg-zinc-900 border-slate-100 dark:border-zinc-800/60'
+                    }">
+                        <div class="flex items-center gap-2 max-w-[50%] truncate">
+                            <i class="fa-solid ${f.icone} text-slate-400 dark:text-zinc-500 text-[10px] w-3.5 text-center"></i>
+                            <span class="text-slate-500 dark:text-zinc-400 text-[11px] font-medium">${f.label}:</span>
+                        </div>
+                        <div class="flex items-center gap-2 truncate max-w-[50%]">
+                            <span class="truncate ${ehVoce ? 'text-red-700 dark:text-red-400 font-black' : (!ehVagaLivre ? 'text-slate-700 dark:text-zinc-200 font-semibold' : 'text-slate-400 dark:text-zinc-500 italic')}">
+                                ${ehVagaLivre ? 'Em aberto' : nomeEscalado} ${ehVoce ? '(Você)' : ''}
+                            </span>
+                            ${badgeStatus}
+                        </div>
+                    </div>`;
+            });
+
+            let painelAcaoUsuarioHtml = "";
+
+            if(estouEscaladoNestaCeb) {
+                if(meuStatusNestaCeb === 'Confirmado') {
+                    painelAcaoUsuarioHtml = `
+                        <div class="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 text-emerald-900 dark:text-emerald-400 p-3.5 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold mt-2 shadow-xs">
+                            <i class="fa-solid fa-circle-check text-emerald-600 dark:text-emerald-500 text-sm"></i> Sua presença está confirmada nesta celebração. Bom serviço!
+                        </div>`;
+                } else if(meuStatusNestaCeb === 'Substituição Solicitada') {
+                    painelAcaoUsuarioHtml = `
+                        <div class="bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 text-rose-900 dark:text-rose-400 p-3.5 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-3 mt-2 shadow-xs">
+                            <span class="text-xs font-bold"><i class="fa-solid fa-handshake-angle text-rose-600 dark:text-rose-500"></i> Você solicitou um substituto para este dia.</span>
+                            <button onclick="window.assumirVagaEscala('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Voltar')" class="bg-red-700 hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg cursor-pointer transition-all uppercase tracking-wider shadow-xs">
+                                Voltar a Servir aqui
+                            </button>
+                        </div>`;
+                } else {
+                    painelAcaoUsuarioHtml = `
+                        <div class="bg-red-800 dark:bg-zinc-800 text-white p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 shadow-md mt-2 border border-red-900/50 dark:border-zinc-700/40">
+                            <div>
+                                <span class="text-[9px] text-red-200 dark:text-amber-400 uppercase tracking-widest block font-black">Sua Escala nesta Celebração</span>
+                                <span class="text-[11px] block text-red-100/90 dark:text-zinc-300 mt-0.5">Responda o chamado oficial para este horário:</span>
+                            </div>
+                            <div class="flex gap-2 w-full sm:w-auto justify-end">
+                                <button onclick="window.votarPresencaItem('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Confirmado')" class="bg-white hover:bg-slate-50 text-emerald-800 px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all shadow-xs border border-transparent">
+                                    Confirmar Presença
+                                </button>
+                                <button onclick="window.votarPresencaItem('${esc.idDoc}', '${minhaFuncaoNestaCeb}', 'Substituição Solicitada')" class="bg-red-950/40 hover:bg-red-950/60 dark:bg-zinc-900 dark:hover:bg-zinc-950 text-white px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all border border-white/10 dark:border-zinc-700/50">
+                                    Pedir Substituto
+                                </button>
+                            </div>
+                        </div>`;
+                }
+            } else {
+                if(vagasLivresOuSubstituicoes.length > 0) {
+                    let botoesVagasHtml = "";
+                    vagasLivresOuSubstituicoes.forEach(v => {
+                        const txtBotao = v.type === 'vazia' ? `Assumir ${v.label} (Vaga Livre)` : `Substituir ${v.quem} em ${v.label}`;
+                        botoesVagasHtml += `
+                            <button onclick="window.assumirVagaEscala('${esc.idDoc}', '${v.funcaoId}', 'Assumir')" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-2.5 py-1.5 rounded-lg font-bold tracking-wide transition-all cursor-pointer text-[10px] uppercase shadow-xs flex items-center gap-1">
+                                <i class="fa-solid fa-plus-circle text-[9px]"></i> ${txtBotao}
+                            </button>`;
+                    });
+
+                    painelAcaoUsuarioHtml = `
+                        <div class="bg-blue-50 dark:bg-blue-950/10 border border-blue-100 dark:border-blue-900/30 p-3.5 rounded-2xl mt-2 space-y-2.5 shadow-xs">
+                            <span class="text-blue-900 dark:text-blue-400 font-bold block text-[11px]"><i class="fa-solid fa-hands-helping"></i> Oportunidades de Serviço neste Horário:</span>
+                            <div class="flex flex-wrap gap-2">${botoesVagasHtml}</div>
+                        </div>`;
+                } else {
+                    painelAcaoUsuarioHtml = `
+                        <div class="bg-slate-50 dark:bg-zinc-800/30 text-slate-400 dark:text-zinc-500 p-2.5 rounded-xl text-center text-[11px] font-medium mt-2 border border-slate-100 dark:border-zinc-800/40">
+                            <i class="fa-solid fa-info-circle text-[10px]"></i> Equipe completa. Você não está escalado neste horário.
+                        </div>`;
+                }
+            }
+
+            resultadoEscalaGeral.innerHTML += `
+                <div class="border border-slate-100 dark:border-zinc-800/80 rounded-2xl p-4 bg-slate-50/40 dark:bg-zinc-800/20 space-y-3 shadow-xs">
+                    <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-zinc-800 pb-2.5 font-black text-slate-800 dark:text-zinc-100 text-xs sm:text-sm">
+                        <span class="tracking-tight"><i class="fa-solid fa-church text-red-700 dark:text-red-500 mr-1.5 text-xs"></i> ${esc.titulo}</span>
+                        <span class="bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 px-2.5 py-0.5 rounded-lg border border-red-100/60 dark:border-red-900/20 text-xs">${esc.horario}h</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        ${listaMembrosHtml}
+                    </div>
+                    ${painelAcaoUsuarioHtml}
+                </div>`;
+        });
+    }
+
+    window.votarPresencaItem = async function(idDocEscala, campoFuncao, novoStatus) {
+        if(!idDocEscala || !campoFuncao) {
+            alert("Erro técnico: ID da escala ou função não encontrado.");
+            return;
+        }
+        
+        const refDoc = doc(db, "escalas", idDocEscala);
+        
+        try {
+            const docSnap = await getDoc(refDoc);
+            if (!docSnap.exists()) {
+                alert("Escala não encontrada no servidor.");
+                return;
+            }
+            
+            const dadosAtuais = docSnap.data();
+            const nomeAtual = dadosAtuais[campoFuncao]?.nome || ""; 
+
+            const dUp = {};
+            dUp[campoFuncao] = {
+                nome: nomeAtual,
+                status: novoStatus
+            };
+
+            await updateDoc(refDoc, dUp);
+        } catch (error) {
+            console.error("ERRO COMPLETO DO FIREBASE:", error);
+            alert("Erro no Firebase: " + error.code + " - " + error.message);
+        }
+    };
+
+    window.assumirVagaEscala = async function(idDocEscala, campoFuncao, operacao) {
+        if(!idDocEscala || !campoFuncao) return;
+        const refDoc = doc(db, "escalas", idDocEscala);
+        
+        try {
+            const docSnap = await getDoc(refDoc);
+            if (!docSnap.exists()) {
+                alert("Escala não encontrada.");
+                return;
+            }
+            
+            const dadosAtuais = docSnap.data();
+            const dUp = {};
+
+            if (operacao === 'Voltar') {
+                const nomeAtual = dadosAtuais[campoFuncao]?.nome || usuarioLogadoDados.nome;
+                dUp[campoFuncao] = {
+                    nome: nomeAtual,
+                    status: "Confirmado"
+                };
+                dUp[`${campoFuncao}.substituiuQuem`] = deleteField(); 
+                await updateDoc(refDoc, dUp);
+                alert("Você reassumiu seu posto!");
+            } else {
+                const donoOriginal = dadosAtuais[campoFuncao]?.nome || "";
+                const eraSubstituicao = dadosAtuais[campoFuncao]?.status === "Substituição Solicitada";
+
+                dUp[campoFuncao] = {
+                    nome: usuarioLogadoDados.nome,
+                    status: "Confirmado"
+                };
+
+                if (eraSubstituicao && donoOriginal && donoOriginal !== "A definir") {
+                    dUp[campoFuncao].substituiuQuem = donoOriginal;
+                }
+
+                await updateDoc(refDoc, dUp);
+                alert("Vaga assumida com sucesso!");
+            }
+        } catch (error) {
+            console.error("Erro ao atualizar escala:", error);
+            alert("Erro ao salvar. Tente novamente.");
+        }
+    };
+    
+    buscaEscalaData?.addEventListener('change', renderizarEscalaGeralPorData);
+
+    async function carregarLiturgiaDoDia() {
+        try {
+            const r = await fetch('https://liturgia.up.railway.app/'); 
+            if (!r.ok) throw new Error();
+            const apiData = await r.json();
+            
+            if (apiData) {
+                let tituloSemana = apiData.liturgia || "Tempo Litúrgico";
+                let santoDoDia = apiData.data || "Dia (Sem memória litúrgica específica)";
+
+                cacheLiturgiaDados = {
+                    semanaTitulo: tituloSemana,
+                    cor: apiData.cor,
+                    santo: santoDoDia,
+                    primeiraLeitura: {
+                        referencia: apiData.primeiraLeitura?.referencia || "I Leitura",
+                        texto: apiData.primeiraLeitura?.texto
+                    },
+                    salmo: {
+                        referencia: apiData.salmo?.referencia || "Salmo Responsorial",
+                        refrao: apiData.salmo?.refrao || apiData.salmo?.refrão || "",
+                        texto: apiData.salmo?.texto
+                    },
+                    segundaLeitura: apiData.segundaLeitura ? {
+                        referencia: apiData.segundaLeitura?.referencia || "II Leitura",
+                        texto: apiData.segundaLeitura?.texto
+                    } : null,
+                    evangelho: {
+                        referencia: apiData.evangelho?.referencia || "Evangelho",
+                        texto: apiData.evangelho?.texto
+                    }
+                };
+                
+                const semTituloEl = document.getElementById('liturgia-semana-titulo');
+                if (semTituloEl) semTituloEl.innerText = cacheLiturgiaDados.semanaTitulo;
+
+                const santoTxt = document.getElementById('liturgia-santo-dia');
+                if(santoTxt) santoTxt.innerText = cacheLiturgiaDados.santo;
+
+                const colBadge = document.getElementById('liturgia-cor-badge');
+                if(colBadge && cacheLiturgiaDados.cor) {
+                    colBadge.innerText = cacheLiturgiaDados.cor;
+                    const colLow = cacheLiturgiaDados.cor.toLowerCase();
+                    if(colLow.includes('verde')) colBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400";
+                    else if(colLow.includes('vermelho')) colBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400";
+                    else if(colLow.includes('branco')) colBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-stone-100 text-stone-800 dark:bg-stone-800 dark:text-stone-300";
+                    else if(colLow.includes('roxo')) colBadge.className = "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-400";
+                }
+
+                const btn2Leitura = document.getElementById('subtab-2leitura');
+                if(cacheLiturgiaDados.segundaLeitura && cacheLiturgiaDados.segundaLeitura.texto) {
+                    btn2Leitura.classList.remove('hidden');
+                } else {
+                    btn2Leitura.classList.add('hidden');
+                }
+
+                window.switchSubTab('1leitura');
+            } else {
+                throw new Error();
+            }
+        } catch (e) { 
+            console.error("Erro ao carregar liturgia:", e);
+            const corpoEl = document.getElementById('liturgia-texto-corpo');
+            if (corpoEl) corpoEl.innerText = "Consulta offline ou instabilidade na API de Liturgias."; 
+        }
+    }
+
+    window.switchSubTab = function(subTabName) {
+        if(!cacheLiturgiaDados) return;
+
+        const refEl = document.getElementById('liturgia-texto-referencia');
+        const corpoEl = document.getElementById('liturgia-texto-corpo');
+        const mapeamentoAbas = ['1leitura', 'salmo', '2leitura', 'evangelho'];
+
+        mapeamentoAbas.forEach(aba => {
+            const btn = document.getElementById(`subtab-${aba}`);
+            if(btn) {
+                if(aba === subTabName) btn.classList.add('active-subtab');
+                else btn.classList.remove('active-subtab');
+            }
+        });
+
+        let targetData = null;
+        if(subTabName === '1leitura') targetData = cacheLiturgiaDados.primeiraLeitura;
+        else if(subTabName === 'salmo') targetData = cacheLiturgiaDados.salmo;
+        else if(subTabName === '2leitura') targetData = cacheLiturgiaDados.segundaLeitura;
+        else if(subTabName === 'evangelho') targetData = cacheLiturgiaDados.evangelho;
+
+        if(targetData) {
+            refEl.innerText = targetData.referencia || "";
+            
+            if (subTabName === 'salmo') {
+                let salmoHtml = "";
+                if (targetData.refrao) {
+                    salmoHtml += `<p class="font-bold text-amber-800 dark:text-amber-500 mb-3 bg-amber-500/5 p-2 rounded-lg border-l-2 border-amber-600 italic">Refrão: ${targetData.refrao}</p>`;
+                }
+                
+                if (targetData.texto) {
+                    if (typeof targetData.texto === 'string') {
+                        salmoHtml += `<div class="space-y-2 text-justify">${targetData.texto}</div>`;
+                    } else if (Array.isArray(targetData.texto)) {
+                        salmoHtml += `<div class="space-y-2 text-justify">${targetData.texto.join('<br>')}</div>`;
+                    } else {
+                        salmoHtml += `<div class="space-y-2 text-justify">${JSON.stringify(targetData.texto)}</div>`;
+                    }
+                } else {
+                    salmoHtml += "<p class='italic text-slate-400'>Versos não disponíveis.</p>";
+                }
+                corpoEl.innerHTML = salmoHtml;
+            } else {
+                if (targetData.texto) {
+                    if (typeof targetData.texto === 'string') {
+                        corpoEl.innerHTML = `<div>${targetData.texto}</div>`;
+                    } else if (Array.isArray(targetData.texto)) {
+                        corpoEl.innerHTML = targetData.texto.join('<br>');
+                    } else if (typeof targetData.texto === 'object') {
+                        corpoEl.innerHTML = targetData.texto.paragrafo || JSON.stringify(targetData.texto);
+                    } else {
+                        corpoEl.innerHTML = "Texto não disponível.";
+                    }
+                } else {
+                    corpoEl.innerHTML = "Texto não disponível.";
+                }
+            }
+        } else {
+            refEl.innerText = "Não disponível";
+            corpoEl.innerHTML = "Nenhum texto associado a esta aba.";
+        }
+        corpoEl.scrollTop = 0;
+    }
+
+    // --- LEITOR DA BÍBLIA INTEGRADO AO ARQUIVO LOCAL JSON ---
+    function inicializarLeitorBiblia() {
+        const selectLivro = document.getElementById('select-biblia-livro');
+        const inputCapitulo = document.getElementById('input-biblia-capitulo');
+        
+        if(!selectLivro || !inputCapitulo) return;
+
+        async function carregarBibliaLocal() {
+            if (bibliaDataCache) return bibliaDataCache;
+            try {
+                // Caso tenha salvado o json como biblia.json no mesmo diretório:
+                const res = await fetch('./biblia.json'); 
+                bibliaDataCache = await res.json();
+                return bibliaDataCache;
+            } catch (err) {
+                console.error("Erro ao carregar o arquivo da Bíblia local:", err);
+                return null;
+            }
+        }
+
+        async function buscarTextoBiblia() {
+            const livroNome = selectLivro.value;
+            const capNum = parseInt(inputCapitulo.value) || 1;
+            const container = document.getElementById('texto-biblia-container');
+            
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center pt-24 text-slate-400 dark:text-zinc-500">
+                    <i class="fa-solid fa-circle-notch animate-spin text-amber-600 text-lg mb-2"></i>
+                    <p class="italic text-xs font-semibold tracking-wide">Lendo as Sagradas Escrituras...</p>
+                </div>`;
+            
+            const biblia = await carregarBibliaLocal();
+            
+            if(!biblia) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center pt-20 text-rose-500 px-4 text-center">
+                        <i class="fa-solid fa-file-circle-exclamation text-xl mb-2"></i>
+                        <p class="font-bold text-xs uppercase tracking-wide">Arquivo da Bíblia não Encontrado</p>
+                        <p class="text-[11px] text-slate-400 dark:text-zinc-500 mt-1 font-medium leading-normal">
+                            Certifique-se de que o arquivo 'biblia.json' está na raiz do seu site.
+                        </p>
+                    </div>`;
+                return;
+            }
+
+            // Junta os livros do Antigo e Novo Testamento do seu arquivo JSON
+            const todosLivros = [...(biblia.antigoTestamento || []), ...(biblia.novoTestamento || [])];
+            
+            // Busca o livro selecionado
+            const livroEncontrado = todosLivros.find(l => l.nome.toLowerCase() === livroNome.toLowerCase());
+
+            if (!livroEncontrado) {
+                container.innerHTML = `<p class="text-slate-400 dark:text-zinc-500 italic text-center pt-24 font-medium">Livro não localizado no arquivo.</p>`;
+                return;
+            }
+
+            // Busca o capítulo selecionado
+            const capituloEncontrado = livroEncontrado.capitulos.find(c => c.capitulo === capNum);
+
+            if (capituloEncontrado && capituloEncontrado.versiculos.length > 0) {
+                container.innerHTML = "";
+                capituloEncontrado.versiculos.forEach(v => {
+                    container.innerHTML += `
+                        <div class="flex items-start gap-3 p-1.5 rounded-lg hover:bg-slate-200/40 dark:hover:bg-zinc-800/40 transition-all">
+                            <span class="bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400 text-[10px] font-black h-5 w-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 shadow-xs border border-amber-200/30">
+                                ${v.versiculo}
+                            </span>
+                            <p class="text-slate-700 dark:text-zinc-300 font-medium text-justify">
+                                ${v.texto}
+                            </p>
+                        </div>`;
+                });
+                container.scrollTop = 0;
+            } else {
+                container.innerHTML = `
+                    <p class="text-slate-400 dark:text-zinc-500 italic text-center pt-24 font-medium">
+                        O capítulo ${capNum} deste livro ainda não está disponível no arquivo.
+                    </p>`;
+            }
+        }
+
+        selectLivro.addEventListener('change', buscarTextoBiblia);
+        inputCapitulo.addEventListener('input', () => {
+            if(inputCapitulo.value > 0) buscarTextoBiblia();
+        });
+
+        buscarTextoBiblia();
+    }
+
+    window.switchTab = function(tabName) {
+        document.getElementById('conteudo-escala').className = tabName === 'escala' ? 'space-y-6 block md:col-span-2' : 'space-y-6 hidden md:col-span-2';
+        document.getElementById('conteudo-avisos').className = tabName === 'avisos' ? 'space-y-4 block w-full' : 'space-y-4 hidden md:block w-full';
+        document.getElementById('conteudo-conteudos').className = tabName === 'conteudos' ? 'space-y-4 block w-full' : 'space-y-4 hidden md:block w-full';
+        document.getElementById('conteudo-liturgia').className = tabName === 'liturgia' ? 'space-y-4 block w-full' : 'space-y-4 hidden md:block w-full';
+        
+        const tabs = ['escala', 'avisos', 'conteudos', 'liturgia'];
+        tabs.forEach(t => {
+            const el = document.getElementById(`tab-${t}`);
+            if(el) {
+                if(t === tabName) el.className = 'active-tab flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400';
+                else el.className = 'text-gray-500 flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer dark:text-zinc-500';
+            }
+        });
+    }
+</script>
+</body>
+</html>
