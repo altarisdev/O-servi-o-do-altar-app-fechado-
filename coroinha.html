@@ -115,7 +115,10 @@
         <button id="tab-liturgia" onclick="switchTab('liturgia')" class="flex-1 py-3.5 text-center text-xs flex flex-col items-center gap-1.5 cursor-pointer text-slate-500 dark:text-zinc-400">
             <i class="fa-solid fa-scroll text-sm"></i> <span>Liturgia</span>
         </button>
-        <button id="tab-oracoes" onclick="window.switchTab('oracoes')">Orações</button>
+        <button id="tab-oracoes" onclick="window.switchTab('oracoes'); carregarOracoes();" class="...">
+    <!-- Ícone se houver -->
+    <span>Orações</span>
+</button>
     </nav>
 
     <main class="max-w-6xl w-full mx-auto p-4 md:p-6 flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 z-10 relative items-start">
@@ -225,12 +228,6 @@
                                 Buscando os textos litúrgicos da mesa da Palavra...
                             </div>
                         </div>
-                        <div id="conteudo-oracoes" class="hidden space-y-4 block w-full">
-    <div class="px-2 py-4 max-w-4xl mx-auto">
-        <h2 class="text-xl font-bold text-amber-600 dark:text-amber-400 mb-4 text-center">Orações Tradicionais</h2>
-        <div id="oracoes-container"></div>
-    </div>
-</div>
 
                         <div class="border-t border-slate-100 dark:border-zinc-800/60 pt-4 space-y-3">
                             <span class="block text-[10px] font-black text-amber-700 dark:text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
@@ -316,7 +313,16 @@
                     </div>
                 </div>
             </div>
-            
+            <div id="conteudo-oracoes" class="hidden space-y-4 block w-full">
+  <div class="px-2 py-4 max-w-4xl mx-auto">
+    <h2 class="text-xl font-bold text-amber-600 dark:text-amber-400 mb-4 text-center">
+      Orações Tradicionais
+    </h2>
+    
+    <!-- É AQUI QUE O JAVASCRIPT Vai INJETAR OS CARDS -->
+    <div id="oracoes-container"></div>
+  </div>
+            </div>
         </div>
     </main>
 
