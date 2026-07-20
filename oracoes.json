@@ -1,0 +1,42 @@
+{
+  "oracoes": [
+    {
+      "id": "pai-nosso",
+      "nome_universal": "Lord's Prayer / Pater Noster",
+      "idiomas": {
+        "pt": {
+          "titulo": "Pai Nosso",
+          "texto": "Pai nosso, que estais nos céus, santificado seja o vosso nome. Venha a nós o vosso reino, seja feita a vossa vontade, assim na terra como no céu. O pão nosso de cada dia nos dai hoje. Perdoai-nos as nossas ofensas, assim como nós perdoamos a quem nos tem ofendido. E não nos deixeis cair em tentação, mas livrai-nos do mal. Amém."
+        },
+        "la": {
+          "titulo": "Pater Noster",
+          "texto": "Pater noster, qui es in caelis, sanctificetur nomen tuum. Adveniat regnum tuum. Fiat voluntas tua, sicut in caelo et in terra. Panem nostrum cotidianum da nobis hodie. Et dimitte nobis debita nostra, sicut et nos dimittimus debitoribus nostris. Et ne nos inducas in tentationem, sed libera nos a malo. Amen."
+        },
+        "arc": {
+          "titulo": "Abwūn d'bwashmayā",
+          "texto": "Abwūn d'bwashmayā, Nethqādash shmākh. Têtē malkūthākh. Nehwē tsebhyānākh, aykānā d'bwashmayā āph b'ar'ā. Habhlān lahmā d'sunqānān yaumānā. Washbūqlān hwbhayn wahtāhayn, aykānā d'āph hnan shbhaqn l'hayābhayn. Welā ta'lān l'nesyōnā, elā patsān min bīshā. Mettul d'dhīlākh hī malkūthā, w'haylā, w'teshbuhtā, l'ālam ālmīn. Amēn.",
+          "nota": "Versão siríaca ocidental tradicional/maronita em transliteração fonética latino-ocidental."
+        }
+      }
+    },
+    {
+      "id": "ave-maria",
+      "nome_universal": "Hail Mary / Ave Maria",
+      "idiomas": {
+        "pt": {
+          "titulo": "Ave Maria",
+          "texto": "Ave Maria, cheia de graça, o Senhor é convosco. Bendita sois vós entre as mulheres e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós, pecadores, agora e na hora da nossa morte. Amém."
+        },
+        "la": {
+          "titulo": "Ave Maria",
+          "texto": "Ave Maria, gratia plena, Dominus tecum. Benedicta tu in mulieribus, et benedictus fructus ventris tui, Iesus. Sancta Maria, Mater Dei, ora pro nobis peccatoribus, nunc et in hora mortis nostrae. Amen."
+        },
+        "arc": {
+          "titulo": "Shlām lêkh Maryam",
+          "texto": "Shlām lêkh Maryam, mlyath taybūthā, māran 'amêkh. Mbarakhtā at b'neshē, w'mbārakhū phīrā d'karsēkh Yeshū'. Qadīshā Maryam, emēh d'Alāhā, ethray s'lōthā h'lāphayn nahnā hatāyē, hāshā w'b'shā'thā d'mauthān. Amēn.",
+          "nota": "Versão litúrgica siríaca oriental/ocidental em transliteração fonética latino-ocidental."
+        }
+      }
+    }
+  ]
+}
