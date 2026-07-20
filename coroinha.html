@@ -1076,7 +1076,7 @@
             if (bibliaDataCache) return bibliaDataCache;
             try {
                 // Caso tenha salvado o json como biblia.json no mesmo diretório:
-                const res = await fetch('./biblia.json'); 
+                const res = await fetch('biblia.json'); 
                 bibliaDataCache = await res.json();
                 return bibliaDataCache;
             } catch (err) {
