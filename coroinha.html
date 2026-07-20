@@ -1166,14 +1166,14 @@
 
         buscarTextoBiblia();
     }
-        // --- SISTEMA DE ORAÇÕES ---
-let oracoesData = null;
+// --- SISTEMA DE ORAÇÕES (GLOBAL) ---
+window.oracoesData = null;
 
-async function carregarOracoes() {
+window.carregarOracoes = async function() {
   const container = document.getElementById('oracoes-container');
   if (!container) return;
 
-  if (!oracoesData) {
+  if (!window.oracoesData) {
     container.innerHTML = `
       <div class="flex flex-col items-center justify-center py-10 text-slate-400">
         <i class="fa-solid fa-circle-notch animate-spin text-2xl text-amber-600"></i>
@@ -1186,28 +1186,28 @@ async function carregarOracoes() {
       if (!res.ok) throw new Error('Erro ao carregar orações');
       
       const json = await res.json();
-      oracoesData = json.oracoes;
+      window.oracoesData = json.oracoes;
     } catch (err) {
       console.error('Erro:', err);
       container.innerHTML = `
         <p class="text-center text-red-500 py-6">
-          Não foi possível carregar as orações. Verifique se o arquivo oracoes.json está na raiz.
+          Não foi possível carregar as orações. Verifique o arquivo JSON.
         </p>
       `;
       return;
     }
   }
 
-  renderizarOracoes('pt');
-}
+  window.renderizarOracoes('pt');
+};
 
-function renderizarOracoes(idiomaPadrao = 'pt') {
+window.renderizarOracoes = function(idiomaPadrao = 'pt') {
   const container = document.getElementById('oracoes-container');
-  if (!container || !oracoesData) return;
+  if (!container || !window.oracoesData) return;
   
   container.innerHTML = '';
 
-  oracoesData.forEach(item => {
+  window.oracoesData.forEach(item => {
     const infoIdioma = item.idiomas[idiomaPadrao] || item.idiomas['pt'];
 
     const card = document.createElement('div');
@@ -1220,15 +1220,15 @@ function renderizarOracoes(idiomaPadrao = 'pt') {
         </h3>
         
         <div class="flex gap-1 text-xs">
-          <button id="btn-${item.id}-pt" onclick="mudarIdiomaOracao('${item.id}', 'pt')" 
+          <button id="btn-${item.id}-pt" onclick="window.mudarIdiomaOracao('${item.id}', 'pt')" 
                   class="btn-lang-${item.id} px-2 py-1 rounded ${idiomaPadrao === 'pt' ? 'bg-amber-600 text-white font-bold' : 'bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300'}">
             PT
           </button>
-          <button id="btn-${item.id}-la" onclick="mudarIdiomaOracao('${item.id}', 'la')" 
+          <button id="btn-${item.id}-la" onclick="window.mudarIdiomaOracao('${item.id}', 'la')" 
                   class="btn-lang-${item.id} px-2 py-1 rounded ${idiomaPadrao === 'la' ? 'bg-amber-600 text-white font-bold' : 'bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300'}">
             LAT
           </button>
-          <button id="btn-${item.id}-arc" onclick="mudarIdiomaOracao('${item.id}', 'arc')" 
+          <button id="btn-${item.id}-arc" onclick="window.mudarIdiomaOracao('${item.id}', 'arc')" 
                   class="btn-lang-${item.id} px-2 py-1 rounded ${idiomaPadrao === 'arc' ? 'bg-amber-600 text-white font-bold' : 'bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300'}">
             ARC
           </button>
@@ -1248,23 +1248,21 @@ function renderizarOracoes(idiomaPadrao = 'pt') {
 
     container.appendChild(card);
   });
-}
+};
 
-function mudarIdiomaOracao(oracaoId, lang) {
-  if (!oracoesData) return;
-  const oracao = oracoesData.find(o => o.id === oracaoId);
+window.mudarIdiomaOracao = function(oracaoId, lang) {
+  if (!window.oracoesData) return;
+  const oracao = window.oracoesData.find(o => o.id === oracaoId);
   if (!oracao || !oracao.idiomas[lang]) return;
 
   const dadosLang = oracao.idiomas[lang];
   
-  // Atualiza título e texto da oração
   const elemTitulo = document.getElementById(`titulo-${oracaoId}`);
   const elemTexto = document.getElementById(`texto-${oracaoId}`);
   
   if (elemTitulo) elemTitulo.innerText = dadosLang.titulo;
   if (elemTexto) elemTexto.innerText = dadosLang.texto;
   
-  // Atualiza a nota de tradução se existir
   const elemNota = document.getElementById(`nota-${oracaoId}`);
   if (elemNota) {
     if (dadosLang.nota) {
@@ -1275,19 +1273,17 @@ function mudarIdiomaOracao(oracaoId, lang) {
     }
   }
 
-  // Reseta o estilo visual de todos os botões do card específico
   const botoes = document.querySelectorAll(`.btn-lang-${oracaoId}`);
   botoes.forEach(btn => {
     btn.className = `btn-lang-${oracaoId} px-2 py-1 rounded bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300`;
   });
 
-  // Destaca apenas o botão ativo clicado
   const btnAtivo = document.getElementById(`btn-${oracaoId}-${lang}`);
   if (btnAtivo) {
     btnAtivo.className = `btn-lang-${oracaoId} px-2 py-1 rounded bg-amber-600 text-white font-bold`;
   }
-}
-
+};
+          
     window.switchTab = function (tabName) {
     document.getElementById('conteudo-escala').className = tabName === 'escala' ? 'space-y-6 block md:col-span-2' : 'hidden';
     document.getElementById('conteudo-avisos').className = tabName === 'avisos' ? 'space-y-4 block w-full' : 'hidden';
