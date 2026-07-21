@@ -37,6 +37,386 @@
           "nota": "Versão litúrgica siríaca oriental/ocidental em transliteração fonética latino-ocidental."
         }
       }
+    },
+    {
+      "id": "gloria-ao-pai",
+      "nome_universal": "Glory Be / Gloria Patri",
+      "idiomas": {
+        "pt": {
+          "titulo": "Glória ao Pai",
+          "texto": "Glória ao Pai e ao Filho e ao Espírito Santo. Como era no princípio, agora e sempre, pelos séculos dos séculos. Amém."
+        },
+        "la": {
+          "titulo": "Gloria Patri",
+          "texto": "Gloria Patri, et Filio, et Spiritui Sancto. Sicut erat in principio, et nunc, et semper, et in saecula saeculorum. Amen."
+        },
+        "arc": {
+          "titulo": "Shubḥā l'Abā w'l'Brā w'l'Rūḥā d'Qudshā",
+          "texto": "Shubḥā l'Abā w'l'Brā w'l'Rūḥā d'Qudshā, min 'ālam w'‘adammā l'‘ālam, w'l'‘ālam ‘ālmīn. Amēn.",
+          "nota": "Doxologia tradicional litúrgica em siríaco/aramaico transliterado."
+        }
+      }
+    },
+    {
+      "id": "credo-apostolos",
+      "nome_universal": "Apostles' Creed / Credo",
+      "idiomas": {
+        "pt": {
+          "titulo": "Creio em Deus Pai",
+          "texto": "Creio em Deus Pai Todo-Poderoso, Criador do céu e da terra; e em Jesus Cristo, seu único Filho, nosso Senhor; que foi concebido pelo poder do Espírito Santo; nasceu da Virgem Maria; padeceu sob Pôncio Pilatos, foi crucificado, morto e sepultado; desceu à mansão dos mortos; ressuscitou ao terceiro dia; subiu aos céus; está sentado à direita de Deus Pai todo-poderoso, onde há de vir a julgar os vivos e os mortos. Creio no Espírito Santo; na santa Igreja Católica; na comunhão dos santos; na remissão dos pecados; na ressurreição da carne; na vida eterna. Amém."
+        },
+        "la": {
+          "titulo": "Credo in Deum",
+          "texto": "Credo in Deum Patrem omnipotentem, Creatorem caeli et terrae. Et in Iesum Christum, Filium eius unicum, Dominum nostrum, qui conceptus est de Spiritu Sancto, natus ex Maria Virgine, passus sub Pontio Pilato, crucifixus, mortuus, et sepultus, descendit ad inferos, tertia die resurrexit a mortuis, ascendit ad caelos, sedet ad dexteram Dei Patris omnipotentis, inde venturus est iudicare vivos et mortuos. Credo in Spiritum Sanctum, sanctam Ecclesiam catholicam, sanctorum communionem, remissionem peccatorum, carnis resurrectionem, vitam aeternam. Amen."
+        },
+        "arc": {
+          "titulo": "Mhaymnīnan b'Ḥadh Alāhā",
+          "texto": "Mhaymnīnan b'ḥadh Alāhā Abā Aḥīd Kūl, 'ābdā d'shmayā w'd'ar'ā, w'd'kūlhēn aynēn d'metḥazyān w'd'lā metḥazyān. W'b'ḥadh Māryā Yeshū' Mshīḥā, Bhrā d'Alāhā Īḥīdāyā, būkrā d'kūlhēn beriyātā. Amēn.",
+          "nota": "Versão do Símbolo da Fé litúrgico das igrejas de tradição aramaica/siríaca."
+        }
+      }
+    },
+    {
+      "id": "santo",
+      "nome_universal": "Holy, Holy, Holy / Sanctus",
+      "idiomas": {
+        "pt": {
+          "titulo": "Santo, Santo, Santo",
+          "texto": "Santo, Santo, Santo, Senhor Deus do Universo! O céu e a terra proclamam a vossa glória. Hosana nas alturas! Bendito o que vem em nome do Senhor! Hosana nas alturas!"
+        },
+        "la": {
+          "titulo": "Sanctus",
+          "texto": "Sanctus, Sanctus, Sanctus Dominus Deus Sabaoth. Pleni sunt caeli et terra gloria tua. Hosanna in excelsis. Benedictus qui venit in nomine Domini. Hosanna in excelsis."
+        },
+        "arc": {
+          "titulo": "Qadīsh, Qadīsh, Qadīsh",
+          "texto": "Qadīsh, Qadīsh, Qadīsh, Māryā Alāhā Ḥayylthānā, mlayēn shmayā w'ar'ā min teshboḥthākh. Ūsha'nā b'mrawmē. Mbarakh d'ātā b'shmêh d'Māryā. Ūsha'nā b'mrawmē.",
+          "nota": "Tradição litúrgica siríaca/aramaica da oração do Sanctus."
+        }
+      }
+    },
+    {
+      "id": "salve-rainha",
+      "nome_universal": "Hail Holy Queen / Salve Regina",
+      "idiomas": {
+        "pt": {
+          "titulo": "Salve Rainha",
+          "texto": "Salve, Rainha, Mãe de misericórdia, vida, doçura e esperança nossa, salve! A vós bradamos, os degredados filhos de Eva. A vós suspiramos, gemendo e chorando neste vale de lágrimas. Eia, pois, advogada nossa, esses vossos olhos misericordiosos a nós volteis, e depois deste desterro, mostrai-nos Jesus, bendito fruto do vosso ventre. Ó clemente, ó piedosa, ó doce sempre Virgem Maria. Rogai por nós, Santa Mãe de Deus, para que sejamos dignos das promessas de Cristo. Amém."
+        },
+        "la": {
+          "titulo": "Salve Regina",
+          "texto": "Salve, Regina, Mater misericordiae, vita, dulcedo, et spes nostra, salve. Ad te clamamus, exsules filii Hevae. Ad te suspiramus, gementes et flentes in hac lacrimarum valle. Eia ergo, advocata nostra, illos tuos misericordes oculos ad nos converte. Et Iesum, benedictum fructum ventris tui, nobis post hoc exsilium ostende. O clemens, o pia, o dulcis Virgo Maria. Ora pro nobis, Sancta Dei Genetrix, ut digni efficiamur promissionibus Christi. Amen."
+        },
+        "arc": {
+          "titulo": "Shlām lêkh Malkthā",
+          "texto": "Shlām lêkh Malkthā, emā d'rahme, ḥayyayn w'swālan, shlām lêkh. Lēkh qārēnan ḥnan bnay Yawā 'ebhdē d'Ḥawwā. Lēkh mettanḥīnan, kad bākhēnan w'mte'nhīnan b'hādhā wādā d'dem'āthā. Eya hākēyl, pāraqlēṭā dīlan, hānnūn 'aynaykh d'raḥmē 'alayn aphon. W'l'Yeshū' phīrā mbarakhā d'karsēkh, bāthar hānā meksānā ḥawwān. Ō mrahmnītā, ō ḥasyā, ō ḥalīthā Maryam. Ethray s'lōthā ḥlāphayn emēh d'Alāhā. Amēn.",
+          "nota": "Transliteração e tradução litúrgica aramaica da antífona marianal."
+        }
+      }
+    },
+    {
+      "id": "anjus-dei",
+      "nome_universal": "Lamb of God / Agnus Dei",
+      "idiomas": {
+        "pt": {
+          "titulo": "Cordeiro de Deus",
+          "texto": "Cordeiro de Deus, que tirais o pecado do mundo, tende piedade de nós. Cordeiro de Deus, que tirais o pecado do mundo, tende piedade de nós. Cordeiro de Deus, que tirais o pecado do mundo, dai-nos a paz."
+        },
+        "la": {
+          "titulo": "Agnus Dei",
+          "texto": "Agnus Dei, qui tollis peccata mundi, miserere nobis. Agnus Dei, qui tollis peccata mundi, miserere nobis. Agnus Dei, qui tollis peccata mundi, dona nobis pacem."
+        },
+        "arc": {
+          "titulo": "Emrēh d'Alāhā",
+          "texto": "Emrēh d'Alāhā, haw d'shāqēl ḥṭīthēh d'‘ālmā, ethraḥam ‘alayn. Emrēh d'Alāhā, haw d'shāqēl ḥṭīthēh d'‘ālmā, ethraḥam ‘alayn. Emrēh d'Alāhā, haw d'shāqēl ḥṭīthēh d'‘ālmā, habhlān shlāmā.",
+          "nota": "Fórmula litúrgica aramaica para a invocação do Cordeiro de Deus."
+        }
+      }
+    },
+    {
+      "id": "sao-miguel-arcanjo",
+      "nome_universal": "Saint Michael Prayer / Sancte Michael Archangele",
+      "idiomas": {
+        "pt": {
+          "titulo": "Oração a São Miguel Arcanjo",
+          "texto": "São Miguel Arcanjo, defendei-nos no combate; sede o nosso refúgio contra as maldades e ciladas do demônio. Ordene-lhe Deus, instantemente o pedimos; e vós, príncipe da milícia celeste, pela virtude divina, precipitai no inferno a Satanás e aos outros espíritos malignos, que vagam pelo mundo para perder as almas. Amém."
+        },
+        "la": {
+          "titulo": "Sancte Michael Archangele",
+          "texto": "Sancte Michael Archangele, defende nos in praelio; contra nequitiam et insidias diaboli esto praesidium. Imperet illi Deus, supplices deprecamur; tuque, Princeps militiae caelestis, Satanam aliosque spiritus malignos, qui ad perditionem animarum pervagantur in mundo, divina virtute in infernum detrude. Amen."
+        },
+        "arc": {
+          "titulo": "Mīkhā’ēl Rēsh Malā’khē",
+          "texto": "Mīkhā’ēl Rēsh Malā’khē Qadīshā, satar lān b’qārbā, hūy lān m’awzā lūqbal bīshūthēh w’ke'dēh d’Sāṭānā. Ne'er’ē beh Alāhā, kad mteḥnanan, w’at rēsh ḥaylā d’shmayā, b’ḥaylā d’Alāhā ṭrūdh l’Sāṭānā w’l’kūl’hūn rūḥē bīshātā l’shyōl. Amēn.",
+          "nota": "Transliteração contemporânea da oração de proteção no estilo litúrgico siríaco."
+        }
+      }
+    },
+    {
+      "id": "oracao-santo-anjo",
+      "nome_universal": "Guardian Angel Prayer / Angele Dei",
+      "idiomas": {
+        "pt": {
+          "titulo": "Santo Anjo do Senhor",
+          "texto": "Santo Anjo do Senhor, meu zeloso guardador, se a ti me confiou a piedade divina, sempre me rege, me guarda, me governa e me ilumina. Amém."
+        },
+        "la": {
+          "titulo": "Angele Dei",
+          "texto": "Angele Dei, qui custos es mei, me, tibi commissum pietate superna, illumina, custodi, rege et guberna. Amen."
+        },
+        "arc": {
+          "titulo": "Mal’ākhēh d’Alāhā",
+          "texto": "Mal’ākhēh d’Alāhā, nāṭr dīlī, haw d’ethchīlth lēh b’raḥmē mraymē: tanhar lī, ṭar lī, dabr lī w’nahē lī. Amēn.",
+          "nota": "Tradução poética tradicional ao aramaico litúrgico sobre os anjos da guarda."
+        }
+      }
+    },
+    {
+      "id": "vinde-espirito-santo",
+      "nome_universal": "Come Holy Spirit / Veni Sancte Spiritus",
+      "idiomas": {
+        "pt": {
+          "titulo": "Vinde Espírito Santo",
+          "texto": "Vinde, Espírito Santo, enchei os corações dos vossos fiéis e acendei neles o fogo do vosso amor. Enviai o vosso Espírito e tudo será criado, e renovareis a face da terra. Ó Deus, que instruístes os corações dos vossos fiéis com a luz do Espírito Santo, fazei que apreciemos retamente todas as coisas segundo o mesmo Espírito e gozemos sempre da sua consolação. Por Cristo, Senhor Nosso. Amém."
+        },
+        "la": {
+          "titulo": "Veni Sancte Spiritus",
+          "texto": "Veni, Sancte Spiritus, reple tuorum corda fidelium: et tui amoris in eis ignem accende. Emitte Spiritum tuum et creabuntur, et renovabis faciem terrae. Deus, qui corda fidelium Sancti Spiritus illustratione docuisti, da nobis in eodem Spiritu recta sapere; et de eius semper consolatione gaudere. Per Christum Dominum nostrum. Amen."
+        },
+        "arc": {
+          "titulo": "Tā Rūḥā d'Qudshā",
+          "texto": "Tā, Rūḥā d'Qudshā, mla lebbawātā d'mhaymnaykh, w'adleq b'hōn nūrā d'ḥubbākh. Shadadh Rūḥākh w'metbrēn, w'mḥadeth at apay ar'ā. Amēn.",
+          "nota": "Invocação do Espírito Santo em aramaico cristão oriental."
+        }
+      }
+    },
+    {
+      "id": "magnificat",
+      "nome_universal": "Magnificat / Canticle of Mary",
+      "idiomas": {
+        "pt": {
+          "titulo": "Magnificat (Alembra-me o Senhor)",
+          "texto": "A minha alma engrandece ao Senhor, e o meu espírito se alegra em Deus meu Salvador; porque olhou para a humilde condição da sua serva; pois eis que desde agora todas as gerações me chamarão bem-aventurada. Porque o Poderoso me fez grandes coisas; e santo é o seu nome."
+        },
+        "la": {
+          "titulo": "Magnificat",
+          "texto": "Magnificat anima mea Dominum, et exsultavit spiritus meus in Deo salvatore meo. Quia respexit humilitatem ancillae suae; ecce enim ex hoc beatam me dicent omnes generationes. Quia fecit mihi magna, qui potens est, et sanctum nomen eius."
+        },
+        "arc": {
+          "titulo": "Mawrbā nafshī l'Māryā",
+          "texto": "Mawrbā nafshī l'Māryā, w'ḥdāth rūḥī b'Alāhā Māḥyānī. D'ḥār b'mūkākā d'amthēh, hā gēyr min hāshā ṭūbhā nehtelān kūlhōn sharbāthā. D'‘ābd lēwāthī rawrbātā haw d’ḥayylthānā, w’qadīsh shmēh.",
+          "nota": "Cântico de Maria em Lucas 1:46-49 segundo a Peshitta siríaca/aramaica."
+        }
+      }
+    },
+    {
+      "id": "benedictus",
+      "nome_universal": "Benedictus / Canticle of Zechariah",
+      "idiomas": {
+        "pt": {
+          "titulo": "Cântico de Zacarias",
+          "texto": "Bendito seja o Senhor, Deus de Israel, porque visitou e remiu o seu povo, e nos suscitou uma força de salvação na casa de Davi, seu servo, como havia prometido pela boca dos seus santos profetas, desde os tempos antigos."
+        },
+        "la": {
+          "titulo": "Benedictus",
+          "texto": "Benedictus Dominus Deus Israel, quia visitavit et fecit redemptionem plebi suae, et erexit cornu salutis nobis in domo David pueri sui, sicut locutus est per os sanctorum, qui a saeculo sunt, prophetarum eius."
+        },
+        "arc": {
+          "titulo": "Mbarakhū Māryā Alāhā d'Īsrā’ēl",
+          "texto": "Mbarakhū Māryā Alāhā d'Īsrā’ēl, d’s'‘ar w’‘ābd fūrqānā l’amēh. W’aqīm lān qarnā d’fūrqānā b’baythēh d’Dāwīdh ‘abdēh. Aykānā d’mallel b’fūmā d’nabīyaw qadīshē d’min ‘ālam.",
+          "nota": "Cântico de Zacarias (Lucas 1:68-70) transliterado do texto aramaico da Peshitta."
+        }
+      }
+    },
+    {
+      "id": "nunc-dimittis",
+      "nome_universal": "Nunc Dimittis / Canticle of Simeon",
+      "idiomas": {
+        "pt": {
+          "titulo": "Cântico de Simeão",
+          "texto": "Agora, Senhor, despedis em paz o vosso servo, segundo a vossa palavra; porque os meus olhos viram a vossa salvação, a qual preparastes ante a face de todos os povos; luz para iluminar as nações e glória do vosso povo de Israel."
+        },
+        "la": {
+          "titulo": "Nunc Dimittis",
+          "texto": "Nunc dimittis servum tuum, Domine, secundum verbum tuum in pace: Quia viderunt oculi mei salutare tuum quod parasti ante faciem omnium populorum: Lumen ad revelationem gentium, et gloriam plebis tuae Israel."
+        },
+        "arc": {
+          "titulo": "Hāshā shārē at l’‘abdākh Māryā",
+          "texto": "Hāshā shārē at l’‘abdākh Māryā b’shlāmā ayk d’amart, d’hā ḥzāy ‘aynay ḥnānākh haw d’tayebht b’qādhām kūlhōn 'ammē. Nūhrā l’glyānā d’'ammē w’teshboḥtā l’amākh Īsrā’ēl.",
+          "nota": "Cântico de Simeão em Lucas 2:29-32 extraído da tradição bíblica siríaca."
+        }
+      }
+    },
+    {
+      "id": "ato-de-contricao",
+      "nome_universal": "Act of Contrition / Actus Contritionis",
+      "idiomas": {
+        "pt": {
+          "titulo": "Ato de Contrição",
+          "texto": "Meu Deus, eu me arrependo de todo o coração de vos ter ofendido, porque sois infinitamente bom e digno de ser amado sobre todas as coisas. Proponho firmemente, com a ajuda da vossa graça, não mais pecar e fugir das ocasiões de pecado. Amém."
+        },
+        "la": {
+          "titulo": "Actus Contritionis",
+          "texto": "Deus meus, ex toto corde me poenitet omnium meorum peccatorum, eaque detestor, quia peccando non solum poenas a te iuste statutas promeritus sum, sed praesertim quia offendi Te, summum bonum, ac dignum qui super omnia ameris. Firmiter propono, adiuvante gratia tua, de cetero me non peccaturum peccandique occasiones proximas fugiturum. Amen."
+        },
+        "arc": {
+          "titulo": "Alāhy, tawēdh 'al ḥṭāhay",
+          "texto": "Alāhy, tawēdh 'al kūlhōn ḥṭāhay min kūlēh lebbī, mettul d’mārā ṭābhā at w’shāvē d’ḥubbā 'al kūl meddem. Metqayam 'alay b’ḥaylā d’taybūthākh d’lā 'ūdh eḥṭē, w’ereḥaq min kūl 'ellthā d’ḥṭīthā. Amēn.",
+          "nota": "Fórmula penitencial traduzida para o aramaico litúrgico."
+        }
+      }
+    },
+    {
+      "id": "alma-de-cristo",
+      "nome_universal": "Soul of Christ / Anima Christi",
+      "idiomas": {
+        "pt": {
+          "titulo": "Alma de Cristo",
+          "texto": "Alma de Cristo, santificai-me. Corpo de Cristo, salvai-me. Sangue de Cristo, inebriai-me. Água do lado de Cristo, lavai-me. Paixão de Cristo, confortai-me. Ó bom Jesus, ouvi-me. Dentro de vossas chagas, escondei-me. Não me permiteis separar de vós. Do inimigo maligno, defendei-me. Na hora da minha morte, chamai-me. E mandai-me ir para vós, para que vos louve com os vossos santos, pelos séculos dos séculos. Amém."
+        },
+        "la": {
+          "titulo": "Anima Christi",
+          "texto": "Anima Christi, sanctifica me. Corpus Christi, salva me. Sanguis Christi, inebria me. Aqua lateris Christi, lava me. Passio Christi, conforta me. O bone Iesu, exaudi me. Intra tua vulnera absconde me. Ne permittas me separari a te. Ab hoste maligno defende me. In hora mortis meae voca me. Et iube me venire ad te, ut cum Sanctis tuis laudem te in saecula saeculorum. Amen."
+        },
+        "arc": {
+          "titulo": "Rūḥēh d'Mshīḥā",
+          "texto": "Rūḥēh d'Mshīḥā, qadashayn. Fgarēh d'Mshīḥā, fūrqan. D'meh d'Mshīḥā, arwayn. Māyā d'min estēh d'Mshīḥā, aṣgayn. Ḥashēh d'Mshīḥā, ḥayylayn. Ō ṭābha Yeshū', shma'ayn. B'shawḥāthākh ṭashayn. Amēn.",
+          "nota": "Transliterativo devocional aramaico medieval adaptado."
+        }
+      }
+    },
+    {
+      "id": "oracao-sao-francisco",
+      "nome_universal": "Prayer of St. Francis / Oratio Sancti Francisci",
+      "idiomas": {
+        "pt": {
+          "titulo": "Oração de São Francisco",
+          "texto": "Senhor, fazei-me instrumento de vossa paz. Onde houver ódio, que eu leve o amor; onde houver ofensa, que eu leve o perdão; onde houver discórdia, que eu leve a união; onde houver dúvida, que eu leve a fé; onde houver erro, que eu leve a verdade; onde houver desespero, que eu leve a esperança; onde houver tristeza, que eu leve a alegria; onde houver trevas, que eu leve a luz."
+        },
+        "la": {
+          "titulo": "Oratio Sancti Francisci",
+          "texto": "Domine, fac me instrumentum pacis tuae. Ubi est odium, fac ut seram amorem; ubi est iniuria, veniam; ubi est discordia, unionem; ubi est dubium, fidem; ubi est error, veritatem; ubi est desperatio, spem; ubi est tristitia, laetitiam; ubi sunt tenebrae, lucem."
+        },
+        "arc": {
+          "titulo": "Māryā, ‘bhedayn māne d'shlāmākh",
+          "texto": "Māryā, ‘bhedayn māne d'shlāmākh. Aykā d’īth sen’ētā, eazra' ḥubbā; aykā d’īth sekhlūthā, shubh qānā; aykā d’īth pelgūthā, ḥdāyūthā; aykā d’īth pūshāqā, haymānūthā; aykā d’īth ḥeshōkhā, nūhrā. Amēn.",
+          "nota": "Oração moderna atribuída a São Francisco em siríaco/aramaico ocidental."
+        }
+      }
+    },
+    {
+      "id": "sub-tuum-praesidium",
+      "nome_universal": "Under Thy Protection / Sub Tuum Praesidium",
+      "idiomas": {
+        "pt": {
+          "titulo": "À vossa proteção",
+          "texto": "À vossa proteção recorremos, Santa Mãe de Deus; não desprezeis as nossas súplicas em nossas necessidades, mas livrai-nos sempre de todos os perigos, ó Virgem gloriosa e bendita. Amém."
+        },
+        "la": {
+          "titulo": "Sub Tuum Praesidium",
+          "texto": "Sub tuum praesidium confugimus, Sancta Dei Genetrix. Nostras deprecationes ne despicias in necessitatibus, sed a periculis omnibus libera nos semper, Virgo gloriosa et benedicta. Amen."
+        },
+        "arc": {
+          "titulo": "B'settārā d'raḥmaykh",
+          "texto": "B'settārā d'raḥmaykh mthewsnan, Qadīshāt Alāhā Emēh. B’bā me'wāthān b'sewnān lā teshṭēn, elā min kūlhēn qēnḏēnos patsān b'kūlznan, Bethūltā mshabaḥtā w'mbarakhtā. Amēn.",
+          "nota": "A mais antiga oração mariana documentada em manuscritos siríacos do século III/IV."
+        }
+      }
+    },
+    {
+      "id": "lembrai-vos",
+      "nome_universal": "Memorare / Remember, O Most Gracious Virgin",
+      "idiomas": {
+        "pt": {
+          "titulo": "Lembrai-vos (Memorare)",
+          "texto": "Lembrai-vos, ó piíssima Virgem Maria, que nunca se ouviu dizer que algum daqueles que recorreram à vossa proteção, imploraram a vossa assistência e pediram o vosso socorro, fosse por vós desamparado. Animado, pois, com igual confiança, a vós, Virgem das virgens, como a Mãe recorro; de vós me aproximo e, gemendo sob o peso dos meus pecados, me prostro aos vossos pés."
+        },
+        "la": {
+          "titulo": "Memorare",
+          "texto": "Memorare, o piissima Virgo Maria, a saeculo non esse auditum quemquam ad tua currentem praesidia, tua implorantem auxilia, tua petentem suffragia, esse derelictum. Ego tali animatus confidentia, ad te, Virgo Virginum, Mater, curro, ad te venio, coram te gemens peccator assisto."
+        },
+        "arc": {
+          "titulo": "Etdhakhar, ō Bethūltā Maryam",
+          "texto": "Etdhakhar, ō mrahmnītā Bethūltā Maryam, d’lā methshema’ min ‘ālam d’anāsh d’ethgawwar b’settārākh, w'b'‘edhdrānākh ethkashaph, w'eshtbaq minēkh. B’sebrā hānā ātē-nā lēkh, ō Emā d'Alāhā. Amēn.",
+          "nota": "Tradução adaptada da oração atribuída a São Bernardo de Claraval."
+        }
+      }
+    },
+    {
+      "id": "oracao-trisagion",
+      "nome_universal": "Trisagion / Thrice Holy",
+      "idiomas": {
+        "pt": {
+          "titulo": "Triságio",
+          "texto": "Santo Deus, Santo Forte, Santo Imortal, tende piedade de nós."
+        },
+        "la": {
+          "titulo": "Trisagion",
+          "texto": "Sanctus Deus, Sanctus Fortis, Sanctus Immortalis, miserere nobis."
+        },
+        "arc": {
+          "titulo": "Qadīshāt Alāhā",
+          "texto": "Qadīshāt Alāhā, Qadīshāt Ḥayylthānā, Qadīshāt Lā-Māyōthā, d’estlebht ḥlāphayn, ethraḥam ‘alayn.",
+          "nota": "Invocação litúrgica original em aramaico/siríaco usada na Anáfora Oriental."
+        }
+      }
+    },
+    {
+      "id": "regina-caeli",
+      "nome_universal": "Regina Caeli / Queen of Heaven",
+      "idiomas": {
+        "pt": {
+          "titulo": "Rainha do Céu",
+          "texto": "Rainha do Céu, alegrai-vos, aleluia. Porque Aquele que merecestes trazer em vosso ventre, aleluia. Ressuscitou como disse, aleluia. Rogai a Deus por nós, aleluia."
+        },
+        "la": {
+          "titulo": "Regina Caeli",
+          "texto": "Regina caeli, laetare, alleluia. Quia quem meruisti portare, alleluia. Resurrexit, sicut dixit, alleluia. Ora pro nobis Deum, alleluia."
+        },
+        "arc": {
+          "titulo": "Malkthā d’Shmayā",
+          "texto": "Malkthā d’shmayā, ḥdhāy, Halelūyā. Metṭul haw d’eshwāyt d’te'anēn, Halelūyā. Qām ayk d’āmār, Halelūyā. Ethray ḥlāphayn l’Alāhā, Halelūyā.",
+          "nota": "Tradução litúrgica pascoal para o aramaico oriental."
+        }
+      }
+    },
+    {
+      "id": "angelus",
+      "nome_universal": "The Angelus",
+      "idiomas": {
+        "pt": {
+          "titulo": "Ângelus",
+          "texto": "O Anjo do Senhor anunciou a Maria. E ela concebeu do Espírito Santo. Eis aqui a serva do Senhor. Faça-se em mim segundo a vossa palavra. E o Verbo se fez carne. E habitou entre nós."
+        },
+        "la": {
+          "titulo": "Angelus Domini",
+          "texto": "Angelus Domini nuntiavit Mariae. Et concepit de Spiritu Sancto. Ecce ancilla Domini. Fiat mihi secundum verbum tuum. Et Verbum caro factum est. Et habitavit in nobis."
+        },
+        "arc": {
+          "titulo": "Mal’ākhēh d’Māryā",
+          "texto": "Mal’ākhēh d’Māryā sabbar l’Maryam. W'baṭnath min Rūḥā d'Qudshā. Hā 'amthēh d'Māryā. Nehwē lī ayk mēlthākh. W'Mēlthā fgarā hwā. W’agēn bīnān.",
+          "nota": "Formulação em siríaco/aramaico baseada nas passagens da Anunciação na Peshitta."
+        }
+      }
+    },
+    {
+      "id": "benedicao-aaronica",
+      "nome_universal": "Priestly Blessing / Aaron's Blessing",
+      "idiomas": {
+        "pt": {
+          "titulo": "Bênção Aarônica",
+          "texto": "O Senhor te abençoe e te guarde; o Senhor faça resplandecer o seu rosto sobre ti e tenha misericórdia de ti; o Senhor sobre ti levante o seu rosto e te dê a paz."
+        },
+        "la": {
+          "titulo": "Benedictio Aaronica",
+          "texto": "Benedicat tibi Dominus et custodiat te; ostendat faciem suam tibi et misereatur tui; convertat vultum suum ad te et det tibi pacem."
+        },
+        "arc": {
+          "titulo": "Nbhārkhākh Māryā w’neṭrāk",
+          "texto": "Nbhārkhākh Māryā w’neṭrākh. Nanhēr Māryā apawayk 'alayk w’neḥnāk. Nessā Māryā apawayk 'alayk w’neseym lāk shlāmā.",
+          "nota": "Números 6:24-26 transliterado diretamente do texto aramaico/mosaico."
+        }
+      }
     }
   ]
 }
