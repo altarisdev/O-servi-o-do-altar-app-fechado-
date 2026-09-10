@@ -675,7 +675,7 @@
 
       cacheTodosUsuarios.filter(u => {
         const f = (u.funcao || '').toLowerCase();
-        return f !== "coordenador" && f !== "mestre";
+        return f !== "coordenador" && f !== "mestre" && f !== "responsavel" && f !== "desenvolvedor";
       }).forEach(c => {
         if(!mapaPresencaAtual[c.nome]) mapaPresencaAtual[c.nome] = "presente";
       });
