@@ -674,7 +674,7 @@
       if(!horarioReuniao) return alert("Por favor, selecione um horário válido!");
 
       cacheTodosUsuarios.filter(u => {
-        const f = (u.funcao || '').toLowerCase();
+        const f = (u.funcao || 'Coroinha').toLowerCase();
         return f !== "coordenador" && f !== "mestre" && f !== "responsavel" && f !== "Responsavel" && f !== "desenvolvedor";
       }).forEach(c => {
         if(!mapaPresencaAtual[c.nome]) mapaPresencaAtual[c.nome] = "presente";
