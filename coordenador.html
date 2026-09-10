@@ -167,10 +167,16 @@
             <label class="block text-[10px] font-bold text-red-900 dark:text-amber-600 uppercase mb-1">Título da Celebração</label>
             <input type="text" id="add-manual-titulo" required placeholder="Ex: Missa Solene de Corpus Christi" class="w-full bg-white dark:bg-zinc-950 border border-red-900/20 dark:border-zinc-800 rounded-xl p-2.5 text-xs font-medium focus:outline-red-700 dark:text-white">
           </div>
-          <div class="w-full sm:w-36">
-            <label class="block text-[10px] font-bold text-red-900 dark:text-amber-600 uppercase mb-1">Horário</label>
-            <input type="time" id="add-manual-horario" required class="w-full bg-white dark:bg-zinc-950 border border-red-900/20 dark:border-zinc-800 rounded-xl p-2.5 text-xs font-bold focus:outline-red-700 dark:text-white">
-          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 border-b dark:border-zinc-800 pb-2.5">
+  <div>
+    <label class="text-[9px] text-zinc-400 font-bold uppercase block mb-0.5">Horário</label>
+    <input type="time" id="edit-horario-${idDoc}" value="${d.horario}" class="w-full border dark:border-zinc-800 p-1.5 bg-zinc-50 dark:bg-zinc-950 rounded-xl text-xs font-bold text-red-950 dark:text-amber-500 focus:outline-red-700">
+  </div>
+  <div>
+    <label class="text-[9px] text-zinc-400 font-bold uppercase block mb-0.5">Título da Celebração</label>
+    <input type="text" id="edit-titulo-${idDoc}" value="${d.titulo}" class="w-full border dark:border-zinc-800 p-1.5 bg-zinc-50 dark:bg-zinc-950 rounded-xl text-xs font-bold text-red-900 dark:text-amber-500 focus:outline-red-700">
+  </div>
+</div>
           <button type="submit" class="bg-gradient-to-r from-red-800 to-red-900 hover:from-red-900 hover:to-zinc-950 text-white font-bold text-xs px-5 py-3 rounded-xl whitespace-nowrap cursor-pointer w-full sm:w-auto shadow-md border border-red-700/30 transition-all">Criar Escala</button>
         </form>
       </div>
