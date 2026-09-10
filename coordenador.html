@@ -576,8 +576,8 @@
         const ehAdministrador = funcLimpa === "coordenador" || funcLimpa === "mestre" || funcLimpa === "Responsavel" || funcLimpa === "responsavel";
         
         let badgeTipo = ehAdministrador 
-          ? `<span class="bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-400 font-black px-2.5 py-0.5 rounded-lg border border-purple-200 dark:border-purple-800/40 text-[10px]">Coordenação</span>`
-          : `<span class="bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 font-black px-2.5 py-0.5 rounded-lg border border-emerald-200 dark:border-emerald-800/40 text-[10px]">Oficial</span>`;
+          ? `<span class="bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-400 font-black px-2.5 py-0.5 rounded-lg border border-purple-200 dark:border-purple-800/40 text-[10px]">Responsável</span>`
+          : `<span class="bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 font-black px-2.5 py-0.5 rounded-lg border border-emerald-200 dark:border-emerald-800/40 text-[10px]">Coroinha</span>`;
         
         let colunaConexao = u.email_conexao 
           ? `<span class="text-blue-700 dark:text-blue-400 font-bold text-[11px] bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 rounded-lg border border-blue-200 dark:border-blue-900/30">Irmão de: ${u.email_conexao}</span>`
